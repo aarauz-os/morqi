@@ -786,7 +786,7 @@ const KIND = {
   'metal-c':{ n:'Bell Knight',       beh:'blades', hp:1,   sp:.85, short:'Throws a fan of spinning blades', tip:'It flashes, then throws a fan of spinning blades. Move sideways between them.' }
 };
 Object.keys(KIND).forEach(k => load('e-' + k, `art4/e-${k}.png?v=6`));
-['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart'].forEach(n => load(n, `art4/props/${n}.png?v=6`));
+['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=6`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=6'), texM = load('tm', 'art4/t-meadow.jpg?v=6');
 const ok = i => i && i.complete && i.naturalWidth > 0;
 
@@ -1359,7 +1359,7 @@ function startRun() {
     p:{ x:WORLD / 2, y:WORLD / 2, hp:220, max:220, face:1, hurt:0, r:26, mx:0, my:0 },
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0, z:0 },
     ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null,
-    en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[],
+    en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
     lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
@@ -1513,7 +1513,7 @@ function hurt(e, dmg, el, o = {}) {
   if (e.hp <= 0) kill(e);
 }
 function kill(e) {
-  e.dead = true; S.thawed++; if (S.ult && !S.ult.cast) S.ult.charge = Math.min(1, S.ult.charge + 1 / 400);
+  e.dead = true; S.thawed++; shrineKill(e); if (S.ult && !S.ult.cast) S.ult.charge = Math.min(1, S.ult.charge + 1 / 400);
   if (!e.boss) {
     // bursts, not an endless combo (playtest 1: kills never stop, so the counter climbed to x1998 and meant nothing, and
     // it chimed every 5 kills): a word and one chime when you clear 25, 50 or 100 creatures inside 3 seconds
@@ -2200,6 +2200,49 @@ function direct(dt) {
 // the Warden hunts you and rotates four attacks, each shown on the ground first: a charge along a red lane, ice spikes under your
 // feet, a spiral of shards and a stomp. In its last phase it is enraged and faster. Hearts appear in the arena to fight over.
 const PATTERNS = ['charge', 'spikes', 'spiral', 'stomp'];
+/* ================= element healing shrines ================= */
+// Demaris' idea from playtest one ("I want a definite way to go get my life up … but I gotta go get that"): clear enough
+// creatures of one element and a shrine of that element rises nearby. Stand in it to heal, up to a third of your health.
+// The catch: the element the shrine feeds is drawn to it (fire feeds earth, so earth crowds a fire shrine), and you fight
+// your way in with the element that beats them. Numbers on the 3-6-9 rhythm: 66 kills, every 54 s at most, 27 s of life,
+// a third of your health, healed at a ninth a second, nine creatures drawn to it as it rises.
+const SHRINE = { at:66, every:54, life:27, r:95,
+  name:{ wood:'Healing Tree', fire:'Warming Hearth', earth:'Mineral Spring', metal:'Clearing Wind', water:'Spirit Geyser' } };
+function shrineKill(e) {
+  if (e.boss || !S.shrines) return; const k = (S.elKills[e.el] = (S.elKills[e.el] || 0) + 1);
+  if (k >= SHRINE.at && S.t - (S.shrineAt ?? -99) >= SHRINE.every && S.shrines.length < 2) { S.elKills[e.el] = 0; S.shrineAt = S.t; raiseShrine(e.el); }
+}
+function raiseShrine(el) {
+  const P = S.p, A = S.arena; let x = P.x, y = P.y;
+  for (let tries = 0; tries < 12; tries++) {
+    const a = rnd(0, TAU), d = A ? rnd(.35, .7) * A.r : rnd(360, 540);
+    x = (A ? A.x : P.x) + Math.cos(a) * d; y = (A ? A.y : P.y) + Math.sin(a) * d;
+    if (x > 140 && x < WORLD - 140 && y > 140 && y < WORLD - 140 && (A || Math.hypot(x - P.x, y - P.y) > 300)) break;
+  }
+  x = clamp(x, 140, WORLD - 140); y = clamp(y, 140, WORLD - 140);
+  // the fed element swarms it; on a level with its own short list of elements (Level 1 only brings the two you beat),
+  // the swarm comes from that list instead, so a shrine never sneaks in an element the level is keeping back
+  const pool = LV().els, fed = !pool || pool.includes(FEEDS[el]) ? FEEDS[el] : pool.find(x => x !== el) || pool[0];
+  const sh = { el, x, y, t:0, life:SHRINE.life, charge:P.max / 3, r:SHRINE.r, fed, healing:false };
+  S.shrines.push(sh);
+  ring(x, y, 20, 260, EL[el], .7, 16, true); stars(x, y - 40, 24, EL[el], 360); SFX.chestDrop();
+  for (let i = 0; i < 9; i++) { const a = i / 9 * TAU, rr = rnd(170, 230); spawn('critter', { x:x + Math.cos(a) * rr, y:y + Math.sin(a) * rr }, 1, sh.fed); }
+}
+function shrines(dt) {
+  const P = S.p;
+  for (const sh of S.shrines) {
+    sh.t += dt;
+    const inside = Math.hypot(P.x - sh.x, P.y - sh.y) < sh.r;
+    if (inside && sh.charge > 0 && P.hp < P.max) {
+      const h = Math.min(sh.charge, P.max / 9 * dt, P.max - P.hp); P.hp += h; sh.charge -= h;
+      if (!sh.healing) { sh.healing = true; SFX.heal(); pickupPop(SHRINE.name[sh.el], EL[sh.el]); }
+      if (Math.random() < .35) fx({ k:'glow', x:P.x + rnd(-20, 20), y:P.y - rnd(10, 60), s:22, s1:4, c:'#FF8FA8', life:.6 });
+    } else sh.healing = false;
+    for (const e of S.en) if (!e.dead && !e.boss && e.el === sh.fed && Math.abs(e.x - sh.x) < 700 && Math.abs(e.y - sh.y) < 700) e.lure = sh;
+    if (sh.charge <= .5) { ring(sh.x, sh.y, 20, 160, EL[sh.el], .4, 10, true); sh.t = sh.life; }   // used up
+  }
+  S.shrines = S.shrines.filter(sh => sh.t < sh.life);
+}
 function bossFight(b, ph, dt) {
   const P = S.p, A = S.arena, enraged = ph === 2;
   S.night = Math.min(1, (S.night || 0) + dt / 2.4);   // the boss pulls the shore into night
@@ -2388,14 +2431,14 @@ function update(dt) {
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); crates(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); crates(dt); shrines(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
     if (e.frozen > 0) continue;
     if (e.kb > 0) { e.kb -= dt; e.x += e.kx * dt; e.y += e.ky * dt; continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
-    if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
+    if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
     if (d < e.r + P.r && P.hurt <= 0) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
       const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el); P.hp -= hit; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy }; floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
@@ -2661,6 +2704,17 @@ function draw() {
     g.restore();
   }
   for (const it of S.items) if (inView(it.x, it.y, 40)) drawItem(it);
+  // healing shrines: a glowing circle to stand in, the shrine, a heart above it and how much healing is left
+  for (const sh of S.shrines || []) {
+    const left = sh.life - sh.t, blink = left < 5 ? .55 + .45 * Math.sin(S.t * 14) : 1, full = Math.max(0, sh.charge / (S.p.max / 3)), col = EL[sh.el];
+    g.save(); g.globalAlpha = .16 * blink; g.fillStyle = col; g.beginPath(); g.ellipse(sh.x, sh.y + 18, sh.r, sh.r * .55, 0, 0, TAU); g.fill();
+    g.globalAlpha = .6 * blink; g.strokeStyle = col; g.lineWidth = 4; g.setLineDash([14, 10]); g.lineDashOffset = -S.t * 40; g.stroke(); g.setLineDash([]); g.restore();
+    add(() => glowAt(sh.x, sh.y - 30, 240 + 20 * Math.sin(S.t * 4), col, .5 * blink));
+    if (!spr('x-shrine-' + sh.el, sh.x, sh.y - 48, 160, 0, blink)) { g.fillStyle = col; g.beginPath(); g.arc(sh.x, sh.y - 30, 30, 0, TAU); g.fill(); }
+    const hy = sh.y - 150 + Math.sin(S.t * 3) * 5; spr('x-heart', sh.x, hy, 40, 0, blink);
+    g.fillStyle = 'rgba(10,14,40,.55)'; g.beginPath(); g.roundRect(sh.x - 28, hy + 20, 56, 8, 4); g.fill();
+    g.fillStyle = '#FF8FA8'; g.beginPath(); g.roundRect(sh.x - 27, hy + 21, Math.max(4, 54 * full), 6, 3); g.fill();
+  }
   for (const ch of S.chests) {
     const bob = Math.sin(S.t * 3) * 4;
     add(() => { const gr = g.createLinearGradient(0, ch.y - 420, 0, ch.y); gr.addColorStop(0, 'rgba(255,220,120,0)'); gr.addColorStop(1, `rgba(255,220,120,${.45 + .2 * Math.sin(S.t * 5)})`); g.fillStyle = gr; g.fillRect(ch.x - 26, ch.y - 420, 52, 420); glowAt(ch.x, ch.y - 10, 180, '#FFD24A', .7); });
@@ -2903,6 +2957,11 @@ function draw() {
   g.globalAlpha = 1; g.lineWidth = 1;
   // screen space: arrows to off-screen chests, flashes, the cold edge of low health
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  for (const sh of S.shrines || []) {   // a shrine off-screen gets an arrow in its element's colour
+    const sx = (sh.x - cx) * Z, sy = (sh.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
+    const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40);
+    g.save(); g.translate(ex, ey); g.rotate(a); g.fillStyle = EL[sh.el]; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(16, 0); g.lineTo(-8, -12); g.lineTo(-8, 12); g.closePath(); g.fill(); g.stroke(); g.restore();
+  }
   for (const ch of S.chests) {
     const sx = (ch.x - cx) * Z, sy = (ch.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
     const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40);
