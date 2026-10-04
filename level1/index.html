@@ -231,8 +231,15 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
 @keyframes orbit{0%{transform:translate(9px,0)}25%{transform:translate(0,9px)}50%{transform:translate(-9px,0)}75%{transform:translate(0,-9px)}100%{transform:translate(9px,0)}}
 .gemi{width:20px;height:30px;background:linear-gradient(160deg,#C9FFD8,#6BE08A 55%,#1E6E3A);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
 /* coach marks: a speech bubble pointing at the real thing on screen */
-#coach{position:absolute;z-index:12;left:0;top:0;width:230px;pointer-events:none;opacity:0;transition:opacity .25s}
-#coach.on{opacity:1}
+#coach{position:absolute;z-index:13;left:0;top:0;width:240px;pointer-events:none;opacity:0;transition:opacity .25s}
+#coach.on{opacity:1;pointer-events:auto}
+#coach .ok{display:block;margin:8px 0 0 auto;padding:5px 16px 7px;border-radius:11px;font-family:var(--chunky);font-size:16px;color:#fff;-webkit-text-stroke:3.5px #1F4A06;paint-order:stroke fill;background:linear-gradient(180deg,#B8F27A,#4DB61F);box-shadow:0 0 0 3px var(--outline),inset 0 2px 0 rgba(255,255,255,.5),0 4px 0 3px var(--outline)}
+#coach .ok:active{transform:translateY(3px);box-shadow:0 0 0 3px var(--outline),0 1px 0 3px var(--outline)}
+#coachDim{position:absolute;inset:0;z-index:11;pointer-events:none;opacity:0;transition:opacity .25s}
+#coachDim.on{opacity:1}
+#wavePill{display:none;align-self:center;padding:2px 12px 4px;border-radius:99px;background:rgba(8,12,18,.72);box-shadow:0 0 0 2px var(--outline);font-family:var(--chunky);font-size:14px;color:#fff;-webkit-text-stroke:3px var(--outline);paint-order:stroke fill}
+#wavePill.on{display:block}
+#wavePill i{font-style:normal;color:var(--c,#FFE58A)}
 #coach .cb{position:relative;padding:8px 12px 10px;border-radius:14px;background:linear-gradient(180deg,#FFF6D6,#FFDB78);color:#2A1A06;box-shadow:0 0 0 3px var(--outline),0 5px 0 3px var(--outline);font-size:13px;font-weight:700;line-height:1.32;text-align:left;animation:pop .4s cubic-bezier(.2,1.6,.4,1)}
 #coach .cb b{display:block;margin-bottom:2px;font-family:var(--chunky);font-weight:400;font-size:17px;color:#fff;-webkit-text-stroke:4px var(--outline);paint-order:stroke fill}
 #coach .tail{position:absolute;left:var(--tx,50%);width:0;height:0;margin-left:-11px;border:11px solid transparent}
@@ -262,6 +269,7 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
         <span class="count" id="freedPill"><i></i><span id="freedN">0</span></span>
       </div>
       <div class="toprow"><div class="xp" id="xpBar"><i></i></div><span class="lvbadge" id="lvPill">1</span></div>
+      <span id="wavePill"></span>
       <div id="bossWrap"><div class="bossname" id="bossName">The Still Warden</div><div id="bossBar"><i></i></div></div>
       <div class="skills" id="skills"></div>
     </div>
@@ -270,7 +278,8 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
     <div id="joy"><i></i></div>
     <div id="moveGhost"><i></i></div>
     <div id="coachRing"></div>
-    <div id="coach"><div class="cb"><b id="coachT"></b><span id="coachP"></span></div><i class="tail"></i></div>
+    <div id="coachDim"></div>
+    <div id="coach"><div class="cb"><b id="coachT"></b><span id="coachP"></span><button class="ok" id="coachOk">OK</button></div><i class="tail"></i></div>
   </div>
 
   <section class="scr" id="title">
@@ -326,7 +335,7 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
         <div class="how"><span class="ic"><span class="gemi"></span></span><div><b>Free creatures, grab gems</b><span>Every creature you free drops a qi gem. Fill the bar to <em>level up and pick a power</em>.</span></div></div>
         <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="#1A1206" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g><g stroke="#FFE58A" stroke-width="1.6" fill="none" opacity=".9"><path d="M28 16 L37 40"/><path d="M39 25 L19 41"/><path d="M33 45 L13 27"/><path d="M17 38 L23 13"/><path d="M15 21 L40 22"/></g></svg></span><div><b>Five elements</b><span>Every power and creature has one, shown by its colour. <em>Water checks Fire, Fire checks Metal, Metal checks Wood, Wood checks Earth, Earth checks Water</em>: 1.5× damage.</span></div></div>
         <div class="how"><span class="ic"><img src="art/props/x-chest.png" alt="" style="width:120%;max-width:none"></span><div><b>Evolve your powers</b><span>Max a power to five stars and hold the <em>gift of the element that feeds it</em>. Crystal brutes drop Spirit Chests that help.</span></div></div>
-        <div class="how"><span class="ic"><img src="art/b-warden.png" alt="" style="width:130%;max-width:none"></span><div><b>Free the shore</b><span>Survive about three minutes as the hordes grow, then <em>defeat the Still Warden</em>.</span></div></div>
+        <div class="how"><span class="ic"><img src="art/b-warden.png" alt="" style="width:130%;max-width:none"></span><div><b>Free the shore</b><span><em>Ten waves</em> come, each one element. Arrows at the edge warn you where. Survive them, then <em>defeat the Still Warden</em>.</span></div></div>
       </div>
       <button class="btn green" id="howtoGo">Let's go!</button>
     </div>
@@ -441,11 +450,11 @@ const AWAKEN_AT = [4, 8, 12, 16, 20];
 const ST = {
   tide:    (l, v) => v ? { n:8, dmg:32, size:22, r:86, surge:2.4 } : { n:1 + l, dmg:14 + 4 * l, size:11 + 2 * l, r:72 + 4 * l },
   pearl:   (l, v) => v ? { n:4, dmg:40, size:26, spd:420, life:99, cd:1 } : { n:[0,1,2,2,3,4][l], dmg:12 + 5 * l, size:13 + 1.6 * l, spd:360 + 20 * l, life:3.4 + .3 * l, cd:2.2 },
-  vine:    (l, v) => v ? { n:12, dmg:44, R:200, w:15, cd:1.0 } : { n:5 + l, dmg:12 + 5 * l, R:100 + 14 * l, w:7 + l, cd:1.3 },
+  vine:    (l, v) => v ? { n:12, dmg:48, R:210, w:15, cd:.9 } : { n:5 + l, dmg:16 + 6 * l, R:118 + 16 * l, w:7 + l, cd:1.1 },
   bamboo:  (l, v) => v ? { n:8, dmg:34, pierce:5, cd:.24 } : { n:l, dmg:14 + 4 * l, pierce:l >= 3 ? 3 : 2, cd:.75 },
   ember:   (l, v) => v ? { n:6, dmg:40, r:82, cd:.7 } : { n:l, dmg:18 + 5 * l, r:40 + 5 * l, cd:1.0 },
   lantern: (l, v) => v ? { n:6, dmg:22, r:96, dur:4, cd:2.4 } : { n:[0,1,2,2,3,3][l], dmg:8 + 3 * l, r:48 + 7 * l, dur:2.4 + .2 * l, cd:2.6 },
-  stone:   (l, v) => v ? { n:5, dmg:48, size:30, r:104 } : { n:2 + (l >> 1), dmg:16 + 4 * l, size:16 + 2.5 * l, r:72 + 4 * l },
+  stone:   (l, v) => v ? { n:6, dmg:52, size:30, r:108 } : { n:3 + (l >> 1), dmg:20 + 5 * l, size:16 + 2.5 * l, r:76 + 5 * l },
   boulder: (l, v) => v ? { n:5, dmg:90, r:112, cd:1.5 } : { n:[0,1,2,2,3,3][l], dmg:30 + 8 * l, r:52 + 6 * l, cd:1.8 },
   bell:    (l, v) => v ? { R:150, dmg:26, pulse:2 } : { R:70 + 12 * l, dmg:9 + 4 * l },
   swords:  (l, v) => v ? { n:6, dmg:44, range:420, rain:1.3 } : { n:l, dmg:20 + 5 * l, range:300 + 20 * l }
@@ -462,7 +471,7 @@ const NEXT = {
   boulder: l => { const a = ST.boulder(l), b = ST.boulder(l + 1); return l ? `${b.n > a.n ? `Boulders ${a.n} → ${b.n} · ` : ''}Damage ${a.dmg} → ${b.dmg} · wider quake` : 'A boulder falls from the sky onto the crowd'; },
   bell:    l => { const a = ST.bell(l), b = ST.bell(l + 1); return l ? `Field ${a.R} → ${b.R} wide · Damage ${a.dmg} → ${b.dmg}` : 'A golden bagua field hurts and slows all inside it'; },
   swords:  l => { const a = ST.swords(l), b = ST.swords(l + 1); return l ? `Swords ${a.n} → ${b.n} · Damage ${a.dmg} → ${b.dmg} · longer flight` : 'A flying sword slices out and returns to you'; },
-  spring:  l => `Healing ${l ? `+${(3 + l * 1.5).toFixed(1)} → ` : ''}+${(4.5 + l * 1.5).toFixed(1)} a second`,
+  spring:  l => `Healing ${l ? `+${(1.4 + l * 1.5).toFixed(1)} → ` : ''}+${(2.9 + l * 1.5).toFixed(1)} a second`,
   shoot:   l => `Qi and pickup range ${l ? `+${l * 15}% → ` : ''}+${(l + 1) * 15}%`,
   kindling:l => `All damage ${l ? `+${l * 10}% → ` : ''}+${(l + 1) * 10}%`,
   rooted:  l => `Damage taken ${l ? `−${l * 8}% → ` : ''}−${(l + 1) * 8}%`,
@@ -698,12 +707,12 @@ function startRun() {
   const A = ANIMAL[animal];
   S = {
     t:0, over:false, won:false,
-    p:{ x:WORLD / 2, y:WORLD / 2, hp:240, max:240, face:1, hurt:0, r:26, mx:0, my:0 },
+    p:{ x:WORLD / 2, y:WORLD / 2, hp:220, max:220, face:1, hurt:0, r:26, mx:0, my:0 },
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0 },
     en:[], shots:[], eshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[],
     lv:1, xp:0, need:need(1), skills:{ [START[A.e]]:1 }, gifts:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
-    spawnAcc:0, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
+    spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
     strongT:-9, taught:{}, shake:0, buffs:{ tiger:0 }, freeze:0, flashT:0, swords:[], pearls:[]
   };
   camX = S.p.x - VW / 2; camY = S.p.y - VH / 2; S.cam = { x:camX, y:camY };
@@ -711,10 +720,10 @@ function startRun() {
   for (let i = 0; i < 6; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   AU.heat(0); renderSkills(); startLoop();
-  COACH.q.length = 0; COACH.cur = null; hideCoach();
+  COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); $('#wavePill').classList.add('on');
   coach('move', 'Drag to move', 'Put your thumb anywhere and drag. Your powers fire on their own.', () => ({ sx:W / 2, sy:H * .7 - 70 }), 7, 'above', () => S.moved > 140);
 }
-function need(lv) { return Math.round(4 + lv * lv * 7); }
+function need(lv) { return Math.round(4 + lv * lv * 4.2); }
 
 /* ================= input ================= */
 const keys = {}; let joy = null;
@@ -765,11 +774,11 @@ function cue(big, small, ms = 1800, warn) { const c = $('#cue'); c.className = w
 const ETYPE = {
   critter:{ img:'e-critter', r:20, hp:16, sp:66, dmg:5, xp:1, size:66 },
   wolf:{ img:'e-wolf', r:24, hp:28, sp:108, dmg:7, xp:3, size:88 },
-  golem:{ img:'e-golem', r:36, hp:260, sp:46, dmg:12, xp:12, size:124 }
+  golem:{ img:'e-golem', r:36, hp:420, sp:48, dmg:14, xp:12, size:124 }
 };
 const ELS = ['wood', 'fire', 'earth', 'metal', 'water'];
-function hpScale() { return 1 + S.t / 125 + (S.lv - 1) * .04; }
-function spawn(type, at, rush) {
+function hpScale() { return 1 + S.t / 90 + (S.lv - 1) * .06; }   // toughness keeps pace with the player's growing powers
+function spawn(type, at, rush, el) {
   if (S.en.length >= CAP && type !== 'golem') return null;
   const T = ETYPE[type], sc = hpScale(); let x, y;
   if (at) { x = at.x; y = at.y; } else {
@@ -779,7 +788,7 @@ function spawn(type, at, rush) {
   }
   x = clamp(x, 30, WORLD - 30); y = clamp(y, 30, WORLD - 30);
   const e = { type, x, y, r:T.r, hp:T.hp * sc, max:T.hp * sc, sp:T.sp * rnd(.9, 1.1) * (rush || 1), dmg:T.dmg, xp:T.xp,
-    el:ELS[(Math.random() * 5) | 0], size:T.size, img:T.img, hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:rnd(0, 6.28), frozen:0 };
+    el:el && el !== 'mix' ? el : ELS[(Math.random() * 5) | 0], size:T.size, img:T.img, hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:rnd(0, 6.28), frozen:0 };
   S.en.push(e); return e;
 }
 const DIRS = [['the north', 0, -1], ['the east', 1, 0], ['the south', 0, 1], ['the west', -1, 0]];
@@ -798,9 +807,10 @@ function ring2(n) {
 }
 function spawnBoss() {
   S.bossSpawned = true;
-  const e = { type:'boss', boss:true, x:S.p.x, y:S.p.y - 220, r:70, hp:1, max:1, sp:30, dmg:12, xp:0, el:'water', size:260, img:'b-warden', hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:0, phase:0, atk:3, summon:5, frozen:0 };
+  const e = { type:'boss', boss:true, x:S.p.x, y:S.p.y - 220, r:70, hp:1, max:1, sp:30, dmg:9, xp:0, el:'water', size:260, img:'b-warden', hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:0, phase:0, atk:3, summon:5, frozen:0 };
   e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5));
   S.en.push(e); S.boss = e;
+  S.p.hp = S.p.max; floatText(S.p.x, S.p.y - 70, 'Full health', '#8CF5A0', 20);
   S.arena = { x:S.p.x, y:S.p.y, r:Math.min(VW / 2 - 16, 330) };
   for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.p.x, m.y - S.p.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
@@ -1015,11 +1025,11 @@ function powers(dt) {
   /* Stone Ward: boulders circling you */
   if (sk.stone) {
     const st = ST.stone(sk.stone, ev.stone);
-    S.ang.stone = (S.ang.stone || 0) + dt * 1.9; S.stones = [];
+    S.ang.stone = (S.ang.stone || 0) + dt * 2.7; S.stones = [];
     for (let i = 0; i < st.n; i++) { const a = S.ang.stone + i * TAU / st.n; S.stones.push({ x:P.x + Math.cos(a) * st.r, y:P.y + Math.sin(a) * st.r, s:st.size, a, molten:ev.stone }); }
     for (const o of S.stones) {
       if (Math.random() < (o.molten ? .5 : .18)) { if (o.molten) flames(o.x, o.y, 1, 6, o.s * .9, 60); else fx({ k:'smoke', x:o.x, y:o.y + o.s * .5, vx:0, vy:-10, drag:2, life:.5, s:o.s * .5, c:'170,140,90' }); }
-      inArea(o.x, o.y, st.size + 4, e => { if ((e.hitCd.stone || 0) <= S.t) { e.hitCd.stone = S.t + .45; hurt(e, st.dmg, 'earth', { kb:300 }); debris(e.x, e.y - 10, 4, 220); SFX.thud(false); if (o.molten) flames(e.x, e.y, 4, 10, 22); } });
+      inArea(o.x, o.y, st.size + 4, e => { if ((e.hitCd.stone || 0) <= S.t) { e.hitCd.stone = S.t + .3; hurt(e, st.dmg, 'earth', { kb:360 }); debris(e.x, e.y - 10, 4, 220); SFX.thud(false); if (o.molten) flames(e.x, e.y, 4, 10, 22); } });
     }
   } else S.stones = null;
 
@@ -1165,35 +1175,81 @@ function teach() {
   if (!tg.c_item && S.items.length) { const it = S.items[0], nm = ITEM_INFO[it.kind]; coach('item', nm[0], nm[1] + ' Walk over it to use it.', () => ({ x:it.x, y:it.y - 40 }), 4.5); }
   if (!tg.c_chest && S.chests.length) { const ch = S.chests[0]; coach('chest', 'A Spirit Chest!', 'Walk to it. It spins for free upgrades, and is the best way to evolve a power.', () => ({ x:ch.x, y:ch.y - 80 }), 6, 'above', () => ch.got); }
   if (!tg.c_golem) { const gm = S.en.find(e => e.type === 'golem'); if (gm && Math.hypot(gm.x - P.x, gm.y - P.y) < 520) coach('golem', 'Crystal brute', 'Much tougher, and it drops a Spirit Chest when it falls.', () => ({ x:gm.x, y:gm.y - 90 }), 5); }
+  if (!tg.c_wave && S.warn) coach('wave', 'Waves', 'Every wave is one element and comes in a shape: a line, a charging column, a closing ring. The arrows show where. Use the element that checks it!', () => ({ sx:W / 2, sy:H * .42 }), 0, 'below');
   if (!tg.c_boss && S.boss) coach('boss', 'The Still Warden', 'Its colour shows its element, and it changes as it weakens. Defeat it to free the shore.', () => ({ x:S.boss.x, y:S.boss.y - 160 }), 6);
 }
 const ITEM_INFO = { magnet:["Luma's Call", 'Pulls every gem on the map to you.'], cracker:['Firecrackers', 'Clears every creature on screen.'], dumpling:['Dumpling', 'Heals you.'], peach:['Peach of Immortality', 'Heals you fully.'], tiger:['Tiger Talisman', 'Your powers hit 50% harder for a while.'], frost:['Frost Bell', 'Freezes everything on screen.'] };
+// ten scripted waves before the boss: each one a single element, in a shape you can read, announced two seconds ahead
+const WAVES = [
+  { t:14,  el:'fire',  form:'line',   type:'critter', n:18, name:'A line of Fire creatures' },
+  { t:30,  el:'wood',  form:'column', type:'wolf',    n:12, name:'Wood wolves charge' },
+  { t:46,  el:'earth', form:'ring',   type:'critter', n:28, name:'An Earth ring closes in' },
+  { t:58,  el:'metal', form:'elite',  type:'golem',   n:1,  name:'A Metal brute and its escort' },
+  { t:72,  el:'water', form:'pincer', type:'critter', n:30, name:'Water from both sides' },
+  { t:88,  el:'fire',  form:'column', type:'wolf',    n:16, name:'Fire wolves charge' },
+  { t:102, el:'wood',  form:'elite',  type:'golem',   n:2,  name:'Two Wood brutes' },
+  { t:118, el:'metal', form:'ring',   type:'critter', n:40, name:'A Metal ring closes in' },
+  { t:134, el:'earth', form:'pincer', type:'wolf',    n:24, name:'Earth wolves from both sides' },
+  { t:150, el:'mix',   form:'storm',  type:'critter', n:52, name:'The Still sends everything' }
+];
+const SIDES = [[0, -1, 'the north'], [1, 0, 'the east'], [0, 1, 'the south'], [-1, 0, 'the west']];
+const checkerOf = el => Object.keys(CONTROLS).find(k => CONTROLS[k] === el);
+function planWave(w) {
+  let d = (Math.random() * 4) | 0; if (d === S.lastDir) d = (d + 1) % 4; S.lastDir = d;
+  const dirs = w.form === 'ring' || w.form === 'storm' ? [0, 1, 2, 3] : w.form === 'pincer' ? [d, (d + 2) % 4] : [d];
+  return { w, dirs, t:0 };
+}
+function launchWave(plan) {
+  const w = plan.w, P = S.p, grow = 1 + (S.lv - 1) * .06, n = Math.round(w.n * (w.type === 'golem' ? 1 : grow)), D = Math.hypot(VW, VH) / 2 + 60;
+  const at = (x, y) => ({ x, y });
+  if (w.form === 'ring') { for (let i = 0; i < n; i++) { const a = i / n * TAU; spawn(w.type, at(P.x + Math.cos(a) * D * .85, P.y + Math.sin(a) * D * .85), .85, w.el); } }
+  else if (w.form === 'elite') {
+    const [dx, dy] = SIDES[plan.dirs[0]], px = -dy, py = dx;
+    for (let i = 0; i < n; i++) spawn('golem', at(P.x + dx * D + px * (i - (n - 1) / 2) * 140, P.y + dy * D + py * (i - (n - 1) / 2) * 140), 1, w.el);
+    for (let i = 0; i < 10 + S.lv; i++) spawn('critter', at(P.x + dx * (D + rnd(40, 160)) + px * rnd(-220, 220), P.y + dy * (D + rnd(40, 160)) + py * rnd(-220, 220)), 1, w.el);
+  } else {
+    const sides = plan.dirs, per = Math.ceil(n / sides.length);
+    sides.forEach((sd, k) => {
+      const [dx, dy] = SIDES[sd], px = -dy, py = dx, el = w.el === 'mix' ? ELS[(k + S.hordes) % 5] : w.el;
+      for (let i = 0; i < per; i++) {
+        let off, depth, rush = 1;
+        if (w.form === 'column') { off = ((i % 3) - 1) * 46; depth = Math.floor(i / 3) * 52; rush = 1.45; }
+        else { off = (i - (per - 1) / 2) * 44; depth = (i % 2) * 30; rush = w.form === 'storm' ? 1.15 : 1; }
+        spawn(w.type, at(P.x + dx * (D + depth) + px * off, P.y + dy * (D + depth) + py * off), rush, el);
+      }
+    });
+  }
+  S.hordes++; SFX.stomp();
+}
 function direct(dt) {
-  const t = S.t, ev = S.ev;
+  const t = S.t;
   teach();
   if (!S.bossSpawned) {
-    const rate = Math.min(26, (2.2 + t * .1) * (1 + (S.lv - 1) * .07));
+    // a light trickle between waves, mixed elements, growing slowly
+    const rate = Math.min(9, (1 + t * .035) * (1 + (S.lv - 1) * .05));
     S.spawnAcc += dt * rate;
-    while (S.spawnAcc > 1) { S.spawnAcc--; spawn(t > 30 && Math.random() < .3 ? 'wolf' : 'critter'); }
-    if (t >= S.nextHorde) { S.nextHorde += 16; horde(); }
-    if (t > 50 && !ev.g1) { ev.g1 = 1; spawn('golem'); toast('A crystal brute! Beat it for a Spirit Chest.', 3000); }
-    if (t > 84 && !ev.r1) { ev.r1 = 1; ring2(36 + S.lv * 2); }
-    if (t > 100 && !ev.g2) { ev.g2 = 1; spawn('golem'); spawn('golem'); }
-    if (t > 138 && !ev.r2) { ev.r2 = 1; ring2(56 + S.lv * 3); }
-    if (t > 148 && !ev.g3) { ev.g3 = 1; spawn('golem'); spawn('golem'); }
-    if (t > 170) spawnBoss();
+    while (S.spawnAcc > 1) { S.spawnAcc--; spawn(t > 40 && Math.random() < .25 ? 'wolf' : 'critter'); }
+    const next = WAVES[S.waveIdx];
+    if (next && !S.warn && t >= next.t - 2.2) {
+      S.warn = planWave(next);
+      const ch = checkerOf(next.el), from = next.form === 'ring' || next.form === 'storm' ? 'all around you' : next.form === 'pincer' ? 'both sides' : SIDES[S.warn.dirs[0]][2];
+      cue(`Wave ${S.waveIdx + 1} of ${WAVES.length}`, next.el === 'mix' ? `${next.name}, from ${from}` : `${next.name}, from ${from} · ${ELNAME[ch]} checks ${ELNAME[next.el]}`, 2600, true); SFX.alarm();
+    }
+    if (S.warn) { S.warn.t += dt; if (S.warn.t >= 2.2) { launchWave(S.warn); S.warn = null; S.waveIdx++; } }
+    if (t > 170 && !S.warn) spawnBoss();
   } else if (S.boss && !S.boss.dead) {
     const b = S.boss, ph = b.hp < b.max * .34 ? 2 : b.hp < b.max * .67 ? 1 : 0;
     if (ph !== b.phase) {
       b.phase = ph; b.el = ['water', 'metal', 'earth'][ph];
-      const checker = Object.keys(CONTROLS).find(k => CONTROLS[k] === b.el);
-      cue(`The Warden turns to ${ELNAME[b.el]}`, `${ELNAME[checker]} checks ${ELNAME[b.el]}`, 2200, true); ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5; ring2(30 + ph * 12);
+      const checker = checkerOf(b.el);
+      cue(`The Warden turns to ${ELNAME[b.el]}`, `${ELNAME[checker]} checks ${ELNAME[b.el]}`, 2200, true); ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5; ring2(16 + ph * 6);
+      const P = S.p, heal = Math.round(P.max * .3); P.hp = Math.min(P.max, P.hp + heal); floatText(P.x, P.y - 70, '+' + heal, '#8CF5A0', 20); stars(P.x, P.y - 30, 10, '#8CF5A0', 220);
     }
     b.atk -= dt; b.summon -= dt;
-    if (b.atk <= 0) { b.atk = 2.6 - ph * .4; b.stompAt = S.t; S.shake = Math.max(S.shake, .2); SFX.stomp(); smoke(b.x, b.y + 50, 6, 40, '200,220,235');
-      const n = 10 + ph * 3; for (let i = 0; i < n; i++) { const a = i / n * TAU + S.t; S.eshots.push({ x:b.x, y:b.y, vx:Math.cos(a) * 220, vy:Math.sin(a) * 220, life:3, rot:a }); } }
-    if (b.summon <= 0) { b.summon = 5; for (let i = 0; i < 8; i++) spawn('critter', { x:b.x + rnd(-120, 120), y:b.y + rnd(-120, 120) }); }
-    S.spawnAcc += dt * 6; while (S.spawnAcc > 1) { S.spawnAcc--; spawn('critter'); }
+    if (b.atk <= 0) { b.atk = 3 - ph * .4; b.stompAt = S.t; S.shake = Math.max(S.shake, .2); SFX.stomp(); smoke(b.x, b.y + 50, 6, 40, '200,220,235');
+      const n = 8 + ph * 3; for (let i = 0; i < n; i++) { const a = i / n * TAU + S.t; S.eshots.push({ x:b.x, y:b.y, vx:Math.cos(a) * 220, vy:Math.sin(a) * 220, life:3, rot:a }); } }
+    if (b.summon <= 0) { b.summon = 6; for (let i = 0; i < 5; i++) spawn('critter', { x:b.x + rnd(-120, 120), y:b.y + rnd(-120, 120) }); }
+    S.spawnAcc += dt * 3; while (S.spawnAcc > 1) { S.spawnAcc--; spawn('critter'); }
   }
 }
 
@@ -1226,11 +1282,11 @@ function update(dt) {
   P.moving = m > .1; P.mx = mx; P.my = my;
   if (P.moving) S.moved = (S.moved || 0) + 235 * dt;
   if (P.moving && (S.dustT = (S.dustT || 0) - dt) <= 0) { S.dustT = .12; fx({ k:'smoke', x:P.x - mx * 14, y:P.y + 28, vx:-mx * 30, vy:-10, drag:3, life:.45, s:12, c:'200,190,170' }); }
-  P.hp = Math.min(P.max, P.hp + (3 + (S.gifts.spring || 0) * 1.5) * dt);
+  P.hp = Math.min(P.max, P.hp + (1.4 + (S.gifts.spring || 0) * 1.5) * dt);   // healing comes mostly from gifts and pickups
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
   direct(dt); powers(dt); awakeTick(dt); crates(dt); gems(dt); updateFX(dt);
-  const armour = 1 - (S.gifts.rooted || 0) * .08;
+  const armour = (1 - (S.gifts.rooted || 0) * .08) * (ANIMAL[animal].e === 'earth' ? .85 : 1);   // Earth stands firm
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
@@ -1238,14 +1294,14 @@ function update(dt) {
     if (e.kb > 0) { e.kb -= dt; e.x += e.kx * dt; e.y += e.ky * dt; continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
     if (d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
-    if (d < e.r + P.r && P.hurt <= 0) { P.hurt = .9; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
-      P.hp -= e.dmg * armour; floatText(P.x, P.y - 60, '-' + Math.round(e.dmg * armour), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
+    if (d < e.r + P.r && P.hurt <= 0) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
+      const hit = e.dmg * (1 + S.t / 300) * armour; P.hp -= hit; floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
   for (const s of S.eshots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; s.rot += dt * 8;
-    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= 8 * armour; shards(P.x, P.y - 20, '#CFE9FF', 4, 160); SFX.hurt(); } }
+    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= 9 * armour; shards(P.x, P.y - 20, '#CFE9FF', 4, 160); SFX.hurt(); } }
   S.eshots = S.eshots.filter(s => s.life > 0);
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
@@ -1582,6 +1638,23 @@ function draw() {
     const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40);
     g.save(); g.translate(ex, ey); g.rotate(a); g.fillStyle = '#FFD24A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.moveTo(16, 0); g.lineTo(-8, -12); g.lineTo(-8, 12); g.closePath(); g.fill(); g.stroke(); g.restore();
   }
+  // an incoming wave: the edges it comes from glow in its element, with arrows pointing in
+  if (S.warn) {
+    const wv = S.warn.w, col = wv.el === 'mix' ? '#FFD24A' : EL[wv.el], pulse = .55 + .45 * Math.sin(S.t * 14);
+    for (const sd of S.warn.dirs) {
+      const [dx, dy] = SIDES[sd];
+      const ex = dx ? (dx > 0 ? W : 0) : W / 2, ey = dy ? (dy > 0 ? H : 0) : H / 2, len = dx ? H : W;
+      const gr = dx ? g.createLinearGradient(ex, 0, ex - dx * 70, 0) : g.createLinearGradient(0, ey, 0, ey - dy * 70);
+      gr.addColorStop(0, col); gr.addColorStop(1, col + '00'); g.globalAlpha = .55 * pulse; g.fillStyle = gr;
+      if (dx) g.fillRect(dx > 0 ? W - 70 : 0, 0, 70, H); else g.fillRect(0, dy > 0 ? H - 70 : 0, W, 70);
+      g.globalAlpha = 1;
+      for (let k = -1; k <= 1; k++) {
+        const ax = dx ? ex - dx * 34 : ex + k * len * .22, ay = dy ? (dy < 0 ? 205 : H - 44) : ey + k * len * .22, ang = Math.atan2(-dy, -dx);
+        g.save(); g.translate(ax, ay); g.rotate(ang); g.globalAlpha = pulse; g.fillStyle = col; g.strokeStyle = '#1A1206'; g.lineWidth = 3;
+        g.beginPath(); g.moveTo(16, 0); g.lineTo(-10, -14); g.lineTo(-4, 0); g.lineTo(-10, 14); g.closePath(); g.fill(); g.stroke(); g.restore(); g.globalAlpha = 1;
+      }
+    }
+  }
   if (S.flashT > 0) { g.fillStyle = `rgba(${S.flashC || '255,255,255'},${S.flashT * 2})`; g.fillRect(0, 0, W, H); }
   if (S.freeze > 0) { g.fillStyle = `rgba(160,220,255,${Math.min(.18, S.freeze * .08)})`; g.fillRect(0, 0, W, H); }
   if (P.hp < P.max * .3) { const v = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); v.addColorStop(0, 'rgba(200,40,30,0)'); v.addColorStop(1, `rgba(200,40,30,${.4 * (1 - P.hp / (P.max * .3)) * (.7 + .3 * Math.sin(S.t * 8))})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
@@ -1838,32 +1911,46 @@ function finishChest() {
 }
 
 /* ================= the guide: one bubble at a time, pointing at the real thing ================= */
-const COACH = { q:[], cur:null };
-function coach(id, title, text, where, secs = 4.5, place = 'above', until) {
+const COACH = { q:[], cur:null, gap:0 };
+function coach(id, title, text, where, secs, place = 'above') {
   if (!S || S.taught['c_' + id]) return; S.taught['c_' + id] = 1;
-  COACH.q.push({ id, title, text, where, secs, place, until });
+  COACH.q.push({ id, title, text, where, place });
 }
 function domPt(sel) { const r = $(sel).getBoundingClientRect(), b = stage.getBoundingClientRect(); return { sx:r.left - b.left + r.width / 2, sy:r.bottom - b.top }; }
-function hideCoach() { $('#coach').classList.remove('on'); $('#coachRing').classList.remove('on'); $('#moveGhost').classList.remove('on'); }
+const popupOpen = () => [...document.querySelectorAll('.scr')].some(s => !s.hidden);
+function hideCoach() { ['#coach', '#coachDim', '#coachRing', '#moveGhost'].forEach(q => $(q).classList.remove('on')); }
+// a tip freezes the game, spotlights what it explains, and waits for OK (or Next when more are waiting)
 function coachTick(dt) {
-  if (!COACH.cur && COACH.q.length) {
-    const c = COACH.cur = COACH.q.shift(); c.t = 0;
-    $('#coachT').textContent = c.title; $('#coachP').textContent = c.text;
-    const el = $('#coach'); el.className = c.place; void el.offsetWidth; el.classList.add('on');
-    const cb = el.querySelector('.cb'); cb.style.animation = 'none'; void cb.offsetWidth; cb.style.animation = '';
-    if (c.id === 'move') $('#moveGhost').classList.add('on'); else $('#coachRing').classList.add('on');
-    SFX.pop();
-  }
-  const c = COACH.cur; if (!c) return;
-  c.t += dt;
+  if (COACH.cur) return;
+  COACH.gap -= dt;
+  if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel) return;
+  showCoach(COACH.q.shift());
+}
+function showCoach(c) {
+  COACH.cur = c; running = false;
   const p = c.where(); let sx = p.sx, sy = p.sy;
   if (sx == null) { sx = (p.x - camX) * Z; sy = (p.y - camY) * Z; }
-  const el = $('#coach'), w = 230, h = el.offsetHeight || 80, x = clamp(sx - w / 2, 8, W - w - 8);
-  el.style.transform = `translate(${x}px,${c.place === 'below' ? sy + 16 : sy - h - 18}px)`;
-  el.style.setProperty('--tx', clamp(sx - x, 18, w - 18) + 'px');
-  const rg = $('#coachRing'); rg.style.left = sx + 'px'; rg.style.top = (c.place === 'below' ? sy - 10 : sy + 34) + 'px';
-  if (c.t > c.secs || (c.until && c.until())) { COACH.cur = null; hideCoach(); }
+  $('#coachT').textContent = c.title; $('#coachP').textContent = c.text; $('#coachOk').textContent = COACH.q.length ? 'Next' : 'OK';
+  const el = $('#coach'); el.className = c.place; el.style.transform = 'translate(-999px,0)'; el.classList.add('on');
+  const cb = el.querySelector('.cb'); cb.style.animation = 'none'; void cb.offsetWidth; cb.style.animation = '';
+  const w = 240, h = el.offsetHeight || 110; let below = c.place === 'below';
+  if (!below && sy - h - 18 < 90) below = true;                 // keep it on screen
+  el.className = (below ? 'below' : 'above') + ' on';
+  const x = clamp(sx - w / 2, 8, W - w - 8), y = below ? sy + 16 : sy - h - 18;
+  el.style.transform = `translate(${x}px,${clamp(y, 60, H - h - 10)}px)`; el.style.setProperty('--tx', clamp(sx - x, 18, w - 18) + 'px');
+  $('#coachDim').style.background = `radial-gradient(circle at ${sx}px ${sy}px, rgba(4,8,14,0) 0 54px, rgba(4,8,14,.62) 96px)`; $('#coachDim').classList.add('on');
+  if (c.id === 'move') $('#moveGhost').classList.add('on'); else { const rg = $('#coachRing'); rg.style.left = sx + 'px'; rg.style.top = sy + 'px'; rg.classList.add('on'); }
+  SFX.pop(); $('#coachOk').focus({ preventScroll:true });
 }
+function coachOk() {
+  if (!COACH.cur) return;
+  hideCoach(); COACH.cur = null; SFX.select();
+  if (COACH.q.length && !popupOpen()) { showCoach(COACH.q.shift()); return; }
+  COACH.gap = 2.5;
+  if (S && !S.over && !popupOpen()) startLoop();
+}
+$('#coachOk').onclick = coachOk;
+addEventListener('keydown', e => { if (COACH.cur && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); coachOk(); } });
 
 /* ================= HUD ================= */
 function renderSkills() {
@@ -1879,6 +1966,11 @@ function hud() {
   $('#xpBar i').style.width = (S.xp / S.need * 100) + '%';
   $('#freedN').textContent = S.thawed;
   const sec = Math.floor(S.t); $('#timePill').textContent = `${String((sec / 60) | 0).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+  const nw = WAVES[S.waveIdx], wp = $('#wavePill');
+  if (S.bossSpawned) wp.innerHTML = 'All 10 waves cleared · <i>Boss</i>';
+  else if (nw) { const left = Math.max(0, Math.ceil(nw.t - S.t)), col = nw.el === 'mix' ? '#FFE58A' : EL[nw.el];
+    wp.innerHTML = `${S.waveIdx ? `Wave ${S.waveIdx} of ${WAVES.length} · ` : ''}next <i style="--c:${col}">${nw.el === 'mix' ? 'everything' : ELNAME[nw.el]}</i> in ${left}s`; }
+  else wp.innerHTML = `Wave ${WAVES.length} of ${WAVES.length} · boss in ${Math.max(0, Math.ceil(170 - S.t))}s`;
   if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = `The Still Warden · ${ELNAME[S.boss.el]}`; }
 }
 function loop(now, id) {
@@ -1917,6 +2009,7 @@ window.__morqi = { state: () => S, finish: () => results(),
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
+      if (COACH.cur) { if (!auto) break; hideCoach(); COACH.cur = null; }
       if (!running) break; update(1 / 30); }
     if (!S.over) running = false; draw(); hud(); return { t:Math.round(S.t), lv:S.lv, hp:Math.round(S.p.hp), en:S.en.length, freed:S.thawed, fx:FX.length }; } };
 })();
