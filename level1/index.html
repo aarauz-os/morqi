@@ -798,7 +798,7 @@ const AU = (() => {
     setTimeout(loadSamples, 0);
     comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 14; comp.ratio.value = 5; comp.attack.value = .002; comp.release.value = .18;
     const master = c.createGain(); master.gain.value = .95; comp.connect(master).connect(c.destination);
-    sfx = c.createGain(); sfx.gain.value = .85; sfx.connect(comp);
+    sfx = c.createGain(); sfx.gain.value = .51; sfx.connect(comp);   // sound effects at about 6 out of 10 (A, 2026-10-04)
     mus = c.createGain(); mus.gain.value = .12; mus.connect(comp);   // music sits under the action: about 4 out of 10
     noiseBuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     return c;
