@@ -437,6 +437,16 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .riseTip p{margin:0;font-size:12.5px;line-height:1.35}
 @media (max-height:700px){.riseArt{aspect-ratio:1.75}}
 /* the companion's ultimate: a ring that fills, a portrait that lights up, a tap */
+/* the corner map: a round glass lens mirroring the companion button, right side */
+#mapBtn{position:absolute;right:10px;top:calc(var(--ultTop, 168px));width:72px;height:72px;border-radius:50%;border:0;padding:4px;background:linear-gradient(180deg,#5566E0,#2B3594);pointer-events:auto;z-index:6;-webkit-tap-highlight-color:transparent;touch-action:none;box-shadow:inset 0 2px 0 rgba(255,255,255,.5),inset 0 -3px 0 rgba(0,0,40,.35),0 0 0 2.5px #fff,0 7px 14px rgba(10,14,40,.4);transition:transform .15s}
+#mapBtn canvas{position:absolute;left:4px;top:4px;display:block;width:64px;height:64px;border-radius:50%}
+#mapBtn::after{content:"";position:absolute;inset:4px;border-radius:50%;background:radial-gradient(120% 80% at 30% 0%,rgba(255,255,255,.34),rgba(255,255,255,0) 46%);pointer-events:none}
+#mapBtn:active{transform:scale(.92)}
+#shoreMap{display:grid;place-items:center;background:rgba(8,12,20,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer}
+#shoreMap[hidden]{display:none}
+#shoreCv{position:relative;inset:auto;display:block;border-radius:28px;box-shadow:0 0 0 2px rgba(255,255,255,.85),0 18px 48px rgba(0,0,0,.5)}
+#shoreMap .go{position:absolute;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));width:54px;height:54px;margin-left:-27px;border-radius:50%;background:linear-gradient(180deg,#8FF0A8,#2FBF6A);box-shadow:0 0 0 2px #fff,0 8px 20px rgba(0,0,0,.35)}
+#shoreMap .go::before{content:"";position:absolute;left:21px;top:16px;border-style:solid;border-width:11px 0 11px 17px;border-color:transparent transparent transparent #fff}
 #ultBtn{position:absolute;left:10px;top:calc(var(--ultTop, 168px));width:74px;height:74px;border-radius:50%;border:0;padding:0;background:none;pointer-events:auto;--p:0;--c:#6FF2CF;z-index:6;-webkit-tap-highlight-color:transparent;touch-action:none;transition:transform .15s}
 #ultBtn .ur{position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p) * 360deg),rgba(255,255,255,.14) 0);-webkit-mask:radial-gradient(circle,transparent 30px,#000 31px);mask:radial-gradient(circle,transparent 30px,#000 31px)}
 #ultBtn img{position:absolute;left:8px;top:8px;width:58px;height:58px;border-radius:50%;object-fit:contain;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--c) 45%,#fff),color-mix(in srgb,var(--c) 35%,#1B2257));filter:grayscale(.7) brightness(.7);transition:filter .3s}
@@ -452,6 +462,50 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 #ultBtn.urge{animation:ultUrge .5s ease-in-out infinite}
 @keyframes ultUrge{0%,100%{transform:scale(1.05);filter:drop-shadow(0 0 10px #FFE08A)}50%{transform:scale(1.2);filter:drop-shadow(0 0 26px #FFB347)}}
 @keyframes ultNope{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+/* Victory is a celebration, not a stats page: light behind the freed elder, a gold title, three stars that each
+   teach one skill (free the shore, evolve a power, use the ultimate three times), bright reward chips, the companion's
+   next goal, and one green button that pulses toward the next level */
+#results{justify-content:center;gap:0;padding-top:20px;overflow:hidden auto}
+#results .victory{width:240px;height:176px;margin-bottom:-18px}
+#results .victory::before{display:none}
+#results .victory img{width:150px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.4));animation:vicFloat 3s ease-in-out infinite}
+.victory .rays{position:absolute;inset:-70% -40%;background:repeating-conic-gradient(from 0deg,rgba(255,214,110,.34) 0 8deg,transparent 8deg 22deg);
+  -webkit-mask:radial-gradient(circle,#000 12%,transparent 62%);mask:radial-gradient(circle,#000 12%,transparent 62%);animation:spin 26s linear infinite}
+#results .victory{z-index:0}#results .res{z-index:1}   /* the light sits behind the card; the elder peeks over its edge */
+.victory .rays::after{content:"";position:absolute;inset:30%;border-radius:50%;background:radial-gradient(circle,rgba(255,226,140,.75),rgba(255,197,74,0) 70%)}
+@keyframes spin{to{transform:rotate(1turn)}}
+@keyframes vicFloat{50%{transform:translateY(-6px)}}
+#results .res{display:flex;flex-direction:column;align-items:center;gap:12px;padding:30px 18px 16px;
+  background:linear-gradient(180deg,rgba(36,44,104,.94),rgba(14,40,58,.95));box-shadow:inset 0 1.5px 0 rgba(255,224,138,.55),inset 0 0 0 1px rgba(255,255,255,.12),0 30px 70px rgba(0,0,0,.45)}
+.vicT{margin:0;font:900 46px/1.02 var(--round);letter-spacing:-.02em;background:linear-gradient(180deg,#FFF8D6 8%,#FFD45A 48%,#F29A1E 92%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 3px 0 #9A5200) drop-shadow(0 10px 18px rgba(255,170,40,.45));animation:vicIn .8s var(--spring) both}
+@keyframes vicIn{0%{transform:scale(.4);opacity:0}100%{transform:none;opacity:1}}
+.resQ{margin:-4px 0 0;max-width:28ch;font-size:13.5px;font-style:italic;line-height:1.4;color:rgba(255,255,255,.7)}
+.stars3{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin-top:2px}
+.st3{width:92px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.st3 svg{width:62px;height:62px;overflow:visible}
+.st3:nth-child(2){margin-bottom:14px}.st3:nth-child(2) svg{width:78px;height:78px}
+.st3 .gold{transform:scale(0);transform-origin:50% 55%;transform-box:fill-box}
+.st3.in .gold{animation:starPop .6s var(--spring) forwards}
+@keyframes starPop{0%{transform:scale(0) rotate(-40deg)}100%{transform:scale(1) rotate(0)}}
+.st3 span{font-size:11.5px;font-weight:800;line-height:1.2;color:rgba(255,255,255,.45)}
+.st3.got span{color:#FFE08A}
+.chips3{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip3{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px 0 9px;border-radius:99px;font:900 15px var(--round);color:#fff;font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,var(--a),var(--b));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,40,.25),0 4px 10px rgba(0,0,0,.25)}
+.chip3 i{width:13px;height:17px;display:block;background:linear-gradient(160deg,#fff,#BFF8FF);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.chip3 svg{width:17px;height:17px}
+.chip3.evo{padding:0 12px 0 3px}.chip3.evo img{width:28px;height:28px;border-radius:50%;box-shadow:0 0 0 2px #FFE08A}
+#results .res .btn{width:100%;max-width:300px}
+#nextLvBtn:not([hidden]){animation:nudge 1.8s ease-in-out 2.6s infinite}
+@keyframes nudge{0%,100%{transform:none}50%{transform:scale(1.045)}}
+#results .res #againBtn.quiet{min-width:0;width:auto;margin-top:-4px;padding:6px 14px;font-size:15px;background:none;box-shadow:none;color:rgba(255,255,255,.85)}
+.resLink{font-size:13px;font-weight:800;color:rgba(255,255,255,.5);text-decoration:none}
+.sparks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sparks i{position:absolute;top:-12px;width:var(--s);height:var(--s);background:var(--c);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:sparkFall var(--t) linear var(--d) infinite;opacity:0}
+@keyframes sparkFall{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:1}100%{transform:translateY(110vh) rotate(1turn);opacity:.2}}
+@media (prefers-reduced-motion:reduce){.victory .rays,#results .victory img,.sparks i,#nextLvBtn:not([hidden]){animation:none}.st3 .gold{transform:none}}
+#petProg .pp{background:linear-gradient(135deg,color-mix(in srgb,var(--c) 34%,#1C244A),rgba(28,36,74,.85)) !important}
 #petProg .pp{display:flex;gap:12px;align-items:center;text-align:left;width:100%;padding:10px 12px;border-radius:20px;background:rgba(28,36,74,.7);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
 #petProg .pp.evo{box-shadow:inset 0 0 0 2px #FFE08A,0 0 24px rgba(255,224,138,.45)}
 #petProg img{width:54px;height:54px;flex:none;border-radius:50%;object-fit:contain;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--c) 45%,#fff),color-mix(in srgb,var(--c) 35%,#1B2257))}
@@ -480,6 +534,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
     </div>
     <div class="skills" id="skills"></div>
     <button id="ultBtn" aria-label="Companion ultimate"><span class="ur"></span><img id="ultImg" alt=""><em id="ultLv"></em><b id="ultName"></b></button>
+    <button id="mapBtn" aria-label="Shore map"><canvas id="mapCv"></canvas></button>
     <div id="combo"><b id="comboN">×0</b><span>combo</span></div>
     <div id="cue"></div>
     <div id="toast"></div>
@@ -572,6 +627,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
     </div>
   </section>
 
+  <section class="scr popup" id="shoreMap" hidden aria-label="The whole shore"><canvas id="shoreCv"></canvas><span class="go" aria-hidden="true"></span></section>
   <section class="scr popup" id="paused" hidden>
     <div class="panel pop" style="gap:16px;padding-top:40px">
       <div class="rb"><span class="ribbon">Paused</span></div>
@@ -585,16 +641,17 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
   </section>
 
   <section class="scr" id="results" hidden>
-    <div class="victory"><img src="art4/b-fisher.png?v=6" alt="The fisherman, freed, holding a glowing lantern."></div>
-    <div class="panel pop">
-      <div class="rb"><span class="ribbon">Victory!</span></div>
-      <p style="font-size:14.5px;color:#D6E1E7;max-width:30ch"><i>"I was so afraid of losing the shore that I stopped feeling anything at all. Thank you, Keeper."</i></p>
-      <div class="stats" id="stats"></div>
+    <div class="sparks" id="resSparks" aria-hidden="true"></div>
+    <div class="victory"><span class="rays"></span><img src="art4/b-fisher.png?v=6" alt="The fisherman, freed, holding a glowing lantern."></div>
+    <div class="panel pop res">
+      <h2 class="vicT">Victory!</h2>
+      <p class="resQ">"I had stopped feeling anything at all. Thank you, Keeper."</p>
+      <div class="stars3" id="resStars"></div>
+      <div class="chips3" id="resChips"></div>
       <div id="petProg"></div>
-      <p style="font-size:14px;color:#BFD3E6">This was one shore. MorQi is a whole world of them.</p>
-      <a class="btn green" href="https://aarauz-os.github.io/morqi/" target="_blank" rel="noopener">Back to the pitch</a>
       <button class="btn green" id="nextLvBtn" hidden>Level 2</button>
-      <button class="btn blue small" id="againBtn">Play again</button>
+      <button class="btn green" id="againBtn">Play again</button>
+      <a class="resLink" href="https://aarauz-os.github.io/morqi/" target="_blank" rel="noopener">Back to the pitch</a>
     </div>
   </section>
 
@@ -1360,7 +1417,7 @@ function startRun() {
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0, z:0 },
     ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null,
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
-    lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, evo:{}, cds:{}, ang:{},
+    lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
     strongT:-9, taught:{}, shake:0, buffs:{ tiger:0, ward:0 }, freeze:0, flashT:0, swords:[], pearls:[]
@@ -1544,7 +1601,7 @@ function kill(e) {
 
 /* ================= qi gems ================= */
 function gems(dt) {
-  const P = S.p, mag = 110 * (1 + (S.gifts.shoot || 0) * .2);
+  const P = S.p, mag = Math.max(110 * (1 + (S.gifts.shoot || 0) * .2), LODE.r[S.lode]);   // the Lodestone's reach, when it is longer
   for (const q of S.gems) {
     q.t += dt;
     if (q.vz !== undefined && !q.pull) { q.vz -= 900 * dt; q.z = Math.max(0, q.z + q.vz * dt); q.x += q.vx * dt; q.y += q.vy * dt; q.vx *= .9; q.vy *= .9; if (q.z === 0) q.vz = 0; }
@@ -3088,9 +3145,16 @@ function gainXp(v) {
 }
 // an element learned this level is an apprentice element: its powers stop at three stars for now
 const maxStars = id => POW[id].e === S.apprentice ? 3 : 5;
-const SLOTS = { active:3, gift:3 };   // six slots: three powers, three gifts, and every power has a gift that evolves it
+const SLOTS = { active:3, gift:3 };
+// the Lodestone: a charm outside the six slots that pulls in the nearest gems. Its reach is a share of a phone screen's
+// height (1400 world units, the same on every device so co-op and versus stay fair): 10%, 20%, 30%.
+// Rare on purpose: each rank is offered once a run, from player level 3, 6 and 9, never above the level's difficulty
+// (Level 1 holds one rank, Level 2 two) or what the companion has earned (a second rank at companion level 24, a third at 36).
+const LODE = { r:[0, 140, 280, 420], at:[0, 3, 6, 9], level:[1, 2, 3, 3], pet:[1, 24, 36] };
+const lodeCap = () => Math.min(LODE.level[S.level - 1] || 3, LODE.pet.filter(l => S.ultInfo.lv >= l).length);
+const lodeDue = () => { const n = S.lode + 1; return n <= lodeCap() && S.lv >= LODE.at[n] && !S.lodeOff[n]; };   // six slots: three powers, three gifts, and every power has a gift that evolves it
 const canEvo = id => S.skills[id] >= 3 && S.gifts[evoGift(id)] && !S.evo[id] && POW[id].e !== S.apprentice;
-const elOf = o => o.kind === 'gift' ? GIFT[o.id].e : o.kind === 'heal' ? 'earth' : POW[o.id].e;
+const elOf = o => o.kind === 'lode' ? 'metal' : o.kind === 'gift' ? GIFT[o.id].e : o.kind === 'heal' ? 'earth' : POW[o.id].e;
 function options() {
   const opts = [], has = (k, id) => opts.some(o => o.kind === k && o.id === id);
   const evo = Object.keys(POW).find(canEvo); if (evo) opts.push({ kind:'evo', id:evo });
@@ -3100,6 +3164,8 @@ function options() {
   const nG0 = Object.keys(S.gifts).length;
   if (nG0 < SLOTS.gift) { const key = Object.keys(S.skills).filter(id => !S.evo[id] && S.skills[id] >= 2 && !S.gifts[evoGift(id)] && POW[id].e !== S.apprentice).sort((a, b) => S.skills[b] - S.skills[a])[0];
     if (key && !has('gift', evoGift(key))) opts.push({ kind:'gift', id:evoGift(key) }); }
+  // the Lodestone shows up once per rank; pass it by and it is gone for this run
+  if (lodeDue() && opts.length < 3) { S.lodeOff[S.lode + 1] = 1; opts.push({ kind:'lode', id:'lode' }); }
   const pool = [], nA = Object.keys(S.skills).length, nG = Object.keys(S.gifts).length;
   for (const id in POW) if (S.learned.includes(POW[id].e) && !S.evo[id] && (S.skills[id] ? S.skills[id] < maxStars(id) : nA < SLOTS.active)) pool.push({ kind:'active', id });
   // a new gift is always one that evolves a power you hold (playtest sims: random picks filled the gift slots with gifts
@@ -3158,6 +3224,10 @@ function renderCards(opts) {
       b.className = 'card gift';
       html = `<span class="tile"><img src="${icon(gi.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${gi.n}</b>${mine.length ? '<span class="flag">KEY</span>' : lv ? '' : '<span class="flag">NEW!</span>'}</span>
         <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${mine.length ? `Evolves your ${mine.map(k => POW[k].n).join(' and ')}` : `${ELNAME[el]} gift · evolves ${feeds.map(k => POW[k].n).join(' and ')}`}</small></span></span>`;
+    } else if (o.kind === 'lode') {
+      const n = S.lode + 1; b.className = 'card gift';
+      html = `<span class="tile"><img src="${icon('g-lodestone')}" alt=""><i>${CHAR.metal}</i></span><span class="body"><span class="tab"><b>Lodestone</b><span class="flag">RARE</span></span>
+        <span class="txt"><span class="stars">${[0, 1, 2].map(i => `<s class="${i < S.lode ? 'f' : i === S.lode ? 'n' : ''}"></s>`).join('')}</span><p>Gems within ${n * 10}% of the screen fly to you.</p><small>Offered once · takes no slot</small></span></span>`;
     } else { b.className = 'card gift'; html = `<span class="tile"><img src="${icon('g-spring')}" alt=""><i>${CHAR.earth}</i></span><span class="body"><span class="tab"><b>Warm Tea</b></span><span class="txt"><p>Heal fully.</p></span></span>`; }
     const cc = CARDC[el]; b.style.setProperty('--c', EL[el]); b.style.setProperty('--c1', cc[0]); b.style.setProperty('--c2', cc[1]); b.style.setProperty('--d', idx * .09 + 's'); b.innerHTML = html;
     b.onclick = () => {
@@ -3173,10 +3243,11 @@ $('#rerollBtn').onclick = () => { if (!S.rerolls || $('#cards').classList.contai
 // learning shows: a burst in the power's colour on the Keeper, its name and new level
 function applyPick(o, quiet) {
   const P = S.p, el = elOf(o), col = EL[el];
-  S.decl = S.decl || {}; for (const x of S.offered || []) if (x.kind !== 'evo' && x.kind !== 'heal') { const k = x.kind + x.id; S.decl[k] = x === o || (x.kind === o.kind && x.id === o.id) ? 0 : (S.decl[k] || 0) + 1; }
+  S.decl = S.decl || {}; for (const x of S.offered || []) if (x.kind !== 'evo' && x.kind !== 'heal' && x.kind !== 'lode') { const k = x.kind + x.id; S.decl[k] = x === o || (x.kind === o.kind && x.id === o.id) ? 0 : (S.decl[k] || 0) + 1; }
   if (o.kind === 'evo') { S.evo[o.id] = true; S.skills[o.id] = Math.max(S.skills[o.id], 5); if (!quiet) { SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
   else if (o.kind === 'active') { S.skills[o.id] = (S.skills[o.id] || 0) + 1; floatText(P.x, P.y - 100, `${POW[o.id].n} ${S.skills[o.id] > 1 ? 'Lv ' + S.skills[o.id] : 'learned'}!`, col, 18); }
   else if (o.kind === 'gift') { S.gifts[o.id] = (S.gifts[o.id] || 0) + 1; floatText(P.x, P.y - 100, `${GIFT[o.id].n} ${S.gifts[o.id] > 1 ? 'Lv ' + S.gifts[o.id] : 'gained'}!`, col, 18); }
+  else if (o.kind === 'lode') { S.lode++; floatText(P.x, P.y - 100, `Lodestone ${S.lode > 1 ? 'Lv ' + S.lode : 'gained'}!`, col, 18); }
   else { P.hp = P.max; SFX.heal(); }
   if (o.kind !== 'evo') { ring(P.x, P.y, 20, 240, col, .5, 12, true); stars(P.x, P.y - 30, 18, col, 360); }
   renderSkills();
@@ -3337,13 +3408,102 @@ function renderSkills() {
   $('#ultLv').textContent = 'Lv ' + I.lv; $('#ultName').textContent = I.name; ub.setAttribute('aria-label', `${A.y} ultimate: ${I.name}`);
   for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
   for (const id in S.gifts) h += `<span class="slot gift" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
+  if (S.lode) h += `<span class="slot gift" style="--c:${EL.metal}"><img src="${icon('g-lodestone')}" alt="Lodestone"><em>${S.lode}</em></span>`;
   box.innerHTML = h;
 }
+/* ================= corner map ================= */
+// Playtests: "I didn't know how far I got until I was already trapped", and a wish to see where you are.
+// A round lens in the top-right corner with your companion in the middle, the green you have restored, the shore's
+// edge and what is close: crowds, hearts, shrines, chests, the boss. Its rim pulses on the side a wave is coming from
+// and glows when you near the edge of the shore. Tap it for the whole shore; the game pauses until you tap again.
+// No words on it, so play stays quiet. The green is rebuilt nine times a second; the markers move every frame.
+const MAP = { px:64, view:900, every:1 / 9, acc:1, face:null, faceSrc:'', edge:270 };
+const mapCv = $('#mapCv'), mg = mapCv.getContext('2d'), shoreCv = $('#shoreCv'), sg = shoreCv.getContext('2d');
+const greenCv = document.createElement('canvas'), gg = greenCv.getContext('2d'); greenCv.width = greenCv.height = gridN;
+let greenImg = null;
+function mapGreen() {
+  if (!greenImg) greenImg = gg.createImageData(gridN, gridN);
+  const d = greenImg.data;
+  for (let i = 0; i < gridN * gridN; i++) { const on = thawGrid[i]; d[i * 4] = 92; d[i * 4 + 1] = 196; d[i * 4 + 2] = 72; d[i * 4 + 3] = on ? 235 : 0; }
+  gg.putImageData(greenImg, 0, 0);
+}
+function mapFace() {
+  const src = $('#ultImg').getAttribute('src');
+  if (src && src !== MAP.faceSrc) { MAP.faceSrc = src; MAP.face = new Image(); MAP.face.src = src; }
+  return MAP.face && MAP.face.complete && MAP.face.naturalWidth ? MAP.face : null;
+}
+// paints the shore into ctx: world point (ox, oy) lands at the canvas centre, s pixels per world unit, R the lens radius
+function paintShore(c, size, ox, oy, s, round) {
+  const P = S.p, half = size / 2, X = x => half + (x - ox) * s, Y = y => half + (y - oy) * s;
+  c.save(); c.beginPath(); if (round) c.arc(half, half, half, 0, TAU); else c.rect(0, 0, size, size); c.clip();
+  c.fillStyle = '#26323F'; c.fillRect(0, 0, size, size);                                 // beyond the shore
+  c.fillStyle = '#DCEAF5'; c.fillRect(X(0), Y(0), WORLD * s, WORLD * s);                  // the frozen shore, pale like the ice
+  c.imageSmoothingEnabled = true; c.globalAlpha = 1; c.drawImage(greenCv, X(0), Y(0), WORLD * s, WORLD * s);   // the green you brought back
+  c.strokeStyle = '#FFFFFF'; c.lineWidth = 1.5; c.strokeRect(X(0), Y(0), WORLD * s, WORLD * s);   // the shore's edge
+  const A = S.arena; if (A) { c.strokeStyle = 'rgba(255,106,87,.8)'; c.lineWidth = 1.5; c.beginPath(); c.arc(X(A.x), Y(A.y), A.r * s, 0, TAU); c.stroke(); }
+  const dot = Math.min(3.2, Math.max(1.4, size / 46));
+  c.fillStyle = '#E2452F';                                                               // the crowd
+  for (const e of S.en) if (!e.dead && !e.boss) { const r = e.type === 'golem' ? dot * 1.6 : dot; c.fillRect(X(e.x) - r / 2, Y(e.y) - r / 2, r, r); }
+  const pin = (x, y, m) => { if (!round) return [X(x), Y(y)]; let dx = X(x) - half, dy = Y(y) - half; const d = Math.hypot(dx, dy), lim = half - m; if (d > lim) { dx *= lim / d; dy *= lim / d; } return [half + dx, half + dy]; };
+  const mark = (x, y, r, fill, shape, ring) => {
+    const [mx, my] = pin(x, y, r + 2); c.fillStyle = fill; c.beginPath();
+    if (shape === 'sq') c.roundRect(mx - r, my - r, r * 2, r * 2, r * .45); else c.arc(mx, my, r, 0, TAU);
+    c.fill(); if (ring) { c.strokeStyle = '#fff'; c.lineWidth = Math.max(1, r / 3); c.stroke(); }
+  };
+  const k = Math.min(2.2, size / 64);
+  for (const it of S.items) if (it.kind === 'heart' || it.kind === 'dumpling') mark(it.x, it.y, 2.6 * k, '#FF7BA9', 'o', true);
+  for (const b of S.crates) mark(b.x, b.y, 2.2 * k, '#F2A93B', 'sq', false);
+  for (const ch of S.chests) mark(ch.x, ch.y, 2.8 * k, '#FFD24A', 'sq', true);
+  for (const sh of S.shrines) mark(sh.x, sh.y, (3.4 + Math.sin(S.t * 6) * .5) * k, EL[sh.el], 'sq', true);
+  if (S.boss && !S.boss.dead) mark(S.boss.x, S.boss.y, 4.6 * k, '#8C7BFF', 'o', true);
+  // you: your companion's face, ringed in white
+  const fr = 10 * k, [px, py] = [X(P.x), Y(P.y)], face = mapFace();
+  c.save(); c.beginPath(); c.arc(px, py, fr, 0, TAU); c.fillStyle = '#1B2257'; c.fill(); c.clip();
+  if (face) c.drawImage(face, px - fr * 1.25, py - fr * 1.35, fr * 2.5, fr * 2.5);
+  c.restore(); c.strokeStyle = '#fff'; c.lineWidth = 1.6 * Math.min(1.6, k); c.beginPath(); c.arc(px, py, fr, 0, TAU); c.stroke();
+  c.restore();
+  return { X, Y };
+}
+function drawMap(dt) {
+  if (!S.p || !thawGrid) return;
+  const D = DPR, px = MAP.px; if (mapCv.width !== px * D) { mapCv.width = mapCv.height = px * D; }
+  MAP.acc += dt; if (MAP.acc >= MAP.every) { MAP.acc = 0; mapGreen(); }
+  mg.setTransform(D, 0, 0, D, 0, 0); mg.clearRect(0, 0, px, px);
+  paintShore(mg, px, S.p.x, S.p.y, px / 2 / MAP.view, true);
+  const half = px / 2, rim = (a0, a1, col, a) => { mg.strokeStyle = col; mg.globalAlpha = a; mg.lineWidth = 3.5; mg.lineCap = 'round'; mg.beginPath(); mg.arc(half, half, half - 2, a0, a1); mg.stroke(); mg.globalAlpha = 1; };
+  // a wave is coming: that side of the rim pulses in the wave's element
+  if (S.warn) { const wv = S.warn.w, col = wv.el === 'mix' ? '#FFD24A' : EL[wv.el], a = .55 + .45 * Math.sin(S.t * 14);
+    for (const sd of S.warn.dirs) { const an = Math.atan2(SIDES[sd][1], SIDES[sd][0]); rim(an - .62, an + .62, col, a); } }
+  // the shore ends here: the rim facing the edge glows frost-white
+  const P = S.p, E = MAP.edge, near = [[WORLD - P.x, 0], [WORLD - P.y, Math.PI / 2], [P.x, Math.PI], [P.y, -Math.PI / 2]];
+  for (const [d, an] of near) if (d < E) rim(an - .5, an + .5, '#E8F6FF', (1 - d / E) * .9);
+}
+// the same edge, on screen: a soft frost along the side where the shore runs out
+function edgeGlow() {
+  if (!S.p || reduce) return; const P = S.p, E = MAP.edge, w = 54;
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const side = (d, x0, y0, x1, y1, rx, ry, rw, rh) => { if (d >= E) return; const a = (1 - d / E) * .42, gr = g.createLinearGradient(x0, y0, x1, y1); gr.addColorStop(0, `rgba(214,238,255,${a})`); gr.addColorStop(1, 'rgba(214,238,255,0)'); g.fillStyle = gr; g.fillRect(rx, ry, rw, rh); };
+  side(P.x, 0, 0, w, 0, 0, 0, w, H); side(WORLD - P.x, W, 0, W - w, 0, W - w, 0, w, H);
+  side(P.y, 0, 0, 0, w, 0, 0, W, w); side(WORLD - P.y, 0, H, 0, H - w, 0, H - w, W, w);
+}
+function openShore() {
+  if (!running || S.over || COACH.cur) return;
+  SFX.pop(); running = false; mapGreen();
+  const size = Math.round(Math.min(W - 32, H - 200, 540)), D = DPR;
+  shoreCv.width = shoreCv.height = size * D; shoreCv.style.width = shoreCv.style.height = size + 'px';
+  sg.setTransform(D, 0, 0, D, 0, 0); sg.clearRect(0, 0, size, size);
+  paintShore(sg, size, WORLD / 2, WORLD / 2, size / WORLD, false);
+  show('shoreMap');
+}
+$('#mapBtn').addEventListener('pointerdown', e => { e.stopPropagation(); });
+$('#mapBtn').onclick = openShore;
+$('#shoreMap').onclick = () => { SFX.select(); resume(); };
+
 function hud() {
   $('#lvPill').textContent = S.lv;
   { const ub = $('#ultBtn'), U = S.ult, ready = U.charge >= 1 && !U.cast; ub.style.setProperty('--p', U.charge.toFixed(3)); ub.classList.toggle('ready', ready); ub.classList.toggle('cast', !!U.cast);
     // sit just under the top HUD, wherever it ends (the wave pill and boss bar change its height)
-    const top = $('#hud .top'); if (top) ub.style.setProperty('--ultTop', Math.round(top.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 12) + 'px');
+    const top = $('#hud .top'); if (top) { const v = Math.round(top.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 12) + 'px'; ub.style.setProperty('--ultTop', v); $('#mapBtn').style.setProperty('--ultTop', v); }
     // surrounded with the ultimate ready: it pulses harder and chimes once, the moment it can save you
     let near = 0; if (ready) for (const e of S.en) if (!e.dead && !e.boss && Math.abs(e.x - S.p.x) < 190 && Math.abs(e.y - S.p.y) < 190) near++;
     const urge = ready && near >= 10; if (urge && !ub.classList.contains('urge')) SFX.ting(); ub.classList.toggle('urge', urge); }
@@ -3364,7 +3524,7 @@ function loop(now, id) {
   if (!running || id !== loopId) return;
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
   if (S.hitstop > 0) S.hitstop -= dt; else update(dt);   // a split-second freeze makes big hits land
-  draw(); hud(); coachTick(dt);
+  draw(); edgeGlow(); drawMap(dt); hud(); coachTick(dt);
   if (running && id === loopId) requestAnimationFrame(t => loop(t, id));
 }
 
@@ -3422,18 +3582,28 @@ function petProgHTML(r) {
   const A = ANIMAL[animal], a = r.after, evolved = a.stage > r.before.stage, up = a.lv - r.before.lv;
   return `<div class="pp${evolved ? ' evo' : ''}" style="--c:${EL[A.e]}"><img src="art4/a-${animal}-y.png?v=6" alt="">
     <div><b>${A.y} · Lv ${a.lv}${up ? ` <i>+${up}</i>` : ''}</b><div class="bar"><i style="--w:${Math.round(a.into / a.need * 100)}%"></i></div>
-    <span>${evolved ? `Ultimate evolved: <strong>${a.name}</strong>!` : a.next ? `+${r.gain} XP · Lv ${a.next} evolves ${a.name} into <strong>${a.nextName}</strong>` : `+${r.gain} XP · ${a.name} is fully evolved`}</span></div></div>`;
+    <span>${evolved ? `Ultimate evolved: <strong>${a.name}</strong>!` : a.next ? `Lv ${a.next} unlocks <strong>${a.nextName}</strong>` : `${a.name} is fully evolved`}</span></div></div>`;
 }
 function results() {
   $('#hud').hidden = true;
   { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
-  const sec = Math.floor(S.t), evos = Object.keys(S.evo).map(k => POW[k].evo);
-  $('#stats').innerHTML = [
-    [S.thawed, 'creatures freed'], [`${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}`, 'time'],
-    ['Lv ' + S.lv, `${S.hordes} hordes broken`], [evos.length ? evos.join(', ') : '–', evos.length ? 'evolved' : 'no evolution yet'],
-    [S.ult.uses + '×', ULT[animal].n[S.ultInfo.stage]], [Math.min(100, Math.round(S.thawCells / (gridN * gridN) * 100)) + '%', 'of the shore restored']
-  ].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
-  if (S.won && LVL < 4) { store.set('morqi.unlocked', Math.max(unlocked(), LVL + 1)); $('#nextLvBtn').textContent = `Level ${LVL + 1} ▶`; $('#nextLvBtn').hidden = false; } else $('#nextLvBtn').hidden = true;
+  // three stars, each one a skill the playtests showed players missing: win, evolve, and use the ultimate
+  const sec = Math.floor(S.t), evoIds = Object.keys(S.evo);
+  const goals = [[S.won, 'Freed the shore'], [evoIds.length > 0, 'Evolved a power'], [S.ult.uses >= 3, 'Ultimate ×3']];
+  const star = `<path d="M50 6l12.6 27.4 29.9 3.3-22.3 20.2 6.2 29.4L50 71.2 23.6 86.3l6.2-29.4L7.5 36.7l29.9-3.3z"`;
+  $('#resStars').innerHTML = goals.map(([got, label]) => `<div class="st3${got ? ' got' : ''}"><svg viewBox="0 0 100 100" aria-hidden="true">
+    <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6C2"/><stop offset=".5" stop-color="#FFC94A"/><stop offset="1" stop-color="#EE8A14"/></linearGradient></defs>
+    ${star} fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.2)" stroke-width="4" stroke-linejoin="round"/>
+    ${got ? `<g class="gold">${star} fill="url(#sg)" stroke="#9A5200" stroke-width="5" stroke-linejoin="round"/><ellipse cx="40" cy="34" rx="11" ry="6" fill="#fff" opacity=".6" transform="rotate(-25 40 34)"/></g>` : ''}</svg><span>${label}</span></div>`).join('');
+  [...$('#resStars').children].forEach((el, i) => { if (goals[i][0]) setTimeout(() => { el.classList.add('in'); SFX.ting(); }, reduce ? 0 : 700 + i * 380); });
+  const clock = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  $('#resChips').innerHTML = `<span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4"><i></i>${S.thawed.toLocaleString()}</span>`
+    + `<span class="chip3" style="--a:#A99CFF;--b:#6F5CF0">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
+    + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('');
+  $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:18 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${8 + (i * 7) % 9}px;--c:${['#FFE08A', '#7FF0C0', '#FFFFFF', '#FFB8D0'][i % 4]};--t:${5 + (i * 3) % 5}s;--d:${(i * .43) % 4}s"></i>`).join('');
+  const next = S.won && LVL < 4;
+  if (next) { store.set('morqi.unlocked', Math.max(unlocked(), LVL + 1)); $('#nextLvBtn').textContent = `Level ${LVL + 1} ▶`; }
+  $('#nextLvBtn').hidden = !next; $('#againBtn').classList.toggle('quiet', next);   // one green button: the next level when there is one
   show('results');
 }
 
