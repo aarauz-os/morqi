@@ -57,8 +57,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .scr p{margin:0;max-width:32ch;color:rgba(255,255,255,.82);font-size:16px;line-height:1.45;font-weight:700}
 .eb{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--jade-hi)}
 .small{font-size:12.5px;color:rgba(255,255,255,.62);font-weight:700}
-#title{background:#0C1420 url(art4/hero-tall.jpg?v=8) 50% 0/cover no-repeat;justify-content:flex-end;gap:14px;padding-bottom:34px}
-#title::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,20,32,0) 28%,rgba(12,20,32,.6) 58%,rgba(12,20,32,.94) 82%)}
+#title{background:#0C1420 url(art4/hero-tall.jpg?v=8) 50% 0/cover no-repeat;justify-content:flex-end;gap:18px;padding-bottom:calc(26px + env(safe-area-inset-bottom))}
+#title::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,20,32,0) 50%,rgba(12,20,32,.55) 68%,rgba(12,20,32,.92) 86%)}
 #title > *{position:relative}
 #title h1{font-family:var(--round);font-weight:900;letter-spacing:-.02em}
 
@@ -287,14 +287,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .elrow{display:grid;grid-template-columns:70px 1fr;gap:8px;align-items:center;padding:8px 10px;border-radius:16px;background:#fff;text-align:left;font-size:12px;line-height:1.4;font-weight:800;color:var(--ink-2)}
 .elrow .ec{justify-self:start;font-size:13px}
 .elrow em{font-style:normal;color:var(--jade-2)}.elrow s{text-decoration:none;color:var(--coral-2)}
-/* level picker: a segmented control */
-.lvls{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-.lvls button,.lvls .btn{min-width:0;padding:7px 12px 8px;font-size:13.5px;border-radius:999px;color:rgba(255,255,255,.85)!important;background:none!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-.lvls .btn.green{color:var(--ink)!important;background:#fff!important;box-shadow:0 2px 8px rgba(0,0,0,.2)!important}
-.lvls button[disabled]{opacity:.4}
 @media (prefers-reduced-motion:reduce){.card,.card.evo::after,.stars s.n,.chestwrap .rays,.victory::before,.pop,#cue b,#cue span{animation:none}}
-.toggles{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.toggles .btn{font-size:13.5px;padding:8px 14px 9px}
 .petchip{width:auto!important;padding:0 10px 0 3px;display:flex;align-items:center;gap:5px;border-radius:99px!important;background:var(--night)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font:900 12.5px var(--round);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)!important}
 .petchip img{width:24px!important;height:24px!important;border-radius:50%!important;background:color-mix(in srgb,var(--c) 40%,#fff)}
 /* Midnight: popups are frosted night glass (indigo into teal) with white type; power cards are small bright element tiles */
@@ -579,16 +572,9 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .rbtn.off::after{content:"";position:absolute;left:12px;top:27px;width:34px;height:4px;border-radius:2px;background:#fff;transform:rotate(-40deg);box-shadow:0 0 0 2px #5A6088}
 .rbtn.off span{opacity:.6}
 .quietb{background:none!important;box-shadow:none!important;text-shadow:none!important;color:rgba(255,255,255,.75)!important;font-size:15px!important}.quietb::after{display:none}
-/* the Bloom grows with stars: each level's best stars sit under its button, and the Victory card says when the Bloom grows */
-.lvls .lvst{display:block;font-style:normal;font-size:9.5px;letter-spacing:1px;line-height:1;margin-top:2px;color:#FFD24A;text-shadow:0 1px 0 rgba(0,0,0,.35)}
-.lvls .btn.green .lvst{color:#E98A12;text-shadow:none}
+/* the Bloom grows with stars: each level's best stars show on the title, and the Victory card says when the Bloom grows */
 .resBloom{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:99px;font:900 14px var(--round);color:#5A3300;background:linear-gradient(180deg,#FFF1B8,#FFC94A);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 3px 0 #C47F12;animation:vicIn .7s var(--spring) .9s both}
 .resBloom[hidden]{display:none}.resBloom img{width:30px;height:30px}
-/* five levels in one even row that always fits: "Level 1" with its stars underneath, no glossy highlight bar on these pills */
-.lvls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:min(100%,380px);box-sizing:border-box;border-radius:22px}
-.lvls button,.lvls .btn{flex-direction:column;justify-content:center;gap:0;padding:6px 2px 7px;font-size:12.5px;line-height:1.1;border-radius:18px;text-shadow:none!important;white-space:nowrap}
-.lvls .btn::after{display:none}
-.lvls .lvst{margin-top:3px;font-size:9px;letter-spacing:0}
 /* the Qi Stone row: five sockets that fill with each element's qi, holding the stone once it is taken */
 #stoneRow{display:flex;gap:9px;justify-content:center;margin-top:2px}
 #stoneRow:empty{display:none}
@@ -599,8 +585,30 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .sk img{position:absolute;left:-5px;top:-6px;width:36px;height:36px;z-index:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
 /* the title: the logo as its own layer over the key art, with the line that sums the game up under it */
 #title > .brand{position:absolute;left:0;right:0;top:calc(22px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
-#title .logo{width:min(80%,340px);filter:drop-shadow(0 6px 14px rgba(10,20,60,.45))}
-#title .tag{font:900 15px var(--round);letter-spacing:.02em;color:#fff;padding:5px 14px 6px;border-radius:99px;background:rgba(20,26,80,.42);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#title .logo{width:min(66%,290px);filter:drop-shadow(0 6px 14px rgba(10,20,60,.45))}
+#title .tag{font:800 15px var(--round);letter-spacing:.01em;color:#fff;text-shadow:0 1px 2px rgba(10,16,50,.7),0 0 18px rgba(10,16,50,.55)}
+/* one hero, one action: the art carries the screen, the level reads like a page you swipe through, Play is the
+   only loud thing, and sound sits quietly in the corner */
+#title > .tsound{position:absolute;top:calc(14px + env(safe-area-inset-top));right:12px;display:flex;flex-direction:column;gap:8px}
+.ibtn{width:38px;height:38px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:rgba(14,20,50,.34);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);-webkit-tap-highlight-color:transparent;position:relative}
+.ibtn svg{width:18px;height:18px}
+.ibtn.off{opacity:.55}
+.ibtn.off::after{content:"";position:absolute;width:22px;height:2.5px;border-radius:2px;background:#fff;transform:rotate(-40deg)}
+.tlvl{display:flex;align-items:center;gap:6px;width:min(100%,380px);justify-content:space-between}
+.tname{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;flex:1}
+.tname span#lvNum{font:800 12px var(--round);letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+#title .tname h1{margin:0;font-size:clamp(22px,7.2vw,32px);line-height:1.05;white-space:nowrap;text-shadow:0 2px 12px rgba(0,0,0,.45)}
+.tstars{display:flex;gap:4px;font-size:15px;line-height:1}
+.tstars i{font-style:normal;color:rgba(255,255,255,.28)}
+.tstars i.on{color:#FFD24A;text-shadow:0 0 8px rgba(255,190,60,.6)}
+.tarr{width:40px;height:40px;flex:none;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .2s}
+.tarr svg{width:20px;height:20px}
+.tarr:disabled{opacity:0;pointer-events:none}
+#title #playBtn{width:min(78%,300px)}
+.tdots{display:flex;gap:10px;align-items:center}
+.tdots button{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:var(--c);opacity:.55;cursor:pointer;transition:all .25s var(--spring)}
+.tdots button.cur{width:22px;border-radius:4px;opacity:1;box-shadow:0 0 10px var(--c)}
+.tdots button.lock{background:none;box-shadow:inset 0 0 0 1.5px var(--c);opacity:.5;cursor:default}
 </style>
 
 <div id="stage">
@@ -633,13 +641,17 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 
   <section class="scr" id="title">
     <div class="brand"><img class="logo" src="art4/logo-morqi.png?v=8" alt="MorQi"><span class="tag">Balance is your superpower</span></div>
-    <div class="eb">Level 1 · Playable demo</div>
-    <h1 class="ck" style="font-size:clamp(34px,10vw,44px)">The Frozen Shore</h1>
-    <p>The shore has gone still. Run in with your spirit animal and free it, one horde at a time.</p>
+    <div class="tsound">
+      <button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg></button>
+      <button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="tlvl">
+      <button class="tarr" id="lvPrev" aria-label="Previous level"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="tname"><span id="lvNum">Level 1</span><h1 class="ck" id="lvName">The Frozen Shore</h1><span class="tstars" id="lvStars"></span></div>
+      <button class="tarr" id="lvNext" aria-label="Next level"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
     <button class="btn green" id="playBtn">Play</button>
-    <div class="lvls" id="lvls"></div>
-    <div class="toggles"><button class="btn blue small musBtn">Music: Off</button><button class="btn blue small sfxBtn">Sound effects: On</button></div>
-    <span class="small">Drag anywhere to move. On a computer, use the mouse or WASD.</span>
+    <div class="tdots" id="lvls" role="tablist" aria-label="Levels"></div>
   </section>
 
   <section class="scr" id="pickKeeper" hidden>
@@ -948,7 +960,7 @@ const AU = (() => {
   // music and sound effects switch on their own; music starts off, sound effects on, and the choice is remembered
   const pref = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v === '1'; } catch (e) { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
-  let c = null, comp, sfx, mus, noiseBuf, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music2', true);
+  let c = null, comp, sfx, mus, musLP, noiseBuf, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music2', true);
   const last = {};
   const MUSVOL = .15;   // music at about 5 out of 10 (A, 2026-10-04; it was 4)
   function init() {
@@ -958,7 +970,7 @@ const AU = (() => {
     comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 14; comp.ratio.value = 5; comp.attack.value = .002; comp.release.value = .18;
     const master = c.createGain(); master.gain.value = .95; comp.connect(master).connect(c.destination);
     sfx = c.createGain(); sfx.gain.value = .47; sfx.connect(comp);   // effects sit under the music: measured in play, about 4 dB below it on average, and even their peaks stay below the music's (A, 2026-10-04)
-    mus = c.createGain(); mus.gain.value = MUSVOL; mus.connect(comp);
+    mus = c.createGain(); mus.gain.value = MUSVOL; musLP = c.createBiquadFilter(); musLP.type = 'lowpass'; musLP.frequency.value = 20000; mus.connect(musLP).connect(comp);
     noiseBuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     return c;
   }
@@ -1021,6 +1033,18 @@ const AU = (() => {
     jackpot(big) { this.fanfare(big); },
     heart() { this.heal(); },
     heartbeat() { tone({ f:60, f1:40, dur:.12, vol:.35 }); tone({ f:58, f1:38, dur:.12, vol:.28, at:.22 }); },
+    // the Keeper's last breath, about three seconds and all of it low: the hit drops the world into slow motion with
+    // a sinking boom, a muffled minor chord (D, A, F) swells like a held breath, the heart beats twice and slows,
+    // frost creaks as it climbs, and one long soft exhale ends it
+    fall() {
+      tone({ f:96, f1:30, dur:1.7, glide:1.5, vol:.5 }); noise({ f:800, f1:90, dur:1.2, vol:.28 });
+      [73.42, 110, 174.61].forEach((f, i) => tone({ f, type:'triangle', dur:2.7, att:.7, vol:.075 - i * .012, lp:520, at:.12 }));
+      tone({ f:52, f1:34, dur:.16, vol:.34, at:.6 }); tone({ f:50, f1:33, dur:.16, vol:.26, at:.84 });
+      tone({ f:46, f1:31, dur:.2, vol:.24, at:1.62 }); tone({ f:44, f1:30, dur:.2, vol:.17, at:1.98 });
+      for (let i = 0; i < 8; i++) noise({ ft:'bandpass', f:rnd(650, 1150), q:3.5, dur:.06, vol:.045 + i * .004, at:1.3 + i * .14 + rnd(0, .05) });
+      noise({ f:950, f1:240, dur:1.2, att:.38, vol:.13, at:1.86 });
+      tone({ f:220, dur:1.4, att:.02, vol:.04, at:2.45 }); tone({ f:330, dur:1.1, att:.02, vol:.022, at:2.47 });
+    },
     charge() { noise({ f:400, f1:1600, dur:.6, vol:.25 }); },
     spikes() { noise({ ft:'highpass', f:3000, f1:9000, dur:.25, vol:.2 }); this.thud(false); },
     combo(n) { tone({ f:440 * Math.pow(2, MINOR[Math.min(n, 14)] / 12), dur:.12, vol:.07 }); },
@@ -1480,6 +1504,8 @@ const AU = (() => {
   function music(play) {
     if (!c) return;
     if (!play) { if (M.timer) { clearInterval(M.timer); M.timer = null; } return; }
+    // back from a fall's slow motion
+    if (musLP) { const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(20000, t); mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(MUSVOL, t); }
     mBuild(); if (M.timer) return;
     M.next = c.currentTime + .08;
     M.timer = setInterval(() => {
@@ -1539,7 +1565,10 @@ const AU = (() => {
       if (!c) return null; if (!this._m) { const m = n => { const a = c.createAnalyser(); a.fftSize = 2048; n.connect(a); return a; }; this._m = { s:m(sfx), u:m(mus), b:new Float32Array(2048) }; }
       const db = a => { a.getFloatTimeDomainData(this._m.b); let e = 0; for (const x of this._m.b) e += x * x; return 10 * Math.log10(e / this._m.b.length + 1e-12); };
       return { sfx:db(this._m.s), mus:db(this._m.u) }; },
-    setSfx(v) { if (sfx) sfx.gain.value = v; }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
+    setSfx(v) { if (sfx) sfx.gain.value = v; },
+    // slow motion: the score sinks under water and fades while the last notes ring out
+    slowmo() { if (!musLP) return; const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(musLP.frequency.value, t); musLP.frequency.exponentialRampToValueAtTime(160, t + 1.1);
+      mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(0, t + 1.4); }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
     get on() { return sfxOn; }, get musicOn() { return musOn; } };
 })();
 const SFX = AU.S;
@@ -1692,7 +1721,7 @@ function startRun() {
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   // Afterglow opens, then the level themes take turns; every boss shares the Warden's
   S.props = scatterProps(worldOf());
-  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; renderSkills(); startLoop();
+  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -1752,9 +1781,9 @@ $('#pauseBtn').onclick = () => { SFX.pop(); pause(); };
 $('#resumeBtn').onclick = () => { SFX.select(); resume(); };
 $('#restartBtn').onclick = () => { show(null); startRun(); };
 function renderSound() {
-  // the pause menu's round icon buttons grey out when off; the title screen's buttons say it in words
-  document.querySelectorAll('.musBtn').forEach(b => { if (b.classList.contains('rbtn')) b.classList.toggle('off', !AU.musicOn); else b.textContent = AU.musicOn ? 'Music: On' : 'Music: Off'; b.setAttribute('aria-pressed', AU.musicOn); });
-  document.querySelectorAll('.sfxBtn').forEach(b => { if (b.classList.contains('rbtn')) b.classList.toggle('off', !AU.on); else b.textContent = AU.on ? 'Sound effects: On' : 'Sound effects: Off'; b.setAttribute('aria-pressed', AU.on); });
+  // the round icon buttons, in the pause menu and on the title, grey out when off
+  document.querySelectorAll('.musBtn').forEach(b => { b.classList.toggle('off', !AU.musicOn); b.setAttribute('aria-pressed', AU.musicOn); });
+  document.querySelectorAll('.sfxBtn').forEach(b => { b.classList.toggle('off', !AU.on); b.setAttribute('aria-pressed', AU.on); });
 }
 document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleMusic(); if (AU.musicOn && S && !S.over) AU.music(true); renderSound(); SFX.select(); });
 document.querySelectorAll('.sfxBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleSfx(); renderSound(); SFX.select(); });
@@ -1762,7 +1791,7 @@ renderSound();
 $('#againBtn').onclick = () => { show(null); AU.music(true); startRun(); };
 $('#retryBtn').onclick = () => { payPet(); show(null); startRun(); };
 $('#riseBtn').onclick = () => {
-  S.over = false; S.p.hp = S.p.max; S.p.hurt = 2; AU.music(true);
+  S.over = false; S.fall = null; $('#hud').hidden = false; S.p.hp = S.p.max; S.p.hurt = 2; AU.music(true);
   for (const e of S.en) if (!e.boss) { const d = Math.hypot(e.x - S.p.x, e.y - S.p.y) || 1; e.kx = (e.x - S.p.x) / d * 700; e.ky = (e.y - S.p.y) / d * 700; e.kb = .5; }
   ring(S.p.x, S.p.y, 20, 520, '#FFE6A3', .6, 14, true); stars(S.p.x, S.p.y, 30, '#FFE58A', 400); SFX.levelup(); resume();
 };
@@ -2942,7 +2971,7 @@ function update(dt) {
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
   for (const n of S.nums) n.t += dt; S.nums = S.nums.filter(n => n.t < .65);
-  if (P.hp <= 0 && !S.over) lose();
+  if (P.hp <= 0 && !S.over) fall();
 }
 function floatText(x, y, s, c, size = 14) { if (S.txt.length > 24) S.txt.shift(); S.txt.push({ x, y, s, c, t:0, size }); }
 
@@ -3472,6 +3501,8 @@ function draw() {
   // the Keeper: runs with a lean and a bounce, breathes when still, recoils and flashes when hit
   // running uses a real run cycle (stride, pass, stride, pass); standing uses the idle pose
   // and, when the art has them, poses that say what is happening: a stretched dash, a flinch when hit, a cheer after a level up
+  // when the Keeper falls, the fall draws them instead (over the drained world, in full colour)
+  if (!S.fall) {
   const runName = `k${keeper}r${[1, 2, 3, 2][Math.floor(S.t * 10) % 4]}`, useRun = P.moving && ok(IMG[runName]), hk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .28);
   const pose = n => ok(IMG['k' + keeper + n]) ? 'k' + keeper + n : null;
   const posed = S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
@@ -3505,6 +3536,7 @@ function draw() {
   if (hb > 0) { const gr = g.createLinearGradient(0, P.y + 43, 0, P.y + 53); if (hb > .3) { gr.addColorStop(0, '#B6F58A'); gr.addColorStop(1, '#3FB24A'); } else { gr.addColorStop(0, '#FFB19A'); gr.addColorStop(1, '#D63A2C'); }
     g.fillStyle = gr; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, Math.max(10, 78 * hb), 10, 5); g.fill();
     g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.roundRect(P.x - 36, P.y + 44.5, Math.max(4, 78 * hb - 6), 3, 2); g.fill(); }
+  }
   // enemy ice shards
   // spirit animal shots, each in its element
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue;
@@ -3570,7 +3602,7 @@ function draw() {
   }
   if (S.flashT > 0) { g.fillStyle = `rgba(${S.flashC || '255,255,255'},${S.flashT * 2})`; g.fillRect(0, 0, W, H); }
   if (S.freeze > 0) { g.fillStyle = `rgba(160,220,255,${Math.min(.18, S.freeze * .08)})`; g.fillRect(0, 0, W, H); }
-  if (P.hp < P.max * .3) { const v = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); v.addColorStop(0, 'rgba(200,40,30,0)'); v.addColorStop(1, `rgba(200,40,30,${.4 * (1 - P.hp / (P.max * .3)) * (.7 + .3 * Math.sin(S.t * 8))})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
+  if (P.hp < P.max * .3 && !S.fall) { const v = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); v.addColorStop(0, 'rgba(200,40,30,0)'); v.addColorStop(1, `rgba(200,40,30,${.4 * (1 - P.hp / (P.max * .3)) * (.7 + .3 * Math.sin(S.t * 8))})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
 }
 
 // particles: a normal pass, then a single additive pass (switching blend modes per particle is slow)
@@ -4191,8 +4223,99 @@ function defeatTip() {
   if (hearts) return { img:src('x-heart'), t:'Grab the hearts', p:'Your health barely refills on its own. A heart heals a third, so go and get one when you are low.' };
   return { img:crea, t:'Keep moving', p:'Creatures only hurt you when they touch you. Circle around the crowd instead of running into it.' };
 }
-function lose() {
-  S.over = true; running = false; AU.music(false); SFX.stomp();
+// The fall, about three seconds with no words, before the defeat card. The last hit lands with a flash and the
+// world drops into slow motion; the colour drains out of everything but your Keeper while the camera pushes in on
+// them; they tip back reaching out (the cartoon "nooo!"), sink to their knees for one last frosty breath, and the
+// Stillness frosts them over from the feet up, their element light going out. Then night falls, and the card asks
+// them to rise again, which thaws them. Frozen still, never hurt: the same spell that froze the shore.
+const FALL = { end:2.75, fade:.45 };
+let fallBuf = null;
+function fall() {
+  if (S.fall) return;
+  S.over = true; running = false; joy = null; $('#joy').style.display = 'none';
+  S.fall = { t:0, ts:1, dir:S.p.face < 0 ? 1 : -1, puff:0 };
+  $('#hud').hidden = true; S.txt = []; if (S.nums) S.nums = [];
+  S.flashT = .3; S.flashC = '255,236,236'; S.shake = reduce ? 0 : .5;
+  for (const n of ['reach', 'breath']) if (!IMG['k' + keeper + n]) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`);
+  AU.slowmo(); SFX.fall();
+  const F = S.fall, id = ++loopId; let last = performance.now();
+  // a tap skips ahead once the moment has landed
+  const skip = () => { if (F.t > .8 && F.t < FALL.end) F.t = FALL.end; };
+  stage.addEventListener('pointerdown', skip);
+  const step = now => {
+    if (id !== loopId || S.fall !== F) { stage.removeEventListener('pointerdown', skip); return; }
+    const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now; F.t += dt;
+    // time slows to a tenth within half a second, so the world keeps drifting, barely
+    F.ts = 1 - .9 * Math.min(1, F.t / .5); const sd = dt * F.ts;
+    S.t += sd; updateFX(sd);
+    S.flashT = Math.max(0, S.flashT - dt); S.shake = Math.max(0, S.shake - dt * 1.4);
+    draw(); drawFall(F);
+    if (F.t < FALL.end + FALL.fade) requestAnimationFrame(step);
+    else { stage.removeEventListener('pointerdown', skip); lose(true); }
+  };
+  requestAnimationFrame(step);
+}
+const easeIO = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+function drawFall(F) {
+  const P = S.p, a = F.t, cl = (x, lo, hi) => Math.max(0, Math.min(1, (x - lo) / (hi - lo)));
+  const drain = cl(a, 0, 1.2) * .88, zk = reduce ? 0 : easeIO(cl(a, .05, 2.3)), fr = cl(a, 1.3, 2.4), fade = cl(a, FALL.end, FALL.end + FALL.fade);
+  // the world drains to grey and cools, darkest at the edges
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  g.globalCompositeOperation = 'saturation'; g.globalAlpha = drain; g.fillStyle = '#808080'; g.fillRect(0, 0, W, H);
+  g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  g.fillStyle = `rgba(16,22,58,${.28 * drain})`; g.fillRect(0, 0, W, H);
+  // the Keeper, in full colour, drawn in the world where they stand
+  const sx = (P.x - camX) * Z, sy = (P.y - 40 - camY) * Z;
+  g.setTransform(DPR * Z, 0, 0, DPR * Z, -camX * DPR * Z, -camY * DPR * Z);
+  const ks = 132, back = easeIO(cl(a, .15, 1.4)), sink = easeIO(cl(a, 1.35, 1.9));
+  const kx = P.x + F.dir * (back * 26 - sink * 8), ky = P.y - back * 10 * (1 - sink) + sink * 6, rot = F.dir * (back * .14 * (1 - sink));
+  const im = n => IMG['k' + keeper + n], hurt = im('hurt'), reach = im('reach'), breath = im('breath'), idle = IMG['k' + keeper];
+  // a clean cut between the two key frames, like hand-drawn animation, with a little squash as they land on their knees
+  const mix = a < 1.5 ? 0 : 1, land = a < 1.5 ? 0 : Math.max(0, 1 - (a - 1.5) / .25), first = a < .15 ? (ok(hurt) ? hurt : idle) : ok(reach) ? reach : ok(hurt) ? hurt : idle, second = ok(breath) ? breath : first;
+  g.fillStyle = `rgba(0,0,0,${.28})`; g.beginPath(); g.ellipse(kx, P.y + 30, 30 + sink * 6, 10, 0, 0, TAU); g.fill();
+  // their element light, going out as the frost climbs
+  add(() => glowAt(kx, ky - 30, 230, EL[keeperEl], .5 * (1 - fr) * (1 - fade)));
+  const pose = (img, al) => { if (!ok(img) || al <= 0) return; const c = frostOf(img, fr); g.save(); g.globalAlpha = al; g.translate(kx, ky + 30); g.rotate(rot); if (P.face < 0) g.scale(-1, 1); g.scale(1 + land * .08, 1 - land * .1); g.drawImage(c, -ks / 2, -ks * .72 - 24, ks, ks); g.restore(); };
+  pose(first, 1 - mix); pose(second, mix);
+  // frost spreading on the ground around them
+  if (fr > 0) { g.save(); g.globalAlpha = .7 * fr; const gr = g.createRadialGradient(kx, P.y + 30, 4, kx, P.y + 30, 70 * fr + 20);
+    gr.addColorStop(0, 'rgba(225,244,255,.95)'); gr.addColorStop(1, 'rgba(225,244,255,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(kx, P.y + 30, 70 * fr + 20, (70 * fr + 20) * .38, 0, 0, TAU); g.fill(); g.restore(); }
+  // one last breath, a small cloud of cold mist drifting up
+  if (a > 1.86) { const k = cl(a, 1.86, 3), hx = kx + (P.face < 0 ? -1 : 1) * 22, hy = ky - ks * .55 + 10;
+    for (let i = 0; i < 3; i++) { const kk = Math.max(0, k - i * .12); if (!kk) continue;
+      add(() => glowAt(hx + (P.face < 0 ? -1 : 1) * kk * (34 + i * 14), hy - kk * (40 + i * 12), 22 + kk * 40, '#DDEFFF', .32 * Math.sin(Math.min(1, kk) * Math.PI))); } }
+  // a glint runs across them once the frost has taken them
+  if (a > 2.4 && a < 2.9) { const k = (a - 2.4) / .5; add(() => glowAt(kx - 50 + k * 100, ky - 60 + k * 40, 70, '#FFFFFF', .45 * Math.sin(k * Math.PI))); }
+  // the vignette closes in around the Keeper
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const vr = g.createRadialGradient(sx, sy, 60, sx, sy, Math.max(W, H) * (.95 - .35 * zk));
+  vr.addColorStop(0, 'rgba(8,10,34,0)'); vr.addColorStop(1, `rgba(8,10,34,${.85 * cl(a, 0, 1)})`); g.fillStyle = vr; g.fillRect(0, 0, W, H);
+  // the slow push-in: the frame scales up around the Keeper and glides them to the centre
+  if (zk > 0) { const z = 1 + 1.3 * zk, px = sx, py = sy, cx = px + (W / 2 - px) * zk, cy = py + (H * .46 - py) * zk;
+    if (!fallBuf) fallBuf = document.createElement('canvas'); if (fallBuf.width !== cv.width || fallBuf.height !== cv.height) { fallBuf.width = cv.width; fallBuf.height = cv.height; }
+    const b = fallBuf.getContext('2d'); b.setTransform(1, 0, 0, 1, 0, 0); b.clearRect(0, 0, cv.width, cv.height); b.drawImage(cv, 0, 0);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#080A22'; g.fillRect(0, 0, cv.width, cv.height);
+    g.setTransform(DPR * z, 0, 0, DPR * z, (cx - px * z) * DPR, (cy - py * z) * DPR); g.drawImage(fallBuf, 0, 0, W, H); }
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (fade > 0) { g.fillStyle = `rgba(8,10,34,${fade})`; g.fillRect(0, 0, W, H); }
+}
+// a Keeper pose with frost climbing it from the feet up (one small canvas per pose, redrawn as the frost moves)
+const FROST = {};
+function frostOf(img, fr) {
+  if (fr <= 0) return img;
+  const key = img.src, F = FROST[key] || (FROST[key] = { c:document.createElement('canvas'), fr:-1 });
+  if (Math.abs(F.fr - fr) < .01) return F.c; F.fr = fr;
+  const n = 256, c = F.c; c.width = c.height = n; const x = c.getContext('2d');
+  x.clearRect(0, 0, n, n); x.drawImage(img, 0, 0, n, n); x.globalCompositeOperation = 'source-atop';
+  const top = n * (1 - fr * .8), gr = x.createLinearGradient(0, n, 0, top);
+  gr.addColorStop(0, 'rgba(190,226,255,.62)'); gr.addColorStop(.8, 'rgba(160,210,250,.42)'); gr.addColorStop(1, 'rgba(160,210,250,0)');
+  x.fillStyle = gr; x.fillRect(0, 0, n, n);
+  // a cold sheen along the frost line
+  x.fillStyle = `rgba(255,255,255,${.22 * fr})`; x.fillRect(0, top + n * .05, n, n * .012);
+  x.globalCompositeOperation = 'source-over'; return c;
+}
+function lose(fell) {
+  S.over = true; running = false; AU.music(false); if (!fell) SFX.stomp();
   const B = S.boss && !S.boss.dead ? S.boss : null, WV = LV().waves, tip = defeatTip(); let title, line, frac;
   if (B) { const left = B.hp / B.max; frac = 1 - left; title = left < .34 ? 'So close!' : 'Nearly there!'; line = `The Warden had only ${Math.max(1, Math.ceil(left * 100))}% left`; }
   else if (S.waveIdx) { frac = S.waveIdx / (WV.length + 1); title = S.waveIdx >= WV.length ? 'Almost there!' : 'Keep going, Keeper!'; line = `You reached wave ${S.waveIdx} of ${WV.length}`; }
@@ -4200,7 +4323,7 @@ function lose() {
   $('#riseImg').src = `art4/rise/k${keeper}.jpg?v=8`; $('#riseT').textContent = title; $('#riseProg').textContent = line;
   const ti = $('#riseTipImg'); ti.hidden = !tip.img; if (tip.img) ti.src = tip.img; $('#riseTipT').textContent = tip.t; $('#riseTipP').textContent = tip.p;
   const bar = $('#riseBar'); bar.style.transition = 'none'; bar.style.width = '0'; void bar.offsetWidth; bar.style.transition = '';
-  setTimeout(() => { if (!S.over) return; show('defeat'); SFX.fanfare(false); requestAnimationFrame(() => { bar.style.width = Math.round(frac * 100) + '%'; }); }, 420);
+  setTimeout(() => { if (!S.over) return; show('defeat'); SFX.fanfare(false); requestAnimationFrame(() => { bar.style.width = Math.round(frac * 100) + '%'; }); }, fell ? 60 : 420);
 }
 function payPet() {   // the companion keeps what it earned: kills, ultimates fired, and a win
   if (!S || S.petPaid) return null; S.petPaid = true;
@@ -4288,11 +4411,20 @@ function chart(from) {
 $('#chartBtn').onclick = () => { SFX.pop(); chart('howto'); };
 $('#chartBtn2').onclick = () => { SFX.pop(); chart('paused'); };
 $('#chartOk').onclick = () => { SFX.select(); show(chartFrom); };
+// the title shows one level at a time, like pages: its name, its stars, and five dots in the element colours of the
+// five realms underneath (filled when open, hollow when still locked)
+const REALM = ['water', 'wood', 'fire', 'earth', 'metal'];
 function renderLevels() {
-  const u = unlocked();
-  $('#lvls').innerHTML = LEVELS.map((_, i) => i + 1).map(n => `<button class="btn ${n === LVL ? 'green' : 'blue'} small" data-n="${n}" ${n > u ? 'disabled' : ''}>${n > u ? '🔒 ' : ''}Level ${n}${n <= u ? `<i class="lvst">${'★'.repeat(starsOf(n))}${'☆'.repeat(3 - starsOf(n))}</i>` : ''}</button>`).join('');
-  $('#lvls').querySelectorAll('button').forEach(b => b.onclick = () => { LVL = +b.dataset.n; SFX.select(); renderLevels(); });
+  const u = unlocked(), st = starsOf(LVL);
+  $('#lvNum').textContent = `Level ${LVL}`; $('#lvName').textContent = LEVELS[LVL - 1].name;
+  $('#lvStars').innerHTML = [0, 1, 2].map(i => `<i class="${i < st ? 'on' : ''}">\u2605</i>`).join('');
+  $('#lvStars').setAttribute('aria-label', `${st} of 3 stars`);
+  $('#lvPrev').disabled = LVL <= 1; $('#lvNext').disabled = LVL >= Math.min(u, LEVELS.length);
+  $('#lvls').innerHTML = LEVELS.map((L, i) => `<button role="tab" style="--c:${EL[REALM[i]]}" class="${i + 1 === LVL ? 'cur' : ''}${i + 1 > u ? ' lock' : ''}" data-n="${i + 1}" aria-label="Level ${i + 1}: ${L.name}${i + 1 > u ? ' (locked)' : ''}" aria-selected="${i + 1 === LVL}" ${i + 1 > u ? 'disabled' : ''}></button>`).join('');
+  $('#lvls').querySelectorAll('button').forEach(b => b.onclick = () => pickLevel(+b.dataset.n));
 }
+function pickLevel(n) { if (n < 1 || n > Math.min(unlocked(), LEVELS.length) || n === LVL) return; LVL = n; SFX.select(); renderLevels(); }
+$('#lvPrev').onclick = () => pickLevel(LVL - 1); $('#lvNext').onclick = () => pickLevel(LVL + 1);
 renderLevels();
 $('#nextLvBtn').onclick = () => { SFX.select(); LVL++; renderLevels(); intro(LVL); };
 })();
