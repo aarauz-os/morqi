@@ -540,10 +540,10 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
     <div class="panel pop" style="padding-top:36px">
       <div class="rb"><span class="ribbon">How to play</span></div>
       <div class="howto">
-        <div class="how"><span class="ic"><span class="ghost"><i></i></span></span><div><b>Move with one thumb</b><span>Drag anywhere on the screen. Your powers <em>fire on their own</em>.</span></div></div>
+        <div class="how"><span class="ic"><span class="ghost"><i></i></span></span><div><b>Move with one thumb</b><span>Drag anywhere on the screen. Your powers <em>fire on their own</em>. <em>Tap</em> to dash out of a crowd.</span></div></div>
         <div class="how"><span class="ic"><span class="gemi"></span></span><div><b>Free creatures, grab gems</b><span>Every creature you free drops a qi gem. Fill the bar to <em>level up and pick a power</em>.</span></div></div>
         <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="#1A1206" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g><g stroke="#FFE58A" stroke-width="1.6" fill="none" opacity=".9"><path d="M28 16 L37 40"/><path d="M39 25 L19 41"/><path d="M33 45 L13 27"/><path d="M17 38 L23 13"/><path d="M15 21 L40 22"/></g></svg></span><div><b>Five elements</b><span>Every power and creature has one. <em>Each element beats two and is weak to two</em>: fire burns wood, water puts out fire. Hits show <em>Super effective!</em> or <em>Resisted</em>. <button class="btn blue small" id="chartBtn" style="margin-top:6px;font-size:14px;padding:5px 12px 7px">See the chart</button></span></div></div>
-        <div class="how"><span class="ic"><img src="art4/props/x-chest.png?v=6" alt="" style="width:120%;max-width:none"></span><div><b>Evolve your powers</b><span>Max a power to five stars and hold the <em>gift of the element that feeds it</em>. Crystal brutes drop Spirit Chests that help.</span></div></div>
+        <div class="how"><span class="ic"><img src="art4/props/x-chest.png?v=6" alt="" style="width:120%;max-width:none"></span><div><b>Evolve your powers</b><span>Get a power to three stars and hold the <em>gift of the element that feeds it</em>. Crystal brutes drop Spirit Chests that help.</span></div></div>
         <div class="how"><span class="ic"><img src="art4/b-warden.png?v=6" alt="" style="width:130%;max-width:none"></span><div><b>Free the shore</b><span><em>Ten waves</em> come, each one element. Arrows at the edge warn you where. Survive them, then <em>defeat the Still Warden</em>.</span></div></div>
       </div>
       <button class="btn green" id="howtoGo">Let's go!</button>
@@ -1374,7 +1374,7 @@ function startRun() {
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
-  coach('move', 'Drag to move', 'Drag anywhere. Your powers fire on their own.', () => ({ sx:W / 2, sy:H * .7 - 70 }), 7, 'above', () => S.moved > 140);
+  coach('move', 'Drag to move', 'Drag anywhere. Your powers fire on their own. Tap to dash out of a crowd.', () => ({ sx:W / 2, sy:H * .7 - 70 }), 7, 'above', () => S.moved > 140);
 }
 function need(lv) { return Math.round(4 + lv * lv * 4.2); }
 
@@ -1384,13 +1384,14 @@ addEventListener('keydown', e => {
   keys[e.key.toLowerCase()] = true;
   if (e.key === 'Escape' && running) pause();
   if ((e.key === 'e' || e.key === 'E') && running) fireUlt();
+  if (e.key === ' ' && running && !COACH.cur) { e.preventDefault(); breakOut(); }
   if (!$('#pickKeeper').hidden) { if (e.key === 'ArrowRight') pickKeeper(keeper + 1, 1); if (e.key === 'ArrowLeft') pickKeeper(keeper - 1, -1); }
 });
 addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 cv.addEventListener('pointerdown', e => {
   if (!running) return; AU.init();
   const r = stage.getBoundingClientRect();
-  joy = { id:e.pointerId, x:e.clientX - r.left, y:e.clientY - r.top, dx:0, dy:0 };
+  joy = { id:e.pointerId, x:e.clientX - r.left, y:e.clientY - r.top, dx:0, dy:0, t0:performance.now(), far:0 };
   const j = $('#joy'); j.style.display = 'block'; j.style.left = joy.x + 'px'; j.style.top = joy.y + 'px'; j.firstChild.style.transform = '';
   cv.setPointerCapture(e.pointerId);
 });
@@ -1398,9 +1399,9 @@ cv.addEventListener('pointermove', e => {
   if (!joy || e.pointerId !== joy.id) return;
   const r = stage.getBoundingClientRect(); let dx = e.clientX - r.left - joy.x, dy = e.clientY - r.top - joy.y;
   const m = Math.hypot(dx, dy), max = 46; if (m > max) { dx *= max / m; dy *= max / m; }
-  joy.dx = dx / max; joy.dy = dy / max; $('#joy i').style.transform = `translate(${dx * .55}px,${dy * .55}px)`;   // the knob travels within the small ring
+  joy.far = Math.max(joy.far, m); joy.dx = dx / max; joy.dy = dy / max; $('#joy i').style.transform = `translate(${dx * .55}px,${dy * .55}px)`;   // the knob travels within the small ring
 });
-const endJoy = e => { if (joy && e.pointerId === joy.id) { joy = null; $('#joy').style.display = 'none'; } };
+const endJoy = e => { if (joy && e.pointerId === joy.id) { const tap = e.type === 'pointerup' && performance.now() - joy.t0 < 230 && joy.far < 14; joy = null; $('#joy').style.display = 'none'; if (tap) breakOut(); } };
 cv.addEventListener('pointerup', endJoy); cv.addEventListener('pointercancel', endJoy);
 // one loop at a time: a new start retires any loop still queued, so a double tap can never double the game speed
 let loopId = 0;
@@ -2242,6 +2243,27 @@ function bossFight(b, ph, dt) {
 // every attack winds up first, with a red circle or lane on the ground, so a watchful player can always step clear
 const bossHit = () => [2 / 3, 5 / 6, 1, 1][S.level - 1];   // the first bosses teach; the later ones punish
 const lvHit = () => S.level === 1 ? 2 / 3 : 1;              // level 1's creatures bite softer while you learn
+// tap to break out (playtest 1: "I want one way to create a big hole through the middle", and Abby kept tapping to see
+// whether it would fire): a short dash you can't be hurt during, with a shockwave that throws the crowd back and slows it.
+// Ready again in 6 s; a thin ring at your feet fills while it recharges.
+const DASH_CD = 6;
+function breakOut() {
+  if (!S || S.over || !running) return false;
+  const P = S.p;
+  if ((S.dashCd || 0) > 0) return false;
+  let dx = S.lastMove ? S.lastMove.x : P.face, dy = S.lastMove ? S.lastMove.y : 0;
+  if (!P.moving) {   // standing still in a crowd: dash away from where it is thickest
+    let cx = 0, cy = 0, n = 0; for (const e of S.en) if (!e.dead && Math.abs(e.x - P.x) < 260 && Math.abs(e.y - P.y) < 260) { cx += e.x; cy += e.y; n++; }
+    if (n) { dx = P.x - cx / n; dy = P.y - cy / n; }
+  }
+  const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
+  S.dash = { t:0, dur:.2, dx, dy, dist:280 }; S.dashCd = DASH_CD; P.hurt = Math.max(P.hurt, .5);
+  const R = 200;
+  inArea(P.x, P.y, R, e => { if (!e.boss) { hurt(e, 18 + S.lv * 4, keeperEl, { kb:560, fx:P.x, fy:P.y }); e.slow = Math.max(e.slow, 1.2); } });
+  ring(P.x, P.y, 20, R * 1.1, EL[keeperEl], .45, 14, true); ring(P.x, P.y, 10, R * .7, '#FFFFFF', .3, 8, true); stars(P.x, P.y - 20, 14, '#FFF1B0', 360);
+  S.shake = Math.max(S.shake, .25); S.hitstop = Math.max(S.hitstop || 0, .04); SFX.whip(); SFX.boom(false);
+  return true;
+}
 function ouch(dmg, fx, fy, o = {}) {
   const P = S.p; if (P.hurt > 0) return false;
   const hit = dmg * armourVs(o.el) * (o.src === 'spikes' || o.src === 'stomp' || o.src === 'charge' ? bossHit() : lvHit());
@@ -2347,6 +2369,11 @@ function update(dt) {
   const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
   P.slowT = Math.max(0, (P.slowT || 0) - dt); const spd = 235 * (P.slowT > 0 ? .6 : 1);
   P.x = clamp(P.x + mx * spd * dt, 30, WORLD - 30); P.y = clamp(P.y + my * spd * dt, 30, WORLD - 30);
+  if (m > .1) S.lastMove = { x:mx, y:my };
+  if (S.dashCd > 0 && (S.dashCd -= dt) <= 0) { S.dashCd = 0; ring(P.x, P.y, 10, 70, '#6FF2CF', .3, 5, true); }   // ready again
+  if (S.dash) { const Dh = S.dash, k = Math.min(dt, Dh.dur - Dh.t); Dh.t += dt;
+    P.x = clamp(P.x + Dh.dx * Dh.dist / Dh.dur * k, 30, WORLD - 30); P.y = clamp(P.y + Dh.dy * Dh.dist / Dh.dur * k, 30, WORLD - 30);
+    fx({ k:'glow', x:P.x, y:P.y - 20, s:70, s1:6, c:EL[keeperEl], life:.3 }); if (Dh.t >= Dh.dur) S.dash = null; }
   if (S.arena) { const A = S.arena, d = Math.hypot(P.x - A.x, P.y - A.y), lim = A.r - 34; if (d > lim) { P.x = A.x + (P.x - A.x) / d * lim; P.y = A.y + (P.y - A.y) / d * lim; } }
   if (Math.abs(mx) > .1) P.face = mx > 0 ? 1 : -1;
   P.moving = m > .1; P.mx = mx; P.my = my;
@@ -2843,6 +2870,7 @@ function draw() {
     g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1)); g.drawImage(kim, -ks / 2, -ks * .72 - 24, ks, ks);   // feet on the shadow
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, -ks * .72 - 24, ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
+  if (S.dashCd > 0) { const k = 1 - S.dashCd / DASH_CD; g.save(); g.strokeStyle = 'rgba(111,242,207,.85)'; g.lineWidth = 4.5; g.lineCap = 'round'; g.beginPath(); g.ellipse(P.x, P.y + 28, 36, 14, 0, -Math.PI / 2, -Math.PI / 2 + k * TAU); g.stroke(); g.restore(); }
   const hb = Math.max(0, P.hp / P.max);
   // a glossy health capsule with a white rim, like the HUD
   g.fillStyle = '#FFFFFF'; g.beginPath(); g.roundRect(P.x - 42, P.y + 40, 84, 16, 8); g.fill();
@@ -3001,17 +3029,24 @@ function gainXp(v) {
 }
 // an element learned this level is an apprentice element: its powers stop at three stars for now
 const maxStars = id => POW[id].e === S.apprentice ? 3 : 5;
-const canEvo = id => S.skills[id] >= 5 && S.gifts[evoGift(id)] && !S.evo[id];
+const SLOTS = { active:3, gift:3 };   // six slots: three powers, three gifts, and every power has a gift that evolves it
+const canEvo = id => S.skills[id] >= 3 && S.gifts[evoGift(id)] && !S.evo[id] && POW[id].e !== S.apprentice;
 const elOf = o => o.kind === 'gift' ? GIFT[o.id].e : o.kind === 'heal' ? 'earth' : POW[o.id].e;
 function options() {
   const opts = [], has = (k, id) => opts.some(o => o.kind === k && o.id === id);
   const evo = Object.keys(POW).find(canEvo); if (evo) opts.push({ kind:'evo', id:evo });
   const st = START[keeperEl];
   if (!S.evo[st] && S.skills[st] < 5) opts.push({ kind:'active', id:st });
-  const fg = evoGift(st); if (!S.gifts[fg] && S.lv >= 3) opts.push({ kind:'gift', id:fg });
+  // the gift that will evolve a power you are building comes first, once that power has two stars
+  const nG0 = Object.keys(S.gifts).length;
+  if (nG0 < SLOTS.gift) { const key = Object.keys(S.skills).filter(id => !S.evo[id] && S.skills[id] >= 2 && !S.gifts[evoGift(id)] && POW[id].e !== S.apprentice).sort((a, b) => S.skills[b] - S.skills[a])[0];
+    if (key && !has('gift', evoGift(key))) opts.push({ kind:'gift', id:evoGift(key) }); }
   const pool = [], nA = Object.keys(S.skills).length, nG = Object.keys(S.gifts).length;
-  for (const id in POW) if (S.learned.includes(POW[id].e) && !S.evo[id] && (S.skills[id] ? S.skills[id] < maxStars(id) : nA < 6)) pool.push({ kind:'active', id });
-  for (const id in GIFT) if (S.gifts[id] ? S.gifts[id] < 5 : nG < 6) pool.push({ kind:'gift', id });
+  for (const id in POW) if (S.learned.includes(POW[id].e) && !S.evo[id] && (S.skills[id] ? S.skills[id] < maxStars(id) : nA < SLOTS.active)) pool.push({ kind:'active', id });
+  // a new gift is always one that evolves a power you hold (playtest sims: random picks filled the gift slots with gifts
+  // that evolved nothing, so no power ever evolved); once no power needs one, any gift can come
+  const keys = Object.keys(S.skills).filter(id => !S.evo[id] && POW[id].e !== S.apprentice).map(evoGift);
+  for (const id in GIFT) if (S.gifts[id] ? S.gifts[id] < 5 : nG < SLOTS.gift && (!keys.some(k => !S.gifts[k]) || keys.includes(id))) pool.push({ kind:'gift', id });
   // a card you have passed on twice rests for a level-up or two (playtest 1: the same unwanted card came back every time)
   S.decl = S.decl || {}; for (let i = pool.length - 1; i >= 0; i--) { const k = pool[i].kind + pool[i].id; if ((S.decl[k] || 0) >= 2) { S.decl[k] -= .5; pool.splice(i, 1); } }
   pool.sort(() => Math.random() - .5);
@@ -3039,8 +3074,8 @@ function renderLoadout() {
   const act = Object.keys(S.skills), gif = Object.keys(S.gifts);
   const cell = (src, col, lvl, cls) => `<span class="slot ${cls}" style="--c:${col}">${src ? `<img src="${src}" alt=""><em>${lvl}</em>` : ''}</span>`;
   let h = '';
-  for (let i = 0; i < 6; i++) { const id = act[i]; h += id ? cell(icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon), S.evo[id] ? 'var(--gold)' : EL[POW[id].e], S.evo[id] ? '★' : S.skills[id], S.evo[id] ? 'evo' : '') : cell(null, '#3A4A58', '', 'empty'); }
-  for (let i = 0; i < 6; i++) { const id = gif[i]; h += id ? cell(icon(GIFT[id].icon), EL[GIFT[id].e], S.gifts[id], 'gift') : cell(null, '#3A4A58', '', 'gift empty'); }
+  for (let i = 0; i < SLOTS.active; i++) { const id = act[i]; h += id ? cell(icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon), S.evo[id] ? 'var(--gold)' : EL[POW[id].e], S.evo[id] ? '★' : S.skills[id], S.evo[id] ? 'evo' : '') : cell(null, '#3A4A58', '', 'empty'); }
+  for (let i = 0; i < SLOTS.gift; i++) { const id = gif[i]; h += id ? cell(icon(GIFT[id].icon), EL[GIFT[id].e], S.gifts[id], 'gift') : cell(null, '#3A4A58', '', 'gift empty'); }
   $('#loadout').innerHTML = h;
 }
 function starRow(lv) { return `<span class="stars">${[0, 1, 2, 3, 4].map(i => `<s class="${i < lv ? 'f' : i === lv ? 'n' : ''}"></s>`).join('')}</span>`; }
@@ -3058,12 +3093,12 @@ function renderCards(opts) {
     } else if (o.kind === 'active') {
       const p = POW[o.id], lv = S.skills[o.id] || 0; b.className = 'card';
       html = `<span class="tile"><img src="${icon(p.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${p.n}</b>${lv ? '' : '<span class="flag">NEW!</span>'}</span>
-        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 4 ? `max it + ${GIFT[evoGift(o.id)].n} to evolve` : `evolves into ${p.evo}`}</small>${POW[o.id].e === S.apprentice ? '<small style="color:var(--sun)">Apprentice · up to 3 stars this level</small>' : ''}<span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
+        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 2 ? `3 stars + ${GIFT[evoGift(o.id)].n} evolve it` : `evolves into ${p.evo}`}</small>${POW[o.id].e === S.apprentice ? '<small style="color:var(--sun)">Apprentice · up to 3 stars this level</small>' : ''}<span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
     } else if (o.kind === 'gift') {
-      const gi = GIFT[o.id], lv = S.gifts[o.id] || 0, feeds = Object.keys(POW).filter(k => evoGift(k) === o.id).map(k => POW[k].n).join(' and ');
+      const gi = GIFT[o.id], lv = S.gifts[o.id] || 0, feeds = Object.keys(POW).filter(k => evoGift(k) === o.id), mine = feeds.filter(k => S.skills[k] && !S.evo[k]);
       b.className = 'card gift';
-      html = `<span class="tile"><img src="${icon(gi.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${gi.n}</b>${lv ? '' : '<span class="flag">NEW!</span>'}</span>
-        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} gift · evolves ${feeds}</small></span></span>`;
+      html = `<span class="tile"><img src="${icon(gi.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${gi.n}</b>${mine.length ? '<span class="flag">KEY</span>' : lv ? '' : '<span class="flag">NEW!</span>'}</span>
+        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${mine.length ? `Evolves your ${mine.map(k => POW[k].n).join(' and ')}` : `${ELNAME[el]} gift · evolves ${feeds.map(k => POW[k].n).join(' and ')}`}</small></span></span>`;
     } else { b.className = 'card gift'; html = `<span class="tile"><img src="${icon('g-spring')}" alt=""><i>${CHAR.earth}</i></span><span class="body"><span class="tab"><b>Warm Tea</b></span><span class="txt"><p>Heal fully.</p></span></span>`; }
     const cc = CARDC[el]; b.style.setProperty('--c', EL[el]); b.style.setProperty('--c1', cc[0]); b.style.setProperty('--c2', cc[1]); b.style.setProperty('--d', idx * .09 + 's'); b.innerHTML = html;
     b.onclick = () => {
@@ -3080,7 +3115,7 @@ $('#rerollBtn').onclick = () => { if (!S.rerolls || $('#cards').classList.contai
 function applyPick(o, quiet) {
   const P = S.p, el = elOf(o), col = EL[el];
   S.decl = S.decl || {}; for (const x of S.offered || []) if (x.kind !== 'evo' && x.kind !== 'heal') { const k = x.kind + x.id; S.decl[k] = x === o || (x.kind === o.kind && x.id === o.id) ? 0 : (S.decl[k] || 0) + 1; }
-  if (o.kind === 'evo') { S.evo[o.id] = true; if (!quiet) { SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
+  if (o.kind === 'evo') { S.evo[o.id] = true; S.skills[o.id] = Math.max(S.skills[o.id], 5); if (!quiet) { SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
   else if (o.kind === 'active') { S.skills[o.id] = (S.skills[o.id] || 0) + 1; floatText(P.x, P.y - 100, `${POW[o.id].n} ${S.skills[o.id] > 1 ? 'Lv ' + S.skills[o.id] : 'learned'}!`, col, 18); }
   else if (o.kind === 'gift') { S.gifts[o.id] = (S.gifts[o.id] || 0) + 1; floatText(P.x, P.y - 100, `${GIFT[o.id].n} ${S.gifts[o.id] > 1 ? 'Lv ' + S.gifts[o.id] : 'gained'}!`, col, 18); }
   else { P.hp = P.max; SFX.heal(); }
@@ -3101,6 +3136,7 @@ function chestPool() {
   for (const id in POW) if (canEvo(id)) list.push({ kind:'evo', id });
   for (const id in S.skills) if (!S.evo[id] && S.skills[id] < maxStars(id)) list.push({ kind:'active', id });
   for (const id in S.gifts) if (S.gifts[id] < 5) list.push({ kind:'gift', id });
+  if (Object.keys(S.gifts).length < SLOTS.gift) for (const id in S.skills) { const g = evoGift(id); if (!S.evo[id] && !S.gifts[g] && POW[id].e !== S.apprentice && !list.some(o => o.kind === 'gift' && o.id === g)) list.push({ kind:'gift', id:g }); }
   return list.length ? list : [{ kind:'heal' }];
 }
 const iconOf = o => icon(o.kind === 'evo' ? POW[o.id].evoIcon : o.kind === 'active' ? POW[o.id].icon : o.kind === 'gift' ? GIFT[o.id].icon : 'g-spring');
