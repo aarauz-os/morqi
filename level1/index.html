@@ -909,6 +909,16 @@ const KIND = {
   'metal-c':{ n:'Bell Knight',       beh:'blades', hp:1,   sp:.85, short:'Throws a fan of spinning blades', tip:'It flashes, then throws a fan of spinning blades. Move sideways between them.' }
 };
 Object.keys(KIND).forEach(k => load('e-' + k, `art4/e-${k}.png?v=6`));
+// a preview of the new character look: add ?look=new to the address and the redrawn sprites replace the current ones
+// wherever they exist (for now one Keeper, the foal, two creatures and the Warden), so both looks can be played side by side
+const LOOK = /[?&]look=new/.test(location.search);
+const LOOKS = { 'art4/k1-hi.png':'art5/k1-hi.png', 'art4/a-horse-y.png':'art5/a-horse-y.png' };
+const lookSrc = p => { const path = p.split('?')[0]; return LOOK && LOOKS[path] ? LOOKS[path] + '?v=1' : p; };
+if (LOOK) { const n = 'art5/', v = '?v=1';
+  load('k1', `${n}k1.png${v}`); for (let r = 1; r <= 3; r++) load('k1r' + r, `${n}k1-r${r}.png${v}`);
+  ['dash', 'hurt', 'cheer'].forEach(p => load('k1' + p, `${n}k1-${p}.png${v}`));
+  load('horsey', `${n}a-horse-y.png${v}`); load('e-water-a', `${n}e-water-a.png${v}`); load('e-earth-a', `${n}e-earth-a.png${v}`);
+  load('b-warden', `${n}b-warden.png${v}`); ['f1', 'up', 'dash', 'cast'].forEach(p => load('w-' + p, `${n}b-warden.png${v}`)); load('w-slam', `${n}warden-slam.png${v}`); }
 ['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=6`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=6'), texM = load('tm', 'art4/t-meadow.jpg?v=6');
 // the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
@@ -1417,7 +1427,7 @@ for (let k = 1; k <= KEEPERS; k++) { const i = new Image(); i.src = `art4/k${k}-
 function pickKeeper(k, dir) {
   keeper = ((k - 1 + KEEPERS) % KEEPERS) + 1;
   [...kb.children].forEach((c, i) => { c.classList.toggle('on', i === keeper - 1); c.setAttribute('aria-checked', i === keeper - 1); });
-  ksImg.src = `art4/k${keeper}-hi.png?v=6`; ksImg.alt = 'Keeper ' + keeper;
+  ksImg.src = lookSrc(`art4/k${keeper}-hi.png?v=6`); ksImg.alt = 'Keeper ' + keeper;
   ksImg.style.setProperty('--dx', (dir || 1) * 40 + 'px'); ksImg.classList.remove('swap'); void ksImg.offsetWidth; ksImg.classList.add('swap');
   SFX.pop();
 }
@@ -1450,7 +1460,7 @@ $('#yearNext').onclick = () => {
   const base = ANIMAL_BASE[animal]; Object.assign(ANIMAL[animal], base, { e:keeperEl, e2:base.e !== keeperEl ? base.e : undefined });
   const A = ANIMAL[animal];
   $('#revEb').textContent = `Year of the ${ELNAME[keeperEl]} ${A.n}`;
-  $('#revImg').src = `art4/a-${animal}-y.png?v=6`; $('#revImg').alt = A.y;
+  $('#revImg').src = lookSrc(`art4/a-${animal}-y.png?v=6`); $('#revImg').alt = A.y;
   $('#revBox').style.setProperty('--c', EL[A.e]);
   $('#revName').textContent = `Your ${A.y}`;
   $('#revEl').textContent = `${ELNAME[keeperEl]} Keeper`; $('#revEl').style.setProperty('--c', EL[keeperEl]);
@@ -3046,8 +3056,11 @@ function draw() {
   if (pv.lungs) { g.strokeStyle = 'rgba(225,235,245,.65)'; g.lineWidth = 3; g.lineCap = 'round'; for (let i = 0; i < pv.lungs; i++) { const a = -S.t * 2.4 + i / pv.lungs * TAU; g.beginPath(); g.ellipse(P.x, P.y - 24, 58, 30, 0, a, a + .9); g.stroke(); } g.lineWidth = 1; }
   // the Keeper: runs with a lean and a bounce, breathes when still, recoils and flashes when hit
   // running uses a real run cycle (stride, pass, stride, pass); standing uses the idle pose
-  const runName = `k${keeper}r${[1, 2, 3, 2][Math.floor(S.t * 10) % 4]}`, useRun = P.moving && ok(IMG[runName]), kName = useRun ? runName : 'k' + keeper;
-  const kim = IMG[kName], ks = 108, hk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .28);
+  // and, when the art has them, poses that say what is happening: a stretched dash, a flinch when hit, a cheer after a level up
+  const runName = `k${keeper}r${[1, 2, 3, 2][Math.floor(S.t * 10) % 4]}`, useRun = P.moving && ok(IMG[runName]), hk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .28);
+  const pose = n => ok(IMG['k' + keeper + n]) ? 'k' + keeper + n : null;
+  const posed = S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
+  const kName = posed || (useRun ? runName : 'k' + keeper), kim = IMG[kName], ks = 108;
   if (P.slowT > 0) { const k = Math.min(1, P.slowT * 2); g.strokeStyle = `rgba(110,190,255,${.8 * k})`; g.fillStyle = `rgba(110,190,255,${.25 * k})`; g.lineWidth = 3; g.beginPath(); g.ellipse(P.x, P.y + 26, 40, 15, 0, 0, TAU); g.fill(); g.stroke(); g.lineWidth = 1; if (Math.random() < .3) fx({ k:'drop', x:P.x + rnd(-24, 24), y:P.y + rnd(-50, 10), z:0, vx:0, vy:30, life:.5, s:3 }); }
   const run = P.moving, cyc = S.t * 13, bob = run ? (useRun ? Math.abs(Math.sin(S.t * Math.PI * 5)) * 3 : Math.abs(Math.sin(cyc)) * 6) : 0;
   const lean = run ? P.mx * (useRun ? .05 : .13) : 0, ksx = run ? 1 - Math.abs(Math.cos(cyc)) * .04 : 1 - Math.sin(S.t * 2.6) * .01, ksy = run ? 1 + Math.abs(Math.cos(cyc)) * .05 : 1 + Math.sin(S.t * 2.6) * .022;
@@ -3056,7 +3069,10 @@ function draw() {
   if (S.buffs.ward > 0) { const k = Math.min(1, S.buffs.ward / 2); g.save(); g.globalAlpha = .55 * k; g.strokeStyle = '#5FE3B4'; g.lineWidth = 4; g.beginPath(); for (let i = 0; i <= 6; i++) { const a = i / 6 * TAU + S.t * .6; g.lineTo(kx + Math.cos(a) * 52, ky - 26 + Math.sin(a) * 40); } g.stroke(); g.restore(); g.lineWidth = 1; }
   if (S.buffs.tiger > 0) add(() => { glowAt(kx, ky - 30, 170 + Math.sin(S.t * 18) * 14, '#FF9A3A', .8); if (Math.random() < .5) flames(kx, ky - 10, 1, 20, 22, 120); });
   if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob); g.rotate(lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
-    g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1)); g.drawImage(kim, -ks / 2, -ks * .72 - 24, ks, ks);   // feet on the shadow
+    g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1));
+    // the new look's signature: a soft rim of light in the Keeper's element colour
+    if (LOOK) { const rim = silhouette(kName, EL[keeperEl]); if (rim) add(() => { g.globalAlpha = .6; g.drawImage(rim, -ks * .53, -ks * .75 - 24, ks * 1.06, ks * 1.06); g.globalAlpha = 1; }); }
+    g.drawImage(kim, -ks / 2, -ks * .72 - 24, ks, ks);   // feet on the shadow
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, -ks * .72 - 24, ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
   if (S.dashCd > 0) { const k = 1 - S.dashCd / DASH_CD; g.save(); g.strokeStyle = 'rgba(111,242,207,.85)'; g.lineWidth = 4.5; g.lineCap = 'round'; g.beginPath(); g.ellipse(P.x, P.y + 28, 36, 14, 0, -Math.PI / 2, -Math.PI / 2 + k * TAU); g.stroke(); g.restore(); }
@@ -3332,6 +3348,8 @@ function applyPick(o, quiet) {
   renderSkills();
 }
 function afterPick() {
+  // a short cheer pose as play resumes, when the Keeper has one
+  if (S && S.p) S.p.cheerAt = S.t;
   S.pendingLevel = false;
   if (S.queued > 0) { S.queued--; levelUp(); return; }
   resume();
@@ -3483,7 +3501,7 @@ function renderSkills() {
   const box = $('#skills'); if (!S) return;
   const nextAw = AWAKEN_AT[S.awakeIdx] || null, A = ANIMAL[animal];
   let h = '';
-  const I = S.ultInfo, ub = $('#ultBtn'); ub.style.setProperty('--c', EL[A.e]); $('#ultImg').src = `art4/a-${animal}-y.png?v=6`; $('#ultImg').alt = A.y;
+  const I = S.ultInfo, ub = $('#ultBtn'); ub.style.setProperty('--c', EL[A.e]); $('#ultImg').src = lookSrc(`art4/a-${animal}-y.png?v=6`); $('#ultImg').alt = A.y;
   $('#ultLv').textContent = 'Lv ' + I.lv; $('#ultName').textContent = I.name; ub.setAttribute('aria-label', `${A.y} ultimate: ${I.name}`);
   for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
   for (const id in S.gifts) h += `<span class="slot gift" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
