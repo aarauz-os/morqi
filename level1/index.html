@@ -799,7 +799,7 @@ const AU = (() => {
     setTimeout(loadSamples, 0);
     comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 14; comp.ratio.value = 5; comp.attack.value = .002; comp.release.value = .18;
     const master = c.createGain(); master.gain.value = .95; comp.connect(master).connect(c.destination);
-    sfx = c.createGain(); sfx.gain.value = .82; sfx.connect(comp);   // sound effects at about 4 out of 10, where 10 is the original mix (A, 2026-10-04)
+    sfx = c.createGain(); sfx.gain.value = .47; sfx.connect(comp);   // effects sit under the music: measured in play, about 4 dB below it on average, and even their peaks stay below the music's (A, 2026-10-04)
     mus = c.createGain(); mus.gain.value = MUSVOL; mus.connect(comp);
     noiseBuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     return c;
@@ -1208,7 +1208,12 @@ const AU = (() => {
     else { const up = M.threat > .72 ? 2 : M.threat > .38 ? 1 : 0; if (up >= M.want) { M.want = up; M.hold = now; } else if (now - M.hold > 9000) M.want = up; }
     if (low !== M.low) { M.low = low; mLow.frequency.setTargetAtTime(low ? 950 : 18000, c.currentTime, low ? .35 : .15); }
   }
-  return { init, S, music, song, threat, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
+  return { init, S, music, song, threat, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; },
+    meter() {   // test hook: the loudness of the effects and the music right now, in dB
+      if (!c) return null; if (!this._m) { const m = n => { const a = c.createAnalyser(); a.fftSize = 2048; n.connect(a); return a; }; this._m = { s:m(sfx), u:m(mus), b:new Float32Array(2048) }; }
+      const db = a => { a.getFloatTimeDomainData(this._m.b); let e = 0; for (const x of this._m.b) e += x * x; return 10 * Math.log10(e / this._m.b.length + 1e-12); };
+      return { sfx:db(this._m.s), mus:db(this._m.u) }; },
+    setSfx(v) { if (sfx) sfx.gain.value = v; }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
     get on() { return sfxOn; }, get musicOn() { return musOn; } };
 })();
 const SFX = AU.S;
