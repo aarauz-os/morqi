@@ -584,6 +584,11 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .lvls .btn.green .lvst{color:#E98A12;text-shadow:none}
 .resBloom{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:99px;font:900 14px var(--round);color:#5A3300;background:linear-gradient(180deg,#FFF1B8,#FFC94A);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 3px 0 #C47F12;animation:vicIn .7s var(--spring) .9s both}
 .resBloom[hidden]{display:none}.resBloom img{width:30px;height:30px}
+/* five levels in one even row that always fits: "Level 1" with its stars underneath, no glossy highlight bar on these pills */
+.lvls{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:min(100%,380px);box-sizing:border-box;border-radius:22px}
+.lvls button,.lvls .btn{flex-direction:column;justify-content:center;gap:0;padding:6px 2px 7px;font-size:12.5px;line-height:1.1;border-radius:18px;text-shadow:none!important;white-space:nowrap}
+.lvls .btn::after{display:none}
+.lvls .lvst{margin-top:3px;font-size:9px;letter-spacing:0}
 </style>
 
 <div id="stage">
