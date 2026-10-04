@@ -516,6 +516,69 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 @keyframes ppFill{from{width:0}}
 #petProg span{font-size:12px;line-height:1.35;color:rgba(255,255,255,.78)}#petProg strong{color:#FFE08A}
 .bday{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.bday select{min-width:0!important;padding:12px 16px!important;font-size:20px!important}
+
+/* The playful layer (A, 2026-10-04: "go ahead with the bolder more playful look across all game screens"): bold, tactile
+   and celebratory, the feel of the best-loved family mobile games, with one clear action per screen. Buttons are glossy
+   candy on a 3D edge that presses down; titles are chunky with a deep shadow; menu screens glow with colour instead of
+   sitting on black; popups are rich indigo with a lit rim. The in-play HUD stays calm so play stays readable. */
+:root{--edge-g:#118A4E;--edge-b:#2A3DA8}
+.btn{font-weight:900;font-size:20px;letter-spacing:.01em;text-shadow:0 2px 0 rgba(0,70,40,.4);
+  background:linear-gradient(180deg,#9BF7B4 0%,#4FE08A 38%,#22B865 100%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(0,90,50,.22),0 6px 0 var(--edge-g),0 12px 22px rgba(10,120,60,.42)}
+.btn::after{content:"";position:absolute;left:12%;right:12%;top:4px;height:40%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0));pointer-events:none}
+.btn:active,.btn.press{transform:translateY(5px);filter:none;box-shadow:inset 0 2px 0 rgba(255,255,255,.6),0 1px 0 var(--edge-g),0 4px 10px rgba(10,120,60,.3)}
+.btn.blue,.scr:not(.popup) .btn.blue,.popup .btn.blue,.panel .btn.blue{color:#fff;text-shadow:0 2px 0 rgba(20,30,110,.4);-webkit-backdrop-filter:none;backdrop-filter:none;
+  background:linear-gradient(180deg,#A9C8FF 0%,#5E8EFF 40%,#3A5FE0 100%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(10,20,90,.22),0 5px 0 var(--edge-b),0 10px 18px rgba(30,50,160,.38)}
+.btn.blue:active,.btn.blue.press{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 1px 0 var(--edge-b),0 3px 8px rgba(30,50,160,.3)}
+#results .res #againBtn.quiet{text-shadow:none}#results .res #againBtn.quiet::after{display:none}
+.scr h1,.scr h2{text-shadow:0 3px 0 rgba(20,24,90,.55),0 10px 24px rgba(0,0,0,.35)}
+.eb{display:inline-block;padding:5px 13px 6px;border-radius:99px;background:linear-gradient(180deg,#FFE9A0,#F6B73C);color:#5A3300;letter-spacing:.1em;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 3px 0 #C47F12}
+.ribbon{background:linear-gradient(180deg,#FFF8D6 10%,#FFD45A 50%,#F29A1E 95%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #9A5200) drop-shadow(0 6px 14px rgba(255,170,40,.35))}
+.rb.red .ribbon{background:linear-gradient(180deg,#FFE1DA 10%,#FF9A86 50%,#E8553F 95%);-webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 2px 0 #7A1E10) drop-shadow(0 6px 14px rgba(232,85,63,.35))}
+.panel{background:linear-gradient(180deg,#3644C8 0%,#27309E 46%,#1B2272 100%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.32),inset 0 0 0 2px rgba(255,255,255,.1),0 9px 0 rgba(12,16,70,.7),0 30px 60px rgba(0,0,0,.45)}
+#pickYear,#reveal,#story{background:
+  radial-gradient(60% 36% at 50% 16%,rgba(111,242,207,.26),transparent 70%),
+  radial-gradient(55% 34% at 10% 88%,rgba(140,123,255,.38),transparent 70%),
+  radial-gradient(48% 30% at 92% 66%,rgba(255,197,74,.2),transparent 70%),
+  linear-gradient(180deg,#232C86 0%,#141A52 58%,#0B0F33 100%)}
+#pickYear::before,#reveal::before,#story::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.7;
+  background-image:radial-gradient(1.6px 1.6px at 12% 18%,#fff,transparent),radial-gradient(1.2px 1.2px at 72% 9%,#fff,transparent),radial-gradient(1.8px 1.8px at 88% 32%,#FFE9A0,transparent),
+  radial-gradient(1.2px 1.2px at 30% 42%,#fff,transparent),radial-gradient(1.6px 1.6px at 55% 76%,#BFF8FF,transparent),radial-gradient(1.2px 1.2px at 8% 64%,#fff,transparent),
+  radial-gradient(1.4px 1.4px at 80% 88%,#fff,transparent),radial-gradient(1.2px 1.2px at 44% 12%,#FFE9A0,transparent);animation:twinkle 4s ease-in-out infinite}
+#pickYear > *,#reveal > *,#story > *{position:relative}
+@keyframes twinkle{50%{opacity:.35}}
+select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shadow:inset 0 2px 0 #fff,0 5px 0 #8C97D8,0 10px 18px rgba(0,0,0,.25);-webkit-backdrop-filter:none;backdrop-filter:none}
+@media (prefers-reduced-motion:reduce){#pickYear::before,#reveal::before,#story::before{animation:none}}
+/* the birthday screen: all twelve spirit animals turning slowly in a ring, so the question is "which one is yours?" */
+.zring{position:relative;width:250px;height:250px;margin-bottom:-6px}
+.zring::before{content:"";position:absolute;inset:22%;border-radius:50%;background:radial-gradient(circle,rgba(255,226,140,.55),rgba(255,197,74,0) 70%);animation:breathe2 3s ease-in-out infinite}
+.zspin{position:absolute;inset:0;animation:spin 60s linear infinite}
+.zspin i{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px;border-radius:50%;
+  transform:rotate(calc(var(--i) * 30deg)) translateY(-96px) rotate(calc(var(--i) * -30deg));
+  background:radial-gradient(circle at 50% 35%,#FFFFFF,#C9D3FF);box-shadow:0 0 0 2.5px #fff,0 4px 0 #8C97D8,0 8px 16px rgba(0,0,0,.3)}
+.zspin i img{width:100%;height:100%;object-fit:contain;animation:spin 60s linear infinite reverse}
+@media (prefers-reduced-motion:reduce){.zspin,.zspin i img,.zring::before{animation:none}}
+/* meeting your spirit animal is a reveal: rays in its element's colour behind it, and it bounces in */
+.reveal{width:230px;height:230px}
+.reveal::after{content:"";position:absolute;inset:-55%;z-index:-1;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--c,#FFD45A) 45%,transparent) 0 8deg,transparent 8deg 22deg);
+  -webkit-mask:radial-gradient(circle,#000 14%,transparent 62%);mask:radial-gradient(circle,#000 14%,transparent 62%);animation:spin 26s linear infinite}
+.reveal{isolation:isolate}
+#reveal:not([hidden]) .reveal img{animation:revIn .9s var(--spring) both,float 3s ease-in-out .9s infinite}
+@keyframes revIn{0%{transform:scale(.2) rotate(-12deg);opacity:0}100%{transform:none;opacity:1}}
+.story{box-shadow:0 0 0 3px #fff,0 8px 0 rgba(12,16,70,.7),0 24px 50px rgba(0,0,0,.45)}
+@media (prefers-reduced-motion:reduce){.reveal::after{animation:none}#reveal:not([hidden]) .reveal img{animation:none}}
+/* pause: one big Resume, a row of round icon buttons, and a quiet way to start over */
+.iconrow{display:flex;gap:12px;justify-content:center}
+.rbtn{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;padding:0;background:none;color:#fff;font:900 12px var(--round);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rbtn svg{width:58px;height:58px;padding:15px;box-sizing:border-box;border-radius:50%;background:linear-gradient(180deg,#A9C8FF,#5E8EFF 45%,#3A5FE0);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.6),0 4px 0 var(--edge-b),0 8px 14px rgba(30,50,160,.35);transition:transform .15s}
+.rbtn:active svg{transform:translateY(3px)}
+.rbtn.off svg{background:linear-gradient(180deg,#8A90B0,#5A6088);box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 4px 0 #3A3F60}
+.rbtn.off::after{content:"";position:absolute;left:12px;top:27px;width:34px;height:4px;border-radius:2px;background:#fff;transform:rotate(-40deg);box-shadow:0 0 0 2px #5A6088}
+.rbtn.off span{opacity:.6}
+.quietb{background:none!important;box-shadow:none!important;text-shadow:none!important;color:rgba(255,255,255,.75)!important;font-size:15px!important}.quietb::after{display:none}
 </style>
 
 <div id="stage">
@@ -568,6 +631,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
   </section>
 
   <section class="scr" id="pickYear" hidden>
+    <div class="zring" aria-hidden="true"><div class="zspin"><i style="--i:0"><img src="art4/a-rat-y.png?v=6" alt=""></i><i style="--i:1"><img src="art4/a-ox-y.png?v=6" alt=""></i><i style="--i:2"><img src="art4/a-tiger-y.png?v=6" alt=""></i><i style="--i:3"><img src="art4/a-rabbit-y.png?v=6" alt=""></i><i style="--i:4"><img src="art4/a-dragon-y.png?v=6" alt=""></i><i style="--i:5"><img src="art4/a-snake-y.png?v=6" alt=""></i><i style="--i:6"><img src="art4/a-horse-y.png?v=6" alt=""></i><i style="--i:7"><img src="art4/a-goat-y.png?v=6" alt=""></i><i style="--i:8"><img src="art4/a-monkey-y.png?v=6" alt=""></i><i style="--i:9"><img src="art4/a-rooster-y.png?v=6" alt=""></i><i style="--i:10"><img src="art4/a-dog-y.png?v=6" alt=""></i><i style="--i:11"><img src="art4/a-pig-y.png?v=6" alt=""></i></div></div>
     <div class="eb">Your spirit animal</div>
     <h2 class="ck">When were you born?</h2>
     <p>Your birthday chooses your spirit animal and its element, counted from Lunar New Year the way the Chinese calendar does.</p>
@@ -595,11 +659,11 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
     <div class="panel pop" style="padding-top:36px">
       <div class="rb"><span class="ribbon">How to play</span></div>
       <div class="howto">
-        <div class="how"><span class="ic"><span class="ghost"><i></i></span></span><div><b>Move with one thumb</b><span>Drag anywhere on the screen. Your powers <em>fire on their own</em>. <em>Tap</em> to dash out of a crowd.</span></div></div>
-        <div class="how"><span class="ic"><span class="gemi"></span></span><div><b>Free creatures, grab gems</b><span>Every creature you free drops a qi gem. Fill the bar to <em>level up and pick a power</em>.</span></div></div>
-        <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="#1A1206" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g><g stroke="#FFE58A" stroke-width="1.6" fill="none" opacity=".9"><path d="M28 16 L37 40"/><path d="M39 25 L19 41"/><path d="M33 45 L13 27"/><path d="M17 38 L23 13"/><path d="M15 21 L40 22"/></g></svg></span><div><b>Five elements</b><span>Every power and creature has one. <em>Each element beats two and is weak to two</em>: fire burns wood, water puts out fire. Hits show <em>Super effective!</em> or <em>Resisted</em>. <button class="btn blue small" id="chartBtn" style="margin-top:6px;font-size:14px;padding:5px 12px 7px">See the chart</button></span></div></div>
-        <div class="how"><span class="ic"><img src="art4/props/x-chest.png?v=6" alt="" style="width:120%;max-width:none"></span><div><b>Evolve your powers</b><span>Get a power to three stars and hold the <em>gift of the element that feeds it</em>. Crystal brutes drop Spirit Chests that help.</span></div></div>
-        <div class="how"><span class="ic"><img src="art4/b-warden.png?v=6" alt="" style="width:130%;max-width:none"></span><div><b>Free the shore</b><span><em>Ten waves</em> come, each one element. Arrows at the edge warn you where. Survive them, then <em>defeat the Still Warden</em>.</span></div></div>
+        <div class="how"><span class="ic"><span class="ghost"><i></i></span></span><div><b>Move with one thumb</b><span>Drag to move. Powers <em>fire on their own</em>. <em>Tap</em> to dash.</span></div></div>
+        <div class="how"><span class="ic"><span class="gemi"></span></span><div><b>Free creatures, grab gems</b><span>Gems fill your bar: <em>level up, pick a power</em>.</span></div></div>
+        <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="#1A1206" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g><g stroke="#FFE58A" stroke-width="1.6" fill="none" opacity=".9"><path d="M28 16 L37 40"/><path d="M39 25 L19 41"/><path d="M33 45 L13 27"/><path d="M17 38 L23 13"/><path d="M15 21 L40 22"/></g></svg></span><div><b>Five elements</b><span><em>Each one beats two</em>. The right element hits twice as hard. <button class="btn blue small" id="chartBtn" style="margin-top:6px;font-size:14px;padding:5px 12px 7px">See the chart</button></span></div></div>
+        <div class="how"><span class="ic"><img src="art4/props/x-chest.png?v=6" alt="" style="width:120%;max-width:none"></span><div><b>Evolve your powers</b><span><em>Three stars</em> + the gift of the element that feeds it.</span></div></div>
+        <div class="how"><span class="ic"><img src="art4/b-warden.png?v=6" alt="" style="width:130%;max-width:none"></span><div><b>Free the shore</b><span>Survive the waves, then <em>free the Warden</em>.</span></div></div>
       </div>
       <button class="btn green" id="howtoGo">Let's go!</button>
     </div>
@@ -629,14 +693,16 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 
   <section class="scr popup" id="shoreMap" hidden aria-label="The whole shore"><canvas id="shoreCv"></canvas><span class="go" aria-hidden="true"></span></section>
   <section class="scr popup" id="paused" hidden>
-    <div class="panel pop" style="gap:16px;padding-top:40px">
+    <div class="panel pop" style="gap:18px;padding-top:40px">
       <div class="rb"><span class="ribbon">Paused</span></div>
       <button class="btn green" id="resumeBtn">Resume</button>
-      <button class="btn blue musBtn">Music: Off</button>
-      <button class="btn blue sfxBtn">Sound effects: On</button>
-      <button class="btn blue" id="howBtn">How to play</button>
-      <button class="btn blue" id="chartBtn2">Element chart</button>
-      <button class="btn" id="restartBtn">Start over</button>
+      <div class="iconrow">
+        <button class="rbtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg><span>Music</span></button>
+        <button class="rbtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg><span>Sound</span></button>
+        <button class="rbtn" id="howBtn" aria-label="How to play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 9a3.5 3.5 0 1 1 5 3.2c-1 .5-1.5 1.2-1.5 2.3" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="18.6" r="1.6" fill="#fff"/></svg><span>Help</span></button>
+        <button class="rbtn" id="chartBtn2" aria-label="Element chart"><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="#fff" stroke-width="1.6"><circle cx="12" cy="4" r="2.6" fill="#6FBF4A"/><circle cx="20" cy="10" r="2.6" fill="#E8553F"/><circle cx="17" cy="19.5" r="2.6" fill="#E6B23A"/><circle cx="7" cy="19.5" r="2.6" fill="#C9D3DB"/><circle cx="4" cy="10" r="2.6" fill="#4E9BE0"/></g></svg><span>Chart</span></button>
+      </div>
+      <button class="btn small quietb" id="restartBtn">Start over</button>
     </div>
   </section>
 
@@ -1471,8 +1537,9 @@ $('#pauseBtn').onclick = () => { SFX.pop(); pause(); };
 $('#resumeBtn').onclick = () => { SFX.select(); resume(); };
 $('#restartBtn').onclick = () => { show(null); startRun(); };
 function renderSound() {
-  document.querySelectorAll('.musBtn').forEach(b => { b.textContent = AU.musicOn ? 'Music: On' : 'Music: Off'; b.setAttribute('aria-pressed', AU.musicOn); });
-  document.querySelectorAll('.sfxBtn').forEach(b => { b.textContent = AU.on ? 'Sound effects: On' : 'Sound effects: Off'; b.setAttribute('aria-pressed', AU.on); });
+  // the pause menu's round icon buttons grey out when off; the title screen's buttons say it in words
+  document.querySelectorAll('.musBtn').forEach(b => { if (b.classList.contains('rbtn')) b.classList.toggle('off', !AU.musicOn); else b.textContent = AU.musicOn ? 'Music: On' : 'Music: Off'; b.setAttribute('aria-pressed', AU.musicOn); });
+  document.querySelectorAll('.sfxBtn').forEach(b => { if (b.classList.contains('rbtn')) b.classList.toggle('off', !AU.on); else b.textContent = AU.on ? 'Sound effects: On' : 'Sound effects: Off'; b.setAttribute('aria-pressed', AU.on); });
 }
 document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleMusic(); if (AU.musicOn && S && !S.over) AU.music(true); renderSound(); SFX.select(); });
 document.querySelectorAll('.sfxBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleSfx(); renderSound(); SFX.select(); });
