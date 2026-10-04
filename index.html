@@ -284,6 +284,18 @@ tr.total td{border-top:2px solid rgba(255,255,255,.6);font-weight:900;font-size:
 .gcard .tile i{display:none!important}
 .gcard .tab b{white-space:normal;text-wrap:balance;line-height:1.15}
 .gcard .tab{align-items:flex-start}
+
+/* the App Store row scrolls sideways: show it (playtest 1: "it would be good if there was an arrow right here") */
+.swipehint{margin:0 0 4px;font-size:13px;font-weight:800;color:var(--mint,#6FF2CF);letter-spacing:.02em}
+.swipehint b{display:inline-block;animation:nudge 1.2s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(6px)}}
+.shotwrap{position:relative}
+.shotwrap::after{content:'';position:absolute;top:0;right:0;bottom:30px;width:56px;pointer-events:none;background:linear-gradient(90deg,rgba(21,27,58,0),rgba(21,27,58,.9))}
+.sarrow{position:absolute;top:42%;z-index:2;width:44px;height:44px;border-radius:50%;border:0;font:900 26px/1 system-ui;color:#1B2257;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
+.sarrow.l{left:-6px}.sarrow.r{right:-6px}
+.sarrow[disabled]{opacity:0;pointer-events:none}
+@media (max-width:720px){.shot{flex-basis:64vw!important}}
+@media print{.swipehint,.sarrow,.shotwrap::after{display:none}}
 </style>
 
 <div class="wrap">
@@ -317,14 +329,15 @@ tr.total td{border-top:2px solid rgba(255,255,255,.6);font-weight:900;font-size:
 
 <section class="sec" id="store">
   <div class="head"><div class="rb"><span class="ribbon">On the App Store</span></div><h2>What a player sees first</h2></div>
-  <div class="shots" role="list">
+  <p class="swipehint">Swipe for more <b>→</b></p>
+  <div class="shotwrap"><button class="sarrow l" aria-label="Previous screens">‹</button><div class="shots" role="list">
     <div class="shot" role="listitem"><h3>Light the last hearth</h3><div class="phone"><img src="img4/s-opening.jpg?v=6" alt="Sorin kneels beside a cold stone hearth in a frozen valley."></div></div>
     <div class="shot" role="listitem"><h3>Every creature fights its own way</h3><div class="phone"><img src="img4/f4-tele.jpg?v=6" alt="Gameplay: an Old Treant's roots fill a red circle under the Keeper while Spout Frogs spit bubbles."></div></div>
     <div class="shot" role="listitem"><h3>Ten powers, five elements</h3><div class="phone"><img src="img4/f4-meteor.jpg?v=6" alt="Gameplay: meteors and flying swords fall around the Keeper."></div></div>
     <div class="shot" role="listitem"><h3>Your spirit animal's ultimate</h3><div class="phone"><img src="img4/f4-ult.jpg?v=6" alt="Gameplay: a spirit animal's ultimate."></div></div>
     <div class="shot" role="listitem"><h3>Raise it from small to mythic</h3><div class="phone"><img src="img4/s-animal.jpg?v=6" alt="A spirit animal screen showing its stage of growth."></div></div>
     <div class="shot" role="listitem"><h3>A new chapter every season</h3><div class="phone"><img src="img4/s-path.jpg?v=6" alt="The Winter Path reward track."></div></div>
-  </div>
+  </div><button class="sarrow r" aria-label="More screens">›</button></div>
 </section>
 
 <section class="sec" id="opportunity">
@@ -802,4 +815,15 @@ tr.total td{border-top:2px solid rgba(255,255,255,.6);font-weight:900;font-size:
 <p class="foot">Market figures come from industry trackers (2025), public company filings (Q2 2025), industry monetisation and cost reports (2024–2026) and published regulatory orders (2022 and 2025). Prices compare against current mobile app-store listings. Gameplay frames are captured from the playable demo; interface panels are recreated from it; other images are concept art. All projections are illustrative. Confidential and for discussion only.</p>
 
 </div>
+
+<script>
+// arrows scroll the App Store row one card at a time and hide at the ends
+document.querySelectorAll('.shotwrap').forEach(w => {
+  const row = w.querySelector('.shots'), l = w.querySelector('.sarrow.l'), r = w.querySelector('.sarrow.r');
+  const step = () => (row.querySelector('.shot')?.getBoundingClientRect().width || 220) + 26;
+  const sync = () => { l.disabled = row.scrollLeft < 8; r.disabled = row.scrollLeft + row.clientWidth > row.scrollWidth - 8; };
+  l.onclick = () => row.scrollBy({ left:-step(), behavior:'smooth' }); r.onclick = () => row.scrollBy({ left:step(), behavior:'smooth' });
+  row.addEventListener('scroll', sync, { passive:true }); sync();
+});
+</script>
 </body></html>

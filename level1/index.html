@@ -437,11 +437,11 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .riseTip p{margin:0;font-size:12.5px;line-height:1.35}
 @media (max-height:700px){.riseArt{aspect-ratio:1.75}}
 /* the companion's ultimate: a ring that fills, a portrait that lights up, a tap */
-#ultBtn{position:absolute;right:12px;bottom:calc(70px + env(safe-area-inset-bottom));width:74px;height:74px;border-radius:50%;border:0;padding:0;background:none;pointer-events:auto;--p:0;--c:#6FF2CF;z-index:6;-webkit-tap-highlight-color:transparent;touch-action:none;transition:transform .15s}
+#ultBtn{position:absolute;left:10px;top:calc(var(--ultTop, 168px));width:74px;height:74px;border-radius:50%;border:0;padding:0;background:none;pointer-events:auto;--p:0;--c:#6FF2CF;z-index:6;-webkit-tap-highlight-color:transparent;touch-action:none;transition:transform .15s}
 #ultBtn .ur{position:absolute;inset:0;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p) * 360deg),rgba(255,255,255,.14) 0);-webkit-mask:radial-gradient(circle,transparent 30px,#000 31px);mask:radial-gradient(circle,transparent 30px,#000 31px)}
 #ultBtn img{position:absolute;left:8px;top:8px;width:58px;height:58px;border-radius:50%;object-fit:contain;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--c) 45%,#fff),color-mix(in srgb,var(--c) 35%,#1B2257));filter:grayscale(.7) brightness(.7);transition:filter .3s}
 #ultBtn em{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);font:900 10px/1 var(--round);font-style:normal;background:#1B2257;color:#fff;padding:3px 7px;border-radius:99px;box-shadow:0 0 0 1.5px rgba(255,255,255,.55);white-space:nowrap}
-#ultBtn b{position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%) scale(.8);opacity:0;white-space:nowrap;font:900 13px var(--round);color:#3A2200;background:linear-gradient(180deg,#FFE08A,#F2A93B);padding:6px 11px;border-radius:99px;box-shadow:0 4px 14px rgba(233,138,18,.5);transition:.25s;pointer-events:none}
+#ultBtn b{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%) scale(.8);opacity:0;white-space:nowrap;font:900 13px var(--round);color:#3A2200;background:linear-gradient(180deg,#FFE08A,#F2A93B);padding:6px 11px;border-radius:99px;box-shadow:0 4px 14px rgba(233,138,18,.5);transition:.25s;pointer-events:none}
 #ultBtn.ready img{filter:none}
 #ultBtn.ready .ur{background:conic-gradient(#FFE08A,var(--c),#FFFFFF,var(--c),#FFE08A)}
 #ultBtn.ready{animation:ultPulse 1s ease-in-out infinite}
@@ -449,6 +449,8 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 #ultBtn.cast{transform:scale(.88)}
 #ultBtn.nope{animation:ultNope .3s}
 @keyframes ultPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 5px var(--c))}50%{transform:scale(1.09);filter:drop-shadow(0 0 16px var(--c))}}
+#ultBtn.urge{animation:ultUrge .5s ease-in-out infinite}
+@keyframes ultUrge{0%,100%{transform:scale(1.05);filter:drop-shadow(0 0 10px #FFE08A)}50%{transform:scale(1.2);filter:drop-shadow(0 0 26px #FFB347)}}
 @keyframes ultNope{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 #petProg .pp{display:flex;gap:12px;align-items:center;text-align:left;width:100%;padding:10px 12px;border-radius:20px;background:rgba(28,36,74,.7);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
 #petProg .pp.evo{box-shadow:inset 0 0 0 2px #FFE08A,0 0 24px rgba(255,224,138,.45)}
@@ -1495,8 +1497,13 @@ function hurt(e, dmg, el, o = {}) {
 }
 function kill(e) {
   e.dead = true; S.thawed++; if (S.ult && !S.ult.cast) S.ult.charge = Math.min(1, S.ult.charge + 1 / 400);
-  if (!e.boss) { S.combo = (S.combo || 0) + 1; S.comboT = 1.8; if (S.combo % 5 === 0) SFX.combo(S.combo / 5); if (S.combo > (S.bestCombo || 0)) S.bestCombo = S.combo;
-    if ([25, 50, 100, 200, 400].includes(S.combo)) { const w = { 25:'Great!', 50:'Amazing!', 100:'Unstoppable!', 200:'Legendary!', 400:'Mythic!' }[S.combo]; floatText(S.p.x, S.p.y - 120, w, '#FFE14A', 30); stars(S.p.x, S.p.y - 60, 24, '#FFE58A', 360); SFX.levelup(); }
+  if (!e.boss) {
+    // bursts, not an endless combo (playtest 1: kills never stop, so the counter climbed to x1998 and meant nothing, and
+    // it chimed every 5 kills): a word and one chime when you clear 25, 50 or 100 creatures inside 3 seconds
+    const now = S.t; S.burst = (S.burst || []).filter(t => now - t < 3); S.burst.push(now);
+    const n = S.burst.length, tier = n >= 100 ? 3 : n >= 50 ? 2 : n >= 25 ? 1 : 0;
+    if (n < 10) S.burstTier = 0;
+    if (tier > (S.burstTier || 0)) { S.burstTier = tier; floatText(S.p.x, S.p.y - 120, ['', 'Great!', 'Amazing!', 'Unstoppable!'][tier], '#FFE14A', 30); stars(S.p.x, S.p.y - 60, 16 + tier * 8, '#FFE58A', 360); SFX.combo(tier * 3); }
     if (Math.random() < (e.type === 'golem' ? 1 / 3 : .003)) S.items.push({ x:e.x, y:e.y, kind:'heart', t:0, z:10, vz:240 }); }
   const col = EL[e.el];
   if (!e.boss) {
@@ -2555,7 +2562,9 @@ function oct(x, y, r, rot) { g.beginPath(); for (let i = 0; i < 8; i++) { const 
 
 function draw() {
   const P = S.p;
-  const fxp = S.arena ? S.arena.x : P.x, fyp = S.arena ? S.arena.y : P.y;
+  // in the boss arena the camera follows you, held within the arena so its edge stays in view
+  // (playtest 1: with the camera locked to the arena's centre, its top hid under the HUD and so did the player)
+  const AR = S.arena, fxp = AR ? clamp(P.x, AR.x - AR.r * .6, AR.x + AR.r * .6) : P.x, fyp = AR ? clamp(P.y, AR.y - AR.r * .6, AR.y + AR.r * .6) : P.y;
   camX += (fxp - VW / 2 - camX) * .2; camY += (fyp - VH / 2 - camY) * .2;
   camX = clamp(camX, 0, WORLD - VW); camY = clamp(camY, 0, WORLD - VH);
   const sh = reduce ? 0 : S.shake * 20, cx = camX + rnd(-.5, .5) * sh, cy = camY + rnd(-.5, .5) * sh;
@@ -2984,6 +2993,8 @@ function options() {
   const pool = [], nA = Object.keys(S.skills).length, nG = Object.keys(S.gifts).length;
   for (const id in POW) if (S.learned.includes(POW[id].e) && !S.evo[id] && (S.skills[id] ? S.skills[id] < maxStars(id) : nA < 6)) pool.push({ kind:'active', id });
   for (const id in GIFT) if (S.gifts[id] ? S.gifts[id] < 5 : nG < 6) pool.push({ kind:'gift', id });
+  // a card you have passed on twice rests for a level-up or two (playtest 1: the same unwanted card came back every time)
+  S.decl = S.decl || {}; for (let i = pool.length - 1; i >= 0; i--) { const k = pool[i].kind + pool[i].id; if ((S.decl[k] || 0) >= 2) { S.decl[k] -= .5; pool.splice(i, 1); } }
   pool.sort(() => Math.random() - .5);
   for (const o of pool) { if (opts.length >= 3) break; if (!has(o.kind, o.id)) opts.push(o); }
   if (!opts.length) opts.push({ kind:'heal' });
@@ -3017,6 +3028,7 @@ function starRow(lv) { return `<span class="stars">${[0, 1, 2, 3, 4].map(i => `<
 // card colours per element: bright enough to pop, deep enough for white type
 const CARDC = { water:['#5DB8FF', '#2F6FDB'], wood:['#7BD860', '#2E9A55'], fire:['#FF8A5B', '#E2433A'], earth:['#F6BC4E', '#C2701A'], metal:['#B9B3EC', '#7A72C8'] };
 function renderCards(opts) {
+  S.offered = opts;
   const box = $('#cards'); box.innerHTML = ''; box.classList.remove('picked');
   opts.forEach((o, idx) => {
     const b = document.createElement('button'), el = elOf(o); let html;
@@ -3048,6 +3060,7 @@ $('#rerollBtn').onclick = () => { if (!S.rerolls || $('#cards').classList.contai
 // learning shows: a burst in the power's colour on the Keeper, its name and new level
 function applyPick(o, quiet) {
   const P = S.p, el = elOf(o), col = EL[el];
+  S.decl = S.decl || {}; for (const x of S.offered || []) if (x.kind !== 'evo' && x.kind !== 'heal') { const k = x.kind + x.id; S.decl[k] = x === o || (x.kind === o.kind && x.id === o.id) ? 0 : (S.decl[k] || 0) + 1; }
   if (o.kind === 'evo') { S.evo[o.id] = true; if (!quiet) { SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
   else if (o.kind === 'active') { S.skills[o.id] = (S.skills[o.id] || 0) + 1; floatText(P.x, P.y - 100, `${POW[o.id].n} ${S.skills[o.id] > 1 ? 'Lv ' + S.skills[o.id] : 'learned'}!`, col, 18); }
   else if (o.kind === 'gift') { S.gifts[o.id] = (S.gifts[o.id] || 0) + 1; floatText(P.x, P.y - 100, `${GIFT[o.id].n} ${S.gifts[o.id] > 1 ? 'Lv ' + S.gifts[o.id] : 'gained'}!`, col, 18); }
@@ -3214,7 +3227,12 @@ function renderSkills() {
 }
 function hud() {
   $('#lvPill').textContent = S.lv;
-  { const ub = $('#ultBtn'), U = S.ult; ub.style.setProperty('--p', U.charge.toFixed(3)); ub.classList.toggle('ready', U.charge >= 1 && !U.cast); ub.classList.toggle('cast', !!U.cast); }
+  { const ub = $('#ultBtn'), U = S.ult, ready = U.charge >= 1 && !U.cast; ub.style.setProperty('--p', U.charge.toFixed(3)); ub.classList.toggle('ready', ready); ub.classList.toggle('cast', !!U.cast);
+    // sit just under the top HUD, wherever it ends (the wave pill and boss bar change its height)
+    const top = $('#hud .top'); if (top) ub.style.setProperty('--ultTop', Math.round(top.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 12) + 'px');
+    // surrounded with the ultimate ready: it pulses harder and chimes once, the moment it can save you
+    let near = 0; if (ready) for (const e of S.en) if (!e.dead && !e.boss && Math.abs(e.x - S.p.x) < 190 && Math.abs(e.y - S.p.y) < 190) near++;
+    const urge = ready && near >= 10; if (urge && !ub.classList.contains('urge')) SFX.ting(); ub.classList.toggle('urge', urge); }
   $('#xpBar i').style.width = (S.xp / S.need * 100) + '%';
   $('#lvPill').style.setProperty('--p', Math.min(1, S.xp / S.need).toFixed(3));
   $('#freedN').textContent = S.thawed;
@@ -3242,6 +3260,7 @@ function win() {
   AU.music(false); SFX.bossdown(); setTimeout(() => SFX.fanfare(true), 900); S.shake = 1;
   for (const e of S.en) if (!e.dead && !e.boss) { e.dead = true; S.thawed++; }
   const bx = S.boss.x, by = S.boss.y; let r = 0;
+  floatText(bx, by - 170, 'Victory!', '#FFE08A', 46);   // an animated word in the world, not a banner
   shards(bx, by - 80, '#CFE9FF', 40, 520); ring(bx, by, 20, 900, '#FFE6A3', 1.2, 30, true); stars(bx, by - 60, 60, '#FFE58A', 700);
   for (let i = 0; i < 70; i++) { const an = rnd(0, TAU), sp = rnd(200, 900); fx({ k:'star', x:bx, y:by - 60, vx:Math.cos(an) * sp, vy:Math.sin(an) * sp, drag:1.6, life:rnd(1, 2), s:rnd(10, 18), c:['#5CF2FF', '#D58BFF', '#FFD24A'][i % 3] }); }
   let lastF = performance.now();
