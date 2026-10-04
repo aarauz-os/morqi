@@ -637,8 +637,9 @@ const EVO_DESC = {
 
 /* ================= assets ================= */
 const IMG = {};
+const KEEPERS = 7;   // Keeper avatars to choose from
 function load(name, src) { const i = new Image(); i.src = src; IMG[name] = i; return i; }
-for (let k = 1; k <= 6; k++) { load('k' + k, `art4/k${k}.png`); for (let r = 1; r <= 3; r++) load(`k${k}r${r}`, `art4/run/k${k}-r${r}.png`); }   // idle pose plus a three-frame run cycle
+for (let k = 1; k <= KEEPERS; k++) { load('k' + k, `art4/k${k}.png`); for (let r = 1; r <= 3; r++) load(`k${k}r${r}`, `art4/run/k${k}-r${r}.png`); }   // idle pose plus a three-frame run cycle
 ZOD.forEach(z => { load(z + 'y', `art4/a-${z}-y.png`); load(z + 'm', `art4/a-${z}-m.png`); });
 ['e-critter','e-wolf','e-golem','b-warden','b-fisher'].forEach(n => load(n, `art4/${n}.png`));
 // every element sends its own creatures: a swarm creature (a), a specialist with its own trick (b) and a brute (c)
@@ -825,15 +826,15 @@ const SEEN = new Set((store.get('morqi.seen') || '').split(',').filter(Boolean))
 const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(',')); };
 function show(id) { document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); }
 const kb = $('#keepers'), ksImg = $('#ksImg');
-for (let k = 1; k <= 6; k++) { const i = new Image(); i.src = `art4/k${k}-hi.png`; }
+for (let k = 1; k <= KEEPERS; k++) { const i = new Image(); i.src = `art4/k${k}-hi.png`; }
 function pickKeeper(k, dir) {
-  keeper = ((k - 1 + 6) % 6) + 1;
+  keeper = ((k - 1 + KEEPERS) % KEEPERS) + 1;
   [...kb.children].forEach((c, i) => { c.classList.toggle('on', i === keeper - 1); c.setAttribute('aria-checked', i === keeper - 1); });
   ksImg.src = `art4/k${keeper}-hi.png`; ksImg.alt = 'Keeper ' + keeper;
   ksImg.style.setProperty('--dx', (dir || 1) * 40 + 'px'); ksImg.classList.remove('swap'); void ksImg.offsetWidth; ksImg.classList.add('swap');
   SFX.pop();
 }
-for (let k = 1; k <= 6; k++) {
+for (let k = 1; k <= KEEPERS; k++) {
   const b = document.createElement('button'); b.className = 'kp' + (k === 1 ? ' on' : ''); b.setAttribute('role', 'radio');
   b.setAttribute('aria-checked', k === 1); b.setAttribute('aria-label', 'Keeper ' + k);
   b.innerHTML = `<img src="art4/k${k}-face.png" alt="">`;
