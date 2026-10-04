@@ -660,7 +660,7 @@ const ELNAME = { wood:'Wood', fire:'Fire', earth:'Earth', metal:'Metal', water:'
 const CHAR = { wood:'木', fire:'火', earth:'土', metal:'金', water:'水' };
 const CONTROLS = { water:'fire', fire:'metal', metal:'wood', wood:'earth', earth:'water' };   // key keeps value in check
 const FED_BY = { wood:'water', fire:'wood', earth:'fire', metal:'earth', water:'metal' };      // key is fed by value
-// the type chart, Pokémon-style: every element beats two, is weak to two, and resists itself.
+// the type chart, in the classic creature-battler shape: every element beats two, is weak to two, and resists itself.
 // It beats the element it keeps in check (water puts out fire) and the element that feeds it, which it uses up (fire burns wood).
 const EL5 = ['water', 'wood', 'fire', 'earth', 'metal'];
 const beats = el => [CONTROLS[el], FED_BY[el]];
@@ -873,7 +873,7 @@ const AU = (() => {
     combo(n) { tone({ f:440 * Math.pow(2, MINOR[Math.min(n, 14)] / 12), dur:.12, vol:.07 }); },
     bossdown() { this.boom(true); }
   };
-  /* recorded effects (made with ElevenLabs), mixed by a few rules (A asked for the golden ratio here too, 2026-10-04):
+  /* recorded effects (generated studio recordings), mixed by a few rules (A asked for the golden ratio here too, 2026-10-04):
      - a loudness ladder in golden steps: every rung is 0.618 of the one above (1, .618, .382, .236). Rare hero moments
        (victory, level up, a boss falling) sit on top; the sounds that happen constantly (shots, gems, shards) sit at
        the bottom, so they never nag;
@@ -992,7 +992,7 @@ const AU = (() => {
      - hooks rise, then fall, with one distinctive leap and one repeated note, peaking about 62% through the phrase
        (the shape of earworms: Jakubowski 2016);
      - while calm, only a three-note preview of the hook plays, so the full hook lands when the beat drops
-       (melodic previews, the Max Martin way; anticipation is where the dopamine is: Salimpoor 2011);
+       (melodic previews, the way hit songwriters tease a hook before it lands; anticipation is where the dopamine is: Salimpoor 2011);
      - medium syncopation in kick and 808, never busier (Witek 2014). */
   const hookOn = bar => bar % 13 < 8;
   const golden = bar => bar % 13 === 8;
@@ -1898,7 +1898,7 @@ function awakeTick(dt) {
 }
 
 /* ================= the companion's ultimate ================= */
-// Survivor.io's pets work on their own. Ours has one big move that the player fires: the ring around the companion's
+// In most horde-survival games a pet works on its own. Ours has one big move that the player fires: the ring around the companion's
 // button fills with time and kills, a tap sends the companion in, and it lands one great, visible hit. The companion
 // keeps its level between runs (kills, ultimates and wins feed it), and its ultimate evolves at companion level 9, 24,
 // 36 and 60: a new name, a bigger shape, more hits, louder. The animal stays young; from the third evolution its
@@ -2114,7 +2114,7 @@ const LEVELS = [
     { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 12], ['golem', 2]], name:'The Still sends everything' } ] }
 ];
 const LV = () => LEVELS[S.level - 1];
-// Level 1 is built from the Keeper's own element, the way Survivor.io's first chapter uses only a couple of enemy families:
+// Level 1 is built from the Keeper's own element, the way a good first chapter uses only a couple of enemy families:
 // just the two elements your element beats, so a new player feels strong. It grows by numbers and by role (swarm, then a
 // brute), never by variety. Nine waves, every 15 to 18 seconds; elements that beat you first arrive in Level 2.
 function shapeLevel1(me) {
@@ -2422,7 +2422,7 @@ function update(dt) {
   P.moving = m > .1; P.mx = mx; P.my = my;
   if (P.moving) S.moved = (S.moved || 0) + 235 * dt;
   if (P.moving && (S.dustT = (S.dustT || 0) - dt) <= 0) { S.dustT = .12; fx({ k:'smoke', x:P.x - mx * 14, y:P.y + 28, vx:-mx * 30, vy:-10, drag:3, life:.45, s:12, c:'200,190,170' }); }
-  P.hp = Math.min(P.max, P.hp + (S.gifts.spring || 0) * .6 * dt);   // no free healing (as in Survivor.io): hearts, peaches and the Deep Spring gift do it
+  P.hp = Math.min(P.max, P.hp + (S.gifts.spring || 0) * .6 * dt);   // no free healing, as the horde-survival genre does it: hearts, peaches and the Deep Spring gift do it
   if (S.comboT > 0 && (S.comboT -= dt) <= 0) S.combo = 0;
   { // how dangerous this moment is, for the score: crowding, big creatures, a wave coming in, health, how far in we are
     let near = 0, big = 0; for (const e of S.en) if (!e.dead && !e.boss && Math.abs(e.x - P.x) < 650 && Math.abs(e.y - P.y) < 650) { near++; if (e.heavy) big++; }
