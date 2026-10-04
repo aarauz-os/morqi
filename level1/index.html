@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Shippori+Mincho+B1:wght@700;800&display=swap">
 <style>
-/* MorQi Glass: a calm, premium kids' UI. Frosted porcelain panels float over the living world, jade capsules invite a tap,
+/* MorQi Glass, Midnight: a calm, premium kids' UI. Frosted midnight glass floats over the living world, jade capsules invite a tap,
    type is round and friendly, and every press springs back. Colour carries meaning: jade go, coral danger, sun reward, violet qi. */
 :root{
   --ink:#1B2232; --ink-2:#5A6378; --ink-3:#8A93A6;
@@ -297,6 +297,64 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .toggles .btn{font-size:13.5px;padding:8px 14px 9px}
 .petchip{width:auto!important;padding:0 10px 0 3px;display:flex;align-items:center;gap:5px;border-radius:99px!important;background:var(--night)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);font:900 12.5px var(--round);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)!important}
 .petchip img{width:24px!important;height:24px!important;border-radius:50%!important;background:color-mix(in srgb,var(--c) 40%,#fff)}
+/* Midnight: popups are frosted night glass (indigo into teal) with white type; power cards are small bright element tiles */
+.popup{background:rgba(8,12,28,.5);-webkit-backdrop-filter:blur(12px) saturate(1.3);backdrop-filter:blur(12px) saturate(1.3)}
+.panel{background:linear-gradient(180deg,rgba(28,36,74,.9),rgba(12,40,54,.92));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 30px 70px rgba(0,0,0,.45)}
+.panel p{color:rgba(255,255,255,.76)!important}
+.ribbon{color:#fff}.rb.red .ribbon{color:#FF8A7A}
+.popup .btn.blue,.panel .btn.blue{color:#fff;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.btn .cost{background:rgba(255,255,255,.18)}
+.hint{color:rgba(255,255,255,.55)}
+.loadout{background:rgba(255,255,255,.06)}
+.loadout .slot{background:rgba(255,255,255,.1);box-shadow:0 0 0 2px rgba(255,255,255,.85),0 0 0 3.5px var(--c,transparent)}
+.loadout .slot.empty{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);background:rgba(255,255,255,.04)}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;align-items:stretch}
+.card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 7px 10px;border-radius:22px;text-align:center;color:#fff;
+  background:linear-gradient(170deg,var(--c1),var(--c2));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px color-mix(in srgb,var(--c2) 45%,transparent)}
+.card .tile{width:64px;height:64px;border-radius:18px;box-shadow:0 6px 12px rgba(0,0,0,.22);background:none}
+.card .tile img{border-radius:18px}
+.card.gift .tile,.card.gift .tile img{border-radius:50%}
+.card .tile i{display:none}
+.card .body{align-items:center;gap:5px;width:100%}
+.card .tab{flex-direction:column;gap:3px}
+.card .tab b{font-size:14px;line-height:1.1;color:#fff;white-space:normal;text-wrap:balance;text-shadow:0 1px 2px rgba(0,0,0,.18)}
+.card .flag{position:absolute;top:-8px;right:-4px;font-size:9.5px;padding:2px 7px 3px}
+.card .txt{align-items:center;gap:5px}
+.card .txt p{font-size:11px;line-height:1.28;color:rgba(255,255,255,.92);text-shadow:0 1px 2px rgba(0,0,0,.15)}
+.card .txt small{display:none}
+.card .txt small[style]{display:block;font-size:10px;line-height:1.2;color:#FFF3C4!important}
+.card .chips{justify-content:center;gap:3px;font-size:10px;color:rgba(255,255,255,.8)}
+.card .chips .ec{font-size:10px;padding:1px 6px 2px;background:rgba(255,255,255,.22);color:#fff;box-shadow:none}
+.stars{gap:3px}.stars s{width:11px;height:5px;background:rgba(255,255,255,.3)}
+.card .stars s.f{background:#fff}.card .stars s.n{background:rgba(255,255,255,.7)}
+.card.evo{--c1:#FFD66E;--c2:#E98A12;box-shadow:0 0 0 2px #FFE7A0,0 12px 26px rgba(233,138,18,.45)}
+.card .formula{flex-direction:column;gap:2px;color:#FFF6D8;font-size:10.5px}
+.card:active{transform:scale(.95)}
+.tip{background:rgba(111,242,207,.12);color:rgba(255,255,255,.82)}.tip b{color:var(--jade-hi)}
+.how,.beast,.elrow,.gain{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.how b,.beast b,.gain b{color:#fff}.how span,.beast p,.gain span,.elrow{color:rgba(255,255,255,.75)}
+.how em{color:var(--jade-hi)}
+.how .ic{background:linear-gradient(160deg,rgba(111,242,207,.35),rgba(86,183,255,.3))}
+.ghost{box-shadow:inset 0 0 0 2px rgba(255,255,255,.4)}
+.beast .pic{background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--c) 55%,#1C2A4A),color-mix(in srgb,var(--c) 22%,#121C33) 75%)}
+.chips{color:rgba(255,255,255,.55)}
+.ec{background:color-mix(in srgb,var(--c) 30%,transparent);color:color-mix(in srgb,var(--c) 45%,#fff);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 60%,transparent)}
+.elrow em{color:#7FF0C0}.elrow s{color:#FF9A8A}
+.rt{background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.stat{background:rgba(28,36,74,.7);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}.stat b{color:#fff}.stat span{color:rgba(255,255,255,.7)}
+#results .panel,#results .rb .ribbon{color:#fff}
+#coach .cb{background:linear-gradient(180deg,rgba(28,36,74,.94),rgba(12,40,54,.95));color:rgba(255,255,255,.8);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 20px 50px rgba(0,0,0,.4)}
+#coach .cb b{color:#fff}
+#coach .tail{background:rgba(16,40,56,.95)}
+#toast{background:linear-gradient(180deg,rgba(28,36,74,.94),rgba(12,40,54,.95));color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),0 16px 40px rgba(0,0,0,.4)}
+.learn{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding:12px;border-radius:20px;background:linear-gradient(170deg,color-mix(in srgb,var(--c) 40%,transparent),rgba(255,255,255,.04));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 55%,transparent)}
+.learn .ek{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--jade-hi)}
+.learn b{font-size:20px;font-weight:900;color:#fff}
+.learn .pw2{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;font-size:13px;color:#fff}.learn .pw2 span{display:inline-flex;align-items:center;white-space:nowrap}
+.learn .pw2 img{width:30px;height:30px;border-radius:9px;vertical-align:middle;margin-right:5px}
+.learn small{font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.75)}
+.revchips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#intro .ribbon,#beastCard .ribbon{white-space:normal;text-wrap:balance;font-size:clamp(21px,6.4vw,27px);line-height:1.1}
 </style>
 
 <div id="stage">
@@ -358,7 +416,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
     <div class="eb" id="revEb">Year of the Pig</div>
     <div class="reveal" id="revBox"><img id="revImg" alt=""></div>
     <h2 class="ck" id="revName">Piglet</h2>
-    <span class="chip" id="revEl">Water</span>
+    <span class="revchips"><span class="chip" id="revEl">Water</span><span class="chip" id="revEl2">Pig</span></span>
     <p id="revP"></p>
     <button class="btn green" id="revNext">Begin</button>
   </section>
@@ -495,6 +553,11 @@ const VERB = {   // [what the attacker does, how the loser hears it]
   earth:{ water:['dams', 'dammed'], fire:['smothers', 'smothered'] },
   metal:{ wood:['chops', 'chopped'], earth:['digs through', 'dug through'] }
 };
+// the Path of the Five: a birth year's last digit gives the Keeper's element (the heavenly stem) and its animal the spirit animal.
+// Keepers learn the elements in the order theirs feeds them, and each new one beats what threatens the one before it.
+const STEM = ['metal', 'metal', 'water', 'water', 'wood', 'wood', 'fire', 'fire', 'earth', 'earth'];
+const FEEDS = { water:'wood', wood:'fire', fire:'earth', earth:'metal', metal:'water' };
+const pathOf = el => { const p = [el]; while (p.length < 5) p.push(FEEDS[p[p.length - 1]]); return p; };
 const andList = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0];
 const ZOD = ['rat','ox','tiger','rabbit','dragon','snake','horse','goat','monkey','rooster','dog','pig'];
 const ANIMAL = {
@@ -530,13 +593,13 @@ const GIFT = {
 const GIFT_OF = { water:'spring', wood:'shoot', fire:'kindling', earth:'rooted', metal:'lungs' };
 const evoGift = id => GIFT_OF[FED_BY[POW[id].e]];          // the gift that evolves a power
 const START = { water:'tide', wood:'vine', fire:'ember', earth:'stone', metal:'bell' };
-const icon = n => `art/icons/${n}.jpg`;
+const icon = n => `art/icons/${n}.jpg?v=2`;   // v2: the cartoony set
 const AWAKEN_AT = [4, 8, 12, 16, 20];
 
 // every number each power has at each level, shared by the game and the cards
 const ST = {
-  tide:    (l, v) => v ? { n:8, dmg:32, size:22, r:86, surge:2.4 } : { n:1 + l, dmg:14 + 4 * l, size:11 + 2 * l, r:72 + 4 * l },
-  pearl:   (l, v) => v ? { n:4, dmg:40, size:26, spd:420, life:99, cd:1 } : { n:[0,1,2,2,3,4][l], dmg:12 + 5 * l, size:13 + 1.6 * l, spd:360 + 20 * l, life:3.4 + .3 * l, cd:2.2 },
+  tide:    (l, v) => v ? { n:8, dmg:34, size:22, r:86, surge:2.4 } : { n:2 + l, dmg:17 + 5 * l, size:13 + 2 * l, r:74 + 4 * l },
+  pearl:   (l, v) => v ? { n:4, dmg:40, size:26, spd:420, life:99, cd:1 } : { n:[0,1,2,3,3,4][l], dmg:16 + 5 * l, size:14 + 1.6 * l, spd:380 + 20 * l, life:3.6 + .3 * l, cd:1.8 },
   vine:    (l, v) => v ? { n:12, dmg:48, R:210, w:15, cd:.9 } : { n:5 + l, dmg:16 + 6 * l, R:118 + 16 * l, w:7 + l, cd:1.1 },
   bamboo:  (l, v) => v ? { n:8, dmg:34, pierce:5, cd:.24 } : { n:l, dmg:14 + 4 * l, pierce:l >= 3 ? 3 : 2, cd:.75 },
   ember:   (l, v) => v ? { n:6, dmg:40, r:82, cd:.7 } : { n:l, dmg:18 + 5 * l, r:40 + 5 * l, cd:1.0 },
@@ -754,7 +817,7 @@ function size() {
 addEventListener('resize', size); size();
 
 /* ================= the opening: Keeper, year, spirit animal ================= */
-let keeper = 1, animal = 'pig';
+let keeper = 1, animal = 'pig', keeperEl = 'water';
 let LVL = Math.min(4, Math.max(1, +new URLSearchParams(location.search).get('level') || 1));
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 const unlocked = () => Math.max(LVL, +(store.get('morqi.unlocked') || 1));
@@ -788,14 +851,15 @@ for (let y = nowY; y >= 1940; y--) { const o = document.createElement('option');
 $('#playBtn').onclick = () => { AU.init(); SFX.select(); AU.music(true); show('pickKeeper'); };
 $('#keeperNext').onclick = () => { SFX.select(); show('pickYear'); };
 $('#yearNext').onclick = () => {
-  const year = +ys.value; animal = ZOD[((year - 1900) % 12 + 12) % 12];
+  const year = +ys.value; animal = ZOD[((year - 1900) % 12 + 12) % 12]; keeperEl = STEM[((year % 10) + 10) % 10];
   const A = ANIMAL[animal];
-  $('#revEb').textContent = `Year of the ${A.n}`;
+  $('#revEb').textContent = `Year of the ${ELNAME[keeperEl]} ${A.n}`;
   $('#revImg').src = `art/a-${animal}-y.png`; $('#revImg').alt = A.y;
   $('#revBox').style.setProperty('--c', EL[A.e]);
   $('#revName').textContent = `Your ${A.y}`;
-  $('#revEl').textContent = ELNAME[A.e]; $('#revEl').style.setProperty('--c', EL[A.e]);
-  $('#revP').textContent = `It starts small, and it grows as you do: one day it becomes the ${A.m}. It runs beside you in every fight, and its element gives you your first power: ${POW[START[A.e]].n}.`;
+  $('#revEl').textContent = `${ELNAME[keeperEl]} Keeper`; $('#revEl').style.setProperty('--c', EL[keeperEl]);
+  $('#revEl2').textContent = `${ELNAME[A.e]} ${A.y}`; $('#revEl2').style.setProperty('--c', EL[A.e]);
+  $('#revP').textContent = `You were born ${ELNAME[keeperEl]}, so your first power is ${POW[START[keeperEl]].n}. Your ${A.y} fights beside you with ${ELNAME[A.e]}, and one day becomes the ${A.m}. The other elements you'll learn, one at a time.`;
   SFX.fanfare(false); show('reveal');
 };
 $('#revNext').onclick = () => { SFX.select(); show('story'); };
@@ -822,14 +886,14 @@ function startRun() {
   resetThaw(); FX.length = 0; GROUND.length = 0;
   const A = ANIMAL[animal];
   S = {
-    t:0, over:false, won:false, level:LVL,
+    t:0, over:false, won:false, level:LVL, learned:pathOf(keeperEl).slice(0, LVL), apprentice:LVL > 1 ? pathOf(keeperEl)[LVL - 1] : null,
     p:{ x:WORLD / 2, y:WORLD / 2, hp:220, max:220, face:1, hurt:0, r:26, mx:0, my:0 },
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0 },
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[],
-    lv:1, xp:0, need:need(1), skills:{ [START[A.e]]:1 }, gifts:{}, evo:{}, cds:{}, ang:{},
+    lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
-    strongT:-9, taught:{}, shake:0, buffs:{ tiger:0 }, freeze:0, flashT:0, swords:[], pearls:[]
+    strongT:-9, taught:{}, shake:0, buffs:{ tiger:0, ward:0 }, freeze:0, flashT:0, swords:[], pearls:[]
   };
   camX = S.p.x - VW / 2; camY = S.p.y - VH / 2; S.cam = { x:camX, y:camY };
   paintThaw(S.p.x, S.p.y, 150);
@@ -940,6 +1004,7 @@ function spawnBoss() {
   e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5) * [.85, 1.05, 1.2, 1.35][S.level - 1]);
   S.en.push(e); S.boss = e;
   S.p.hp = S.p.max; floatText(S.p.x, S.p.y - 70, 'Full health', '#8CF5A0', 20);
+  if (eff(e.el, keeperEl) > 1) S.items.push({ x:S.p.x + 80, y:S.p.y + 40, kind:'ward', t:0, z:10, vz:260 });
   S.arena = { x:S.p.x, y:S.p.y, r:Math.min(VW / 2 - 16, 330) };
   for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.p.x, m.y - S.p.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
@@ -1011,7 +1076,14 @@ function placeCrate(near) {
   S.crates.push({ x:clamp(S.p.x + Math.cos(a) * d, 60, WORLD - 60), y:clamp(S.p.y + Math.sin(a) * d, 60, WORLD - 60), hp:3, cd:0, wob:rnd(0, 6) });
 }
 const ITEMS = [['magnet', .25], ['cracker', .2], ['dumpling', .24], ['peach', .05], ['tiger', .15], ['frost', .11]];
-function dropItem(x, y) { let r = Math.random(), k = 'dumpling'; for (const [n, w] of ITEMS) { if (r < w) { k = n; break; } r -= w; } S.items.push({ x, y, kind:k, t:0, z:10, vz:260 }); }
+// when the creatures near you beat your element, lanterns lean towards protection: Jade Wards and Dumplings
+function threatened() { const W = LEVELS[S.level - 1].waves[Math.max(0, S.waveIdx - 1)], els = [S.boss && !S.boss.dead ? S.boss.el : null, W && W.el !== 'mix' ? W.el : null].filter(Boolean); return els.some(e => eff(e, keeperEl) > 1); }
+function dropItem(x, y) {
+  let r = Math.random(), k = 'dumpling';
+  if (threatened() && r < .55) k = r < .35 ? 'ward' : 'dumpling';
+  else for (const [n, w] of ITEMS) { if (r < w) { k = n; break; } r -= w; }
+  S.items.push({ x, y, kind:k, t:0, z:10, vz:260 });
+}
 function crates(dt) {
   const P = S.p, hit = [[P.x, P.y, 50], [S.pet.x, S.pet.y, 40]];
   if (S.awake && S.awake.x != null) hit.push([S.awake.x, S.awake.y, 100]);
@@ -1041,7 +1113,8 @@ function useItem(k) {
     const h = k === 'peach' ? P.max : P.max * .3; P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
     if (k === 'peach') cue('Peach of Immortality!', 'Fully healed', 1500); SFX.heal();
     for (let i = 0; i < 14; i++) fx({ k:'plus', x:P.x + rnd(-40, 40), y:P.y + rnd(-30, 20), vx:0, vy:-rnd(60, 120), life:rnd(.5, .9), s:rnd(7, 11), c:'#8FF0A0' });
-  } else if (k === 'tiger') { S.buffs.tiger = 12; cue('Tiger Talisman!', 'Every power hits 50% harder for 12 seconds', 1800); SFX.roar(); ring(P.x, P.y, 20, 300, '#FFB347', .6, 14, true); stars(P.x, P.y - 30, 24, '#FFB347', 320); }
+  } else if (k === 'ward') { S.buffs.ward = 15; cue('Jade Ward!', `Elements that beat ${ELNAME[keeperEl]} hurt you half as much`, 1800); SFX.bell(true); ring(P.x, P.y, 20, 240, '#5FE3B4', .6, 14, true); }
+  else if (k === 'tiger') { S.buffs.tiger = 12; cue('Tiger Talisman!', 'Every power hits 50% harder for 12 seconds', 1800); SFX.roar(); ring(P.x, P.y, 20, 300, '#FFB347', .6, 14, true); stars(P.x, P.y - 30, 24, '#FFB347', 320); }
   else if (k === 'frost') {
     S.freeze = 3.2; for (const e of S.en) if (!e.boss && Math.abs(e.x - P.x) < VW * .7 && Math.abs(e.y - P.y) < VH * .7) e.frozen = 3.2;
     cue('Frost Bell!', 'Everything on screen is frozen', 1600); SFX.freeze(); S.flashT = .25; S.flashC = '200,235,255'; ring(P.x, P.y, 20, 1000, '#CFEFFF', .8, 16, true);
@@ -1362,7 +1435,7 @@ function teach() {
   if (!tg.c_wave && S.warn) coach('wave', 'Waves', 'Every wave is one element and comes in a shape: a line, a charging column, a closing ring. The arrows show where, and the banner says which elements beat it.', () => ({ sx:W / 2, sy:H * .42 }), 0, 'below');
   if (!tg.c_boss && S.boss) coach('boss', 'The Still Warden', 'Its colour shows its element, and it changes as it weakens. Defeat it to free the shore.', () => ({ x:S.boss.x, y:S.boss.y - 160 }), 6);
 }
-const ITEM_INFO = { magnet:["Luma's Call", 'Pulls every gem on the map to you.'], cracker:['Firecrackers', 'Clears every creature on screen.'], dumpling:['Dumpling', 'Heals you.'], peach:['Peach of Immortality', 'Heals you fully.'], tiger:['Tiger Talisman', 'Your powers hit 50% harder for a while.'], frost:['Frost Bell', 'Freezes everything on screen.'] };
+const ITEM_INFO = { magnet:["Luma's Call", 'Pulls every gem on the map to you.'], cracker:['Firecrackers', 'Clears every creature on screen.'], dumpling:['Dumpling', 'Heals you.'], peach:['Peach of Immortality', 'Heals you fully.'], tiger:['Tiger Talisman', 'Your powers hit 50% harder for a while.'], frost:['Frost Bell', 'Freezes everything on screen.'], ward:['Jade Ward', 'For a while, elements that beat yours hurt you half as much.'] };
 // ten scripted waves before the boss: each one a single element, in a shape you can read, announced two seconds ahead
 // levels, paced the way the genre does it: level 1 is simple chasers of all five elements plus two brutes and the boss;
 // each later level brings back what you know and adds one or two new creatures with a trick, introduced before it starts
@@ -1470,7 +1543,8 @@ function direct(dt) {
     const b = S.boss, ph = b.hp < b.max * .34 ? 2 : b.hp < b.max * .67 ? 1 : 0;
     if (ph !== b.phase) {
       b.phase = ph; b.el = LV().boss[ph];
-      cue(`The Warden turns to ${ELNAME[b.el]}`, `${beatenBy(b.el)} beat ${ELNAME[b.el]}`, 2200, true); ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5; ring2(16 + ph * 6);
+      cue(`The Warden turns to ${ELNAME[b.el]}`, `${beatenBy(b.el)} beat ${ELNAME[b.el]}`, 2200, true);
+      if (eff(b.el, keeperEl) > 1) { const a = rnd(0, TAU); S.items.push({ x:S.p.x + Math.cos(a) * 90, y:S.p.y + Math.sin(a) * 90, kind:'ward', t:0, z:10, vz:260 }); }   // the shore helps a Keeper this element beats ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5; ring2(16 + ph * 6);
       const P = S.p, heal = Math.round(P.max * .3); P.hp = Math.min(P.max, P.hp + heal); floatText(P.x, P.y - 70, '+' + heal, '#8CF5A0', 20); stars(P.x, P.y - 30, 10, '#8CF5A0', 220);
     }
     b.atk -= dt; b.summon -= dt;
@@ -1495,7 +1569,7 @@ function ouch(dmg, fx, fy, o = {}) {
   return true;
 }
 // your Keeper has your spirit animal's element: creatures whose element beats yours hit harder, the rest hit softer
-function armourVs(el) { const A = ANIMAL[animal]; let m = 1 - (S.gifts.rooted || 0) * .08; if (el) for (const me of [A.e, A.e2].filter(Boolean)) m *= eff(el, me) > 1 ? 1.15 : .9; return m; }
+function armourVs(el) { let m = 1 - (S.gifts.rooted || 0) * .08; if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
 function hazard(k, x, y, r, life, dmg) { if (S.hz.length < 60) S.hz.push({ k, x, y, r, life, t:0, dmg, tick:0, rot:rnd(0, TAU) }); }
 function brain(e, P, d, dt, s) {
   const K = e.K, a = e.act, ux = (P.x - e.x) / d, uy = (P.y - e.y) / d;
@@ -1594,7 +1668,7 @@ function update(dt) {
   if (P.moving) S.moved = (S.moved || 0) + 235 * dt;
   if (P.moving && (S.dustT = (S.dustT || 0) - dt) <= 0) { S.dustT = .12; fx({ k:'smoke', x:P.x - mx * 14, y:P.y + 28, vx:-mx * 30, vy:-10, drag:3, life:.45, s:12, c:'200,190,170' }); }
   P.hp = Math.min(P.max, P.hp + (1.4 + (S.gifts.spring || 0) * 1.5) * dt);   // healing comes mostly from gifts and pickups
-  P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt);
+  P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
   direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); crates(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
@@ -1957,6 +2031,7 @@ function draw() {
   const lean = run ? P.mx * (useRun ? .05 : .13) : 0, ksx = run ? 1 - Math.abs(Math.cos(cyc)) * .04 : 1 - Math.sin(S.t * 2.6) * .01, ksy = run ? 1 + Math.abs(Math.cos(cyc)) * .05 : 1 + Math.sin(S.t * 2.6) * .022;
   const kx = P.x + (P.rx || 0), ky = P.y + (P.ry || 0);
   g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(P.x, P.y + 30, 26 - bob * .8, 9, 0, 0, TAU); g.fill();
+  if (S.buffs.ward > 0) { const k = Math.min(1, S.buffs.ward / 2); g.save(); g.globalAlpha = .55 * k; g.strokeStyle = '#5FE3B4'; g.lineWidth = 4; g.beginPath(); for (let i = 0; i <= 6; i++) { const a = i / 6 * TAU + S.t * .6; g.lineTo(kx + Math.cos(a) * 52, ky - 26 + Math.sin(a) * 40); } g.stroke(); g.restore(); g.lineWidth = 1; }
   if (S.buffs.tiger > 0) add(() => { glowAt(kx, ky - 30, 170 + Math.sin(S.t * 18) * 14, '#FF9A3A', .8); if (Math.random() < .5) flames(kx, ky - 10, 1, 20, 22, 120); });
   if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob); g.rotate(lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
     g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1)); g.drawImage(kim, -ks / 2, -ks * .72 - 24, ks, ks);   // feet on the shadow
@@ -2075,7 +2150,7 @@ function drawVine(p, k) {
 function drawItem(it) {
   const y = it.y - 12 - (it.z || 0) + Math.sin(it.t * 4) * 5, x = it.x;
   g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(x, it.y + 8, 18, 6, 0, 0, TAU); g.fill();
-  const col = { magnet:'#7FC4FF', cracker:'#FF7A5A', dumpling:'#FFF1C9', peach:'#FF9AB8', tiger:'#FFB347', frost:'#CFEFFF' }[it.kind];
+  const col = { magnet:'#7FC4FF', cracker:'#FF7A5A', dumpling:'#FFF1C9', peach:'#FF9AB8', tiger:'#FFB347', frost:'#CFEFFF', ward:'#5FE3B4' }[it.kind];
   add(() => glowAt(x, y, 110, col, .55 + .2 * Math.sin(it.t * 6)));
   g.strokeStyle = '#1A1206'; g.lineWidth = 3;
   if (it.kind === 'magnet') {          // Luma's Call: a blue fox-fire
@@ -2090,6 +2165,9 @@ function drawItem(it) {
   } else if (it.kind === 'peach') {
     g.fillStyle = '#FFB0C8'; g.beginPath(); g.arc(x, y + 2, 16, 0, TAU); g.fill(); g.stroke(); g.fillStyle = '#FF7AA0'; g.beginPath(); g.arc(x + 5, y + 6, 8, 0, TAU); g.fill();
     g.fillStyle = '#6FBF4A'; g.beginPath(); g.ellipse(x - 8, y - 15, 9, 4, -.5, 0, TAU); g.fill(); g.stroke();
+  } else if (it.kind === 'ward') {     // Jade Ward: a small jade shield
+    g.fillStyle = '#3CC79A'; g.beginPath(); g.moveTo(x, y - 20); g.lineTo(x + 16, y - 13); g.quadraticCurveTo(x + 15, y + 9, x, y + 18); g.quadraticCurveTo(x - 15, y + 9, x - 16, y - 13); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#C9FFE9'; g.beginPath(); g.moveTo(x, y - 12); g.lineTo(x + 8, y - 8); g.quadraticCurveTo(x + 7, y + 4, x, y + 9); g.closePath(); g.fill();
   } else if (it.kind === 'tiger') {
     g.save(); g.translate(x, y); g.rotate(Math.sin(it.t * 3) * .1); g.fillStyle = '#FFD24A'; g.fillRect(-12, -22, 24, 44); g.strokeRect(-12, -22, 24, 44);
     g.strokeStyle = '#C8251A'; g.lineWidth = 3; g.beginPath(); g.moveTo(-6, -14); g.lineTo(6, -14); g.moveTo(0, -18); g.lineTo(0, 14); g.moveTo(-6, -2); g.lineTo(6, 4); g.moveTo(-6, 10); g.lineTo(6, 10); g.stroke(); g.restore();
@@ -2105,16 +2183,18 @@ function gainXp(v) {
   S.xp += v * (1 + (S.gifts.shoot || 0) * .15);
   while (S.xp >= S.need) { S.xp -= S.need; S.lv++; S.need = need(S.lv); if (S.pendingLevel) S.queued++; else levelUp(); }
 }
+// an element learned this level is an apprentice element: its powers stop at three stars for now
+const maxStars = id => POW[id].e === S.apprentice ? 3 : 5;
 const canEvo = id => S.skills[id] >= 5 && S.gifts[evoGift(id)] && !S.evo[id];
 const elOf = o => o.kind === 'gift' ? GIFT[o.id].e : o.kind === 'heal' ? 'earth' : POW[o.id].e;
 function options() {
   const opts = [], has = (k, id) => opts.some(o => o.kind === k && o.id === id);
   const evo = Object.keys(POW).find(canEvo); if (evo) opts.push({ kind:'evo', id:evo });
-  const st = START[ANIMAL[animal].e];
+  const st = START[keeperEl];
   if (!S.evo[st] && S.skills[st] < 5) opts.push({ kind:'active', id:st });
   const fg = evoGift(st); if (!S.gifts[fg] && S.lv >= 3) opts.push({ kind:'gift', id:fg });
   const pool = [], nA = Object.keys(S.skills).length, nG = Object.keys(S.gifts).length;
-  for (const id in POW) if (!S.evo[id] && (S.skills[id] ? S.skills[id] < 5 : nA < 6)) pool.push({ kind:'active', id });
+  for (const id in POW) if (S.learned.includes(POW[id].e) && !S.evo[id] && (S.skills[id] ? S.skills[id] < maxStars(id) : nA < 6)) pool.push({ kind:'active', id });
   for (const id in GIFT) if (S.gifts[id] ? S.gifts[id] < 5 : nG < 6) pool.push({ kind:'gift', id });
   pool.sort(() => Math.random() - .5);
   for (const o of pool) { if (opts.length >= 3) break; if (!has(o.kind, o.id)) opts.push(o); }
@@ -2129,7 +2209,7 @@ function levelUp() {
   draw(); hud();
   $('#luTitle').textContent = 'Level Up!';
   const opts = options(), tip = $('#luTip');
-  if (!S.taught.lu) { S.taught.lu = 1; tip.innerHTML = 'Each card is a power. <b>Stars</b> show its level, up to five. <b>NEW!</b> is a power you don\'t have yet. Your powers sit in the bar above.'; tip.hidden = false; }
+  if (!S.taught.lu) { S.taught.lu = 1; tip.innerHTML = 'Each card is a power. <b>The bars</b> show its level, up to five. <b>NEW!</b> is a power you don\'t have yet. Your powers sit in the bar above.'; tip.hidden = false; }
   else if (opts.some(o => o.kind === 'evo') && !S.taught.luevo) { S.taught.luevo = 1; tip.innerHTML = '<b>EVOLVE!</b> Your power is at five stars and you hold the gift that feeds it. Take it!'; tip.hidden = false; }
   else if (opts.some(o => o.kind === 'gift') && !S.taught.lugift) { S.taught.lugift = 1; tip.innerHTML = '<b>Gifts</b> (round icons) boost everything, and each one is the key that evolves the powers of the element it feeds.'; tip.hidden = false; }
   else tip.hidden = true;
@@ -2146,6 +2226,8 @@ function renderLoadout() {
   $('#loadout').innerHTML = h;
 }
 function starRow(lv) { return `<span class="stars">${[0, 1, 2, 3, 4].map(i => `<s class="${i < lv ? 'f' : i === lv ? 'n' : ''}"></s>`).join('')}</span>`; }
+// card colours per element: bright enough to pop, deep enough for white type
+const CARDC = { water:['#5DB8FF', '#2F6FDB'], wood:['#7BD860', '#2E9A55'], fire:['#FF8A5B', '#E2433A'], earth:['#F6BC4E', '#C2701A'], metal:['#B9B3EC', '#7A72C8'] };
 function renderCards(opts) {
   const box = $('#cards'); box.innerHTML = ''; box.classList.remove('picked');
   opts.forEach((o, idx) => {
@@ -2157,14 +2239,14 @@ function renderCards(opts) {
     } else if (o.kind === 'active') {
       const p = POW[o.id], lv = S.skills[o.id] || 0; b.className = 'card';
       html = `<span class="tile"><img src="${icon(p.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${p.n}</b>${lv ? '' : '<span class="flag">NEW!</span>'}</span>
-        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 4 ? `max it + ${GIFT[evoGift(o.id)].n} to evolve` : `evolves into ${p.evo}`}</small><span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
+        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 4 ? `max it + ${GIFT[evoGift(o.id)].n} to evolve` : `evolves into ${p.evo}`}</small>${POW[o.id].e === S.apprentice ? '<small style="color:var(--sun)">Apprentice · up to 3 stars this level</small>' : ''}<span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
     } else if (o.kind === 'gift') {
       const gi = GIFT[o.id], lv = S.gifts[o.id] || 0, feeds = Object.keys(POW).filter(k => evoGift(k) === o.id).map(k => POW[k].n).join(' and ');
       b.className = 'card gift';
       html = `<span class="tile"><img src="${icon(gi.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${gi.n}</b>${lv ? '' : '<span class="flag">NEW!</span>'}</span>
         <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} gift · evolves ${feeds}</small></span></span>`;
     } else { b.className = 'card gift'; html = `<span class="tile"><img src="${icon('g-spring')}" alt=""><i>${CHAR.earth}</i></span><span class="body"><span class="tab"><b>Warm Tea</b></span><span class="txt"><p>Heal fully.</p></span></span>`; }
-    b.style.setProperty('--c', EL[el]); b.style.setProperty('--d', idx * .09 + 's'); b.innerHTML = html;
+    const cc = CARDC[el]; b.style.setProperty('--c', EL[el]); b.style.setProperty('--c1', cc[0]); b.style.setProperty('--c2', cc[1]); b.style.setProperty('--d', idx * .09 + 's'); b.innerHTML = html;
     b.onclick = () => {
       if (box.classList.contains('picked')) return;
       box.classList.add('picked'); b.classList.add('chosen'); SFX.select();
@@ -2198,7 +2280,7 @@ let CH = null;
 function chestPool() {
   const list = [];
   for (const id in POW) if (canEvo(id)) list.push({ kind:'evo', id });
-  for (const id in S.skills) if (!S.evo[id] && S.skills[id] < 5) list.push({ kind:'active', id });
+  for (const id in S.skills) if (!S.evo[id] && S.skills[id] < maxStars(id)) list.push({ kind:'active', id });
   for (const id in S.gifts) if (S.gifts[id] < 5) list.push({ kind:'gift', id });
   return list.length ? list : [{ kind:'heal' }];
 }
@@ -2209,7 +2291,7 @@ function openChest() {
   // the rewards: an evolution first if one is ready, then upgrades to what you carry (never past five stars)
   const lv = {}, rewards = [];
   for (let i = 0; i < mult; i++) {
-    const avail = pool.filter(o => o.kind === 'heal' || (o.kind === 'evo' ? !rewards.some(x => x.kind === 'evo' && x.id === o.id) : ((o.kind === 'active' ? S.skills[o.id] : S.gifts[o.id]) + (lv[o.id] || 0)) < 5));
+    const avail = pool.filter(o => o.kind === 'heal' || (o.kind === 'evo' ? !rewards.some(x => x.kind === 'evo' && x.id === o.id) : ((o.kind === 'active' ? S.skills[o.id] : S.gifts[o.id]) + (lv[o.id] || 0)) < (o.kind === 'active' ? maxStars(o.id) : 5)));
     if (!avail.length) break;
     const o = (i === 0 && avail.find(x => x.kind === 'evo')) || avail[(Math.random() * avail.length) | 0];
     rewards.push(o); if (o.kind !== 'evo') lv[o.id] = (lv[o.id] || 0) + 1;
@@ -2389,13 +2471,15 @@ function beastHTML(kid, big) {
   return `<div class="beast${big ? ' big' : ''}" style="--c:${EL[el]}"><span class="pic"><img src="art/e-${kid}.png" alt=""></span><div><b>${K.n}</b>
     <p>${what}${brute && !SEEN.has('_chest') ? (markSeen('_chest'), ' The first brute on each shore guards a Spirit Chest.') : ''}</p><span class="chips">${chip(el)} · beat it with ${weakTo(el).map(chip).join('')}</span></div></div>`;
 }
-// before a later level, only the new creatures that beat your element get a card; if none do, the level just starts
+// before a later level: the element the Keeper learns on this shore, then any new creature whose element beats theirs
 function intro(n) {
-  const L = LEVELS[n - 1], me = ANIMAL[animal].e, threats = L.fresh.filter(k => beats(k.split('-')[0]).includes(me));
+  const L = LEVELS[n - 1], me = keeperEl, path = pathOf(me), fresh = path[n - 1], threats = L.fresh.filter(k => beats(k.split('-')[0]).includes(me));
   L.fresh.forEach(markSeen);
-  if (!threats.length) { show(null); AU.music(true); startRun(); return; }
+  const prev = path[n - 2], foe = CONTROLS[fresh] && weakTo(prev).find(k => beats(fresh).includes(k));
+  const pw = Object.keys(POW).filter(id => POW[id].e === fresh);
   $('#introT').textContent = `Level ${n} · ${L.name}`;
-  $('#introP').innerHTML = `Watch out: ${threats.length > 1 ? 'these new creatures beat' : 'this new creature beats'} your ${chip(me)}`;
+  $('#introP').innerHTML = `<div class="learn" style="--c:${EL[fresh]}"><span class="ek">New element</span><b>You learned ${chip(fresh)}</b><span class="pw2">${pw.map(id => `<span><img src="${icon(POW[id].icon)}" alt="">${POW[id].n}</span>`).join('')}</span><small>${ELNAME[prev]} feeds ${ELNAME[fresh]}, and ${ELNAME[fresh]} ${foe ? `${VERB[fresh][foe][0]} ${ELNAME[foe]}, which beats your ${ELNAME[prev]}` : 'covers you'}. Apprentice powers reach three stars for now.</small></div>`
+    + (threats.length ? `<span class="hint" style="margin-top:6px">Watch out: ${threats.length > 1 ? 'these new creatures beat' : 'this new creature beats'} your ${chip(me)} · lanterns here carry Jade Wards</span>` : '');
   $('#introList').innerHTML = threats.map(k => beastHTML(k)).join('');
   show('intro');
 }
@@ -2405,8 +2489,8 @@ let chartFrom = null;
 function chart(from) {
   chartFrom = from;
   $('#elRows').innerHTML = EL5.map(el => `<div class="elrow">${chip(el)}<span><em>${beats(el).map(k => `${VERB[el][k][0]} ${ELNAME[k]}`).join(', ')}</em><br><s>${weakTo(el).map(k => `${VERB[k][el][1]} by ${ELNAME[k]}`).join(', ')}</s></span></div>`).join('');
-  const me = ANIMAL[animal].e;
-  $('#elYou').innerHTML = `Your Keeper fights as ${chip(me)}, your spirit animal's element: ${andList(weakTo(me).map(k => ELNAME[k]))} creatures hit you harder, the rest hit softer.`;
+  const me = keeperEl;
+  $('#elYou').innerHTML = `You're a ${chip(me)} Keeper: ${andList(weakTo(me).map(k => ELNAME[k]))} creatures hit you harder. Your path: ${pathOf(me).map((k, i) => S && S.learned && S.learned.includes(k) ? chip(k) : `<span style="opacity:.45">${ELNAME[k]}</span>`).join(' → ')}`;
   show('chart');
 }
 $('#chartBtn').onclick = () => { SFX.pop(); chart('howto'); };
