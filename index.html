@@ -1,0 +1,694 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="MorQi: a family action game about the five elements, breathing and becoming your highest self. Investor pitch bible and playable Level 1.">
+</head><body>
+<title>MorQi Pitch Bible</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
+<style>
+/* Layout: the pitch told in the game's own interface. Every section opens under a gold ribbon; content sits in framed
+   navy panels and skill-card tiles with thick ink outlines and bevelled lips, the way the game's popups do. Wide art,
+   iPhone frames, and numbers in chunky outlined gold. Single dark look: the night sky over the Still. */
+:root{
+  --night:#0B1422; --night-2:#0F1B2E; --navy:#1A2C4A; --navy-2:#132238; --ink:#1A1206; --rim:rgba(140,190,255,.28);
+  --text:#E8EFF5; --text-2:#B9CADB; --cream:#F3EAD6; --cream-2:#DDCDAE; --cream-ink:#3A2C14;
+  --wood:#6FBF4A; --fire:#E8553F; --earth:#E6B23A; --metal:#C9D3DB; --water:#4E9BE0; --gold:#FFC93C; --gold-2:#FFE58A;
+  --chunky:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --story:"Shippori Mincho B1","Songti SC",Georgia,serif;
+  --body:"Zen Kaku Gothic New",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;color:var(--text);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(ellipse 120% 60% at 50% 0%,#18304F 0%,transparent 60%),var(--night)}
+img{display:block;max-width:100%}
+p{margin:0;max-width:66ch}
+a{color:var(--gold-2)}
+:focus-visible{outline:3px solid var(--gold-2);outline-offset:3px}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:18px;padding-block:0 90px}
+
+/* chunky outlined lettering, as in the game */
+.ck,h2{font-family:var(--chunky);font-weight:400;letter-spacing:.01em;color:#fff;-webkit-text-stroke:5px var(--ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--ink)}
+h2{margin:0;font-size:clamp(28px,5vw,44px);line-height:1.08;text-wrap:balance}
+h3{margin:0;font-family:var(--chunky);font-weight:400;font-size:20px;line-height:1.15;color:#fff;-webkit-text-stroke:4px var(--ink);paint-order:stroke fill}
+.lede{font-size:17px;color:#D3DFEA;max-width:64ch}
+.small{font-size:13.5px;color:var(--text-2)}
+
+/* a gold ribbon with folded, notched tails */
+.rb{position:relative;display:inline-block;isolation:isolate;align-self:flex-start;margin-left:20px}
+.ribbon{position:relative;z-index:1;display:inline-block;padding:6px 22px 9px;font-family:var(--chunky);font-size:17px;letter-spacing:.04em;color:#fff;-webkit-text-stroke:4px #6B2A00;paint-order:stroke fill;white-space:nowrap;
+  background:linear-gradient(180deg,#FFD25A,#F5A623);box-shadow:0 0 0 3px var(--ink),inset 0 3px 0 rgba(255,255,255,.5),0 5px 0 3px var(--ink);border-radius:6px}
+.rb::before,.rb::after{content:"";position:absolute;z-index:0;top:10px;bottom:-10px;width:26px;background:#C97A12;box-shadow:0 0 0 3px var(--ink)}
+.rb::before{left:-17px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,40% 50%)}
+.rb::after{right:-17px;clip-path:polygon(0 0,100% 0,60% 50%,100% 100%,0 100%)}
+.rb.blue .ribbon{background:linear-gradient(180deg,#9FD8FF,#2E8FE0);-webkit-text-stroke-color:#0E3260}
+.rb.blue::before,.rb.blue::after{background:#1E5FA0}
+.rb.red .ribbon{background:linear-gradient(180deg,#FF8A6A,#D9362A);-webkit-text-stroke-color:#5A0A06}
+.rb.red::before,.rb.red::after{background:#9A2018}
+.rb.green .ribbon{background:linear-gradient(180deg,#B8F27A,#4DB61F);-webkit-text-stroke-color:#1F4A06}
+.rb.green::before,.rb.green::after{background:#357A12}
+
+/* bevelled toy buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;align-self:flex-start;padding:13px 28px 15px;border-radius:18px;text-decoration:none;
+  font-family:var(--chunky);font-size:22px;color:#fff;-webkit-text-stroke:5px #1F4A06;paint-order:stroke fill;
+  background:linear-gradient(180deg,#B8F27A 0%,#6FD13A 48%,#4DB61F 52%,#3E9E16 100%);
+  box-shadow:0 0 0 3px var(--ink),inset 0 3px 0 rgba(255,255,255,.55),inset 0 -4px 0 rgba(0,60,0,.3),0 7px 0 3px var(--ink),0 14px 24px rgba(0,0,0,.45);transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(5px);box-shadow:0 0 0 3px var(--ink),inset 0 3px 0 rgba(255,255,255,.55),0 2px 0 3px var(--ink)}
+.btn::before{content:"";width:0;height:0;border-left:14px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;filter:drop-shadow(0 0 0 var(--ink)) drop-shadow(2px 2px 0 var(--ink))}
+.btn.gold{background:linear-gradient(180deg,#FFE58A 0%,#FFC93C 48%,#F2A516 52%,#E89310 100%);-webkit-text-stroke-color:#5A3305}
+
+/* framed panels */
+.panel{position:relative;min-width:0;padding:18px;border-radius:20px;background:linear-gradient(180deg,var(--navy),var(--navy-2));
+  box-shadow:0 0 0 3px var(--ink),inset 0 0 0 3px var(--rim),0 8px 0 3px var(--ink),0 18px 34px rgba(0,0,0,.45)}
+.panel p{color:#D3DFEA;font-size:15px}
+.sec{display:flex;flex-direction:column;gap:22px;padding-block:58px 30px;scroll-margin-top:70px}
+.sec > .head{display:flex;flex-direction:column;gap:16px}
+
+/* cover */
+.hero{position:relative;margin-inline:-18px;overflow:hidden}
+.hero img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,20,34,0) 45%,var(--night) 98%)}
+.cover{position:relative;z-index:1;margin-top:-90px;display:flex;flex-direction:column;gap:16px;padding-bottom:20px}
+.cover h1{margin:0;font-size:clamp(32px,6vw,58px);line-height:1.05;max-width:20ch}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{display:inline-block;padding:4px 14px 6px;border-radius:99px;font-family:var(--chunky);font-size:15px;color:#fff;-webkit-text-stroke:3.5px var(--ink);paint-order:stroke fill;background:var(--c,#34506F);box-shadow:0 0 0 3px var(--ink),inset 0 2px 0 rgba(255,255,255,.35)}
+.chip.gold{--c:#F2A516}
+
+/* section nav: a row of small bevelled buttons */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-inline:-18px;padding:10px 18px 14px;background:rgba(11,20,34,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;box-shadow:0 3px 0 var(--ink)}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;padding:5px 13px 7px;border-radius:12px;font-family:var(--chunky);font-size:15px;color:#fff;text-decoration:none;-webkit-text-stroke:3.5px var(--ink);paint-order:stroke fill;
+  background:linear-gradient(180deg,#5E7690,#34495F);box-shadow:0 0 0 2.5px var(--ink),inset 0 2px 0 rgba(255,255,255,.3),0 4px 0 2.5px var(--ink)}
+.nav a.play{background:linear-gradient(180deg,#B8F27A,#4DB61F)}
+
+/* iPhone frames */
+.phone{position:relative;width:100%;aspect-ratio:9/16;border-radius:28px;overflow:hidden;background:#000;
+  box-shadow:0 0 0 4px #05080C,0 0 0 7px var(--ink),0 0 0 9px rgba(255,255,255,.12),0 10px 0 7px var(--ink),0 22px 40px rgba(0,0,0,.55)}
+.phone img{width:100%;height:100%;object-fit:cover}
+.shots{display:flex;gap:22px;overflow-x:auto;padding:8px 10px 24px;scroll-snap-type:x mandatory}
+.shot{flex:0 0 clamp(200px,24vw,236px);scroll-snap-align:start;display:flex;flex-direction:column;gap:14px}
+.shot h3{font-size:18px;min-height:2.3em;text-wrap:balance}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:26px;align-items:start}
+.item{display:flex;flex-direction:column;gap:14px;min-width:0}
+.cap{display:flex;flex-direction:column;gap:4px}
+.cap p{font-size:14.5px;line-height:1.5;color:var(--text-2)}
+.art{border-radius:18px;overflow:hidden;box-shadow:0 0 0 3px var(--ink),0 0 0 6px rgba(255,255,255,.1),0 8px 0 3px var(--ink),0 18px 34px rgba(0,0,0,.45)}
+.art img{width:100%;height:100%;object-fit:cover}
+.sq{aspect-ratio:1/1}.tall{aspect-ratio:3/4}.wd{aspect-ratio:16/9}
+.span2{grid-column:span 2}
+@media (max-width:720px){.span2{grid-column:auto}}
+
+/* skill cards, exactly as the game draws them */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.gcard{position:relative;display:grid;grid-template-columns:96px 1fr;min-width:0;border-radius:16px;overflow:hidden;background:linear-gradient(180deg,var(--cream),var(--cream-2));color:var(--cream-ink);box-shadow:0 0 0 3px var(--ink),0 6px 0 3px var(--ink),0 14px 24px rgba(0,0,0,.35)}
+.gcard .tile{position:relative;display:grid;place-items:center;background:radial-gradient(circle,color-mix(in srgb,var(--c) 70%,#fff),color-mix(in srgb,var(--c) 55%,#0B1014));overflow:hidden;border-right:3px solid var(--ink)}
+.gcard .tile::before{content:"";position:absolute;inset:-30%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.28) 0 10deg,transparent 10deg 24deg);animation:spin 12s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gcard .tile img{position:relative;width:74px;height:74px;border-radius:14px;object-fit:cover;box-shadow:0 0 0 3px var(--ink),0 4px 0 2px var(--ink)}
+.gcard .tile i{position:absolute;left:5px;top:5px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 var(--story);font-style:normal;color:#fff;background:color-mix(in srgb,var(--c) 75%,#0B1014);box-shadow:0 0 0 2px var(--ink)}
+.gcard .body{display:flex;flex-direction:column;min-width:0}
+.gcard .tab{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 10px 6px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 85%,#fff),var(--c));border-bottom:3px solid var(--ink)}
+.gcard .tab b{font-family:var(--chunky);font-weight:400;font-size:19px;color:#fff;-webkit-text-stroke:4px var(--ink);paint-order:stroke fill;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcard .role,.flag{flex:none;padding:1px 8px 3px;border-radius:7px;font-family:var(--chunky);font-size:12.5px;color:#fff;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;background:rgba(0,0,0,.25);box-shadow:0 0 0 2px var(--ink)}
+.flag{background:linear-gradient(180deg,#FF7A5A,#D9362A);transform:rotate(4deg)}
+.gcard .txt{padding:7px 10px 10px;display:flex;flex-direction:column;gap:5px}
+.gcard p{margin:0;font-size:13.5px;line-height:1.35;font-weight:700;color:var(--cream-ink);max-width:none}
+.gcard .evo{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:10px;background:linear-gradient(180deg,#FFF1C2,#F2C766);box-shadow:inset 0 0 0 2px rgba(26,18,6,.35)}
+.gcard .evo img{width:30px;height:30px;flex:none;border-radius:7px;box-shadow:0 0 0 2px var(--ink)}
+.gcard .evo span{font-size:12px;line-height:1.3;font-weight:700;color:#5A3A08}
+.gcard .evo b{color:#3A2006}
+.stars{display:flex;gap:2px}
+.stars s{width:15px;height:15px;text-decoration:none;background:#B8A88A;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.stars s.f{background:linear-gradient(180deg,#FFE58A,#F2A516)}
+.stars s.n{background:linear-gradient(180deg,#FFF3B8,#FFC93C);animation:blink .8s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+
+/* a popup replica, built with the game's own pieces */
+.popup{position:relative;width:100%;max-width:380px;justify-self:center;padding:34px 12px 16px;border-radius:22px;background:linear-gradient(180deg,#1E3354,#132238);box-shadow:0 0 0 3px var(--ink),inset 0 0 0 3px var(--rim),0 10px 0 3px var(--ink),0 20px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;gap:10px}
+.popup > .rb{position:absolute;top:-22px;left:50%;transform:translateX(-50%);margin:0}
+.popup .ribbon{font-size:24px;padding:7px 28px 10px}
+.loadout{display:grid;grid-template-columns:repeat(6,28px);gap:6px;justify-content:center;padding:8px 10px;border-radius:14px;background:rgba(0,0,0,.28)}
+.slot{position:relative;width:28px;height:28px;border-radius:8px;background:#0B1014;box-shadow:0 0 0 2px var(--ink),0 0 0 3.5px var(--c,#3A4A58)}
+.slot img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.slot.g,.slot.g img{border-radius:50%}
+.slot em{position:absolute;right:-5px;bottom:-5px;min-width:14px;height:14px;border-radius:7px;background:#0B1014;box-shadow:0 0 0 2px var(--ink);font:10px/14px var(--chunky);font-style:normal;text-align:center;color:var(--gold-2)}
+.slot.e{opacity:.4}
+.popup .gcard{width:100%;grid-template-columns:86px 1fr}
+.popup .gcard .tile img{width:64px;height:64px}
+.popup .gcard.evocard{background:linear-gradient(180deg,#FFF1C2,#F2C766)}
+.popup .gcard.evocard .tab{background:linear-gradient(180deg,#FFE58A,#E89310)}
+.popup .gcard.evocard::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.6) 50%,transparent 65%);transform:translateX(-100%);animation:sheen 2.2s ease-in-out infinite}
+@keyframes sheen{60%,100%{transform:translateX(100%)}}
+.minibtn{padding:7px 16px 9px;border-radius:13px;font-family:var(--chunky);font-size:16px;color:#fff;-webkit-text-stroke:3.5px #0E3260;paint-order:stroke fill;background:linear-gradient(180deg,#9FD8FF,#2E8FE0);box-shadow:0 0 0 3px var(--ink),inset 0 2px 0 rgba(255,255,255,.5),0 5px 0 3px var(--ink)}
+.minibtn.g{-webkit-text-stroke-color:#1F4A06;background:linear-gradient(180deg,#B8F27A,#4DB61F)}
+.wheel{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:290px}
+.wheel::before{content:"";position:absolute;inset:-12%;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,220,120,.32) 0 9deg,transparent 9deg 22deg);-webkit-mask:radial-gradient(circle,#000 12%,transparent 66%);mask:radial-gradient(circle,#000 12%,transparent 66%);animation:spin 9s linear infinite}
+.wt{position:relative;aspect-ratio:1;border-radius:14px;background:#0B1424;box-shadow:0 0 0 3px var(--ink);display:grid;place-items:center;overflow:hidden}
+.wt img{width:86%;height:86%;object-fit:cover;border-radius:10px}
+.wt.won{box-shadow:0 0 0 3px var(--ink),0 0 0 6px #7DFF9A,0 0 24px 6px rgba(120,255,160,.85)}
+.wt.c{background:none;box-shadow:none;overflow:visible}
+.wt.c img{width:125%;height:125%;object-fit:contain;border-radius:0}
+.mult{font-family:var(--chunky);font-size:34px;color:#FFE58A;-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;line-height:1}
+.gain{display:flex;align-items:center;gap:10px;width:100%;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.08)}
+.gain img{width:36px;height:36px;border-radius:9px;box-shadow:0 0 0 2px var(--ink)}
+.gain b{font-family:var(--chunky);font-weight:400;font-size:16px;color:#fff;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill}
+.gain span{display:block;font-size:12px;font-weight:700;color:#CFE0F0}
+
+/* tiles: facts, gifts, boosters, peoples */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.fact b{display:block;font-family:var(--chunky);font-weight:400;font-size:clamp(34px,5.5vw,46px);line-height:1;color:var(--gold-2);-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 4px 0 var(--ink);font-variant-numeric:tabular-nums}
+.fact span{display:block;margin-top:10px;font-size:14.5px;line-height:1.5;color:#D3DFEA}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.gift-chip,.boost{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:linear-gradient(180deg,var(--navy),var(--navy-2));box-shadow:0 0 0 3px var(--ink),inset 0 0 0 2px color-mix(in srgb,var(--c) 45%,transparent),0 5px 0 3px var(--ink)}
+.gift-chip img{width:52px;height:52px;flex:none;border-radius:50%;box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--c)}
+.boost .glyph{width:52px;height:52px;flex:none;border-radius:14px;display:grid;place-items:center;font:800 26px/1 var(--story);color:#fff;background:radial-gradient(circle at 40% 30%,color-mix(in srgb,var(--c) 70%,#fff),var(--c));box-shadow:0 0 0 3px var(--ink),inset 0 2px 0 rgba(255,255,255,.4),0 4px 0 3px var(--ink);text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.gift-chip b,.boost b{display:block;font-family:var(--chunky);font-weight:400;font-size:17px;color:#fff;-webkit-text-stroke:3.5px var(--ink);paint-order:stroke fill}
+.gift-chip span,.boost span{display:block;font-size:13px;line-height:1.4;color:var(--text-2)}
+.peoples{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.people{border-radius:16px;overflow:hidden;background:linear-gradient(180deg,var(--cream),var(--cream-2));color:var(--cream-ink);box-shadow:0 0 0 3px var(--ink),0 6px 0 3px var(--ink)}
+.people .tab{display:flex;align-items:center;gap:10px;padding:7px 10px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 85%,#fff),var(--c));border-bottom:3px solid var(--ink)}
+.people .tab i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:800 17px/1 var(--story);font-style:normal;color:#fff;background:color-mix(in srgb,var(--c) 70%,#0B1014);box-shadow:0 0 0 2px var(--ink)}
+.people .tab b{font-family:var(--chunky);font-weight:400;font-size:18px;color:#fff;-webkit-text-stroke:4px var(--ink);paint-order:stroke fill}
+.people .in{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.people .who{font-size:12.5px;font-weight:800;color:color-mix(in srgb,var(--c) 70%,#2A1A06)}
+.people p{font-size:14px;line-height:1.45;font-weight:700;color:var(--cream-ink)}
+.people .ls{font-family:var(--story);font-weight:800;font-size:15px;color:#2A1A06}
+.keepers{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px}
+.keeper{position:relative;aspect-ratio:3/4;border-radius:18px;overflow:hidden;display:grid;place-items:end center;background:radial-gradient(circle at 50% 75%,rgba(255,214,130,.35),transparent 60%),linear-gradient(180deg,#203858,#132238);box-shadow:0 0 0 3px var(--ink),inset 0 0 0 3px var(--rim),0 6px 0 3px var(--ink)}
+.keeper::after{content:"";position:absolute;left:18%;right:18%;bottom:6%;height:10%;border-radius:50%;background:radial-gradient(ellipse,rgba(255,230,160,.55),transparent 70%)}
+.keeper img{position:relative;z-index:1;width:118%;max-width:none;margin-bottom:-8%}
+.zoo{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.beast{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:16px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 22%,var(--navy)),var(--navy-2));box-shadow:0 0 0 3px var(--ink),inset 0 0 0 2px color-mix(in srgb,var(--c) 40%,transparent),0 5px 0 3px var(--ink)}
+.beast .pics{display:grid;grid-template-columns:1fr auto 1.5fr;align-items:center;gap:4px}
+.beast .pics img{width:100%;aspect-ratio:1;object-fit:contain}
+.beast .y{transform:scale(.85)}
+.beast .arrow{font-size:14px;color:var(--gold-2);text-shadow:0 2px 0 var(--ink)}
+.beast .lbl{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.beast .lbl b{font-family:var(--chunky);font-weight:400;font-size:17px;color:#fff;-webkit-text-stroke:3.5px var(--ink);paint-order:stroke fill}
+.beast .chip{--c:var(--c);font-size:12px;padding:2px 10px 4px}
+.beast small{font-size:12.5px;color:var(--text-2)}
+
+/* tables in panels */
+.tw{overflow-x:auto}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:540px;font-size:14.5px;line-height:1.5}
+th{text-align:left;padding:9px 12px;font-family:var(--chunky);font-weight:400;font-size:14px;letter-spacing:.03em;color:#fff;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;background:linear-gradient(180deg,#FFD25A,#F5A623);white-space:nowrap}
+th:first-child{border-radius:10px 0 0 10px}th:last-child{border-radius:0 10px 10px 0}
+td{padding:11px 12px;border-bottom:2px solid rgba(255,255,255,.07);vertical-align:middle;color:#D3DFEA}
+td b{color:#fff}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+th.num{text-align:right}
+tr.total td{border-bottom:0;font-family:var(--chunky);font-size:18px;color:var(--gold-2);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill}
+.pw{display:inline-flex;align-items:center;gap:10px;font-weight:700;color:#fff}
+.pw img{width:40px;height:40px;flex:none;border-radius:10px;object-fit:cover;box-shadow:0 0 0 2.5px var(--ink),0 0 0 4.5px var(--c,var(--gold))}
+.pw.gift img{border-radius:50%}
+.pw.evo img{width:46px;height:46px;box-shadow:0 0 0 2.5px var(--ink),0 0 0 4.5px var(--gold),0 0 16px rgba(255,214,120,.6)}
+.pw.evo b{font-family:var(--chunky);font-weight:400;font-size:16px;color:var(--gold-2);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill}
+
+/* other blocks */
+.loop{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.loop span{padding:6px 14px 8px;border-radius:12px;font-family:var(--chunky);font-size:16px;color:#fff;-webkit-text-stroke:3.5px var(--ink);paint-order:stroke fill;background:linear-gradient(180deg,#5E7690,#34495F);box-shadow:0 0 0 2.5px var(--ink),inset 0 2px 0 rgba(255,255,255,.3),0 4px 0 2.5px var(--ink)}
+.loop i{font-style:normal;font-family:var(--chunky);font-size:22px;color:var(--gold-2);-webkit-text-stroke:3px var(--ink);paint-order:stroke fill}
+.pull{padding:22px 24px}
+.pull p{font-family:var(--story);font-size:clamp(21px,3.6vw,28px);font-weight:800;line-height:1.35;color:#fff;max-width:none}
+.pull small{display:block;margin-top:10px;font-size:14.5px;color:var(--text-2);line-height:1.6}
+.seasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.season{border-radius:16px;overflow:hidden;background:linear-gradient(180deg,var(--navy),var(--navy-2));box-shadow:0 0 0 3px var(--ink),0 5px 0 3px var(--ink)}
+.season .tab{padding:6px 12px 8px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 85%,#fff),var(--c));border-bottom:3px solid var(--ink)}
+.season .tab b{font-family:var(--chunky);font-weight:400;font-size:18px;color:#fff;-webkit-text-stroke:4px var(--ink);paint-order:stroke fill}
+.season .in{padding:9px 12px 12px}
+.season span{display:block;font-size:12.5px;font-weight:800;color:var(--gold-2)}
+.season p{font-size:13.5px;color:#D3DFEA}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.k{display:inline-block;margin-bottom:8px;font-family:var(--chunky);font-size:13px;letter-spacing:.06em;color:var(--c,var(--gold-2));-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;text-transform:uppercase}
+.phases{display:flex;flex-direction:column;gap:14px}
+.phase{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start}
+.phase .n{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--chunky);font-size:22px;color:#fff;-webkit-text-stroke:4px var(--ink);paint-order:stroke fill;background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--c) 70%,#fff),var(--c));box-shadow:0 0 0 3px var(--ink),inset 0 2px 0 rgba(255,255,255,.5),0 4px 0 3px var(--ink)}
+.phase p{font-size:15px;color:#D3DFEA}
+.team{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.member{display:flex;align-items:center;gap:14px}
+.member .av{width:64px;height:64px;flex:none;border-radius:50%;display:grid;place-items:center;font-family:var(--chunky);font-size:28px;color:#fff;-webkit-text-stroke:4px var(--ink);paint-order:stroke fill;background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--c) 70%,#fff),var(--c));box-shadow:0 0 0 3px var(--ink),inset 0 2px 0 rgba(255,255,255,.5),0 4px 0 3px var(--ink)}
+.close{padding-block:70px 30px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.close .btn{align-self:center}
+.close h2{font-size:clamp(34px,6.5vw,60px)}
+.foot{margin-top:28px;font-size:12.5px;color:#7F93A8;line-height:1.6}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:34px;align-items:start}
+.url{display:none}
+/* the PDF: a tall screen-width page, dark colours kept, nothing split across pages, links spelled out */
+@page{size:1140px 1560px;margin:0}
+@media print{
+  html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:var(--night)}
+  .nav{display:none}
+  .wrap{padding-block:0 30px}
+  .sec{padding-block:40px 20px}
+  .panel,.item,.gcard,.beast,.people,.popup,.fact,.season,.keeper,.shot,.gift-chip,.boost,.phase,.member,.cover{break-inside:avoid}
+  .sec > .head{break-after:avoid}
+  .shots{flex-wrap:wrap;overflow:visible;justify-content:flex-start}
+  .url{display:inline-block;align-self:flex-start;padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.08);font-weight:700;font-size:15px;color:var(--gold-2)}
+  .close .url{align-self:center}
+  *{animation:none!important}
+}
+@media (prefers-reduced-motion:reduce){.gcard .tile::before,.wheel::before,.stars s.n,.popup .gcard.evocard::after{animation:none}}
+</style>
+
+<div class="wrap">
+
+<div class="hero"><img src="img/hero.jpg" alt="A vast valley frozen in grey crystal, a waterfall and a festival stopped mid-motion, two children and a dog on a bridge looking toward one warm hearth burning on a distant hill."></div>
+<header class="cover">
+  <div class="rb"><span class="ribbon">Investor pitch bible · October 2026</span></div>
+  <h1 class="ck"><span class="vh">MorQi: </span>A game about becoming your highest self, in a world that forgot how to feel.</h1>
+  <p class="lede">A mobile action adventure for the whole family. Children choose it for the hordes, the powers, the creatures and the story. Parents are glad they did, because it teaches the five elements, breathing, emotional resilience and the habits that carry people through hard things, and every purchase is one they won't regret.</p>
+  <div class="chips"><span class="chip gold">Raising $4.0M seed</span><span class="chip">iPhone first</span><span class="chip">Free to play</span><span class="chip">Five seasons a year</span></div>
+  <a class="btn" href="https://aarauz-os.github.io/morqi/level1/" target="_blank" rel="noopener">Play Level 1 now</a>
+  <a class="url" href="https://aarauz-os.github.io/morqi/level1/">aarauz-os.github.io/morqi/level1/</a>
+</header>
+
+<nav class="nav" aria-label="Sections">
+  <a class="play" href="#demo">Play</a><a href="#store">The game</a><a href="#opportunity">Opportunity</a><a href="#world">World</a><a href="#characters">Characters</a><a href="#keepers">Keepers</a><a href="#animals">Spirit animals</a><a href="#powers">Powers</a><a href="#feel">Rewards</a><a href="#play">How it plays</a><a href="#teaches">Lessons</a><a href="#seasons">Seasons</a><a href="#model">Business</a><a href="#economics">Economics</a><a href="#why">Why we win</a><a href="#trust">Trust</a><a href="#roadmap">Roadmap</a><a href="#team">Team</a><a href="#raise">The raise</a>
+</nav>
+
+<section class="sec" id="demo">
+  <div class="head"><div class="rb green"><span class="ribbon">Playable today</span></div><h2>Level 1: The Frozen Shore</h2></div>
+  <p class="lede">Choose a Keeper, enter your birth year to meet your spirit animal, and run into the Still. Three and a half minutes of hordes that grow with time and with your level, ten elemental powers that evolve, a Spirit Chest roulette, a spirit animal that awakens into its mythic form, and a boss arena. Then the shore wakes up. It runs in the browser on an iPhone or a computer, with sound.</p>
+  <a class="btn" href="https://aarauz-os.github.io/morqi/level1/" target="_blank" rel="noopener">Play Level 1</a>
+  <a class="url" href="https://aarauz-os.github.io/morqi/level1/">aarauz-os.github.io/morqi/level1/</a>
+  <div class="row">
+    <div class="item"><div class="phone"><img src="img/f3-horde.jpg" alt="Gameplay: pools of fire burn across a thawed meadow, comets of flame streak toward the horde, gems carpet the ground."></div><div class="cap"><h3>Wildfire</h3><p>Evolved fireballs leave the ground burning. The meadow grows back wherever the Keeper has freed it.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/f3-guards.jpg" alt="Gameplay: a golden bagua field, orbiting boulders and water orbs ring the Keeper."></div><div class="cap"><h3>Guards</h3><p>Golden Bell, Stone Ward and Tide Ring stack around the Keeper, always centred on them.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/f3-awake.jpg" alt="Gameplay: the spirit animal awakens as the Monkey King in a burst of golden light."></div><div class="cap"><h3>The awakening</h3><p>At set levels and when the boss arrives, your own spirit animal takes its mythic form and storms the horde.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/f3-boss.jpg" alt="Gameplay: a ring of ice crystal closes around the Keeper and the Still Warden."></div><div class="cap"><h3>The Still Warden</h3><p>A crystal arena closes in. The Warden turns from Water to Metal to Earth, and players learn which element checks each one.</p></div></div>
+  </div>
+</section>
+
+<section class="sec" id="store">
+  <div class="head"><div class="rb"><span class="ribbon">On the App Store</span></div><h2>What a player sees first</h2></div>
+  <div class="shots" role="list">
+    <div class="shot" role="listitem"><h3>Light the last hearth</h3><div class="phone"><img src="img/s-opening.jpg" alt="Sorin kneels beside a cold stone hearth in a frozen valley."></div></div>
+    <div class="shot" role="listitem"><h3>Hordes that grow every minute</h3><div class="phone"><img src="img/f3-fire.jpg" alt="Gameplay: lanterns burst into pools of fire around the Keeper."></div></div>
+    <div class="shot" role="listitem"><h3>Ten powers, five elements</h3><div class="phone"><img src="img/f3-meteor.jpg" alt="Gameplay: meteors and flying swords fall around the Keeper."></div></div>
+    <div class="shot" role="listitem"><h3>Your spirit animal awakens</h3><div class="phone"><img src="img/f3-awake.jpg" alt="Gameplay: the Monkey King awakens."></div></div>
+    <div class="shot" role="listitem"><h3>Raise it from small to mythic</h3><div class="phone"><img src="img/s-animal.jpg" alt="A spirit animal screen showing its stage of growth."></div></div>
+    <div class="shot" role="listitem"><h3>A new chapter every season</h3><div class="phone"><img src="img/s-path.jpg" alt="The Winter Path reward track."></div></div>
+  </div>
+</section>
+
+<section class="sec" id="opportunity">
+  <div class="head"><div class="rb blue"><span class="ribbon">The opportunity</span></div><h2>Families spend on games. They don't trust most of them.</h2></div>
+  <div class="facts">
+    <div class="panel fact"><b>$3B+</b><span>Player spending on the leading title in MorQi's core genre in under two and a half years.</span></div>
+    <div class="panel fact"><b>~$20</b><span>Monthly spend of the average paying user on the largest kids' gaming platform.</span></div>
+    <div class="panel fact"><b>$520M</b><span>The largest penalty yet against a game publisher over dark patterns and children's privacy.</span></div>
+  </div>
+  <p class="lede">The highest-earning games collect their money through random paid rewards, endless limited-time offers and competition that rewards whoever spends most. Parents distrust those mechanics, and regulators now penalise them. Wellbeing apps for children teach worthwhile skills, but children rarely ask to open them. Nobody has built a game children choose on their own that also leaves them better off. That gap is MorQi.</p>
+</section>
+
+<section class="sec" id="world">
+  <div class="head"><div class="rb"><span class="ribbon">The world</span></div><h2>The Stillness</h2></div>
+  <p class="lede">Qi has stopped flowing. Rivers stand frozen mid-wave, fires have turned to glass, and people have stopped feeling. Nothing has died; everything has simply stopped. The player keeps the last hearth that still burns, and wins the world back one region at a time.</p>
+  <div class="row">
+    <div class="item span2"><div class="art wd"><img src="img/hero.jpg" alt="The valley of the Stillness."></div><div class="cap"><h3>A world frozen mid-motion</h3><p>The world is a mirror. The Stillness outside is what being stuck feels like inside, and every region a player brings back stands for a habit they've built.</p></div></div>
+    <div class="item"><div class="art tall"><img src="img/c-stillmaker-v2.jpg" alt="The Stillmaker: an immaculately dressed man in a high-collared charcoal and silver coat and white gloves, holding a silent bronze bell."></div><div class="cap"><h3>The Stillmaker</h3><p>Precise, composed, perfectly dressed, and never once raising his voice. A grieving former master who decided that feeling is what makes people hurt each other, and is stopping the world to keep it safe.</p></div></div>
+  </div>
+  <div class="split">
+    <div class="item"><div class="art tall"><img src="img/c-stillmaker-v2.jpg" alt="The Stillmaker at the start of the story."></div><div class="cap"><h3>Year one</h3><p>Cold silver eyes and a silent bell. Every season, players thaw one more piece of what he froze.</p></div></div>
+    <div class="item"><div class="art tall"><img src="img/c-stillmaker-after.jpg" alt="The same man at the end of his story, crystal falling away and colour returning."></div><div class="cap"><h3>The end of his story</h3><p>Over the seasons the crystal falls away and his features soften into balance. The villain children feared becomes the proof that anyone can come back.</p></div></div>
+  </div>
+  <div class="panel pull">
+    <p>You cannot keep people safe by making them stop feeling.</p>
+    <small>The idea under every chapter, and the reason the story works for a seven-year-old with a temper and for a forty-year-old who has never cried at work. It also carries a mystery planned from its first line and answered over the first year: why is the player's hearth the only one still burning?</small>
+  </div>
+  <h3>Five peoples, one element and one emotion each</h3>
+  <div class="peoples">
+    <div class="people" style="--c:var(--water)"><div class="tab"><i>水</i><b>The Deep Tide</b></div><div class="in"><span class="who">Water · fear → courage</span><p>Sailors and storytellers, too frightened to leave a frozen shore.</p><span class="ls">Courage is being afraid and moving anyway.</span></div></div>
+    <div class="people" style="--c:var(--wood)"><div class="tab"><i>木</i><b>The Verdant Reach</b></div><div class="in"><span class="who">Wood · anger → kindness</span><p>Healers and growers, furious at a world that let their forest go grey.</p><span class="ls">Anger tells you something matters.</span></div></div>
+    <div class="people" style="--c:var(--fire)"><div class="tab"><i>火</i><b>The Ember Courts</b></div><div class="in"><span class="who">Fire · performed joy → shared joy</span><p>Dancers who never stop celebrating, so they never have to feel what they lost.</p><span class="ls">Real joy is shared.</span></div></div>
+    <div class="people" style="--c:var(--earth)"><div class="tab"><i>土</i><b>The Harvest Hold</b></div><div class="in"><span class="who">Earth · worry → trust</span><p>The people who feed everyone and carry every worry but their own.</p><span class="ls">You can care without carrying everything.</span></div></div>
+    <div class="people" style="--c:var(--metal)"><div class="tab"><i>金</i><b>The Silver Peaks</b></div><div class="in"><span class="who">Metal · grief → letting go</span><p>Smiths and scholars who can't put down what they've lost. The Stillness began here.</p><span class="ls">Letting go isn't losing.</span></div></div>
+  </div>
+</section>
+
+<section class="sec" id="characters">
+  <div class="head"><div class="rb"><span class="ribbon">The characters</span></div><h2>A master, a fox spirit, and five companions</h2></div>
+  <div class="row">
+    <div class="item"><div class="art tall"><img src="img/c-sorin.jpg" alt="Sorin in a tai chi posture beside a hearth, five-coloured light spiralling around his hands."></div><div class="cap"><h3>Sorin</h3><p>A master of qi, tai chi and feelings, earned through hard choices and living with what each one brought. He teaches one thing: keep striving to be the best version of yourself, all the way to your highest self.</p></div></div>
+    <div class="item"><div class="art sq"><img src="img/c-luma.jpg" alt="Luma, a small pale-blue fox spirit with one glowing tail."></div><div class="cap"><h3>Luma</h3><p>The fox spirit who guards the last hearth. She grows a tail each season, and each tail returns a memory that unlocks the story's mystery.</p></div></div>
+  </div>
+  <div class="art wd"><img src="img/c-companions.jpg" alt="Five companions: Nami of Water, Rowan of Wood, Kaia of Fire, Tobin of Earth and Sen of Metal."></div>
+  <div class="row">
+    <div class="item"><div class="phone"><img src="img/s-bond.jpg" alt="Story dialogue on a frozen harbour with two reply choices."></div><div class="cap"><h3>Bond stories</h3><p>Every companion has a personal story. Choices are remembered, and only the companions whose stories you walked stand with you in a season's finale.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/s-roster.jpg" alt="Companions roster with ranks and levels."></div><div class="cap"><h3>Companions</h3><p>Met in the story, never won from a random draw. Ranks climb from Stone through Jade, Gold and Spirit to Celestial.</p></div></div>
+  </div>
+</section>
+
+<section class="sec" id="keepers">
+  <div class="head"><div class="rb"><span class="ribbon">Keepers</span></div><h2>Every player is a Keeper, and every Keeper looks like someone</h2></div>
+  <p class="lede">The player is the hero of the run, with their own spirit animal at their side. Keepers come in every skin tone, hair type and look, so every child can see themselves, and a player who sees themselves keeps coming back. The trim on a Keeper's robe takes the colour of their spirit animal's element, and Season Path outfits build on it from there.</p>
+  <div class="keepers" role="list">
+    <div class="keeper" role="listitem"><img src="img/k1.png" alt="A Keeper with brown skin and curly hair in two puffs."></div>
+    <div class="keeper" role="listitem"><img src="img/k2.png" alt="A Keeper with black hair in a topknot."></div>
+    <div class="keeper" role="listitem"><img src="img/k3.png" alt="A Keeper with warm brown skin and a long dark braid."></div>
+    <div class="keeper" role="listitem"><img src="img/k4.png" alt="A Keeper with tousled brown hair and a headband."></div>
+    <div class="keeper" role="listitem"><img src="img/k5.png" alt="A Keeper with freckles and long red curls."></div>
+    <div class="keeper" role="listitem"><img src="img/k6.png" alt="A Keeper with dark skin and short locs."></div>
+  </div>
+  <p class="small">At launch: a simple creator for skin tone, hair and face. Later: a full wardrobe earned and collected through the seasons.</p>
+</section>
+
+<section class="sec" id="animals">
+  <div class="head"><div class="rb"><span class="ribbon">Spirit animals</span></div><h2>Twelve free, each growing from small to mythic</h2></div>
+  <p class="lede">A player's birth year chooses one of the twelve zodiac animals. It runs beside them in every fight, its element gives them their first power, and it grows over five stages into its mythic form, in its element's colours. All twelve can be earned without paying.</p>
+  <div class="zoo">
+<div class="beast" style="--c:var(--water)"><div class="pics"><img class="y" src="img/a-rat-y.png" alt="Pup"><span class="arrow">▶</span><img src="img/a-rat-m.png" alt="Moonrat"></div>
+      <div class="lbl"><b>Moonrat</b><span class="chip">Water</span></div><small>Rat · starts as a pup</small></div>
+<div class="beast" style="--c:var(--earth)"><div class="pics"><img class="y" src="img/a-ox-y.png" alt="Calf"><span class="arrow">▶</span><img src="img/a-ox-m.png" alt="Thunder Buffalo"></div>
+      <div class="lbl"><b>Thunder Buffalo</b><span class="chip">Earth</span></div><small>Ox · starts as a calf</small></div>
+<div class="beast" style="--c:var(--wood)"><div class="pics"><img class="y" src="img/a-tiger-y.png" alt="Cub"><span class="arrow">▶</span><img src="img/a-tiger-m.png" alt="Jade Tiger"></div>
+      <div class="lbl"><b>Jade Tiger</b><span class="chip">Wood</span></div><small>Tiger · starts as a cub</small></div>
+<div class="beast" style="--c:var(--wood)"><div class="pics"><img class="y" src="img/a-rabbit-y.png" alt="Kit"><span class="arrow">▶</span><img src="img/a-rabbit-m.png" alt="Moon Hare"></div>
+      <div class="lbl"><b>Moon Hare</b><span class="chip">Wood</span></div><small>Rabbit · starts as a kit</small></div>
+<div class="beast" style="--c:var(--earth)"><div class="pics"><img class="y" src="img/a-dragon-y.png" alt="Hatchling"><span class="arrow">▶</span><img src="img/a-dragon-m.png" alt="Celestial Dragon"></div>
+      <div class="lbl"><b>Celestial Dragon</b><span class="chip">Earth</span></div><small>Dragon · starts as a hatchling</small></div>
+<div class="beast" style="--c:var(--fire)"><div class="pics"><img class="y" src="img/a-snake-y.png" alt="Snakelet"><span class="arrow">▶</span><img src="img/a-snake-m.png" alt="Little Dragon"></div>
+      <div class="lbl"><b>Little Dragon</b><span class="chip">Fire</span></div><small>Snake · starts as a snakelet</small></div>
+<div class="beast" style="--c:var(--fire)"><div class="pics"><img class="y" src="img/a-horse-y.png" alt="Foal"><span class="arrow">▶</span><img src="img/a-horse-m.png" alt="Dragon Horse"></div>
+      <div class="lbl"><b>Dragon Horse</b><span class="chip">Fire</span></div><small>Horse · starts as a foal</small></div>
+<div class="beast" style="--c:var(--earth)"><div class="pics"><img class="y" src="img/a-goat-y.png" alt="Lamb"><span class="arrow">▶</span><img src="img/a-goat-m.png" alt="Cloud Ram"></div>
+      <div class="lbl"><b>Cloud Ram</b><span class="chip">Earth</span></div><small>Goat · starts as a lamb</small></div>
+<div class="beast" style="--c:var(--metal)"><div class="pics"><img class="y" src="img/a-monkey-y.png" alt="Baby Monkey"><span class="arrow">▶</span><img src="img/a-monkey-m.png" alt="Monkey King"></div>
+      <div class="lbl"><b>Monkey King</b><span class="chip">Metal</span></div><small>Monkey · starts as a baby monkey</small></div>
+<div class="beast" style="--c:var(--metal)"><div class="pics"><img class="y" src="img/a-rooster-y.png" alt="Chick"><span class="arrow">▶</span><img src="img/a-rooster-m.png" alt="Silver Phoenix"></div>
+      <div class="lbl"><b>Silver Phoenix</b><span class="chip">Metal</span></div><small>Rooster · starts as a chick</small></div>
+<div class="beast" style="--c:var(--earth)"><div class="pics"><img class="y" src="img/a-dog-y.png" alt="Puppy"><span class="arrow">▶</span><img src="img/a-dog-m.png" alt="Guardian Lion"></div>
+      <div class="lbl"><b>Guardian Lion</b><span class="chip">Earth</span></div><small>Dog · starts as a puppy</small></div>
+<div class="beast" style="--c:var(--water)"><div class="pics"><img class="y" src="img/a-pig-y.png" alt="Piglet"><span class="arrow">▶</span><img src="img/a-pig-m.png" alt="Tide Boar"></div>
+      <div class="lbl"><b>Tide Boar</b><span class="chip">Water</span></div><small>Pig · starts as a piglet</small></div>
+  </div>
+  <div class="row">
+    <div class="item"><div class="phone"><img src="img/s-animal.jpg" alt="Spirit animal detail screen."></div><div class="cap"><h3>Your birth animal</h3><p>It fights beside you in every run, pouncing on whatever comes closest, and awakens into its mythic form as you level up.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/s-grove.jpg" alt="The Spirit Grove where collected animals roam."></div><div class="cap"><h3>The Spirit Grove</h3><p>Where your animals live, play and grow.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/s-packscreen.jpg" alt="Chinese Mythology lore pack screen with a grown-ups only button."></div><div class="cap"><h3>Mythology packs</h3><p>Beyond the twelve, creatures from the world's mythologies, Chinese first. Earned through long play or bought, behind a grown-up gate.</p></div></div>
+  </div>
+  <div class="row">
+    <div class="item span2"><div class="art wd"><img src="img/c-zodiac.jpg" alt="The twelve zodiac animals in their young forms in a glowing bamboo grove."></div></div>
+    <div class="item"><div class="art wd"><img src="img/c-pack.jpg" alt="Six legendary creatures from Chinese mythology."></div><div class="cap"><h3>The first pack</h3><p>Qilin, Black Tortoise, Baize, Pixiu, Kun-Peng and Jingwei.</p></div></div>
+  </div>
+</section>
+
+<section class="sec" id="powers">
+  <div class="head"><div class="rb red"><span class="ribbon">Powers</span></div><h2>Ten powers, two for every element</h2></div>
+  <p class="lede">Each element has a shooter and a guard or area power, and each one is a real thing on screen: orbs, pearls, vines, spears, fireballs, lanterns, boulders, a golden bagua, flying swords. Every level makes it visibly bigger. At five stars, paired with the gift of the element that feeds it, it evolves into something spectacular. The five-element creation cycle is the strategy, and players learn it by playing.</p>
+  <div class="cards">
+<article class="gcard" style="--c:var(--water)">
+      <div class="tile"><img src="img/icons/p-tide.jpg" alt=""><i>水</i></div>
+      <div class="body"><div class="tab"><b>Tide Ring</b><span class="role">Guard</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>Water orbs circle you and splash everything they touch.</p>
+          <div class="evo"><img src="img/icons/e-moon.jpg" alt=""><span><b>Moon Tide</b> with Clear Lungs: Eight orbs, and a tidal wave rolls out from you.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--water)">
+      <div class="tile"><img src="img/icons/p-pearl.jpg" alt=""><i>水</i></div>
+      <div class="body"><div class="tab"><b>Dragon Pearls</b><span class="role">Shooter</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>Glowing pearls ricochet off every edge of the screen.</p>
+          <div class="evo"><img src="img/icons/e-pearlstorm.jpg" alt=""><span><b>Pearl Storm</b> with Clear Lungs: Four giant pearls that never fade and burst on every hit.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--wood)">
+      <div class="tile"><img src="img/icons/p-vine.jpg" alt=""><i>木</i></div>
+      <div class="body"><div class="tab"><b>Vine Lash</b><span class="role">Area</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>Thorned vines whip out around you and crack.</p>
+          <div class="evo"><img src="img/icons/e-grove.jpg" alt=""><span><b>Rising Grove</b> with Deep Spring: Twelve vines, and sacred trees sprout to fight beside you.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--wood)">
+      <div class="tile"><img src="img/icons/p-bamboo.jpg" alt=""><i>木</i></div>
+      <div class="body"><div class="tab"><b>Bamboo Spears</b><span class="role">Shooter</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>Volleys of spears fly the way you run.</p>
+          <div class="evo"><img src="img/icons/e-bamboostorm.jpg" alt=""><span><b>Bamboo Storm</b> with Deep Spring: Spears spiral out in every direction, nonstop.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--fire)">
+      <div class="tile"><img src="img/icons/p-ember.jpg" alt=""><i>火</i></div>
+      <div class="body"><div class="tab"><b>Ember Darts</b><span class="role">Shooter</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>Homing fireballs that explode in flame and smoke.</p>
+          <div class="evo"><img src="img/icons/e-wild.jpg" alt=""><span><b>Wildfire</b> with Green Shoot: Six fireballs whose blasts set the ground ablaze.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--fire)">
+      <div class="tile"><img src="img/icons/p-lantern.jpg" alt=""><i>火</i></div>
+      <div class="body"><div class="tab"><b>Lantern Bombs</b><span class="role">Area</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>Thrown red lanterns burst into pools of fire.</p>
+          <div class="evo"><img src="img/icons/e-festival.jpg" alt=""><span><b>Lantern Festival</b> with Green Shoot: A festival of lanterns that ends in fireworks.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--earth)">
+      <div class="tile"><img src="img/icons/p-stone.jpg" alt=""><i>土</i></div>
+      <div class="body"><div class="tab"><b>Stone Ward</b><span class="role">Guard</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>Rune boulders orbit you and smash foes back.</p>
+          <div class="evo"><img src="img/icons/e-molten.jpg" alt=""><span><b>Molten Ward</b> with Kindling: Molten boulders that burn everything they touch.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--earth)">
+      <div class="tile"><img src="img/icons/p-boulder.jpg" alt=""><i>土</i></div>
+      <div class="body"><div class="tab"><b>Mountain Fist</b><span class="role">Area</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>A shadow grows, a boulder falls, the ground cracks.</p>
+          <div class="evo"><img src="img/icons/e-meteor.jpg" alt=""><span><b>Meteor Fall</b> with Kindling: Flaming meteors that leave lava where they land.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--metal)">
+      <div class="tile"><img src="img/icons/p-bell.jpg" alt=""><i>金</i></div>
+      <div class="body"><div class="tab"><b>Golden Bell</b><span class="role">Guard</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>A rotating golden bagua field hurts and slows all inside.</p>
+          <div class="evo"><img src="img/icons/e-mountain.jpg" alt=""><span><b>Mountain Bell</b> with Rooted: A vast field that rings out in great golden waves.</span></div></div></div>
+    </article>
+<article class="gcard" style="--c:var(--metal)">
+      <div class="tile"><img src="img/icons/p-swords.jpg" alt=""><i>金</i></div>
+      <div class="body"><div class="tab"><b>Flying Swords</b><span class="role">Shooter</span></div>
+        <div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s><s class="f"></s></span><p>Jian swords slice out through the crowd and fly home.</p>
+          <div class="evo"><img src="img/icons/e-swords.jpg" alt=""><span><b>Ten Thousand Swords</b> with Rooted: Swords rain from the sky around you.</span></div></div></div>
+    </article>
+  </div>
+  <h3>The gifts that feed them</h3>
+  <div class="tiles"><div class="gift-chip" style="--c:var(--water)"><img src="img/icons/g-spring.jpg" alt=""><div><b>Deep Spring</b><span>Heal faster. Evolves the Wood powers.</span></div></div><div class="gift-chip" style="--c:var(--wood)"><img src="img/icons/g-shoot.jpg" alt=""><div><b>Green Shoot</b><span>More qi and pickup range. Evolves the Fire powers.</span></div></div><div class="gift-chip" style="--c:var(--fire)"><img src="img/icons/g-kindling.jpg" alt=""><div><b>Kindling</b><span>Every power hits harder. Evolves the Earth powers.</span></div></div><div class="gift-chip" style="--c:var(--earth)"><img src="img/icons/g-rooted.jpg" alt=""><div><b>Rooted</b><span>Take less damage. Evolves the Metal powers.</span></div></div><div class="gift-chip" style="--c:var(--metal)"><img src="img/icons/g-lungs.jpg" alt=""><div><b>Clear Lungs</b><span>Every power recharges faster. Evolves the Water powers.</span></div></div></div>
+  <div class="panel"><div class="tw"><table>
+    <thead><tr><th>Max this power</th><th>Hold this gift</th><th>Because</th><th>It evolves into</th></tr></thead>
+    <tbody>
+<tr><td><span class="pw" style="--c:var(--water)"><img src="img/icons/p-tide.jpg" alt="">Tide Ring</span></td><td><span class="pw gift" style="--c:var(--metal)"><img src="img/icons/g-lungs.jpg" alt="">Clear Lungs</span></td><td>Metal feeds Water</td><td><span class="pw evo"><img src="img/icons/e-moon.jpg" alt=""><b>Moon Tide</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--water)"><img src="img/icons/p-pearl.jpg" alt="">Dragon Pearls</span></td><td><span class="pw gift" style="--c:var(--metal)"><img src="img/icons/g-lungs.jpg" alt="">Clear Lungs</span></td><td>Metal feeds Water</td><td><span class="pw evo"><img src="img/icons/e-pearlstorm.jpg" alt=""><b>Pearl Storm</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--wood)"><img src="img/icons/p-vine.jpg" alt="">Vine Lash</span></td><td><span class="pw gift" style="--c:var(--water)"><img src="img/icons/g-spring.jpg" alt="">Deep Spring</span></td><td>Water feeds Wood</td><td><span class="pw evo"><img src="img/icons/e-grove.jpg" alt=""><b>Rising Grove</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--wood)"><img src="img/icons/p-bamboo.jpg" alt="">Bamboo Spears</span></td><td><span class="pw gift" style="--c:var(--water)"><img src="img/icons/g-spring.jpg" alt="">Deep Spring</span></td><td>Water feeds Wood</td><td><span class="pw evo"><img src="img/icons/e-bamboostorm.jpg" alt=""><b>Bamboo Storm</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--fire)"><img src="img/icons/p-ember.jpg" alt="">Ember Darts</span></td><td><span class="pw gift" style="--c:var(--wood)"><img src="img/icons/g-shoot.jpg" alt="">Green Shoot</span></td><td>Wood feeds Fire</td><td><span class="pw evo"><img src="img/icons/e-wild.jpg" alt=""><b>Wildfire</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--fire)"><img src="img/icons/p-lantern.jpg" alt="">Lantern Bombs</span></td><td><span class="pw gift" style="--c:var(--wood)"><img src="img/icons/g-shoot.jpg" alt="">Green Shoot</span></td><td>Wood feeds Fire</td><td><span class="pw evo"><img src="img/icons/e-festival.jpg" alt=""><b>Lantern Festival</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--earth)"><img src="img/icons/p-stone.jpg" alt="">Stone Ward</span></td><td><span class="pw gift" style="--c:var(--fire)"><img src="img/icons/g-kindling.jpg" alt="">Kindling</span></td><td>Fire feeds Earth</td><td><span class="pw evo"><img src="img/icons/e-molten.jpg" alt=""><b>Molten Ward</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--earth)"><img src="img/icons/p-boulder.jpg" alt="">Mountain Fist</span></td><td><span class="pw gift" style="--c:var(--fire)"><img src="img/icons/g-kindling.jpg" alt="">Kindling</span></td><td>Fire feeds Earth</td><td><span class="pw evo"><img src="img/icons/e-meteor.jpg" alt=""><b>Meteor Fall</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--metal)"><img src="img/icons/p-bell.jpg" alt="">Golden Bell</span></td><td><span class="pw gift" style="--c:var(--earth)"><img src="img/icons/g-rooted.jpg" alt="">Rooted</span></td><td>Earth feeds Metal</td><td><span class="pw evo"><img src="img/icons/e-mountain.jpg" alt=""><b>Mountain Bell</b></span></td></tr>
+<tr><td><span class="pw" style="--c:var(--metal)"><img src="img/icons/p-swords.jpg" alt="">Flying Swords</span></td><td><span class="pw gift" style="--c:var(--earth)"><img src="img/icons/g-rooted.jpg" alt="">Rooted</span></td><td>Earth feeds Metal</td><td><span class="pw evo"><img src="img/icons/e-swords.jpg" alt=""><b>Ten Thousand Swords</b></span></td></tr>
+    </tbody>
+  </table></div></div>
+  <p class="small">Enemies carry elements too, shown by the coloured ring at their feet, and the element that keeps theirs in check hits half again as hard. The winning build is a balanced one.</p>
+</section>
+
+<section class="sec" id="feel">
+  <div class="head"><div class="rb green"><span class="ribbon">Every second rewards</span></div><h2>Built for the feeling of one more run</h2></div>
+  <p class="lede">Every hit flashes, squashes and knocks back. Every kill shatters into crystal and drops a gem, and the pickup chime climbs as you chain them. Level-ups arrive every twelve to fifteen seconds as a choice of three cards. Crystal brutes drop a Spirit Chest that spins a roulette over your build. All of it is earned in play; none of it is sold.</p>
+  <div class="split">
+    <div class="popup" aria-label="The level-up choice, as it appears in the game">
+      <div class="rb"><span class="ribbon">Level Up!</span></div>
+      <div class="loadout">
+        <span class="slot" style="--c:var(--metal)"><img src="img/icons/p-bell.jpg" alt=""><em>5</em></span><span class="slot" style="--c:var(--metal)"><img src="img/icons/p-swords.jpg" alt=""><em>3</em></span><span class="slot" style="--c:var(--earth)"><img src="img/icons/p-stone.jpg" alt=""><em>4</em></span><span class="slot e"></span><span class="slot e"></span><span class="slot e"></span>
+        <span class="slot g" style="--c:var(--earth)"><img src="img/icons/g-rooted.jpg" alt=""><em>2</em></span><span class="slot g" style="--c:var(--fire)"><img src="img/icons/g-kindling.jpg" alt=""><em>1</em></span><span class="slot g e"></span><span class="slot g e"></span><span class="slot g e"></span><span class="slot g e"></span>
+      </div>
+      <div class="gcard evocard" style="--c:var(--metal)"><div class="tile"><img src="img/icons/e-mountain.jpg" alt=""><i>金</i></div><div class="body"><div class="tab"><b>Mountain Bell</b><span class="flag">EVOLVE!</span></div><div class="txt"><p>A vast golden field that rings out in great waves.</p></div></div></div>
+      <div class="gcard" style="--c:var(--metal)"><div class="tile"><img src="img/icons/p-swords.jpg" alt=""><i>金</i></div><div class="body"><div class="tab"><b>Flying Swords</b></div><div class="txt"><span class="stars"><s class="f"></s><s class="f"></s><s class="f"></s><s class="n"></s><s></s></span><p>Swords 3 → 4 · Damage 35 → 40</p></div></div></div>
+      <div class="gcard" style="--c:var(--fire)"><div class="tile"><img src="img/icons/p-lantern.jpg" alt=""><i>火</i></div><div class="body"><div class="tab"><b>Lantern Bombs</b><span class="flag">NEW!</span></div><div class="txt"><span class="stars"><s class="n"></s><s></s><s></s><s></s><s></s></span><p>Thrown lanterns burst into pools of fire</p></div></div></div>
+      <span class="minibtn">Reroll 1</span>
+    </div>
+    <div class="popup" aria-label="The Spirit Chest roulette, as it appears in the game">
+      <div class="rb"><span class="ribbon">Spirit Chest</span></div>
+      <div class="wheel">
+        <div class="wt"><img src="img/icons/g-spring.jpg" alt=""></div><div class="wt won"><img src="img/icons/p-vine.jpg" alt=""></div><div class="wt"><img src="img/icons/p-bell.jpg" alt=""></div>
+        <div class="wt won"><img src="img/icons/e-molten.jpg" alt=""></div><div class="wt c"><img src="img/props/x-chest-open.png" alt="An open treasure chest bursting with light."></div><div class="wt"><img src="img/icons/g-kindling.jpg" alt=""></div>
+        <div class="wt won"><img src="img/icons/p-vine.jpg" alt=""></div><div class="wt"><img src="img/icons/p-stone.jpg" alt=""></div><div class="wt"><img src="img/icons/g-rooted.jpg" alt=""></div>
+      </div>
+      <span class="mult">×3!</span>
+      <div class="gain"><img src="img/icons/e-molten.jpg" alt=""><div><b>Molten Ward</b><span>Evolution!</span></div></div>
+      <div class="gain"><img src="img/icons/p-vine.jpg" alt=""><div><b>Vine Lash</b><span>Lv 3 → 4</span></div></div>
+      <div class="gain"><img src="img/icons/p-vine.jpg" alt=""><div><b>Vine Lash</b><span>Lv 4 → 5</span></div></div>
+      <span class="minibtn g">Collect</span>
+    </div>
+  </div>
+  <h3>Boosters from frozen lanterns</h3>
+  <div class="tiles"><div class="boost" style="--c:var(--water)"><span class="glyph">狐</span><div><b>Luma's Call</b><span>Every gem on the map flies to you.</span></div></div><div class="boost" style="--c:var(--fire)"><span class="glyph">爆</span><div><b>Firecrackers</b><span>A string of firecrackers clears the screen.</span></div></div><div class="boost" style="--c:var(--earth)"><span class="glyph">饺</span><div><b>Dumpling</b><span>Heals a third of your health.</span></div></div><div class="boost" style="--c:var(--wood)"><span class="glyph">桃</span><div><b>Peach of Immortality</b><span>A rare full heal.</span></div></div><div class="boost" style="--c:var(--fire)"><span class="glyph">虎</span><div><b>Tiger Talisman</b><span>Every power hits 50% harder for 12 seconds.</span></div></div><div class="boost" style="--c:var(--metal)"><span class="glyph">冰</span><div><b>Frost Bell</b><span>Freezes everything on screen for three seconds.</span></div></div></div>
+</section>
+
+<section class="sec" id="play">
+  <div class="head"><div class="rb blue"><span class="ribbon">How it plays</span></div><h2>Fast action outside, a home that grows inside</h2></div>
+  <div class="panel loop" aria-label="The core loop">
+    <span>Win a region in a run</span><i>→</i><span>free its people</span><i>→</i><span>grow your hearth</span><i>→</i><span>raise companions and animals</span><i>→</i><span>take the next region</span>
+  </div>
+  <div class="row">
+    <div class="item"><div class="phone"><img src="img/f3-water.jpg" alt="Gameplay: Moon Tide orbs, sacred trees and fire around the Keeper."></div><div class="cap"><h3>The run</h3><p>Your Keeper and spirit animal against the Still. One thumb to move while powers fire on their own; hordes that grow with time and with your level; chests, boosters and an arena boss.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/c-base.jpg" alt="The Last Hearth home base with five element halls."></div><div class="cap"><h3>The Last Hearth</h3><p>Home. Five halls around the fire, survivors with names and feelings, and a settlement that visibly grows.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/s-teaching.jpg" alt="Sorin demonstrates Lifting the Sky."></div><div class="cap"><h3>Sorin's Teachings</h3><p>Where breathing lives: short side missions of real qigong and breathing with Sorin, away from the action. Each one unlocks a permanent upgrade for the hearth.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/s-map.jpg" alt="World map with reclaimed and still regions."></div><div class="cap"><h3>The world map</h3><p>Colour returns wherever you've won.</p></div></div>
+  </div>
+  <div class="panel"><span class="k">Walked, then opened</span><h3 style="margin-bottom:6px">Nothing opens until a player has been shown how</h3><p>Every area unlocks at the end of a short guided mission where the player does it themselves, with a hand pointing and everything else dimmed. The first fifteen minutes cover the hearth, the spirit animal, the first survivors, the first run and the first hall.</p></div>
+</section>
+
+<section class="sec" id="teaches">
+  <div class="head"><div class="rb green"><span class="ribbon">What it teaches</span></div><h2>The lessons are in the rules</h2></div>
+  <p class="lede">No screen ever announces a moral. Every lesson is a rule the player runs into or a consequence they feel. Children absorb it. Parents notice the change.</p>
+  <div class="panel"><div class="tw"><table>
+    <thead><tr><th>What they learn</th><th>Where it lives in the game</th></tr></thead>
+    <tbody>
+      <tr><td><b>Balance wins</b></td><td>Bosses change element as they weaken. The strongest builds use the whole cycle.</td></tr>
+      <tr><td><b>Everything feeds something</b></td><td>A power evolves only with the gift of the element that feeds it: Water feeds Wood, Wood feeds Fire, and on around the circle.</td></tr>
+      <tr><td><b>Breathe when it's all too much</b></td><td>Sorin's Teachings are real breathing and qigong, a few minutes at a time, and they make the hearth stronger.</td></tr>
+      <tr><td><b>What you raise grows with you</b></td><td>The spirit animal grows only through play and care, and its awakenings come from that bond, never from a purchase.</td></tr>
+      <tr><td><b>Risk has a price</b></td><td>In Hearth Trials each player chooses how much to risk. Nobody tells them the right number.</td></tr>
+      <tr><td><b>Honour is what you do when you could get away with less</b></td><td>Picking on smaller players is allowed, pays less, and lowers an Honour score everyone can see.</td></tr>
+      <tr><td><b>Losing is information</b></td><td>After a loss: time to rebuild, a companion's story of their own defeat, and a question about what you'd change.</td></tr>
+      <tr><td><b>Consistency beats intensity</b></td><td>Steady days compound. A missed day slows progress and never wipes it.</td></tr>
+      <tr><td><b>Everyone has a reason</b></td><td>Every creature you free shows the memory that froze it. The first boss is a fisherman who stopped feeling because he was afraid. Even the Stillmaker started from love.</td></tr>
+      <tr><td><b>Nobody builds alone</b></td><td>The biggest bosses fall only to families and friends together.</td></tr>
+    </tbody>
+  </table></div></div>
+</section>
+
+<section class="sec" id="seasons">
+  <div class="head"><div class="rb"><span class="ribbon">Seasons</span></div><h2>One story, a new chapter every season, free for everyone</h2></div>
+  <p class="lede">Each season matches the real calendar and the element traditional Chinese medicine pairs with it, so the year turns through the five elements in order. Every season tells one people's story, brings its own reward track, and gives lapsed players a reason to come back.</p>
+  <div class="seasons">
+    <div class="season" style="--c:var(--water)"><div class="tab"><b>Winter</b></div><div class="in"><span>Water · launch season</span><p>The Frozen Sea.</p></div></div>
+    <div class="season" style="--c:var(--wood)"><div class="tab"><b>Spring</b></div><div class="in"><span>Wood</span><p>The Grey Forest.</p></div></div>
+    <div class="season" style="--c:var(--fire)"><div class="tab"><b>Summer</b></div><div class="in"><span>Fire</span><p>The Endless Festival.</p></div></div>
+    <div class="season" style="--c:var(--earth)"><div class="tab"><b>Late summer</b></div><div class="in"><span>Earth</span><p>The Heavy Harvest.</p></div></div>
+    <div class="season" style="--c:var(--metal)"><div class="tab"><b>Autumn</b></div><div class="in"><span>Metal</span><p>The Silver Bell. The year's mystery answered.</p></div></div>
+  </div>
+  <div class="row">
+    <div class="item"><div class="phone"><img src="img/s-path.jpg" alt="The Season Path reward track."></div><div class="cap"><h3>The Season Path</h3><p>50 tiers, free and premium. Outfits and styles, in-game currency, home and animal looks, and each season's exclusive spirit animal and hero. It expires with the season, and $0.99 buys an unfinished Path all the time it needs.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/s-titan2.jpg" alt="Four Keepers and their mythic spirit animals bring down a colossal crystal Titan together."></div><div class="cap"><h3>Kin events</h3><p>Family and friends bring down a colossal Still Titan together, each Keeper with their own mythic spirit animal. Nobody loses anything.</p></div></div>
+    <div class="item"><div class="phone"><img src="img/s-raids.jpg" alt="Hearth Trial raid screen with a risk dial from 0% to 50%."></div><div class="cap"><h3>Hearth Trials</h3><p>Optional raids where each player chooses their stake, from nothing to half their spare resources. Nothing a player has raised can ever be lost.</p></div></div>
+  </div>
+</section>
+
+<section class="sec" id="model">
+  <div class="head"><div class="rb blue"><span class="ribbon">Business model</span></div><h2>Free to play, priced 25% under market</h2></div>
+  <div class="panel"><div class="tw"><table>
+    <thead><tr><th>Product</th><th>What it is</th><th class="num">Price</th></tr></thead>
+    <tbody>
+      <tr><td><b>The story</b></td><td>A new chapter every season, for everyone.</td><td class="num">Free</td></tr>
+      <tr><td><b>Season Path</b></td><td>The premium reward track: outfits, looks, currency, and the season's exclusive spirit animal and hero. Finishing it earns the next one.</td><td class="num">$5.99</td></tr>
+      <tr><td><b>Path+</b></td><td>The premium track with the season's hero unlocked on day one.</td><td class="num">$9.99</td></tr>
+      <tr><td><b>Second chance</b></td><td>Reopens an unfinished Path with no end date. Rewards still earned by playing.</td><td class="num">$0.99</td></tr>
+      <tr><td><b>Extra spirit animal</b></td><td>Beyond the free twelve. Also earnable through about two months of play.</td><td class="num">$5.99</td></tr>
+      <tr><td><b>Mythology pack</b></td><td>Six creatures from one culture's myths.</td><td class="num">$19.99</td></tr>
+      <tr><td><b>Looks</b></td><td>Styles and effects for powers and animals. No added power.</td><td class="num">$1.99–$3.99</td></tr>
+      <tr><td><b>Family Seat</b></td><td>A second player on the same home.</td><td class="num">$4.99</td></tr>
+    </tbody>
+  </table></div></div>
+  <p class="small">Never sold: random rewards, premium currency, energy, extra lives, power or time skips. Spirit Chests, boosters and every power are earned only by playing.</p>
+</section>
+
+<section class="sec" id="economics">
+  <div class="head"><div class="rb"><span class="ribbon">Unit economics</span></div><h2>About $10 a month per paying family</h2></div>
+  <div class="split">
+    <div class="panel"><div class="tw"><table style="min-width:0">
+      <thead><tr><th>A paying family, one season (about ten weeks)</th><th class="num">Spend</th></tr></thead>
+      <tbody>
+        <tr><td>Path+</td><td class="num">$9.99</td></tr>
+        <tr><td>One extra spirit animal</td><td class="num">$5.99</td></tr>
+        <tr><td>One look</td><td class="num">$2.99</td></tr>
+        <tr><td>One second chance</td><td class="num">$0.99</td></tr>
+        <tr class="total"><td>Per season</td><td class="num">$19.96</td></tr>
+      </tbody>
+    </table></div></div>
+    <p class="lede">About $8.70 a month in an ordinary season and about $17 in a season with a mythology pack: <b style="color:#fff">around $10 a month across a year</b>, at the low end of the $10–$25 range typical for paying players in casual mobile games.</p>
+  </div>
+  <div class="panel"><div class="tw"><table>
+    <thead><tr><th>Monthly active players</th><th class="num">Share who pay</th><th class="num">Paying families</th><th class="num">Gross a year</th><th class="num">Net a year</th></tr></thead>
+    <tbody>
+      <tr><td>100,000</td><td class="num">3%</td><td class="num">3,000</td><td class="num">$360K</td><td class="num">$306K</td></tr>
+      <tr><td>500,000</td><td class="num">4%</td><td class="num">20,000</td><td class="num">$2.4M</td><td class="num">$1.83M</td></tr>
+      <tr><td>1,000,000</td><td class="num">5%</td><td class="num">50,000</td><td class="num">$6.0M</td><td class="num">$4.35M</td></tr>
+    </tbody>
+  </table></div></div>
+  <p class="small">At $10 a month per paying family. Net is after app-store fees of 15% on the first $1M a year and 30% above it, before operating costs. Industry data puts the share of mobile players who ever pay at roughly 2–8%. Illustrative scenarios, not a forecast.</p>
+</section>
+
+<section class="sec" id="why">
+  <div class="head"><div class="rb red"><span class="ribbon">Why we win</span></div><h2>Four advantages that reinforce each other</h2></div>
+  <div class="grid">
+    <div class="panel" style="--c:var(--wood)"><span class="k">Teaching through rules</span><h3 style="margin-bottom:6px">Lessons nobody announces</h3><p>The five-element cycles are the strategy, and life skills are the consequences. Learning is never a lecture, so children keep playing.</p></div>
+    <div class="panel" style="--c:var(--fire)"><span class="k">The feel of the genre's best</span><h3 style="margin-bottom:6px">Polish players already love</h3><p>Hordes, evolving powers, chests and boosters with real effects and sound, proven in a playable level today, in a world and art style of our own.</p></div>
+    <div class="panel" style="--c:var(--water)"><span class="k">A story built to last</span><h3 style="margin-bottom:6px">Serialised by season</h3><p>One free, continuing story on the real calendar with a mystery planned from the first line. Every season is a reason to come back.</p></div>
+    <div class="panel" style="--c:var(--gold-2)"><span class="k">Trust as a moat</span><h3 style="margin-bottom:6px">The fair model is the compliant one</h3><p>Built for where regulation is going rather than where the genre has been. Parents can see and control everything they pay for.</p></div>
+  </div>
+  <div class="panel"><div class="tw"><table>
+    <thead><tr><th>What players dislike in today's top games</th><th>MorQi</th></tr></thead>
+    <tbody>
+      <tr><td>Random paid rewards with long odds</td><td>Every purchase is direct, priced in dollars. Chests are earned, never bought.</td></tr>
+      <tr><td>Big spenders wiping out months of a player's progress</td><td>Players choose their own risk; nothing they raised can be lost.</td></tr>
+      <tr><td>New characters that make old ones obsolete every few months</td><td>Companions and animals never go obsolete.</td></tr>
+      <tr><td>Pop-up offers and status tiers bought with lifetime spend</td><td>One shop page, fixed prices, a grown-up gate.</td></tr>
+      <tr><td>Timers and energy you pay to skip</td><td>No paid speed-ups, no paid energy.</td></tr>
+      <tr><td>Open chat full of strangers</td><td>No open chat for under-13s; family groups and kind preset messages.</td></tr>
+    </tbody>
+  </table></div></div>
+</section>
+
+<section class="sec" id="trust">
+  <div class="head"><div class="rb green"><span class="ribbon">Trust and go to market</span></div><h2>Built for the parent who pays</h2></div>
+  <div class="grid">
+    <div class="panel" style="--c:var(--gold-2)"><span class="k">Trust and safety</span><p>A grown-up gate on every purchase and a monthly spending summary for parents. No open chat for under-13s. Parent controls, including the most a child can risk in Hearth Trials. No third-party advertising. Data practices designed for US children's privacy law (COPPA). Parent-owned accounts, deleted in one step.</p></div>
+    <div class="panel" style="--c:var(--water)"><span class="k">Go to market</span><p>A family game for all ages with a neutral age check, since advertising aimed at children is tightly restricted and the parent is the one who pays. Paid acquisition aimed at parents and adults. Qigong, tai chi, wellness and parenting communities as channels. Each season's chapter as its own moment to bring players back.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="roadmap">
+  <div class="head"><div class="rb blue"><span class="ribbon">Roadmap</span></div><h2>From a playable level to the first season</h2></div>
+  <p class="lede">The design is complete: world, characters, core loop, ten powers, economy and pricing. The breathing and five-element systems were proven in an earlier prototype built over more than a hundred versions, and <a href="https://aarauz-os.github.io/morqi/level1/" target="_blank" rel="noopener">a playable first level</a> of the new game is live today.</p>
+  <div class="panel phases">
+    <div class="phase" style="--c:var(--metal)"><span class="n">1</span><div><h3>The look</h3><p>Final visual development of the world, Sorin, Luma, the companions and the spirit animals.</p></div></div>
+    <div class="phase" style="--c:var(--water)"><span class="n">2</span><div><h3>First playable, native</h3><p>Level 1 rebuilt for iPhone, then the opening, a spirit animal's growth, a companion's story and a Teaching, end to end.</p></div></div>
+    <div class="phase" style="--c:var(--wood)"><span class="n">3</span><div><h3>Soft launch, iPhone</h3><p>The winter season with runs, a lighter home base, four to six spirit animals and the first Season Path. Targets: day-1 retention of 35–50%, day-7 of 15–25%, day-30 of 5–15%, plus share of players who pay and spend per paying family.</p></div></div>
+    <div class="phase" style="--c:var(--fire)"><span class="n">4</span><div><h3>Launch and the seasonal rhythm</h3><p>Five seasons a year, the first mythology pack, Kin events and Hearth Trials, then Android.</p></div></div>
+    <div class="phase" style="--c:var(--earth)"><span class="n">★</span><div><h3>Beyond</h3><p>More mythology packs, deeper family play, and the world beyond the game.</p></div></div>
+  </div>
+</section>
+
+<section class="sec" id="team">
+  <div class="head"><div class="rb"><span class="ribbon">Team</span></div><h2>Three founders behind MorQi</h2></div>
+  <div class="team">
+    <div class="panel member" style="--c:var(--gold)"><span class="av">A</span><div><span class="k">Co-founder</span><h3>Amos</h3><p class="small">Background: –</p></div></div>
+    <div class="panel member" style="--c:var(--wood)"><span class="av">D</span><div><span class="k">Co-founder · qigong and tai chi master</span><h3>Demaris</h3><p class="small">Background: –</p></div></div>
+    <div class="panel member" style="--c:var(--water)"><span class="av">S</span><div><span class="k">Co-founder · role TBD</span><h3>Sammy</h3><p class="small">Background: –</p></div></div>
+  </div>
+</section>
+
+<section class="sec" id="raise">
+  <div class="head"><div class="rb red"><span class="ribbon">The raise</span></div><h2>$4.0M seed for 24 months of runway</h2></div>
+  <p class="lede">About 15 months of production, six months of soft launch, and three months to raise the next round. The team grows from about six to twelve people, with the founders and a technical lead in the US and the rest working remotely.</p>
+  <div class="panel"><div class="tw"><table>
+    <thead><tr><th>Use of funds</th><th class="num">Amount</th></tr></thead>
+    <tbody>
+      <tr><td><b>People:</b> the three founders, a technical lead, three game engineers, a backend engineer, systems and narrative designers, an art director, two artists and animators, an interface designer, a product and acquisition lead, and community</td><td class="num">$2.50M</td></tr>
+      <tr><td><b>Art, animation, effects and audio</b></td><td class="num">$0.45M</td></tr>
+      <tr><td><b>Technology and infrastructure</b></td><td class="num">$0.15M</td></tr>
+      <tr><td><b>Legal and compliance</b>, including children's privacy</td><td class="num">$0.15M</td></tr>
+      <tr><td><b>Soft-launch acquisition</b> and ad creative</td><td class="num">$0.30M</td></tr>
+      <tr><td><b>Contingency,</b> about 12%</td><td class="num">$0.45M</td></tr>
+      <tr class="total"><td>Total</td><td class="num">$4.0M</td></tr>
+    </tbody>
+  </table></div></div>
+  <div class="panel pull">
+    <p>A leaner path: about $1.75M for 18 months.</p>
+    <small>A fully remote team of six or seven, iPhone only, three spirit animals and a small test-market launch. It reaches soft launch with early retention data, but not the longer-term revenue numbers a next round looks for, so a bridge round is likely.</small>
+  </div>
+</section>
+
+<section class="close">
+  <div class="rb"><span class="ribbon">MorQi</span></div>
+  <h2>Bring a frozen world back to life.</h2>
+  <p class="lede" style="text-align:center">A game children choose, families trust, and everyone grows from.</p>
+  <a class="btn" href="https://aarauz-os.github.io/morqi/level1/" target="_blank" rel="noopener">Play Level 1</a>
+  <a class="url" href="https://aarauz-os.github.io/morqi/level1/">aarauz-os.github.io/morqi/level1/</a>
+</section>
+
+<p class="foot">Market figures come from industry trackers (2025), public company filings (Q2 2025), industry monetisation and cost reports (2024–2026) and published regulatory orders (2022 and 2025). Prices compare against current mobile app-store listings. Gameplay frames are captured from the playable Level 1; interface panels are recreated from it; other images are concept art. All projections are illustrative. Confidential and for discussion only.</p>
+
+</div>
+</body></html>
