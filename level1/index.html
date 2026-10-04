@@ -820,7 +820,7 @@ const AU = (() => {
     const gn = c.createGain(); gn.gain.setValueAtTime(.0001, t); gn.gain.exponentialRampToValueAtTime(o.vol || .2, t + (o.att || .003)); gn.gain.exponentialRampToValueAtTime(.0001, t + dur);
     s.connect(f).connect(gn).connect(o.bus === 'mus' ? mus : sfx); s.start(t, Math.random() * 1.5); s.stop(t + dur + .05);
   }
-  const PENTA = [587.33, 698.46, 783.99, 880, 1046.5, 1174.66, 1396.91, 1567.98, 1760, 2093];
+  const PENTA = [293.66, 349.23, 392, 440, 523.25, 587.33, 698.46, 783.99, 880, 1046.5];   // D minor pentatonic, in the middle
   let gemN = 0, gemT = 0;
   const S = {
     dart() { if (!gate('dart', 60)) return; tone({ f:520, f1:1300, type:'triangle', dur:.09, vol:.09 }); noise({ ft:'highpass', f:3000, dur:.06, vol:.05 }); },
@@ -832,7 +832,7 @@ const AU = (() => {
     thud(big) { if (!gate('thud', 60)) return; tone({ f:big ? 120 : 160, f1:40, dur:big ? .4 : .22, vol:big ? .5 : .28 }); noise({ f:500, f1:120, dur:big ? .3 : .14, vol:big ? .3 : .16 }); },
     bell(big) { if (!gate('bell', 120)) return; const b = big ? 330 : 520;
       [[1, 1.6, .16], [2.76, .9, .07], [5.4, .5, .045], [8.93, .3, .03]].forEach(([r, d, v]) => tone({ f:b * r, dur:d * (big ? 1.6 : 1), vol:v * (big ? 1.6 : 1), att:.002 })); },
-    ting() { if (!gate('ting', 110)) return; tone({ f:1760, dur:.18, vol:.035, att:.002 }); tone({ f:4860, dur:.08, vol:.012 }); },
+    ting() { if (!gate('ting', 144)) return; tone({ f:880, dur:.18, vol:.03, att:.002 }); tone({ f:2430, dur:.06, vol:.008 }); },
     shing() { if (!gate('shing', 60)) return; noise({ ft:'bandpass', f:4000, f1:9000, q:6, dur:.16, vol:.14 }); tone({ f:2600, f1:3200, dur:.12, vol:.035 }); },
     shatter() { if (!gate('shatter', 38)) return; tone({ f:PENTA[(Math.random() * 6 | 0) + 4], dur:.14, vol:.045, att:.002 }); noise({ ft:'highpass', f:5000, dur:.05, vol:.05 }); },
     gem() { const n = performance.now(); gemN = n - gemT < 350 ? Math.min(gemN + 1, 9) : 0; gemT = n; if (!gate('gem', 28)) return;
@@ -864,28 +864,47 @@ const AU = (() => {
     heartbeat() { tone({ f:60, f1:40, dur:.12, vol:.35 }); tone({ f:58, f1:38, dur:.12, vol:.28, at:.22 }); },
     charge() { noise({ f:400, f1:1600, dur:.6, vol:.25 }); },
     spikes() { noise({ ft:'highpass', f:3000, f1:9000, dur:.25, vol:.2 }); this.thud(false); },
-    combo(n) { tone({ f:880 * Math.pow(2, Math.min(n, 12) / 12), dur:.12, vol:.08 }); },
+    combo(n) { tone({ f:440 * Math.pow(2, MINOR[Math.min(n, 14)] / 12), dur:.12, vol:.07 }); },
     bossdown() { this.boom(true); }
   };
-  // recorded effects (made with ElevenLabs): each moment has its own sound, a small random pitch shift keeps repeats
-  // from sounding identical, gems climb in pitch as you chain them, and a voice cap keeps big fights clean.
-  // If a file can't load, the synth version above plays instead.
-  const SMP = {}, SVAR = { shatter:['shatter1', 'shatter2'] };
+  /* recorded effects (made with ElevenLabs), mixed by a few rules (A asked for the golden ratio here too, 2026-10-04):
+     - a loudness ladder in golden steps: every rung is 0.618 of the one above (1, .618, .382, .236). Rare hero moments
+       (victory, level up, a boss falling) sit on top; the sounds that happen constantly (shots, gems, shards) sit at
+       the bottom, so they never nag;
+     - every file is first levelled to the same loudness (its loudest 50 ms, measured), so the ladder means something;
+     - the more often a sound plays, the softer its top end (A's rule: no high-pitched sound on endless repeat);
+     - repeats are spaced by Fibonacci gaps (34, 55, 89, 144, 233 ms), and never repeat the exact same pitch twice;
+     - chains and combos climb the minor pentatonic, the scale the music uses, so they sing along with the score;
+     - the music dips for a beat under a hero moment, so it lands.
+     If a file can't load, the synth version above plays instead. */
+  const PHI = 1.618, LADDER = [1, 1 / PHI, 1 / PHI / PHI, 1 / PHI / PHI / PHI], SOFT = [18000, 9000, 5200, 2800];
+  const LOUD = { alarm:-6.0, bell:-25.9, bloop:-8.9, 'boom-big':-7.7, boom:-18.9, bossdown:-5.7, bossroar:-6.7, cardin:-17.3, charge:-8.0, chestdrop:-3.6, combo:-24.1, crackle:-13.0, dart:-9.4, firecrackers:-16.0, firework:-8.7, freeze:-17.1, gem:-21.4, heal:-22.9, heart:-7.2, heartbeat:-22.4, hurt:-9.3, jackpot:-8.4, levelup:-11.0, pop:-13.4, power:-10.1, reveal:-8.6, roar:-6.3, select:-45.8, shatter1:-14.9, shatter2:-26.5, shing:-5.6, spikes:-16.2, splash:-11.4, stomp:-13.1, sweep:-9.8, thud:-26.2, thwip:-4.0, ting:-20.5, victory:-9.7, wave:-11.9, whip:-21.0 };
+  const level = n => Math.min(4, Math.max(.3, Math.pow(10, (-12 - (LOUD[n] ?? -12)) / 20)));
+  const MINOR = [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24, 27, 29, 31, 34];   // minor pentatonic steps, in semitones
+  const SMP = {}, SVAR = { shatter:['shatter1', 'shatter2'] }, lastRate = {};
   const SFILES = ['gem','shatter1','shatter2','splash','bloop','dart','boom','boom-big','whip','thwip','thud','stomp','bell','ting','shing','levelup','select','cardin','reveal','victory','chestdrop','roar','alarm','hurt','crackle','firecrackers','heal','sweep','freeze','power','wave','firework','pop','bossroar','jackpot','heart','heartbeat','charge','spikes','combo','bossdown'];
-  const SMAP = { dart:['dart', .45], boom:a => a[0] ? ['boom-big', .9] : ['boom', .55], splash:['splash', .5], bloop:['bloop', .45], whip:['whip', .5], thwip:['thwip', .4],
-    thud:a => a[0] ? ['stomp', .75] : ['thud', .55], bell:['bell', .55], ting:['ting', .45], shing:['shing', .45], shatter:['shatter', .4], levelup:['levelup', .95], select:['select', .7],
-    cardIn:['cardin', .45], fanfare:a => a[0] ? ['victory', .95] : ['reveal', .85], chestDrop:['chestdrop', .9], roar:['roar', .85], alarm:['alarm', .8], hurt:['hurt', .8],
-    crackle:['crackle', .3], firecrackers:['firecrackers', .8], heal:['heal', .7], sweep:['sweep', .7], freeze:['freeze', .8], power:['power', .95], wave:['wave', .55],
-    firework:['firework', .55], stomp:['stomp', .9], pop:['pop', .5], bossroar:['bossroar', .95], jackpot:a => [a[0] ? 'jackpot' : 'reveal', .9],
-    heart:['heart', .8], heartbeat:['heartbeat', .7], charge:['charge', .85], spikes:['spikes', .7], bossdown:['bossdown', 1] };
-  const SGATE = { dart:60, boom:45, splash:70, bloop:80, whip:90, thwip:55, thud:60, bell:120, ting:110, shing:60, shatter:38, crackle:160, hurt:150, wave:200, firework:120, pop:40, cardIn:30 };
+  // [file, rung]: 0 hero, 1 big event, 2 regular combat, 3 constant
+  const SMAP = { dart:['dart', 3], boom:a => a[0] ? ['boom-big', 1] : ['boom', 2], splash:['splash', 2], bloop:['bloop', 3], whip:['whip', 2], thwip:['thwip', 3],
+    thud:a => a[0] ? ['stomp', 1] : ['thud', 2], bell:['bell', 2], ting:['ting', 3], shing:['shing', 2], shatter:['shatter', 3], levelup:['levelup', 0], select:['select', 2],
+    cardIn:['cardin', 2], fanfare:a => a[0] ? ['victory', 0] : ['reveal', 1], chestDrop:['chestdrop', 1], roar:['roar', 1], alarm:['alarm', 1], hurt:['hurt', 1],
+    crackle:['crackle', 3], firecrackers:['firecrackers', 1], heal:['heal', 1], sweep:['sweep', 1], freeze:['freeze', 1], power:['power', 0], wave:['wave', 2],
+    firework:['firework', 2], stomp:['stomp', 1], pop:['pop', 3], bossroar:['bossroar', 0], jackpot:a => [a[0] ? 'jackpot' : 'reveal', a[0] ? 0 : 1],
+    heart:['heart', 1], heartbeat:['heartbeat', 1], charge:['charge', 1], spikes:['spikes', 1], bossdown:['bossdown', 0] };
+  const SGATE = { dart:55, boom:55, splash:89, bloop:89, whip:89, thwip:55, thud:55, bell:144, ting:144, shing:55, shatter:34, crackle:144, hurt:144, wave:233, firework:144, pop:34, cardIn:34 };
+  function duck() {   // the music dips to .618 for a moment under a hero sound
+    if (!mus) return; const t = c.currentTime, v = .12; mus.gain.cancelScheduledValues(t); mus.gain.setTargetAtTime(v / PHI, t, .03); mus.gain.setTargetAtTime(v, t + .618, .25);
+  }
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=6`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  function smp(name, vol, rate) {
+  function smp(name, rung, rate) {
     const list = (SVAR[name] || [name]).filter(n => SMP[n]); if (!list.length) return false;
     if (voices >= 22) return true;
-    const src = c.createBufferSource(), gn = c.createGain(); src.buffer = SMP[list[(Math.random() * list.length) | 0]];
-    src.playbackRate.value = rate || rnd(.94, 1.06); gn.gain.value = vol; src.connect(gn).connect(sfx);
+    const file = list[(Math.random() * list.length) | 0], src = c.createBufferSource(), gn = c.createGain(), f = c.createBiquadFilter();
+    let r = rate || rnd(.94, 1.06); if (!rate && Math.abs(r - (lastRate[name] || 0)) < .02) r += r < 1 ? .03 : -.03; lastRate[name] = r;
+    src.buffer = SMP[file]; src.playbackRate.value = r;
+    gn.gain.value = LADDER[rung] * level(file) * (rung === 3 ? rnd(.85, 1) : 1);
+    f.type = 'lowpass'; f.frequency.value = SOFT[rung]; f.Q.value = .5;
+    src.connect(f).connect(gn).connect(sfx); if (rung === 0) duck();
     voices++; src.onended = () => voices--; src.start(); return true;
   }
   for (const k in SMAP) { const synth = S[k];
@@ -894,11 +913,11 @@ const AU = (() => {
       if (SGATE[k] && !gate('s' + k, SGATE[k])) return;
       if (!smp(m[0], m[1])) return synth.apply(S, a);
     }; }
-  { const synthCombo = S.combo; S.combo = function (n) { if (!c || !sfxOn) return; if (!smp('combo', .45, Math.pow(2, Math.min(n, 14) / 12))) synthCombo.call(S, n); }; }
+  { const synthCombo = S.combo; S.combo = function (n) { if (!c || !sfxOn) return; if (!smp('combo', 2, Math.pow(2, MINOR[Math.min(n, 14)] / 12 - .5))) synthCombo.call(S, n); }; }
   { const synthGem = S.gem; S.gem = function () {
       const n = performance.now(); gemN = n - gemT < 350 ? Math.min(gemN + 1, 9) : 0; gemT = n;
-      if (!c || !sfxOn || !gate('sgem', 28)) return;
-      if (!smp('gem', .5, Math.pow(2, [0, 2, 4, 7, 9, 12, 14, 16, 19, 21][gemN] / 12))) synthGem.call(S);
+      if (!c || !sfxOn || !gate('sgem', 34)) return;
+      if (!smp('gem', 3, Math.pow(2, MINOR[gemN] / 12 - .25))) synthGem.call(S);
     }; }
   /* ---------- the score ----------
      Written as code so it can follow the fight. "The Path" (F minor) floats on night pads and a bell hook, then,
