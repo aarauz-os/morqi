@@ -57,10 +57,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .scr p{margin:0;max-width:32ch;color:rgba(255,255,255,.82);font-size:16px;line-height:1.45;font-weight:700}
 .eb{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--jade-hi)}
 .small{font-size:12.5px;color:rgba(255,255,255,.62);font-weight:700}
-#title{background:#0C1420 url(art/hero.jpg) 50% 0/auto 86% no-repeat;justify-content:flex-end;gap:14px;padding-bottom:34px}
+#title{background:#0C1420 url(art4/hero-tall.jpg) 50% 0/cover no-repeat;justify-content:flex-end;gap:14px;padding-bottom:34px}
 #title::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,20,32,0) 28%,rgba(12,20,32,.6) 58%,rgba(12,20,32,.94) 82%)}
 #title > *{position:relative}
-#title h1{font-family:var(--display);font-weight:800;letter-spacing:0}
+#title h1{font-family:var(--round);font-weight:900;letter-spacing:-.02em}
 
 /* section titles: a clean heading instead of a banner */
 .rb{position:relative;display:block;text-align:center}
@@ -72,7 +72,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 /* Keeper select */
 .keepers{display:flex;justify-content:center;gap:10px;flex-wrap:nowrap;width:100%;max-width:360px}
 #pickKeeper{justify-content:space-between;gap:10px;background:#0C1420}
-#pickKeeper::before{content:"";position:absolute;inset:0;background:url(art/hero.jpg) 50% 100%/cover no-repeat;opacity:.5;filter:blur(6px) saturate(1.1)}
+#pickKeeper::before{content:"";position:absolute;inset:0;background:url(art4/hero.jpg) 50% 100%/cover no-repeat;opacity:.5;filter:blur(6px) saturate(1.1)}
 #pickKeeper::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 70% 42% at 50% 56%,rgba(111,242,207,.18),transparent 70%),linear-gradient(180deg,rgba(12,20,32,.7),rgba(12,20,32,.15) 30%,rgba(12,20,32,.3) 70%,rgba(12,20,32,.9))}
 #pickKeeper > *{position:relative;z-index:1}
 .ks-head{display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -395,7 +395,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
     <div class="ks-head"><div class="eb">You are a Keeper</div><h2 class="ck">Choose your Keeper</h2></div>
     <div class="ks-stage" id="ksStage">
       <div class="ks-rays"></div><div class="ks-ped"></div>
-      <img id="ksImg" src="art/k1-hi.png" alt="Keeper 1">
+      <img id="ksImg" src="art4/k1-hi.png" alt="Keeper 1">
       <button class="ks-arrow l" id="ksPrev" aria-label="Previous Keeper">‹</button>
       <button class="ks-arrow r" id="ksNext" aria-label="Next Keeper">›</button>
     </div>
@@ -422,7 +422,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
   </section>
 
   <section class="scr" id="story" hidden>
-    <div class="story"><img src="art/luma.jpg" alt="Luma, the little fox spirit of the hearth, with one glowing tail."></div>
+    <div class="story"><img src="art4/luma.jpg" alt="Luma, the little fox spirit of the hearth, with one glowing tail."></div>
     <h2 class="ck">The shore has gone still</h2>
     <p>The Stillmaker froze this shore and everyone on it. Luma, the fox spirit of your hearth, sends you out with your spirit animal. Free every creature, and the shore will wake.</p>
     <button class="btn green" id="storyNext">Run in</button>
@@ -435,8 +435,8 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
         <div class="how"><span class="ic"><span class="ghost"><i></i></span></span><div><b>Move with one thumb</b><span>Drag anywhere on the screen. Your powers <em>fire on their own</em>.</span></div></div>
         <div class="how"><span class="ic"><span class="gemi"></span></span><div><b>Free creatures, grab gems</b><span>Every creature you free drops a qi gem. Fill the bar to <em>level up and pick a power</em>.</span></div></div>
         <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="#1A1206" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g><g stroke="#FFE58A" stroke-width="1.6" fill="none" opacity=".9"><path d="M28 16 L37 40"/><path d="M39 25 L19 41"/><path d="M33 45 L13 27"/><path d="M17 38 L23 13"/><path d="M15 21 L40 22"/></g></svg></span><div><b>Five elements</b><span>Every power and creature has one. <em>Each element beats two and is weak to two</em>: fire burns wood, water puts out fire. Hits show <em>Super effective!</em> or <em>Resisted</em>. <button class="btn blue small" id="chartBtn" style="margin-top:6px;font-size:14px;padding:5px 12px 7px">See the chart</button></span></div></div>
-        <div class="how"><span class="ic"><img src="art/props/x-chest.png" alt="" style="width:120%;max-width:none"></span><div><b>Evolve your powers</b><span>Max a power to five stars and hold the <em>gift of the element that feeds it</em>. Crystal brutes drop Spirit Chests that help.</span></div></div>
-        <div class="how"><span class="ic"><img src="art/b-warden.png" alt="" style="width:130%;max-width:none"></span><div><b>Free the shore</b><span><em>Ten waves</em> come, each one element. Arrows at the edge warn you where. Survive them, then <em>defeat the Still Warden</em>.</span></div></div>
+        <div class="how"><span class="ic"><img src="art4/props/x-chest.png" alt="" style="width:120%;max-width:none"></span><div><b>Evolve your powers</b><span>Max a power to five stars and hold the <em>gift of the element that feeds it</em>. Crystal brutes drop Spirit Chests that help.</span></div></div>
+        <div class="how"><span class="ic"><img src="art4/b-warden.png" alt="" style="width:130%;max-width:none"></span><div><b>Free the shore</b><span><em>Ten waves</em> come, each one element. Arrows at the edge warn you where. Survive them, then <em>defeat the Still Warden</em>.</span></div></div>
       </div>
       <button class="btn green" id="howtoGo">Let's go!</button>
     </div>
@@ -477,7 +477,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
   </section>
 
   <section class="scr" id="results" hidden>
-    <div class="victory"><img src="art/b-fisher.png" alt="The fisherman, freed, holding a glowing lantern."></div>
+    <div class="victory"><img src="art4/b-fisher.png" alt="The fisherman, freed, holding a glowing lantern."></div>
     <div class="panel pop">
       <div class="rb"><span class="ribbon">Victory!</span></div>
       <p style="font-size:14.5px;color:#D6E1E7;max-width:30ch"><i>"I was so afraid of losing the shore that I stopped feeling anything at all. Thank you, Keeper."</i></p>
@@ -593,7 +593,7 @@ const GIFT = {
 const GIFT_OF = { water:'spring', wood:'shoot', fire:'kindling', earth:'rooted', metal:'lungs' };
 const evoGift = id => GIFT_OF[FED_BY[POW[id].e]];          // the gift that evolves a power
 const START = { water:'tide', wood:'vine', fire:'ember', earth:'stone', metal:'bell' };
-const icon = n => `art/icons/${n}.jpg?v=2`;   // v2: the cartoony set
+const icon = n => `art4/icons/${n}.jpg?v=2`;   // v2: the cartoony set
 const AWAKEN_AT = [4, 8, 12, 16, 20];
 
 // every number each power has at each level, shared by the game and the cards
@@ -638,9 +638,9 @@ const EVO_DESC = {
 /* ================= assets ================= */
 const IMG = {};
 function load(name, src) { const i = new Image(); i.src = src; IMG[name] = i; return i; }
-for (let k = 1; k <= 6; k++) { load('k' + k, `art/k${k}.png`); for (let r = 1; r <= 3; r++) load(`k${k}r${r}`, `art/run/k${k}-r${r}.png`); }   // idle pose plus a three-frame run cycle
-ZOD.forEach(z => { load(z + 'y', `art/a-${z}-y.png`); load(z + 'm', `art/a-${z}-m.png`); });
-['e-critter','e-wolf','e-golem','b-warden','b-fisher'].forEach(n => load(n, `art/${n}.png`));
+for (let k = 1; k <= 6; k++) { load('k' + k, `art4/k${k}.png`); for (let r = 1; r <= 3; r++) load(`k${k}r${r}`, `art4/run/k${k}-r${r}.png`); }   // idle pose plus a three-frame run cycle
+ZOD.forEach(z => { load(z + 'y', `art4/a-${z}-y.png`); load(z + 'm', `art4/a-${z}-m.png`); });
+['e-critter','e-wolf','e-golem','b-warden','b-fisher'].forEach(n => load(n, `art4/${n}.png`));
 // every element sends its own creatures: a swarm creature (a), a specialist with its own trick (b) and a brute (c)
 const ROLE = { critter:'a', wolf:'b', golem:'c' };
 const KIND = {
@@ -660,9 +660,9 @@ const KIND = {
   'metal-b':{ n:'Blade Mantis',      beh:'dash',   hp:1,   sp:.95, short:'Dashes along a red line: sidestep it', tip:'It freezes, shows a red line, then dashes along it. Sidestep the line.' },
   'metal-c':{ n:'Bell Knight',       beh:'blades', hp:1,   sp:.85, short:'Throws a fan of spinning blades', tip:'It flashes, then throws a fan of spinning blades. Move sideways between them.' }
 };
-Object.keys(KIND).forEach(k => load('e-' + k, `art/e-${k}.png`));
-['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate'].forEach(n => load(n, `art/props/${n}.png`));
-const texF = load('tf', 'art/t-frozen.jpg'), texM = load('tm', 'art/t-meadow.jpg');
+Object.keys(KIND).forEach(k => load('e-' + k, `art4/e-${k}.png`));
+['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate'].forEach(n => load(n, `art4/props/${n}.png`));
+const texF = load('tf', 'art4/t-frozen.jpg'), texM = load('tm', 'art4/t-meadow.jpg');
 const ok = i => i && i.complete && i.naturalWidth > 0;
 
 /* ================= sound: a small synth with a compressor, voice gates and a looping score ================= */
@@ -825,18 +825,18 @@ const SEEN = new Set((store.get('morqi.seen') || '').split(',').filter(Boolean))
 const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(',')); };
 function show(id) { document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); }
 const kb = $('#keepers'), ksImg = $('#ksImg');
-for (let k = 1; k <= 6; k++) { const i = new Image(); i.src = `art/k${k}-hi.png`; }
+for (let k = 1; k <= 6; k++) { const i = new Image(); i.src = `art4/k${k}-hi.png`; }
 function pickKeeper(k, dir) {
   keeper = ((k - 1 + 6) % 6) + 1;
   [...kb.children].forEach((c, i) => { c.classList.toggle('on', i === keeper - 1); c.setAttribute('aria-checked', i === keeper - 1); });
-  ksImg.src = `art/k${keeper}-hi.png`; ksImg.alt = 'Keeper ' + keeper;
+  ksImg.src = `art4/k${keeper}-hi.png`; ksImg.alt = 'Keeper ' + keeper;
   ksImg.style.setProperty('--dx', (dir || 1) * 40 + 'px'); ksImg.classList.remove('swap'); void ksImg.offsetWidth; ksImg.classList.add('swap');
   SFX.pop();
 }
 for (let k = 1; k <= 6; k++) {
   const b = document.createElement('button'); b.className = 'kp' + (k === 1 ? ' on' : ''); b.setAttribute('role', 'radio');
   b.setAttribute('aria-checked', k === 1); b.setAttribute('aria-label', 'Keeper ' + k);
-  b.innerHTML = `<img src="art/k${k}-face.png" alt="">`;
+  b.innerHTML = `<img src="art4/k${k}-face.png" alt="">`;
   b.onclick = () => pickKeeper(k, k > keeper ? 1 : -1);
   kb.appendChild(b);
 }
@@ -854,7 +854,7 @@ $('#yearNext').onclick = () => {
   const year = +ys.value; animal = ZOD[((year - 1900) % 12 + 12) % 12]; keeperEl = STEM[((year % 10) + 10) % 10];
   const A = ANIMAL[animal];
   $('#revEb').textContent = `Year of the ${ELNAME[keeperEl]} ${A.n}`;
-  $('#revImg').src = `art/a-${animal}-y.png`; $('#revImg').alt = A.y;
+  $('#revImg').src = `art4/a-${animal}-y.png`; $('#revImg').alt = A.y;
   $('#revBox').style.setProperty('--c', EL[A.e]);
   $('#revName').textContent = `Your ${A.y}`;
   $('#revEl').textContent = `${ELNAME[keeperEl]} Keeper`; $('#revEl').style.setProperty('--c', EL[keeperEl]);
@@ -1749,16 +1749,24 @@ const TPX = Math.ceil((TILE + TPAD * 2) * TS); tmpT.width = tmpT.height = TPX;
 let icePat = null, grassPat = null;
 function markThaw(x, y, r) { r += TPAD; for (let i = Math.floor((x - r) / TILE); i <= Math.floor((x + r) / TILE); i++) for (let j = Math.floor((y - r) / TILE); j <= Math.floor((y + r) / TILE); j++) { const t = tiles.get(i * 64 + j); if (t) t.dirty = true; } }
 function resetTiles() { tiles.clear(); }
+// generated textures rarely wrap perfectly, so each is mirrored into a 2×2 block, which always tiles without a seam
+function mirror(im) {
+  const w = im.naturalWidth, h = im.naturalHeight, c = document.createElement('canvas'); c.width = w * 2; c.height = h * 2; const x = c.getContext('2d');
+  for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) { x.save(); x.translate(sx < 0 ? w * 2 : 0, sy < 0 ? h * 2 : 0); x.scale(sx, sy); x.drawImage(im, 0, 0); x.restore(); }
+  return c;
+}
 function renderTile(t, i, j) {
-  if (!icePat && ok(texF)) icePat = t.x.createPattern(texF, 'repeat');
-  if (!grassPat && ok(texM)) grassPat = t.x.createPattern(texM, 'repeat');
+  if (!icePat && ok(texF)) icePat = t.x.createPattern(mirror(texF), 'repeat');
+  if (!grassPat && ok(texM)) grassPat = t.x.createPattern(mirror(texM), 'repeat');
   const ox = i * TILE - TPAD, oy = j * TILE - TPAD, SZ = TILE + TPAD * 2, m = new DOMMatrix(); m.a = m.d = .5;
   const x = t.x; x.setTransform(TS, 0, 0, TS, -ox * TS, -oy * TS);
   if (icePat) { icePat.setTransform(m); x.fillStyle = icePat; } else x.fillStyle = '#2B3640';
   x.fillRect(ox, oy, SZ, SZ);
   tmpX.globalCompositeOperation = 'source-over'; tmpX.setTransform(TS, 0, 0, TS, -ox * TS, -oy * TS);
-  if (grassPat) { grassPat.setTransform(m); tmpX.fillStyle = grassPat; } else tmpX.fillStyle = '#5E9A3A';
+  const mg = new DOMMatrix(); mg.a = mg.d = .9;   // the meadow at a larger scale than the ice, softened so creatures read on top
+  if (grassPat) { grassPat.setTransform(mg); tmpX.fillStyle = grassPat; } else tmpX.fillStyle = '#5E9A3A';
   tmpX.fillRect(ox, oy, SZ, SZ);
+  tmpX.fillStyle = 'rgba(24,52,58,.22)'; tmpX.fillRect(ox, oy, SZ, SZ);
   tmpX.setTransform(1, 0, 0, 1, 0, 0); tmpX.globalCompositeOperation = 'destination-in';
   tmpX.drawImage(thaw, ox * MASK, oy * MASK, SZ * MASK, SZ * MASK, 0, 0, TPX, TPX);
   tmpX.globalCompositeOperation = 'source-over';
@@ -2303,7 +2311,7 @@ function openChest() {
   CH = { rewards, tiles, slots, mult, phase:'closed' };
   const ringEl = $('#chestRing'); ringEl.innerHTML = '';
   for (let i = 0; i < 9; i++) { const d = document.createElement('div'); d.className = 'rt' + (i === 4 ? ' center' : ''); ringEl.appendChild(d); }
-  ringEl.children[4].innerHTML = '<img src="art/props/x-chest.png" alt="">';
+  ringEl.children[4].innerHTML = '<img src="art4/props/x-chest.png" alt="">';
   slots.forEach((pos, i) => { ringEl.children[pos].innerHTML = `<img src="${iconOf(tiles[i])}" alt="">`; });
   $('#chestWrap').classList.remove('open'); $('#chestMult').textContent = ''; $('#chestGains').innerHTML = '';
   $('#chestBtn').textContent = 'Open!'; $('#chestBtn').disabled = false;
@@ -2317,7 +2325,7 @@ $('#chestBtn').onclick = () => {
 };
 function spinChest() {
   const ringEl = $('#chestRing');
-  ringEl.children[4].innerHTML = '<img src="art/props/x-chest-open.png" alt="">';
+  ringEl.children[4].innerHTML = '<img src="art4/props/x-chest-open.png" alt="">';
   $('#chestWrap').classList.add('open'); SFX.boom(true); SFX.pop();
   const target = ORDER.indexOf(CH.slots[0]), steps = 16 + target;   // two full laps, then stop exactly on the prize
   let i = 0;
@@ -2403,7 +2411,7 @@ addEventListener('keydown', e => { if (COACH.cur && (e.key === 'Enter' || e.key 
 function renderSkills() {
   const box = $('#skills'); if (!S) return;
   const nextAw = AWAKEN_AT[S.awakeIdx] || null, A = ANIMAL[animal];
-  let h = `<span class="slot petchip" style="--c:${EL[A.e]}"><img src="art/a-${animal}-y.png" alt="" style="width:26px;height:26px;object-fit:contain">${nextAw ? `Awakens Lv ${nextAw}` : A.y}</span>`;
+  let h = `<span class="slot petchip" style="--c:${EL[A.e]}"><img src="art4/a-${animal}-y.png" alt="" style="width:26px;height:26px;object-fit:contain">${nextAw ? `Awakens Lv ${nextAw}` : A.y}</span>`;
   for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
   for (const id in S.gifts) h += `<span class="slot gift" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
   box.innerHTML = h;
@@ -2468,7 +2476,7 @@ const chip = el => `<i class="ec" style="--c:${EL[el]}">${ELNAME[el]}</i>`;
 function beastHTML(kid, big) {
   const K = KIND[kid], el = kid.split('-')[0], brute = kid.endsWith('-c');
   const what = K.tip || { weave:'Weaves side to side as it drifts in.', split:'Splits into two little sprouts when you free it.', rush:'Very fast, but fragile.', heavy:'Slow and tough. Hard to knock back.', zigzag:'Zigzags fast and erratically.' }[K.beh];
-  return `<div class="beast${big ? ' big' : ''}" style="--c:${EL[el]}"><span class="pic"><img src="art/e-${kid}.png" alt=""></span><div><b>${K.n}</b>
+  return `<div class="beast${big ? ' big' : ''}" style="--c:${EL[el]}"><span class="pic"><img src="art4/e-${kid}.png" alt=""></span><div><b>${K.n}</b>
     <p>${what}${brute && !SEEN.has('_chest') ? (markSeen('_chest'), ' The first brute on each shore guards a Spirit Chest.') : ''}</p><span class="chips">${chip(el)} · beat it with ${weakTo(el).map(chip).join('')}</span></div></div>`;
 }
 // before a later level: the element the Keeper learns on this shore, then any new creature whose element beats theirs
