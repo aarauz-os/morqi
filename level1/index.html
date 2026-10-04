@@ -836,7 +836,9 @@ function startRun() {
   for (let i = 0; i < 6; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   AU.heat(0); renderSkills(); startLoop();
-  COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3; $('#wavePill').classList.add('on');
+  COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
+  // tutorials belong to level 1 only; later levels just play
+  if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
   coach('move', 'Drag to move', 'Put your thumb anywhere and drag. Your powers fire on their own.', () => ({ sx:W / 2, sy:H * .7 - 70 }), 7, 'above', () => S.moved > 140);
 }
 function need(lv) { return Math.round(4 + lv * lv * 4.2); }
@@ -1351,7 +1353,8 @@ function teach() {
     tg['n_' + e.kid] = 1; e.tagT = 3.5;
     if ((e.K.tip || e.type === 'golem') && !SEEN.has(e.kid)) {
       markSeen(e.kid);
-      if (!SEEN.has('_card')) { markSeen('_card'); COACH.q.push({ id:'k' + e.kid, card:e.kid }); }
+      if (S.level > 1) {}   // later levels introduce what matters before the level starts
+      else if (!SEEN.has('_card')) { markSeen('_card'); COACH.q.push({ id:'k' + e.kid, card:e.kid }); }
       else cue(e.K.n, e.K.short || e.K.tip, 2800, true);
     }
     break;
@@ -2386,12 +2389,14 @@ function beastHTML(kid, big) {
   return `<div class="beast${big ? ' big' : ''}" style="--c:${EL[el]}"><span class="pic"><img src="art/e-${kid}.png" alt=""></span><div><b>${K.n}</b>
     <p>${what}${brute && !SEEN.has('_chest') ? (markSeen('_chest'), ' The first brute on each shore guards a Spirit Chest.') : ''}</p><span class="chips">${chip(el)} · beat it with ${weakTo(el).map(chip).join('')}</span></div></div>`;
 }
+// before a later level, only the new creatures that beat your element get a card; if none do, the level just starts
 function intro(n) {
-  const L = LEVELS[n - 1];
-  $('#introT').textContent = `Level ${n} · ${L.name}`;
-  $('#introP').textContent = L.fresh.length ? 'New creatures on this shore:' : '';
-  $('#introList').innerHTML = L.fresh.map(k => beastHTML(k)).join('');
+  const L = LEVELS[n - 1], me = ANIMAL[animal].e, threats = L.fresh.filter(k => beats(k.split('-')[0]).includes(me));
   L.fresh.forEach(markSeen);
+  if (!threats.length) { show(null); AU.music(true); startRun(); return; }
+  $('#introT').textContent = `Level ${n} · ${L.name}`;
+  $('#introP').innerHTML = `Watch out: ${threats.length > 1 ? 'these new creatures beat' : 'this new creature beats'} your ${chip(me)}`;
+  $('#introList').innerHTML = threats.map(k => beastHTML(k)).join('');
   show('intro');
 }
 $('#introGo').onclick = () => { SFX.select(); show(null); AU.music(true); startRun(); };
