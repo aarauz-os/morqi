@@ -589,6 +589,14 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .lvls button,.lvls .btn{flex-direction:column;justify-content:center;gap:0;padding:6px 2px 7px;font-size:12.5px;line-height:1.1;border-radius:18px;text-shadow:none!important;white-space:nowrap}
 .lvls .btn::after{display:none}
 .lvls .lvst{margin-top:3px;font-size:9px;letter-spacing:0}
+/* the Qi Stone row: five sockets that fill with each element's qi, holding the stone once it is taken */
+#stoneRow{display:flex;gap:9px;justify-content:center;margin-top:2px}
+#stoneRow:empty{display:none}
+.sk{position:relative;width:26px;height:26px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p) * 1turn),rgba(16,22,34,.5) 0);box-shadow:0 0 0 2px rgba(255,255,255,.9),0 3px 8px rgba(0,0,0,.3)}
+.sk::after{content:"";position:absolute;inset:5px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#2A3474,#141A44)}
+.sk.got{background:radial-gradient(circle,color-mix(in srgb,var(--c) 60%,#fff),var(--c));box-shadow:0 0 0 2px #fff,0 0 14px var(--c);animation:bump .6s var(--spring)}
+.sk.got::after{display:none}
+.sk img{position:absolute;left:-5px;top:-6px;width:36px;height:36px;z-index:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
 </style>
 
 <div id="stage">
@@ -603,6 +611,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       </div>
       <div class="toprow"><div class="xp" id="xpBar"><i></i></div><span class="lvbadge" id="lvPill">1</span></div>
       <span id="wavePill"></span>
+      <div id="stoneRow" aria-label="Qi Stones"></div>
       <div id="bossWrap"><div class="bossname" id="bossName">The Still Warden</div><div id="bossBar"><i></i></div></div>
     </div>
     <div class="skills" id="skills"></div>
@@ -921,7 +930,7 @@ const KIND = {
 };
 Object.keys(KIND).forEach(k => load('e-' + k, `art4/e-${k}.png?v=7`));
 const lookSrc = p => p;   // the bold look is the only look now; kept so image paths have one place to change
-['x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=7`));
+['x-stone-wood','x-stone-fire','x-stone-earth','x-stone-metal','x-stone-water','x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=7`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=7'), texM = load('tm', 'art4/t-meadow.jpg?v=7');
 // the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
 // every world's ground, frozen and restored; each pair loads when its world first needs it
@@ -1667,7 +1676,7 @@ function startRun() {
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0, z:0 },
     ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null,
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
-    lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, evo:{}, cds:{}, ang:{},
+    lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, qi:{}, qiStones:{}, stoneOut:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
     strongT:-9, taught:{}, shake:0, buffs:{ tiger:0, ward:0 }, freeze:0, flashT:0, swords:[], pearls:[]
@@ -1777,7 +1786,8 @@ function spawn(type, at, rush, el) {
     else { const d = Math.hypot(VW, VH) / 2 + 50; x = S.p.x + Math.cos(a) * d; y = S.p.y + Math.sin(a) * d; }
   }
   x = clamp(x, 30, WORLD - 30); y = clamp(y, 30, WORLD - 30);
-  const E = el && el !== 'mix' ? el : (pl => pl[(Math.random() * pl.length) | 0])(mixPool());
+  // the trickle leans toward the element you are furthest behind on, so every stone stays within reach
+  const E = el && el !== 'mix' ? el : (!S.bossSpawned && Math.random() < .4 && behind()) || (pl => pl[(Math.random() * pl.length) | 0])(mixPool());
   if (type === 'wolf' && !LEVELS[S.level - 1].allow.includes(E + '-b')) type = 'critter';   // only this level's specialists
   T = ETYPE[type];
   const kid = E + '-' + ROLE[type], K = KIND[kid];
@@ -1830,7 +1840,7 @@ function hurt(e, dmg, el, o = {}) {
   const dealt = dmg * m;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
-  if (strong && e.hp <= 0 && !e.boss && !e.wise) { e.wise = 1; S.wise = (S.wise || 0) + 1; if (!S.hs.on) S.hs.charge = Math.min(1, S.hs.charge + 1 / HIGHEST.need); }
+  if (strong && e.hp <= 0 && !e.boss && !e.wise) { e.wise = 1; S.wise = (S.wise || 0) + 1; }
   if (!e.boss) {
     const P = S.p, d = Math.hypot(e.x - P.x, e.y - P.y) || 1, k = (o.kb || 5) * (e.heavy ? .25 : 1);
     if (e.heavy && o.kb) o = { ...o, kb:o.kb * .3 };
@@ -1842,7 +1852,7 @@ function hurt(e, dmg, el, o = {}) {
   if (e.hp <= 0) kill(e);
 }
 function kill(e) {
-  e.dead = true; S.thawed++; shrineKill(e); if (S.ult && !S.ult.cast) S.ult.charge = Math.min(1, S.ult.charge + 1 / 400);
+  e.dead = true; S.thawed++; shrineKill(e); if (!e.boss) qiKill(e); if (S.ult && !S.ult.cast) S.ult.charge = Math.min(1, S.ult.charge + 1 / 400);
   if (!e.boss) {
     // bursts, not an endless combo (playtest 1: kills never stop, so the counter climbed to x1998 and meant nothing, and
     // it chimed every 5 kills): a word and one chime when you clear 25, 50 or 100 creatures inside 3 seconds
@@ -1914,9 +1924,9 @@ function crates(dt) {
   if ((S.crateT = (S.crateT ?? 36) - dt) <= 0 && S.crates.length < 3) { S.crateT = 36; placeCrate(false); }
   for (const it of S.items) {
     it.t += dt; if (it.vz) { it.vz -= 900 * dt; it.z = Math.max(0, it.z + it.vz * dt); if (it.z === 0) it.vz = 0; }
-    if (Math.hypot(it.x - P.x, it.y - P.y) < 60) { it.got = true; useItem(it.kind); }
+    if (Math.hypot(it.x - P.x, it.y - P.y) < 60) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
-  S.items = S.items.filter(it => !it.got && it.t < 40);
+  S.items = S.items.filter(it => !it.got && (it.kind === 'stone' || it.t < 40));
   for (const ch of S.chests) { ch.t += dt; if (!ch.got && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
   S.chests = S.chests.filter(c => !c.got);
 }
@@ -2524,7 +2534,13 @@ function direct(dt) {
       SFX.alarm();
     }
     if (S.warn) { S.warn.t += dt; if (S.warn.t >= 2.2) { launchWave(S.warn); S.warn = null; S.waveIdx++; } }
-    if (t > 170 && !S.warn) spawnBoss();
+    // the Warden comes once every stone is gathered and Highest Self has had its moment
+    if (S.bossAt && t >= S.bossAt && !S.warn) spawnBoss();
+    // after the last scripted wave, waves of whatever is still missing, until every stone is out
+    else if (!next && !S.warn && !allStones() && (S.extraT = (S.extraT ?? 2) - dt) <= 0) {
+      S.extraT = STONE.extraEvery; const el = behind();
+      if (el) { S.warn = planWave({ t, el, form:['line', 'ring', 'pincer'][(Math.random() * 3) | 0], mix:[['critter', 22], ['wolf', 4]], name:'' }); SFX.alarm(); }
+    }
   } else if (S.boss && !S.boss.dead) {
     const b = S.boss, ph = b.hp < b.max * .34 ? 2 : b.hp < b.max * .67 ? 1 : 0;
     if (ph !== b.phase) {
@@ -2803,33 +2819,27 @@ function bloomCreature(e, d, dt) {
   if (d < e.r + S.p.r + 16) { stars(e.x, e.y - 30, 5, '#FFE58A', 200); kill(e); }
 }
 /* ================= Highest Self ================= */
-// MorQi's point is becoming your highest self, and for six seconds you are it (A: "yes you should build Highest Self the
-// way you described"). A thin gold ring around your health bar fills each time you free a creature with the element
-// that beats it, so the power comes from practising the lesson. When the ring is full it fires on its own at the clutch
-// moment, surrounded or under a third of your health, at most once a level: you float up in radiant robes with the five
-// elements circling you, nothing can touch you, every half second a wave of all five elements breaks over everything
-// near you (cycling, so the strong one always lands), and every gem flies to you. On a player's very first Level 1 it
-// happens once for free when the shore swarms them, followed by a card: that's who you're becoming.
-const HIGHEST = { need:66, life:6, pulse:.45, R:470, taste:50 };
+// MorQi's point is becoming your highest self, and for six seconds you are it. Gathering every Qi Stone of a level makes
+// you whole: you rise in the master's robes with the five elements circling you, nothing can touch you, every half second
+// a wave of all five elements breaks over everything near you (cycling, so the strong one always lands), every gem flies
+// to you, and it ends in the Five-Stone Burst before the Warden arrives. The first time ever, a card names it.
+const HIGHEST = { life:6, pulse:.45, R:470 };
 const hsOn = () => !!(S && S.hs && S.hs.on);
 function hsTick(dt) {
   const H = S.hs, P = S.p;
-  if (H.on) {
-    H.on.t += dt; H.on.p -= dt;
-    if (H.on.p <= 0) { H.on.p = HIGHEST.pulse; hsPulse(); }
-    if (H.on.t >= HIGHEST.life) { H.on = null; AU.bloom(false); SFX.sweep(); ring(P.x, P.y, 20, 700, '#FFE6A3', .8, 16, true); flushLevels();
-      if (H.taste) { H.taste = false; coach('highest', 'Your Highest Self', 'That is who you are becoming. Free creatures with the element that beats them to fill the gold ring, and it will rise again when you need it most.',
-        () => { const cam = S.cam || { x:0, y:0 }; return { sx:(P.x - cam.x) * Z, sy:(P.y - 30 - cam.y) * Z, sr:70 }; }); } }
-    return;
+  if (!H.on) return;
+  H.on.t += dt; H.on.p -= dt;
+  if (H.on.p <= 0) { H.on.p = HIGHEST.pulse; hsPulse(); }
+  if (H.on.t >= HIGHEST.life) {
+    const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); flushLevels();
+    if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
+    if (!SEEN.has('_highest')) { markSeen('_highest'); S.taught.c_highest = 0;
+      coach('highest', 'Your Highest Self', 'Your Qi Stones made you whole: that is who you are becoming. Gather them on every shore and you will rise again.',
+        () => { const cam = S.cam || { x:0, y:0 }; return { sx:(P.x - cam.x) * Z, sy:(P.y - 30 - cam.y) * Z, sr:70 }; }); }
   }
-  if (H.used || S.bloom || S.over) return;
-  if (S.level === 1 && !SEEN.has('_highest') && S.t >= HIGHEST.taste) { markSeen('_highest'); S.taught.c_highest = 0; H.taste = true; return hsStart(); }
-  if (H.charge < 1) return;
-  let near = 0; for (const e of S.en) if (!e.dead && !e.boss && Math.abs(e.x - P.x) < 220 && Math.abs(e.y - P.y) < 220) near++;
-  if (near >= 15 || P.hp < P.max / 3) hsStart();
 }
-function hsStart() {
-  const H = S.hs, P = S.p; H.used = true; H.charge = 0; H.on = { t:0, p:.35 };
+function hsStart(final) {
+  const H = S.hs, P = S.p; H.used = true; H.on = { t:0, p:.35, final };
   S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); SFX.power(); SFX.jackpot(true);
   ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true); stars(P.x, P.y - 60, 50, '#FFE58A', 600);
   for (const q of S.gems) q.pull = true;
@@ -2842,6 +2852,38 @@ function hsPulse() {
     for (const k of ELS) if (eff(k, e.el) > 1) { hurt(e, e.boss ? 260 : 900, k); break; }
   }
   for (const q of S.gems) q.pull = true;
+}
+/* ================= the five Qi Stones ================= */
+// The point of every level (A: "yes lets go with your recommendations"): balance. Each creature you free gives qi of its
+// element; when one element's qi is full, its Qi Stone pops out of the last creature freed and you go and take it. All
+// the stones together make you whole: Highest Self has its moment, ending in the Five-Stone Burst, and then the Warden
+// comes. You cannot get there by freeing only one element, so balance is the win condition. The game keeps it fair: the
+// background trickle leans toward whatever you are furthest behind on, and after the last scripted wave, waves of the
+// missing elements keep coming until every stone is out. Level 1 brings only its two elements, so it uses two stones to
+// teach the idea; from Level 2 it is all five.
+const STONE = { need:[99, 66, 66, 66, 66], extraEvery:8 };
+const stoneEls = () => S.level === 1 ? (LV().els || ELS) : ELS;
+const stoneNeed = () => STONE.need[S.level - 1];
+const allStones = () => stoneEls().every(el => S.qiStones[el]);
+const behind = () => stoneEls().filter(el => !S.qiStones[el] && !S.stoneOut[el]).sort((a, b) => (S.qi[a] || 0) - (S.qi[b] || 0))[0];
+function qiKill(e) {
+  const el = e.el; S.qi[el] = (S.qi[el] || 0) + 1;
+  if (stoneEls().includes(el) && !S.qiStones[el] && !S.stoneOut[el] && S.qi[el] >= stoneNeed()) {
+    S.stoneOut[el] = true; S.items.push({ x:e.x, y:e.y, kind:'stone', el, t:0, z:30, vz:320 });
+    ring(e.x, e.y, 10, 280, EL[el], .7, 14, true); stars(e.x, e.y - 30, 20, EL[el], 340); SFX.chestDrop();
+  }
+}
+function collectStone(el) {
+  const P = S.p; S.qiStones[el] = true; SFX.fanfare(false); S.flashT = .15; S.flashC = '255,246,214';
+  ring(P.x, P.y, 20, 560, EL[el], .9, 20, true); stars(P.x, P.y - 50, 34, EL[el], 520);
+  if (allStones() && !S.hs.used) hsStart(true);
+}
+// the end of Highest Self after the stones: every element at once, a held breath, and the shore cleared
+function stoneBurst() {
+  const P = S.p; S.hitstop = .35; S.flashT = .55; S.flashC = '255,255,255'; S.shake = 1.2; SFX.boom(true); SFX.bossdown(); SFX.jackpot(true);
+  ELS.forEach((el, i) => ring(P.x, P.y, 20 + i * 40, 1600, EL[el], 1.1 + i * .12, 34, true));
+  stars(P.x, P.y - 40, 90, '#FFE58A', 900); paintThaw(P.x, P.y, 1100);
+  for (const e of S.en) if (!e.dead && !e.boss) { stars(e.x, e.y - 20, 3, EL[e.el], 200); kill(e); }
 }
 function update(dt) {
   S.t += dt;
@@ -3458,11 +3500,6 @@ function draw() {
   if (hb > 0) { const gr = g.createLinearGradient(0, P.y + 43, 0, P.y + 53); if (hb > .3) { gr.addColorStop(0, '#B6F58A'); gr.addColorStop(1, '#3FB24A'); } else { gr.addColorStop(0, '#FFB19A'); gr.addColorStop(1, '#D63A2C'); }
     g.fillStyle = gr; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, Math.max(10, 78 * hb), 10, 5); g.fill();
     g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.roundRect(P.x - 36, P.y + 44.5, Math.max(4, 78 * hb - 6), 3, 2); g.fill(); }
-  // the Highest Self ring: gold tracing round the health capsule as it fills; full, it glows and waits for the moment
-  { const ch = S.hs ? S.hs.charge : 0; if (ch > 0 && !hsOn()) { const len = 2 * (84 - 16) + Math.PI * 16, full = ch >= 1, pulse = full ? .6 + .4 * Math.sin(S.t * 8) : 1;
-    g.save(); g.strokeStyle = full ? `rgba(255,214,90,${pulse})` : '#FFC94A'; g.lineWidth = full ? 4 : 3; g.setLineDash([len * ch, len]); g.lineCap = 'round';
-    g.beginPath(); g.roundRect(P.x - 44, P.y + 38, 88, 20, 10); g.stroke(); g.restore();
-    if (full) add(() => glowAt(P.x, P.y + 48, 120, '#FFD24A', .35 * pulse)); } }
   // enemy ice shards
   // spirit animal shots, each in its element
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue;
@@ -3489,6 +3526,11 @@ function draw() {
   g.globalAlpha = 1; g.lineWidth = 1;
   // screen space: arrows to off-screen chests, flashes, the cold edge of low health
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  for (const it of S.items) if (it.kind === 'stone') {   // a stone off screen gets an arrow in its element's colour
+    const sx = (it.x - cx) * Z, sy = (it.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
+    const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40), k = 1 + Math.sin(S.t * 6) * .15;
+    g.save(); g.translate(ex, ey); g.rotate(a); g.scale(k, k); g.fillStyle = EL[it.el]; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-9, -13); g.lineTo(-9, 13); g.closePath(); g.fill(); g.stroke(); g.restore();
+  }
   if (S.bloomSeed) {   // the seed off screen gets a golden arrow that pulses
     const sd = S.bloomSeed, sx = (sd.x - cx) * Z, sy = (sd.y - cy) * Z;
     if (!(sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20)) { const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40), k = 1 + Math.sin(S.t * 6) * .15;
@@ -3586,6 +3628,12 @@ function drawVine(p, k) {
 }
 function drawItem(it) {
   const y = it.y - 12 - (it.z || 0) + Math.sin(it.t * 4) * 5, x = it.x;
+  if (it.kind === 'stone') {   // a Qi Stone: its element's light, a slow spin of sparkle, too precious not to grab
+    g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(x, it.y + 10, 24, 8, 0, 0, TAU); g.fill();
+    add(() => glowAt(x, y - 20, 170 + Math.sin(S.t * 5) * 18, EL[it.el], .85));
+    if (!spr('x-stone-' + it.el, x, y - 22, 72, Math.sin(S.t * 2) * .1)) { g.fillStyle = EL[it.el]; g.beginPath(); g.arc(x, y - 22, 20, 0, TAU); g.fill(); }
+    return;
+  }
   g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(x, it.y + 8, 18, 6, 0, 0, TAU); g.fill();
   const col = { magnet:'#7FC4FF', cracker:'#FF7A5A', dumpling:'#FFF1C9', peach:'#FF9AB8', tiger:'#FFB347', frost:'#CFEFFF', ward:'#5FE3B4', heart:'#FF6A80' }[it.kind];
   add(() => glowAt(x, y, 110, col, .55 + .2 * Math.sin(it.t * 6)));
@@ -3942,6 +3990,7 @@ function paintShore(c, size, ox, oy, s, round) {
   for (const sh of S.shrines) mark(sh.x, sh.y, (3.4 + Math.sin(S.t * 6) * .5) * k, EL[sh.el], 'sq', true);
   if (S.boss && !S.boss.dead) mark(S.boss.x, S.boss.y, 4.6 * k, '#8C7BFF', 'o', true);
   if (S.bloomSeed) mark(S.bloomSeed.x, S.bloomSeed.y, (4 + Math.sin(S.t * 6)) * k, '#FFD24A', 'o', true);
+  for (const it of S.items) if (it.kind === 'stone') mark(it.x, it.y, (3.8 + Math.sin(S.t * 6) * .8) * k, EL[it.el], 'sq', true);
   // you: your companion's face, ringed in white
   const fr = 10 * k, [px, py] = [X(P.x), Y(P.y)], face = mapFace();
   c.save(); c.beginPath(); c.arc(px, py, fr, 0, TAU); c.fillStyle = '#1B2257'; c.fill(); c.clip();
@@ -4003,7 +4052,11 @@ function hud() {
   if (S.bossSpawned) wp.innerHTML = '';
   else if (nw) { const left = Math.max(0, Math.ceil(nw.t - S.t)), ech = k => `<i class="ech" style="--c1:${CARDC[k][0]};--c2:${CARDC[k][1]}">${ELNAME[k]}</i>`;
     wp.innerHTML = `${S.waveIdx ? `<span class="wv">Wave ${S.waveIdx}/${WV.length}</span>` : ''}Next ${nw.el === 'mix' ? (LV().els ? LV().els.map(ech).join(' ') : '<i class="ech" style="--c1:#FFD66E;--c2:#E98A12">everything</i>') : ech(nw.el)} in ${left}s${nw.el === 'mix' ? '' : `<small>Beat it with ${weakTo(nw.el).map(ech).join(' ')}</small>`}`; }
-  else wp.innerHTML = `Wave ${WV.length} of ${WV.length} · boss in ${Math.max(0, Math.ceil(170 - S.t))}s`;
+  else { const miss = stoneEls().filter(el => !S.qiStones[el]); wp.innerHTML = miss.length ? `Free more ${miss.map(k => `<i class="ech" style="--c1:${CARDC[k][0]};--c2:${CARDC[k][1]}">${ELNAME[k]}</i>`).join(' ')}` : ''; wp.style.display = miss.length ? '' : 'none'; }
+  // the Qi Stone row: one socket per element in feeding order, filling with its qi; a stone sits in it once taken
+  { const need = stoneNeed(), key = stoneEls().map(el => S.qiStones[el] ? 'S' : Math.min(20, Math.floor((S.qi[el] || 0) / need * 20))).join(',');
+    const row = $('#stoneRow'); if (row.dataset.k !== key) { row.dataset.k = key;
+      row.innerHTML = ELS.filter(el => stoneEls().includes(el)).map(el => `<i class="sk${S.qiStones[el] ? ' got' : ''}" style="--c:${EL[el]};--p:${Math.min(1, (S.qi[el] || 0) / need).toFixed(2)}">${S.qiStones[el] ? `<img src="art4/props/x-stone-${el}.png?v=7" alt="${ELNAME[el]} stone">` : ''}</i>`).join(''); } }
   if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = `The Still Warden · ${ELNAME[S.boss.el]}`; }
 }
 function loop(now, id) {
