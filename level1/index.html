@@ -871,7 +871,7 @@ const AU = (() => {
      - a loudness ladder in golden steps: every rung is 0.618 of the one above (1, .618, .382, .236). Rare hero moments
        (victory, level up, a boss falling) sit on top; the sounds that happen constantly (shots, gems, shards) sit at
        the bottom, so they never nag;
-     - every file is first levelled to the same loudness (its loudest 50 ms, measured), so the ladder means something;
+     - every file is first levelled toward the same loudness (its loudest 50 ms, measured), so the ladder means something;
      - the more often a sound plays, the softer its top end (A's rule: no high-pitched sound on endless repeat);
      - repeats are spaced by Fibonacci gaps (34, 55, 89, 144, 233 ms), and never repeat the exact same pitch twice;
      - chains and combos climb the minor pentatonic, the scale the music uses, so they sing along with the score;
@@ -879,7 +879,8 @@ const AU = (() => {
      If a file can't load, the synth version above plays instead. */
   const PHI = 1.618, LADDER = [1, 1 / PHI, 1 / PHI / PHI, 1 / PHI / PHI / PHI], SOFT = [18000, 9000, 5200, 2800];
   const LOUD = { alarm:-6.0, bell:-25.9, bloop:-8.9, 'boom-big':-7.7, boom:-18.9, bossdown:-5.7, bossroar:-6.7, cardin:-17.3, charge:-8.0, chestdrop:-3.6, combo:-24.1, crackle:-13.0, dart:-9.4, firecrackers:-16.0, firework:-8.7, freeze:-17.1, gem:-21.4, heal:-22.9, heart:-7.2, heartbeat:-22.4, hurt:-9.3, jackpot:-8.4, levelup:-11.0, pop:-13.4, power:-10.1, reveal:-8.6, roar:-6.3, select:-45.8, shatter1:-14.9, shatter2:-26.5, shing:-5.6, spikes:-16.2, splash:-11.4, stomp:-13.1, sweep:-9.8, thud:-26.2, thwip:-4.0, ting:-20.5, victory:-9.7, wave:-11.9, whip:-21.0 };
-  const level = n => Math.min(4, Math.max(.3, Math.pow(10, (-12 - (LOUD[n] ?? -12)) / 20)));
+  // levelled to -18 dB and never boosted more than 1.4x, so a quiet file can't come out louder than it used to (A: still too loud)
+  const level = n => Math.min(1.4, Math.max(.3, Math.pow(10, (-18 - (LOUD[n] ?? -18)) / 20)));
   const MINOR = [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24, 27, 29, 31, 34];   // minor pentatonic steps, in semitones
   const SMP = {}, SVAR = { shatter:['shatter1', 'shatter2'] }, lastRate = {};
   const SFILES = ['gem','shatter1','shatter2','splash','bloop','dart','boom','boom-big','whip','thwip','thud','stomp','bell','ting','shing','levelup','select','cardin','reveal','victory','chestdrop','roar','alarm','hurt','crackle','firecrackers','heal','sweep','freeze','power','wave','firework','pop','bossroar','jackpot','heart','heartbeat','charge','spikes','combo','bossdown'];
