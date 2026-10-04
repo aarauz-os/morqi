@@ -760,6 +760,7 @@ function load(name, src) { const i = new Image(); i.src = src; IMG[name] = i; re
 for (let k = 1; k <= KEEPERS; k++) { load('k' + k, `art4/k${k}.png?v=6`); for (let r = 1; r <= 3; r++) load(`k${k}r${r}`, `art4/run/k${k}-r${r}.png?v=6`); }   // idle pose plus a three-frame run cycle
 ZOD.forEach(z => { load(z + 'y', `art4/a-${z}-y.png?v=6`); load(z + 'm', `art4/a-${z}-m.png?v=6`); });
 ['e-critter','e-wolf','e-golem','b-warden','b-fisher'].forEach(n => load(n, `art4/${n}.png?v=6`));
+['f1', 'up', 'slam', 'dash', 'cast'].forEach(n => load('w-' + n, `art4/warden/${n}.png?v=6`));   // the Warden's poses
 // every element sends its own creatures: a swarm creature (a), a specialist with its own trick (b) and a brute (c)
 const ROLE = { critter:'a', wolf:'b', golem:'c' };
 const KIND = {
@@ -789,7 +790,7 @@ const AU = (() => {
   // music and sound effects switch on their own; music starts off, sound effects on, and the choice is remembered
   const pref = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v === '1'; } catch (e) { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
-  let c = null, comp, sfx, mus, noiseBuf, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music', false);
+  let c = null, comp, sfx, mus, noiseBuf, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music2', true);
   const last = {};
   function init() {
     if (c) { if (c.state === 'suspended') c.resume(); return c; }
@@ -798,7 +799,7 @@ const AU = (() => {
     comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 14; comp.ratio.value = 5; comp.attack.value = .002; comp.release.value = .18;
     const master = c.createGain(); master.gain.value = .95; comp.connect(master).connect(c.destination);
     sfx = c.createGain(); sfx.gain.value = .85; sfx.connect(comp);
-    mus = c.createGain(); mus.gain.value = .3; mus.connect(comp);
+    mus = c.createGain(); mus.gain.value = .12; mus.connect(comp);   // music sits under the action: about 4 out of 10
     noiseBuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     return c;
   }
@@ -978,13 +979,81 @@ const AU = (() => {
     const up = (bar & 1) && at === ks.length - 1, from = up ? r : (i === 0 && (bar & 1) === 0 ? S2.root[(ch + 3) & 3] : null);
     b808(t, up ? r * 2 : r, Math.max(SIX * gap, .2) + .08, from);
   }
+  function phrase(bar, t) {  // tier changes land on four-bar phrases: a riser and a breath going up, a sweep coming down
+    if (M.sw === bar) { M.tier = M.want; M.sw = -1; crash(t, .11); kick(t, .8); filt([900, 2600, 5200][M.tier], t); }
+    else if (M.sw < 0 && M.want > M.tier && (bar + 1) % 4 === 0) { M.sw = bar + 1; riser(t, SIX * 16, .085); breath(t + SIX * 13, SIX * 3); }
+    else if (M.want < M.tier && bar % 4 === 0) { M.tier = M.want; mn({ t, f:7000, f1:400, dur:SIX * 16, vol:.05, to:mLow }); filt([900, 2600, 5200][M.tier], t); }
+  }
+  // "Lantern Night": the second level theme, an original bouncy night-market trap tune. It is in D minor at the same
+  // tempo as the boss theme and ends its loop on A major, the Warden's own dominant, so it can roll straight into the
+  // boss on the next bar. The hook is a one-bar pluck riff that climbs each bar (call, answer, climb, tension), with
+  // chant stabs answering it once the beat drops.
+  const LANT = {
+    pad:[[293.66, 349.23, 440], [233.08, 293.66, 349.23], [196, 233.08, 293.66], [220, 277.18, 329.63]],   // Dm, Bb, Gm, A
+    root:[36.71, 58.27, 49, 55],
+    hook:[[[0, 587.33], [3, 698.46], [6, 880], [8, 783.99], [10, 698.46], [12, 659.25], [14, 587.33]],
+          [[0, 587.33], [3, 698.46], [6, 932.33], [10, 880], [12, 698.46], [14, 587.33]],
+          [[0, 783.99], [3, 932.33], [6, 1174.66], [10, 1046.5], [12, 932.33], [14, 880]],
+          [[0, 880], [3, 1108.73], [6, 1318.51], [8, 1174.66], [10, 1108.73], [12, 880], [14, 659.25]]],
+    kicks:[[0, 7, 10], [0, 3, 6, 11]] };
+  const pluck = (t, f, v) => { mv({ t, f, type:'triangle', dur:.26, vol:v, att:.002, dly:.35, rev:.2 }); mv({ t, f:f * 2, dur:.09, vol:v * .35, att:.002 }); mv({ t, f:f * 3.01, dur:.05, vol:v * .15 }); };
+  const chant = (t, f, v = .05) => { for (const [lp, q] of [[820, 6], [1300, 7]]) mv({ t, f, type:'sawtooth', dur:.16, vol:v, att:.01, lp, ft:'bandpass', q, rev:.3 }); mn({ t, f:2200, ft:'bandpass', q:2, dur:.05, vol:v * .5 }); };
+  function lanternStep(s, t) {
+    const bar = s >> 4, i = s & 15, ch = bar & 3, L = LANT, sw = i % 4 === 2 ? SIX * .2 : 0;   // a little swing on the off-beats
+    if (i === 0) phrase(bar, t);
+    const tier = M.tier, fill = M.sw === bar + 1;
+    if (i === 0) { pad(t, L.pad[ch], SIX * 16 + .7, tier ? .015 : .02, 'triangle'); if (!tier) sub(t, L.root[ch] * 2, SIX * 16, .09); }
+    const hk = L.hook[ch].find(h => h[0] === i); if (hk && !(fill && i >= 13)) pluck(t, hk[1], tier ? .07 : .085);
+    if (fill && tier === 0) { if (i >= 8 && i < 13) clap(t, .07 + (i - 8) * .035, .1); if (i < 13 && i % 2 === 0) hat(t + sw, .03); if (i === 0) kick(t, .35); return; }
+    if (tier === 0) {   // already catchy before the drop: snaps, a shaker and a soft kick under the riff
+      if (i === 0 || i === 10) kick(t, .3); if (i === 8) rim(t, .1); if (i % 2 === 0) hat(t + sw, .02); else hat(t, .008); return;
+    }
+    groove(t, bar, i, L, ch, tier, tier >= 2 ? .66 : .6);
+    if (i === 8) clap(t, tier >= 2 ? .34 : .3); if (i === 15 && bar & 1) rim(t, .09);
+    if (i === 6) hat(t + sw, .05, true); else if (tier >= 2 || i % 2 === 0) hat(t + (i % 2 ? 0 : sw), i % 2 ? .025 : .045);
+    if (bar & 1 && i >= 12 && i % 2 === 0) for (let r = 1; r < 3; r++) hat(t + r * SIX * 2 / 3, .035);
+    if ((bar & 1) && (i === 12 || i === 14)) chant(t, L.pad[ch][0] / 2, .045);   // "hey, hey"
+    if (tier >= 2) { if (i === 4) chant(t, L.pad[ch][1] / 2, .03); const n = L.pad[ch][[0, 2, 1, 2][i & 3]] * 2; mv({ t, f:n, type:'square', dur:.1, vol:.014, lp:2200, dly:.2 }); }
+  }
+  // "Rising Qi": the main theme, for the menu and Level 1. An original, bright, bouncy anthem: a brass-stab riff on the
+  // off-beats, a whistle-like lead hook over Gm, Eb, Bb, F, claps on every other beat for drive, and chant stabs. It is
+  // the menu's full beat, then Level 1 starts it calm and lets the danger bring the beat back in.
+  const RISE = {
+    pad:[[196, 233.08, 293.66], [196, 233.08, 311.13], [174.61, 233.08, 293.66], [174.61, 220, 261.63]],   // Gm, Eb/G, Bb/F, F
+    root:[49, 38.89, 58.27, 43.65],
+    stab:[[0, 3, 6, 10, 12], [0, 3, 6, 10, 12], [0, 3, 6, 10, 12], [0, 3, 6, 8, 10, 12, 14]],
+    lead:[[[0, 587.33], [2, 587.33], [4, 466.16], [6, 523.25], [8, 587.33], [11, 698.46], [14, 587.33]],
+          [[0, 622.25], [2, 622.25], [4, 587.33], [6, 523.25], [8, 466.16], [11, 523.25], [14, 392]],
+          [[0, 587.33], [2, 587.33], [4, 698.46], [6, 783.99], [8, 698.46], [11, 587.33], [14, 466.16]],
+          [[0, 523.25], [2, 523.25], [4, 587.33], [6, 698.46], [8, 698.46], [10, 622.25], [12, 587.33], [14, 523.25]]],
+    kicks:[[0, 6, 10], [0, 3, 8, 11]] };
+  function brass(t, notes, v, open) {   // a horn stab: detuned saws through a filter that snaps open and shuts
+    const f = c.createBiquadFilter(), gn = c.createGain(); f.type = 'lowpass'; f.Q.value = 2;
+    f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(open, t + .025); f.frequency.exponentialRampToValueAtTime(700, t + .2);
+    gn.gain.setValueAtTime(.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + .008); gn.gain.exponentialRampToValueAtTime(.0001, t + .24);
+    f.connect(gn).connect(mBus); const sd = c.createGain(); sd.gain.value = .3; gn.connect(sd).connect(rev);
+    for (const n of notes) for (const d of [-12, 12]) { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = n; o.detune.value = d; o.connect(f); o.start(t); o.stop(t + .28); }
+  }
+  const whistle = (t, f, v) => mv({ t, f, type:'triangle', dur:SIX * 1.9, vol:v, att:.012, hold:SIX * .9, vib:6.5, vibD:9, dly:.3, rev:.25 });
+  function riseStep(s, t) {
+    const bar = s >> 4, i = s & 15, ch = bar & 3, R = RISE;
+    if (i === 0) phrase(bar, t);
+    const tier = M.tier, fill = M.sw === bar + 1;
+    if (i === 0) { pad(t, R.pad[ch], SIX * 16 + .7, tier ? .012 : .018); if (!tier) sub(t, R.root[ch] * 2, SIX * 16, .085); }
+    const ld = R.lead[ch].find(h => h[0] === i); if (ld && !(fill && i >= 13)) whistle(t, ld[1] * (tier >= 2 ? 2 : 1), tier ? .055 : .065);
+    if (R.stab[ch].includes(i) && !(fill && i >= 13)) brass(t, R.pad[ch].map(f => f * 2), tier ? .05 : .03, tier ? 4200 : 1500);
+    if (fill && tier === 0) { if (i >= 8 && i < 13) clap(t, .07 + (i - 8) * .035, .1); if (i < 13 && i % 2 === 0) hat(t, .03); if (i === 0) kick(t, .35); return; }
+    if (tier === 0) { if (i === 0 || i === 8) kick(t, .3); if (i === 4 || i === 12) rim(t, .1); if (i % 2 === 0) hat(t, .018); return; }
+    groove(t, bar, i, R, ch, tier, tier >= 2 ? .66 : .6);
+    if (i === 4 || i === 12) clap(t, i === 12 ? .32 : .26, .28);
+    if (tier >= 2 || i % 2 === 0) hat(t, i % 2 ? .025 : .045); if (i === 14 && !(bar & 1)) hat(t, .05, true);
+    if ((bar & 3) === 3 && (i === 13 || i === 14 || i === 15)) clap(t, .12, .05);
+    if ((bar & 1) && i === 14) chant(t, R.pad[ch][0] / 2, .05);
+    if (tier >= 2 && i % 4 === 2) mv({ t, f:R.pad[ch][(i >> 2) % 3] * 4, type:'square', dur:.08, vol:.012, lp:2600, dly:.2 });
+  }
   function pathStep(s, t) {
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, P = PATH;
-    if (i === 0) {
-      if (M.sw === bar) { M.tier = M.want; M.sw = -1; crash(t, .11); kick(t, .8); filt([900, 2600, 5200][M.tier], t); }
-      else if (M.sw < 0 && M.want > M.tier && (bar + 1) % 4 === 0) { M.sw = bar + 1; riser(t, SIX * 16, .085); breath(t + SIX * 13, SIX * 3); }
-      else if (M.want < M.tier && bar % 4 === 0) { M.tier = M.want; mn({ t, f:7000, f1:400, dur:SIX * 16, vol:.05, to:mLow }); filt([900, 2600, 5200][M.tier], t); }
-    }
+    if (i === 0) phrase(bar, t);
     const tier = M.tier, fill = M.sw === bar + 1;
     if (k === 0) { pad(t, P.pad[ch], SIX * 32 + 1, tier ? .016 : .022); if (!tier) sub(t, P.root[ch] * 2, SIX * 32, .09); }
     const hk = (ch & 1 ? P.hookB : P.hookA).find(h => h[0] === k); if (hk) bell(t, P.pent[hk[1]], tier ? .06 : .075);
@@ -1030,18 +1099,31 @@ const AU = (() => {
     M.next = c.currentTime + .08;
     M.timer = setInterval(() => {
       if (!c) return; if (M.next < c.currentTime - .1) M.next = c.currentTime + .05;  // back from a hidden tab: skip, don't pile up
-      while (M.next < c.currentTime + .2) { if (musOn) (M.song === 'boss' ? wardStep : pathStep)(M.step, M.next); M.next += SIX; M.step++; }
+      while (M.next < c.currentTime + .2) {
+        if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
+        if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep }[M.song] || pathStep)(M.step, M.next); M.next += SIX; M.step++;
+      }
     }, 25);
   }
-  function song(name) {  // 'path' starts a level calm; 'boss' cuts to the Warden theme
-    M.song = name; M.step = 0; M.sw = -1; M.threat = 0; M.tier = M.want = name === 'boss' ? 1 : 0;
-    if (!c || !M.built) return; const t = c.currentTime + .02;
+  function startSong(name, t) {
+    M.pend = null; M.song = name; M.step = 0; M.sw = -1; M.threat = 0; M.tier = M.want = name === 'boss' ? 1 : 0;
+    if (!c || !M.built) return;
     mBus.gain.cancelScheduledValues(t);
-    if (name === 'boss') {
-      mBus.gain.setValueAtTime(mBus.gain.value, t); mBus.gain.linearRampToValueAtTime(.0001, t + .12); mBus.gain.linearRampToValueAtTime(1, t + 1.2);
-      filt(1500, t); M.next = c.currentTime + .4;
-      if (musOn) { mv({ t, f:110, f1:26, gl1:1.8, dur:2.2, vol:.5, to:mLow }); mn({ t, f:5000, f1:300, dur:1.6, vol:.08, to:mLow }); }
+    if (name === 'boss') {   // the old theme ducks out under a sub drop and a crash, and the Warden's bell takes the downbeat
+      mBus.gain.setValueAtTime(1, t); mBus.gain.linearRampToValueAtTime(.06, t + .08); mBus.gain.linearRampToValueAtTime(1, t + 1.4);
+      filt(1500, t);
+      if (musOn) { mv({ t, f:110, f1:26, gl1:1.8, dur:2.2, vol:.5, to:mLow }); mn({ t, f:5000, f1:300, dur:1.6, vol:.08, to:mLow }); crash(t, .1); }
     } else { mBus.gain.setValueAtTime(1, t); filt(900, t); }
+  }
+  // 'path' or 'lantern' start a level calm, at once; 'boss' waits for the next bar with a riser, so it lands on the beat
+  function song(name, tier = 0) {
+    if (name === M.song && name !== 'boss' && c && M.built && M.timer) { M.want = tier; M.threat = 0; return; }   // already playing: keep the groove, let it settle
+    if (name === 'boss' && c && M.built && M.timer) {
+      const left = (16 - (M.step & 15)) % 16 * SIX; M.pend = 'boss';
+      if (musOn && left > .2) { riser(c.currentTime, left, .1); breath(c.currentTime + Math.max(0, left - SIX * 2), SIX * 2); }
+      if (left < .01) startSong('boss', M.next); return;
+    }
+    startSong(name, c ? c.currentTime + .02 : 0); M.tier = M.want = tier; if (tier && M.built) filt(2600, c.currentTime); if (c && M.built) M.next = c.currentTime + .06;
   }
   function threat(v, low, bossPh) {  // called every frame: 0..1 danger, low health, boss phase
     if (!c || !M.built) return; const now = performance.now();
@@ -1050,7 +1132,7 @@ const AU = (() => {
     else { const up = M.threat > .72 ? 2 : M.threat > .38 ? 1 : 0; if (up >= M.want) { M.want = up; M.hold = now; } else if (now - M.hold > 9000) M.want = up; }
     if (low !== M.low) { M.low = low; mLow.frequency.setTargetAtTime(low ? 950 : 18000, c.currentTime, low ? .35 : .15); }
   }
-  return { init, S, music, song, threat, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
+  return { init, S, music, song, threat, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
     get on() { return sfxOn; }, get musicOn() { return musOn; } };
 })();
 const SFX = AU.S;
@@ -1141,7 +1223,7 @@ $('#ksStage').addEventListener('pointerdown', e => { swipeX = e.clientX; });
 $('#ksStage').addEventListener('pointerup', e => { if (swipeX == null) return; const dx = e.clientX - swipeX; swipeX = null; if (Math.abs(dx) > 40) pickKeeper(keeper + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); });
 const ys = $('#year'), nowY = new Date().getFullYear();
 for (let y = nowY; y >= 1940; y--) { const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === 2015) o.selected = true; ys.appendChild(o); }
-$('#playBtn').onclick = () => { AU.init(); SFX.select(); AU.music(true); show('pickKeeper'); };
+$('#playBtn').onclick = () => { AU.init(); SFX.select(); AU.music(true); AU.song('rise', 1); show('pickKeeper'); };   // the menu plays the main theme with its beat in
 $('#keeperNext').onclick = () => { SFX.select(); show('pickYear'); };
 $('#yearNext').onclick = () => {
   const year = +ys.value; animal = ZOD[((year - 1900) % 12 + 12) % 12]; keeperEl = STEM[((year % 10) + 10) % 10];
@@ -1193,7 +1275,7 @@ function startRun() {
   paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
-  AU.song('path'); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
+  AU.song(['rise', 'lantern', 'path', 'lantern'][S.level - 1]); AU.music(true);   // Rising Qi opens, then the level themes take turns; every boss shares the Warden's new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -1305,7 +1387,7 @@ function spawnBoss() {
   e.pat = 0; e.atk = 2.2; S.bossFx = []; S.heartT = 3;
   for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.p.x, m.y - S.p.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
-  cue('The Still Warden', `${ELNAME[e.el]} first. ${andList(weakTo(e.el).map(k => ELNAME[k]))} beat ${ELNAME[e.el]}.`, 2800, true); SFX.bossroar(); SFX.stomp(); S.shake = .6; AU.song('boss');
+  cue('The Still Warden', `${ELNAME[e.el]} first. ${andList(weakTo(e.el).map(k => ELNAME[k]))} beat ${ELNAME[e.el]}.`, 2800, true); SFX.bossroar(); SFX.stomp(); S.shake = .6; AU.song('boss'); S.flashT = .45; S.flashC = '110,96,255'; ring(e.x, e.y, 30, 900, '#8F7CFF', .9, 24, true);
   ring(e.x, e.y, 20, 400, '#BFE3FF', .8, 16, true); smoke(e.x, e.y + 60, 14, 50, '200,220,235');
   setTimeout(() => { if (S && !S.over) awaken(); }, 1400);
 }
@@ -2018,7 +2100,13 @@ function direct(dt) {
 const PATTERNS = ['charge', 'spikes', 'spiral', 'stomp'];
 function bossFight(b, ph, dt) {
   const P = S.p, A = S.arena, enraged = ph === 2;
-  if (enraged && !b.enraged) { b.enraged = true; cue('The Warden is enraged!', 'Faster attacks. Keep moving and grab hearts.', 2200, true); SFX.bossroar(); S.shake = .6; S.hitstop = .18; }
+  S.night = Math.min(1, (S.night || 0) + dt / 2.4);   // the boss pulls the shore into night
+  if (S.bolt) S.bolt.t += dt;
+  if (enraged && (S.boltT = (S.boltT ?? 2) - dt) <= 0) {   // and when enraged, lightning strikes around the arena
+    S.boltT = rnd(3, 6); const a = rnd(0, TAU), r = rnd(.3, .9) * A.r; S.bolt = { t:0, x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, seed:Array.from({ length:10 }, () => rnd(-1, 1)) };
+    SFX.boom(true); S.shake = Math.max(S.shake, .35); ring(S.bolt.x, S.bolt.y, 10, 160, '#CFE0FF', .4, 10, true); shards(S.bolt.x, S.bolt.y, '#E8F1FF', 10, 300);
+  }
+  if (enraged && !b.enraged) { b.enraged = true; b.castAt = S.t + .6; cue('The Warden is enraged!', 'Faster attacks. Keep moving and grab hearts.', 2200, true); SFX.bossroar(); S.shake = .6; S.hitstop = .18; }
   S.heartT -= dt; if (S.heartT <= 0) { S.heartT = enraged ? 12 : 18; if (!S.items.some(it => it.kind === 'heart')) { const a = rnd(0, TAU), r = rnd(.35, .8) * A.r; S.items.push({ x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, kind:'heart', t:0, z:30, vz:200 }); } }
   // ground hazards from spikes and stomps
   for (const f of S.bossFx) { f.t += dt; if (!f.done && f.t >= f.wind) { f.done = true;
@@ -2038,13 +2126,14 @@ function bossFight(b, ph, dt) {
       if (Math.hypot(b.x - A.x, b.y - A.y) > A.r - 70 || a.t >= a.dur) { b.act = null; S.shake = Math.max(S.shake, .35); debris(b.x, b.y + 40, 10, 300); SFX.thud(true); } }
     return; }
   b.atk -= dt; b.summon -= dt;
-  if (b.summon <= 0) { b.summon = 9; for (let i = 0; i < 4; i++) spawn('critter', { x:b.x + rnd(-140, 140), y:b.y + rnd(-140, 140) }); }
+  if ((b.wispT = (b.wispT || 0) - dt) <= 0) { b.wispT = .05; fx({ k:'smoke', x:b.x + rnd(-70, 70), y:b.y + rnd(10, 60), vx:rnd(-30, 30), vy:-rnd(30, 80), drag:1, life:rnd(.6, 1.1), s:rnd(16, 30), c:'200,225,250' }); }   // icy wisps off its robe
+  if (b.summon <= 0) { b.summon = 9; b.castAt = S.t; for (let i = 0; i < 4; i++) spawn('critter', { x:b.x + rnd(-140, 140), y:b.y + rnd(-140, 140) }); }
   if (b.atk > 0 || b.spiral > 0) return;
   const pat = PATTERNS[b.pat++ % PATTERNS.length], d = Math.hypot(P.x - b.x, P.y - b.y) || 1;
   b.atk = (enraged ? 1.5 : 2.4 - ph * .35); b.stompAt = S.t;
   if (pat === 'charge') b.act = { k:'lane', ph:0, t:0, wind:.85, dx:(P.x - b.x) / d, dy:(P.y - b.y) / d, spd:enraged ? 980 : 820, dur:.75, len:620, w:170 };
   else if (pat === 'spikes') { const n = 3 + ph; for (let i = 0; i < n; i++) { const an = rnd(0, TAU), r = i ? rnd(60, 150) : 0; S.bossFx.push({ k:'spike', x:P.x + Math.cos(an) * r + P.mx * 80, y:P.y + Math.sin(an) * r + P.my * 80, r:72, t:-i * .12, wind:.95 }); } }
-  else if (pat === 'spiral') { b.spiral = enraged ? 2.6 : 2; SFX.alarm(); }
+  else if (pat === 'spiral') { b.spiral = enraged ? 2.6 : 2; b.castAt = S.t; SFX.alarm(); }
   else S.bossFx.push({ k:'quake', x:b.x, y:b.y, r:210, t:0, wind:.9 });
 }
 
@@ -2291,6 +2380,77 @@ function ringSprite(col) {
   x.fillStyle = 'rgba(0,0,0,.25)'; x.beginPath(); x.ellipse(48, 22, 42, 17, 0, 0, TAU); x.fill(); x.strokeStyle = col; x.lineWidth = 6; x.stroke();
   return RINGS[col] = c;
 }
+// boss fights fall into night: the shore darkens to deep indigo with a pool of light around the Keeper, the Warden
+// glows with its own cold light, aurora ribbons ripple overhead, spirit motes drift, and an enraged Warden calls lightning
+function drawNight(cx, cy) {
+  const n = S.night, P = S.p, px = (P.x - cx) * Z, py = (P.y - cy) * Z - 20, B = S.boss && !S.boss.dead ? S.boss : null;
+  g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  // a night grade, not a grey veil: multiply everything toward indigo, gently near the Keeper and deeply at the edges
+  const mix = (a, b) => `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * n)).join(',')})`, wt = [255, 255, 255];
+  const v = g.createRadialGradient(px, py, 40, px, py, Math.max(W, H) * .78);
+  v.addColorStop(0, mix(wt, [196, 192, 236])); v.addColorStop(.32, mix(wt, [104, 108, 186])); v.addColorStop(1, mix(wt, [34, 38, 104]));
+  g.globalCompositeOperation = 'multiply'; g.fillStyle = v; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
+  g.globalCompositeOperation = 'lighter';
+  if (B) glowAt((B.x - cx) * Z, (B.y - cy) * Z - B.size * .3 * Z, 420 * Z * 1.6, EL[B.el], (B.enraged ? .5 : .32) * n);
+  glowAt(px, py, 240, '#FFD9A0', .22 * n);
+  for (let k = 0; k < 3; k++) {   // the aurora
+    const base = 150 + k * 46, gr = g.createLinearGradient(0, base - 40, 0, base + 90); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(.5, ['#36F5B8', '#7C6BFF', '#3FB8FF'][k]); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g.globalAlpha = .13 * n; g.fillStyle = gr; g.beginPath();
+    for (let x = 0; x <= W + 16; x += 16) { const y = base + Math.sin(x * .011 + S.t * (.5 + k * .2) + k * 2) * 30 + Math.sin(x * .029 - S.t * .8) * 10; x ? g.lineTo(x, y) : g.moveTo(x, y); }
+    for (let x = W + 16; x >= 0; x -= 16) g.lineTo(x, base + 80 + Math.sin(x * .011 + S.t * (.5 + k * .2) + k * 2 + .7) * 34);
+    g.closePath(); g.fill();
+  }
+  for (let i = 0; i < 46; i++) {   // spirit motes
+    const x = ((i * 97.3 + S.t * 18 * (1 + i % 3)) % (W + 40)) - 20, y = (((i * 53.7 - S.t * 22 * (1 + i % 2)) % (H + 40)) + H + 40) % (H + 40) - 20, tw = .5 + .5 * Math.sin(S.t * 3 + i * 1.7);
+    glowAt(x, y, 14 + 10 * tw, i % 4 ? '#9FE8FF' : '#FFE08A', .7 * tw * n);
+  }
+  const bt = S.bolt;
+  if (bt && bt.t < .45) {   // lightning: a jagged white bolt from the sky to the arena, then the screen flares
+    const k = 1 - bt.t / .45, tx = (bt.x - cx) * Z, ty = (bt.y - cy) * Z;
+    g.globalAlpha = .35 * k; g.fillStyle = '#C8D8FF'; g.fillRect(0, 0, W, H);
+    for (const [w, a] of [[14, .25], [6, .6], [2.5, 1]]) { g.globalAlpha = a * k; g.strokeStyle = w > 6 ? '#8FB0FF' : '#FFFFFF'; g.lineWidth = w; g.beginPath(); g.moveTo(tx + bt.seed[0] * 40, -10);
+      for (let j = 1; j <= 9; j++) g.lineTo(tx + bt.seed[j] * 60 * (1 - j / 10), -10 + (ty + 10) * j / 9); g.stroke(); }
+    glowAt(tx, ty, 260, '#BFD4FF', .8 * k);
+  }
+  g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+}
+// the Warden is animated, not a gliding picture: it drifts between two hover frames, and every attack has its own pose
+// (rising with the staff overhead before a stomp, the slam itself, a crouch and a lunge for the charge, arms flung wide to
+// cast spikes, spirals and summons). Poses cross-fade, and squash, lean, bob and an icy aura keep it alive between them.
+function wardenPose(b) {
+  const a = b.act, quake = S.bossFx.find(f => f.k === 'quake'), spike = S.bossFx.some(f => f.k === 'spike' && !f.done);
+  if (a && a.k === 'lane') return a.ph === 0 ? ['w-dash', 'coil'] : ['w-dash', 'rush'];
+  if (quake && !quake.done) return ['w-up', 'rise'];
+  if (quake && quake.done) return ['w-slam', 'land'];
+  if (b.spiral > 0) return ['w-cast', 'spin'];
+  if (spike || S.t - (b.castAt ?? -9) < .7) return ['w-cast', 'cast'];
+  return [Math.sin(S.t * 2.4) > 0 ? 'w-f1' : 'b-warden', 'idle'];
+}
+function drawWarden(b, hk) {
+  let [name, mode] = wardenPose(b); if (!ok(IMG[name])) name = 'b-warden';
+  if (name !== b.pose) { b.prev = b.pose; b.pose = name; b.poseAt = S.t; }
+  const k = Math.min(1, (S.t - (b.poseAt ?? -9)) / (mode === 'idle' ? .45 : .1)), s = b.size, P = S.p, a = b.act, col = EL[b.el];
+  let bob = Math.sin(S.t * 2.4) * 9, rot = Math.sin(S.t * 1.3) * .04, sx = 1 + Math.sin(S.t * 2.4) * .02, sy = 1 - Math.sin(S.t * 2.4) * .02, flip = P.x > b.x, ox = 0;
+  if (mode === 'coil') { const w = Math.min(1, a.t / a.wind), j = Math.sin(S.t * 46) * w; sx += w * .1; sy -= w * .12; ox = j * 5; bob = -6 * w; flip = a.dx < 0; }
+  if (mode === 'rush') { sx += .12; sy -= .06; rot = (a.dx >= 0 ? 1 : -1) * .1; flip = a.dx < 0; bob = 0; }
+  if (mode === 'rise') { const q = S.bossFx.find(f => f.k === 'quake'), w = Math.min(1, q.t / q.wind); sy += w * .12; sx -= w * .06; bob = 10 + w * 28; ox = Math.sin(S.t * 40) * w * 3; }
+  if (mode === 'land') { const q = S.bossFx.find(f => f.k === 'quake'), w = Math.max(0, 1 - (q.t - q.wind) / .3); sx += w * .18; sy -= w * .16; bob = -w * 8; }
+  if (mode === 'spin') { sx *= Math.cos(S.t * 9); rot = Math.sin(S.t * 18) * .06; }
+  if (mode === 'cast') { sx += .04; sy += .05; bob += 6; }
+  sx += hk * .05; sy -= hk * .04;
+  // its cold aura, brighter when enraged, and a shadow that shrinks as it rises
+  add(() => glowAt(b.x, b.y - s * .3 - bob, s * (b.enraged ? 2.4 : 1.9) * (1 + .05 * Math.sin(S.t * 5)), col, b.enraged ? .75 : .5));
+  g.fillStyle = 'rgba(0,10,30,.32)'; g.beginPath(); g.ellipse(b.x, b.y + b.r * .55, b.r * (1.5 - Math.max(0, bob) / 120), b.r * .45, 0, 0, TAU); g.fill();
+  const drawIm = (n, al) => { const im = IMG[n]; if (!ok(im) || al <= 0) return; g.globalAlpha = al; g.drawImage(im, -s / 2, -s * .62 - b.r * .5, s, s); };
+  g.save(); g.translate(b.x + ox, b.y + b.r * .5 - bob); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
+  if (k < 1 && b.prev) drawIm(b.prev, 1 - k); drawIm(name, k < 1 && b.prev ? k : 1); g.globalAlpha = 1;
+  if (hk > 0) { const wh = silhouette(name, '#FFFFFF'); if (wh) { g.globalAlpha = hk * .22; g.drawImage(wh, -s / 2, -s * .62 - b.r * .5, s, s); } }
+  if (mode === 'coil' || mode === 'rise') { const rd = silhouette(name, '#FF3A2A'); if (rd) { g.globalAlpha = .3 * (.6 + .4 * Math.sin(S.t * 30)); g.drawImage(rd, -s / 2, -s * .62 - b.r * .5, s, s); } }
+  if (b.enraged) { const rg = silhouette(name, col); if (rg) { g.globalAlpha = .18 + .1 * Math.sin(S.t * 12); g.drawImage(rg, -s / 2, -s * .62 - b.r * .5, s, s); } }
+  g.globalAlpha = 1; g.restore();
+  // its eyes: two cold sparks that flare during wind-ups
+  if (mode === 'coil' || mode === 'rise' || mode === 'cast') add(() => glowAt(b.x, b.y - s * .5 - bob, 90 + Math.sin(S.t * 30) * 14, '#BFEFFF', .9));
+}
 function silhouette(name, col) {
   const key = name + col; if (SIL[key]) return SIL[key];
   const im = IMG[name]; if (!ok(im)) return null;
@@ -2425,6 +2585,7 @@ function draw() {
       if (rolling) { rot = S.t * 18 * (e.act.dx >= 0 ? 1 : -1); hop = 0; } }
     const flip = e.own ? (e.K.face === -1 && toward > 0) : (e.type === 'wolf' && toward > 0);
     if (e.own && !e.boss && fly) { g.fillStyle = 'rgba(10,20,30,.25)'; g.beginPath(); g.ellipse(e.x, e.y + e.r * .6, e.r * .9, e.r * .35, 0, 0, TAU); g.fill(); }
+    if (e.boss) { drawWarden(e, hk); continue; }
     g.save(); g.translate(e.x, e.y + e.r * .5 - hop); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
     g.drawImage(im, -s / 2, -s * .62 - e.r * .5, s, s);
     if (hk > 0) { const wh = silhouette(e.img, '#FFFFFF'); if (wh) { g.globalAlpha = hk * (e.boss ? .22 : .9); g.drawImage(wh, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
@@ -2595,6 +2756,7 @@ function draw() {
     if (s.k === 'blade') { add(() => glowAt(s.x, s.y, 50, '#FFE6A0', .5)); g.save(); g.translate(s.x, s.y); g.rotate(s.rot * 2); g.fillStyle = '#E6EEF4'; g.strokeStyle = '#2A3440'; g.lineWidth = 2.5; g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? 6 : 17; g.lineTo(Math.cos(i * TAU / 8) * r, Math.sin(i * TAU / 8) * r); } g.closePath(); g.fill(); g.stroke(); g.fillStyle = '#E6B23A'; g.beginPath(); g.arc(0, 0, 4, 0, TAU); g.fill(); g.restore(); continue; }
     add(() => glowAt(s.x, s.y, 50, '#7FC4FF', .7)); g.save(); g.translate(s.x, s.y); g.rotate(s.rot); g.fillStyle = '#E6F6FF'; g.strokeStyle = '#2A5A8A'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(14, 0); g.lineTo(0, 6); g.lineTo(-14, 0); g.lineTo(0, -6); g.closePath(); g.fill(); g.stroke(); g.restore(); }
   // particles on top
+  if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
   drawFX(true);
   // damage numbers and callouts
   g.textAlign = 'center'; g.lineJoin = 'round';
