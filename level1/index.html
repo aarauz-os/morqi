@@ -3087,7 +3087,7 @@ let icePat = null, grassPat = null, seaIcePat = null, seaPat = null;
 // each level's ground: frozen and restored
 const groundTex = () => S ? groundArt(worldOf()) : [texF, texM];
 let patW = '';
-function markThaw(x, y, r) { r += TPAD; for (let i = Math.floor((x - r) / TILE); i <= Math.floor((x + r) / TILE); i++) for (let j = Math.floor((y - r) / TILE); j <= Math.floor((y + r) / TILE); j++) { const t = tiles.get(i * 64 + j); if (t) t.dirty = true; } }
+function markThaw(x, y, r) { r += TPAD; for (let i = Math.floor((x - r) / TILE); i <= Math.floor((x + r) / TILE); i++) for (let j = Math.floor((y - r) / TILE); j <= Math.floor((y + r) / TILE); j++) { const t = tiles.get(i * 64 + j); if (t && !t.dirty) { t.dirty = true; t.since = performance.now(); } } }
 function resetTiles() { tiles.clear(); }
 // generated textures rarely wrap perfectly, so each is mirrored into a 2×2 block, which always tiles without a seam
 function mirror(im) {
@@ -3130,15 +3130,17 @@ function shoreLayer(x, ox, oy, SZ, pat, m, alive) {
   if (alive) { edge(26, 'rgba(110,80,40,.16)', 22); edge(16, 'rgba(255,255,255,.55)', 4); edge(6, 'rgba(255,255,255,.85)', -2); }
   else { edge(14, 'rgba(244,250,255,.75)', 0); edge(4, 'rgba(160,200,230,.6)', 9); }
 }
+// three stale tiles are redrawn a frame, the longest-waiting first, so a tile that keeps being thawed (a Bloom, a
+// big crowd) can never starve its neighbours and leave a seam
 function drawGround(cx, cy) {
-  let budget = 3;
-  const i0 = Math.floor(cx / TILE), i1 = Math.floor((cx + VW) / TILE), j0 = Math.floor(cy / TILE), j1 = Math.floor((cy + VH) / TILE);
+  const i0 = Math.floor(cx / TILE), i1 = Math.floor((cx + VW) / TILE), j0 = Math.floor(cy / TILE), j1 = Math.floor((cy + VH) / TILE), stale = [];
   for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) {
     let t = tiles.get(i * 64 + j);
     if (!t) { const c = document.createElement('canvas'); c.width = c.height = TPX; t = { c, x:c.getContext('2d'), dirty:true }; tiles.set(i * 64 + j, t); renderTile(t, i, j); }
-    else if ((t.dirty || !t.ready) && budget > 0) { budget--; renderTile(t, i, j); }
-    g.drawImage(t.c, i * TILE - TPAD, j * TILE - TPAD, TILE + TPAD * 2, TILE + TPAD * 2);
+    else if (t.dirty || !t.ready) stale.push([t, i, j]);
   }
+  stale.sort((a, b) => (a[0].since || 0) - (b[0].since || 0)).slice(0, 3).forEach(([t, i, j]) => renderTile(t, i, j));
+  for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) { const t = tiles.get(i * 64 + j); g.drawImage(t.c, i * TILE - TPAD, j * TILE - TPAD, TILE + TPAD * 2, TILE + TPAD * 2); }
 }
 const RINGS = {};
 function ringSprite(col) {
@@ -4451,7 +4453,7 @@ function results() {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
