@@ -461,6 +461,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 #petProg .bar i{display:block;height:100%;width:var(--w);border-radius:8px;background:linear-gradient(90deg,var(--c),#FFE08A);animation:ppFill 1.2s cubic-bezier(.2,.8,.2,1) .5s both}
 @keyframes ppFill{from{width:0}}
 #petProg span{font-size:12px;line-height:1.35;color:rgba(255,255,255,.78)}#petProg strong{color:#FFE08A}
+.bday{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.bday select{min-width:0!important;padding:12px 16px!important;font-size:20px!important}
 </style>
 
 <div id="stage">
@@ -513,10 +514,9 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 
   <section class="scr" id="pickYear" hidden>
     <div class="eb">Your spirit animal</div>
-    <h2 class="ck">What year were you born?</h2>
-    <p>Your birth year chooses which of the twelve spirit animals is yours.</p>
-    <span class="small">Born in January or early February? The new year starts at Lunar New Year, so pick the year before.</span>
-    <select id="year" aria-label="Birth year"></select>
+    <h2 class="ck">When were you born?</h2>
+    <p>Your birthday chooses your spirit animal and its element, counted from Lunar New Year the way the Chinese calendar does.</p>
+    <div class="bday"><select id="bmonth" aria-label="Birth month"></select><select id="bday" aria-label="Birth day"></select><select id="year" aria-label="Birth year"></select></div>
     <button class="btn" id="yearNext">Meet my spirit animal</button>
   </section>
 
@@ -680,6 +680,9 @@ const FEEDS = { water:'wood', wood:'fire', fire:'earth', earth:'metal', metal:'w
 const pathOf = el => { const p = [el]; while (p.length < 5) p.push(FEEDS[p[p.length - 1]]); return p; };
 const andList = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0];
 const ZOD = ['rat','ox','tiger','rabbit','dragon','snake','horse','goat','monkey','rooster','dog','pig'];
+// the zodiac year starts at Lunar New Year, not January 1st (playtest 2: a January birthday got the wrong year)
+const CNY = {1940:208,1941:127,1942:215,1943:205,1944:125,1945:213,1946:202,1947:122,1948:210,1949:129,1950:217,1951:206,1952:127,1953:214,1954:203,1955:124,1956:212,1957:131,1958:218,1959:208,1960:128,1961:215,1962:205,1963:125,1964:213,1965:202,1966:121,1967:209,1968:130,1969:217,1970:206,1971:127,1972:215,1973:203,1974:123,1975:211,1976:131,1977:218,1978:207,1979:128,1980:216,1981:205,1982:125,1983:213,1984:202,1985:220,1986:209,1987:129,1988:217,1989:206,1990:127,1991:215,1992:204,1993:123,1994:210,1995:131,1996:219,1997:207,1998:128,1999:216,2000:205,2001:124,2002:212,2003:201,2004:122,2005:209,2006:129,2007:218,2008:207,2009:126,2010:214,2011:203,2012:123,2013:210,2014:131,2015:219,2016:208,2017:128,2018:216,2019:205,2020:125,2021:212,2022:201,2023:122,2024:210,2025:129,2026:217,2027:206,2028:126,2029:213,2030:203,2031:123,2032:211,2033:131,2034:219,2035:208};   // Lunar New Year as month*100+day, 1940-2035 (from the lunar calendar, checked against published dates)
+const lunarYear = (y, m, d) => (m * 100 + d < (CNY[y] || 205) ? y - 1 : y);
 const ANIMAL = {
   rat:{n:'Rat',y:'Pup',m:'Moonrat',e:'water'}, ox:{n:'Ox',y:'Calf',m:'Thunder Buffalo',e:'earth'},
   tiger:{n:'Tiger',y:'Cub',m:'Jade Tiger',e:'wood'}, rabbit:{n:'Rabbit',y:'Kit',m:'Moon Hare',e:'wood'},
@@ -1306,10 +1309,18 @@ $('#ksStage').addEventListener('pointerdown', e => { swipeX = e.clientX; });
 $('#ksStage').addEventListener('pointerup', e => { if (swipeX == null) return; const dx = e.clientX - swipeX; swipeX = null; if (Math.abs(dx) > 40) pickKeeper(keeper + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); });
 const ys = $('#year'), nowY = new Date().getFullYear();
 for (let y = nowY; y >= 1940; y--) { const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === 2015) o.selected = true; ys.appendChild(o); }
+['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].forEach((n, i) => { const o = document.createElement('option'); o.value = i + 1; o.textContent = n; if (i === 5) o.selected = true; $('#bmonth').appendChild(o); });
+for (let d = 1; d <= 31; d++) { const o = document.createElement('option'); o.value = d; o.textContent = d; if (d === 1) o.selected = true; $('#bday').appendChild(o); }
+const ANIMAL_BASE = JSON.parse(JSON.stringify(ANIMAL));
 $('#playBtn').onclick = () => { AU.init(); SFX.select(); AU.music(true); AU.song('rise', 1); show('pickKeeper'); };   // the menu plays the main theme with its beat in
 $('#keeperNext').onclick = () => { SFX.select(); show('pickYear'); };
 $('#yearNext').onclick = () => {
-  const year = +ys.value; animal = ZOD[((year - 1900) % 12 + 12) % 12]; keeperEl = STEM[((year % 10) + 10) % 10];
+  // the Chinese year begins at Lunar New Year; its stem gives the element, its branch the animal (a 2014 birthday after
+  // January 31st is a Wood Horse). The companion carries the year's element first and its own nature second, so a
+  // Wood Horse fights with Wood and keeps the horse's Fire (playtest 2: "she's actually a wood horse ... I need that accuracy")
+  const year = lunarYear(+ys.value, +$('#bmonth').value, +$('#bday').value);
+  animal = ZOD[((year - 1900) % 12 + 12) % 12]; keeperEl = STEM[((year % 10) + 10) % 10];
+  const base = ANIMAL_BASE[animal]; Object.assign(ANIMAL[animal], base, { e:keeperEl, e2:base.e !== keeperEl ? base.e : undefined });
   const A = ANIMAL[animal];
   $('#revEb').textContent = `Year of the ${ELNAME[keeperEl]} ${A.n}`;
   $('#revImg').src = `art4/a-${animal}-y.png?v=6`; $('#revImg').alt = A.y;
@@ -1317,7 +1328,7 @@ $('#yearNext').onclick = () => {
   $('#revName').textContent = `Your ${A.y}`;
   $('#revEl').textContent = `${ELNAME[keeperEl]} Keeper`; $('#revEl').style.setProperty('--c', EL[keeperEl]);
   $('#revEl2').textContent = `${ELNAME[A.e]} ${A.y}`; $('#revEl2').style.setProperty('--c', EL[A.e]);
-  $('#revP').textContent = `You were born ${ELNAME[keeperEl]}, so your first power is ${POW[START[keeperEl]].n}. Your ${A.y} fights beside you with ${ELNAME[A.e]}, and one day becomes the ${A.m}. The other elements you'll learn, one at a time.`;
+  $('#revP').textContent = `You were born ${ELNAME[keeperEl]}, so your first power is ${POW[START[keeperEl]].n}. Your ${A.y} fights beside you with ${ELNAME[A.e]}${A.e2 ? ` and its own ${ELNAME[A.e2]} nature` : ''}, and one day becomes the ${A.m}. The other elements you'll learn, one at a time.`;
   SFX.fanfare(false); show('reveal');
 };
 $('#revNext').onclick = () => { SFX.select(); show('story'); };
@@ -1466,9 +1477,14 @@ function spawnBoss() {
   e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5) * [2.6, 3, 3.3, 3.6][S.level - 1]);   // a real fight: about a minute
   S.en.push(e); S.boss = e;
   if (eff(e.el, keeperEl) > 1) S.items.push({ x:S.p.x + 80, y:S.p.y + 40, kind:'ward', t:0, z:10, vz:260 });
-  S.arena = { x:S.p.x, y:S.p.y, r:Math.max(430, Math.min(VW, VH) * .62) };   // room to dodge, so the boss can really attack
+  // room to dodge, so the boss can really attack; the whole arena always sits inside the world (playtest 2: a boss that
+  // arrived near the world's edge left half its arena off the map, and the camera could not follow there)
+  { const r = Math.max(430, Math.min(VW, VH) * .62), m = r + 90;   // extra room above for the HUD and below for the power row
+    S.arena = { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
+    const A = S.arena; e.x = A.x; e.y = A.y - 260;
+    if (Math.hypot(S.p.x - A.x, S.p.y - A.y) > r - 80) { S.p.x = A.x; S.p.y = A.y + 160; ring(S.p.x, S.p.y, 20, 260, '#FFE6A3', .5, 12, true); } }
   e.pat = 0; e.atk = 2.2; S.bossFx = []; S.heartT = 3;
-  for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.p.x, m.y - S.p.y) > S.arena.r) m.dead = true;
+  for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.arena.x, m.y - S.arena.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
   SFX.bossroar(); SFX.stomp(); S.shake = .6; AU.song('boss'); S.flashT = .45; S.flashC = '110,96,255'; ring(e.x, e.y, 30, 900, '#8F7CFF', .9, 24, true);
   ring(e.x, e.y, 20, 400, '#BFE3FF', .8, 16, true); smoke(e.x, e.y + 60, 14, 50, '200,220,235');
@@ -2888,11 +2904,14 @@ function draw() {
 
 // particles: a normal pass, then a single additive pass (switching blend modes per particle is slow)
 const ADD = { glow:1, spark:1, star:1 };
+// effects can run a frame past their life (the victory flood steps them by hand); a circle never gets a negative size,
+// which would throw and stop the whole animation (playtest 2: "oh, it froze" right at a victory)
+const arc0 = (x, y, r, a0, a1) => g.arc(x, y, r > 0 ? r : 0, a0, a1);
 function drawFX(top) {
   for (const p of FX) {
     const k = p.t / p.life, a = 1 - k;
     if (!top) {
-      if (p.k === 'smoke') { g.fillStyle = `rgba(${p.c},${.35 * a})`; g.beginPath(); g.arc(p.x, p.y, p.s * (1 + k * 1.4), 0, TAU); g.fill(); }
+      if (p.k === 'smoke') { g.fillStyle = `rgba(${p.c},${.35 * a})`; g.beginPath(); arc0(p.x, p.y, p.s * (1 + k * 1.4), 0, TAU); g.fill(); }
       else if (p.k === 'shard' || p.k === 'rock' || p.k === 'paper') {
         const y = p.y - p.z, c = Math.cos(p.rot) * p.s, sn = Math.sin(p.rot) * p.s, q = p.p || [-1, -.6, 1, -.2, -.2, 1];
         g.globalAlpha = Math.min(1, a * 2); g.fillStyle = p.c;
@@ -2900,7 +2919,7 @@ function drawFX(top) {
         if (p.k !== 'paper') { g.strokeStyle = p.k === 'shard' ? 'rgba(255,255,255,.9)' : '#1A1206'; g.lineWidth = 1.5; g.stroke(); }
         g.globalAlpha = 1;
       }
-      else if (p.k === 'drop') { g.fillStyle = `rgba(170,220,255,${a})`; g.beginPath(); g.arc(p.x, p.y - p.z, p.s, 0, TAU); g.fill(); }
+      else if (p.k === 'drop') { g.fillStyle = `rgba(170,220,255,${a})`; g.beginPath(); arc0(p.x, p.y - p.z, p.s, 0, TAU); g.fill(); }
       else if (p.k === 'leaf') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.globalAlpha = a; g.fillStyle = p.c; g.beginPath(); g.ellipse(0, 0, p.s, p.s * .45, 0, 0, TAU); g.fill(); g.restore(); g.globalAlpha = 1; }
       else if (p.k === 'vine') drawVine(p, k);
       else if (p.k === 'spike') { const h = p.s * Math.min(1, k * 5) * (1 - Math.max(0, k - .6) * 2.5); g.fillStyle = p.c; g.strokeStyle = '#1A2A10'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(p.x - 9, p.y); g.quadraticCurveTo(p.x - 3, p.y - h * .6, p.x + 2, p.y - h); g.quadraticCurveTo(p.x + 4, p.y - h * .5, p.x + 9, p.y); g.closePath(); g.fill(); g.stroke(); }
@@ -2908,7 +2927,7 @@ function drawFX(top) {
     }
     if (p.k === 'flame') { const st = Math.min(3, (k * 4) | 0), w = p.s * 1.1 * (1 + Math.sin(S.t * 30 + p.x) * .08), h = w * 1.5; g.globalAlpha = Math.pow(a, .6); g.drawImage(flameSprite(st), p.x - w / 2, p.y - h * .73, w, h); g.globalAlpha = 1; }
     else if (p.k === 'plus') { g.globalAlpha = a; g.fillStyle = p.c; g.fillRect(p.x - p.s / 2, p.y - p.s / 6, p.s, p.s / 3); g.fillRect(p.x - p.s / 6, p.y - p.s / 2, p.s / 3, p.s); g.globalAlpha = 1; }
-    else if (p.k === 'ring' && !p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); g.arc(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
+    else if (p.k === 'ring' && !p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'hit') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = `rgba(255,255,255,${a})`; const s = p.s * (.6 + k * .6); g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? s * .25 : s * .6; g.lineTo(Math.cos(i * TAU / 8) * r, Math.sin(i * TAU / 8) * r); } g.closePath(); g.fill(); g.restore(); }
   }
   if (!top) return;
@@ -2917,10 +2936,10 @@ function drawFX(top) {
     const k = p.t / p.life, a = 1 - k;
     if (p.k === 'glow') glowAt(p.x, p.y, p.s + ((p.s1 ?? p.s) - p.s) * k, p.c, a);
     else if (p.k === 'hit') glowAt(p.x, p.y, p.s * 1.6, p.c, a);
-    else if (p.k === 'ring' && p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); g.arc(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
+    else if (p.k === 'ring' && p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'spark') { g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.s; g.lineCap = 'round'; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x - p.vx * .04, p.y - p.vy * .04); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'star') { const s = p.s * 2.4 * (1 - k * .5); g.globalAlpha = a; g.drawImage(starSprite(p.c), p.x - s / 2, p.y - s / 2, s, s); g.globalAlpha = 1; }
-    else if (p.k === 'slash') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.strokeStyle = `rgba(235,245,255,${a})`; g.lineWidth = 9 * a + 1; g.beginPath(); g.arc(0, 0, p.s, -1.1, 1.1); g.stroke(); g.strokeStyle = `rgba(255,255,255,${a})`; g.lineWidth = 3; g.beginPath(); g.arc(0, 0, p.s * .9, -.9, .9); g.stroke(); g.restore(); }
+    else if (p.k === 'slash') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.strokeStyle = `rgba(235,245,255,${a})`; g.lineWidth = 9 * a + 1; g.beginPath(); arc0(0, 0, p.s, -1.1, 1.1); g.stroke(); g.strokeStyle = `rgba(255,255,255,${a})`; g.lineWidth = 3; g.beginPath(); arc0(0, 0, p.s * .9, -.9, .9); g.stroke(); g.restore(); }
   }
   g.globalCompositeOperation = 'source-over'; g.lineWidth = 1;
 }
