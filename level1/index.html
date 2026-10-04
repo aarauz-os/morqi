@@ -140,7 +140,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .ibtn:active{transform:scale(.88)}
 .ibtn svg{width:18px;height:18px;fill:#fff}
 /* a Dynamic Island style banner: a dark capsule that grows to announce what is coming */
-#cue{position:absolute;left:0;right:0;top:200px;display:flex;justify-content:center;pointer-events:none;transition:opacity .3s}
+#cue{position:absolute;left:0;right:0;top:262px;display:flex;justify-content:center;pointer-events:none;transition:opacity .3s}
 #cue:empty{display:none}
 #cue b,#cue span{display:block}
 #cue{flex-direction:column;align-items:center}
@@ -355,6 +355,39 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .learn small{font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.75)}
 .revchips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 #intro .ribbon,#beastCard .ribbon{white-space:normal;text-wrap:balance;font-size:clamp(21px,6.4vw,27px);line-height:1.1}
+/* HUD, toy glass: chunky glossy controls with a white rim, a top shine and a soft drop, like the art's vinyl toys */
+.ibtn,.timer,.count,#wavePill,.petchip{-webkit-backdrop-filter:none;backdrop-filter:none}
+.ibtn{width:46px;height:46px;background:linear-gradient(180deg,#5566E0,#2B3594);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),inset 0 -3px 0 rgba(0,0,40,.35),0 0 0 2.5px #fff,0 7px 14px rgba(10,14,40,.4)}
+.ibtn svg{width:19px;height:19px;filter:drop-shadow(0 1.5px 0 rgba(10,14,60,.45))}
+.timer{padding:5px 18px 7px;border-radius:999px;font-size:23px;color:#fff;text-shadow:0 2px 0 rgba(10,14,60,.45);background:linear-gradient(180deg,#4352C9,#262F82);box-shadow:inset 0 2px 0 rgba(255,255,255,.45),inset 0 -3px 0 rgba(0,0,40,.35),0 0 0 2.5px #fff,0 7px 14px rgba(10,14,40,.4)}
+.count{gap:5px;padding:4px 14px 5px 6px;font-size:17px;color:#fff;text-shadow:0 2px 0 rgba(0,50,70,.45);background:linear-gradient(180deg,#2CC8DC,#0F7FA0);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),inset 0 -3px 0 rgba(0,30,50,.35),0 0 0 2.5px #fff,0 7px 14px rgba(10,14,40,.4)}
+.count i{width:24px;height:24px;clip-path:none;background:none}
+.count i svg{width:24px;height:24px;display:block;filter:drop-shadow(0 2px 0 rgba(0,40,60,.4))}
+.xp{height:17px;background:linear-gradient(180deg,#141A3D,#252E66);box-shadow:inset 0 3px 6px rgba(0,0,0,.5),0 0 0 2.5px #fff,0 6px 12px rgba(10,14,40,.35);margin-right:-10px}
+.xp i{border-radius:99px;background:linear-gradient(180deg,#C2B8FF,#8270F7 50%,#5B47DB);box-shadow:inset 0 -2px 0 rgba(30,10,90,.3),0 0 14px rgba(140,123,255,.75)}
+.xp i::after{content:"";position:absolute;left:6px;right:6px;top:3px;height:4px;border-radius:9px;background:rgba(255,255,255,.55)}
+.lvbadge{width:54px;height:54px;font-size:22px;text-shadow:0 2px 0 rgba(40,20,110,.5);background:conic-gradient(#5CF2FF calc(var(--p) * 1turn),rgba(255,255,255,.28) 0);box-shadow:0 0 0 2.5px #fff,0 7px 16px rgba(10,14,40,.45)}
+.lvbadge::before{inset:5px;background:radial-gradient(circle at 50% 28%,#C9C0FF,#8573F8 45%,#5A45D6 80%);box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(30,10,90,.35)}
+.lvbadge::after{content:"";position:absolute;left:30%;right:30%;top:9px;height:7px;border-radius:9px;background:rgba(255,255,255,.55);z-index:0}
+#wavePill{padding:6px 16px 8px;border-radius:22px;background:linear-gradient(180deg,rgba(54,66,170,.95),rgba(28,36,110,.95));box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 0 0 2.5px #fff,0 8px 18px rgba(10,14,40,.4);font-size:14.5px;text-shadow:0 1.5px 0 rgba(10,14,60,.45)}
+#wavePill .wv{display:inline-block;margin-right:6px;padding:1px 9px 2px;border-radius:99px;background:rgba(255,255,255,.18);font-size:12.5px}
+#wavePill small{margin-top:4px;font-size:12px;color:rgba(255,255,255,.85)}
+.ech{display:inline-block;padding:1px 9px 2px;margin:0 1px;border-radius:99px;font-style:normal;color:#fff!important;text-shadow:0 1px 0 rgba(0,0,0,.25);background:linear-gradient(180deg,var(--c1),var(--c2));box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),0 0 0 1.5px rgba(255,255,255,.7)}
+.skills{gap:8px}
+.slot{width:38px;height:38px;border-radius:12px;background:#1C2452;box-shadow:0 0 0 2.5px #fff,0 6px 12px rgba(10,14,40,.4)}
+.slot img{border-radius:12px}
+.slot em{right:-7px;bottom:-7px;min-width:18px;height:18px;line-height:18px;font-size:11px;color:#4A2A00;background:linear-gradient(180deg,#FFE58A,#F5A524);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 0 0 2px #fff,0 2px 4px rgba(0,0,0,.3)}
+.slot.evo{box-shadow:0 0 0 2.5px #FFE58A,0 0 16px rgba(255,214,120,.9),0 6px 12px rgba(10,14,40,.4)}
+.petchip{height:38px;padding:0 13px 0 4px!important;gap:7px;font-size:13px!important;color:#fff;text-shadow:0 1.5px 0 rgba(10,14,60,.45);background:linear-gradient(180deg,#4352C9,#262F82)!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 0 0 2.5px #fff,0 6px 12px rgba(10,14,40,.4)!important}
+.petchip img{width:30px!important;height:30px!important;border-radius:50%!important;object-fit:contain;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--c) 45%,#fff),color-mix(in srgb,var(--c) 70%,#1C2452));box-shadow:0 0 0 2px #fff}
+#bossBar{height:16px;background:linear-gradient(180deg,#2A0F1A,#45182A);box-shadow:inset 0 3px 6px rgba(0,0,0,.5),0 0 0 2.5px #fff,0 6px 12px rgba(10,14,40,.35)}
+#bossBar i{background:linear-gradient(180deg,#FFB19A,#FF6A57 50%,#D63A2C);position:relative}
+.bossname{font-size:16px;text-shadow:0 2px 0 rgba(10,14,60,.55)}
+#cue b,#cue span{background:linear-gradient(180deg,rgba(66,82,200,.97),rgba(30,38,118,.97));text-shadow:0 2px 0 rgba(10,14,60,.45)}
+#cue b{box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 0 0 2.5px #fff}
+#cue span{box-shadow:0 0 0 2.5px #fff,0 10px 22px rgba(10,14,40,.4);clip-path:inset(0 -10px -30px -10px)}
+#cue b:only-child{box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 0 0 2.5px #fff,0 10px 22px rgba(10,14,40,.4)}
+#toast{background:linear-gradient(180deg,rgba(66,82,200,.97),rgba(30,38,118,.97))!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 0 0 2.5px #fff,0 10px 22px rgba(10,14,40,.4)!important;text-shadow:0 1.5px 0 rgba(10,14,60,.4)}
 </style>
 
 <div id="stage">
@@ -365,7 +398,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
       <div class="toprow">
         <button class="ibtn" id="pauseBtn" aria-label="Pause"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/></svg></button>
         <span class="timer" id="timePill">00:00</span>
-        <span class="count" id="freedPill"><i></i><span id="freedN">0</span></span>
+        <span class="count" id="freedPill"><i><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0FEFF"/><stop offset=".55" stop-color="#5CF2FF"/><stop offset="1" stop-color="#1FA9CF"/></linearGradient></defs><path d="M12 2 20 11 12 22 4 11Z" fill="url(#gm)" stroke="#0B3A52" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 2 15.5 9.5 12 11Z" fill="#fff" opacity=".85"/></svg></i><span id="freedN">0</span></span>
       </div>
       <div class="toprow"><div class="xp" id="xpBar"><i></i></div><span class="lvbadge" id="lvPill">1</span></div>
       <span id="wavePill"></span>
@@ -2047,9 +2080,12 @@ function draw() {
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, -ks * .72 - 24, ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
   const hb = Math.max(0, P.hp / P.max);
-  g.fillStyle = '#1A1206'; g.fillRect(P.x - 40, P.y + 41, 80, 13);
-  g.fillStyle = '#3A0A06'; g.fillRect(P.x - 37, P.y + 44, 74, 7);
-  g.fillStyle = hb > .3 ? '#6BD23A' : '#E8553F'; g.fillRect(P.x - 37, P.y + 44, 74 * hb, 7);
+  // a glossy health capsule with a white rim, like the HUD
+  g.fillStyle = '#FFFFFF'; g.beginPath(); g.roundRect(P.x - 42, P.y + 40, 84, 16, 8); g.fill();
+  g.fillStyle = '#1C2452'; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, 78, 10, 5); g.fill();
+  if (hb > 0) { const gr = g.createLinearGradient(0, P.y + 43, 0, P.y + 53); if (hb > .3) { gr.addColorStop(0, '#B6F58A'); gr.addColorStop(1, '#3FB24A'); } else { gr.addColorStop(0, '#FFB19A'); gr.addColorStop(1, '#D63A2C'); }
+    g.fillStyle = gr; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, Math.max(10, 78 * hb), 10, 5); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.roundRect(P.x - 36, P.y + 44.5, Math.max(4, 78 * hb - 6), 3, 2); g.fill(); }
   // enemy ice shards
   // spirit animal shots, each in its element
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue;
@@ -2412,7 +2448,7 @@ addEventListener('keydown', e => { if (COACH.cur && (e.key === 'Enter' || e.key 
 function renderSkills() {
   const box = $('#skills'); if (!S) return;
   const nextAw = AWAKEN_AT[S.awakeIdx] || null, A = ANIMAL[animal];
-  let h = `<span class="slot petchip" style="--c:${EL[A.e]}"><img src="art4/a-${animal}-y.png" alt="" style="width:26px;height:26px;object-fit:contain">${nextAw ? `Awakens Lv ${nextAw}` : A.y}</span>`;
+  let h = `<span class="slot petchip" style="--c:${EL[A.e]}"><img src="art4/a-${animal}-y.png" alt="">${nextAw ? `Awakens Lv ${nextAw}` : A.y}</span>`;
   for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
   for (const id in S.gifts) h += `<span class="slot gift" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
   box.innerHTML = h;
@@ -2425,8 +2461,8 @@ function hud() {
   const sec = Math.floor(S.t); $('#timePill').textContent = `${String((sec / 60) | 0).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
   const WV = LEVELS[S.level - 1].waves, nw = WV[S.waveIdx], wp = $('#wavePill');
   if (S.bossSpawned) wp.innerHTML = 'All 10 waves cleared · <i>Boss</i>';
-  else if (nw) { const left = Math.max(0, Math.ceil(nw.t - S.t)), col = nw.el === 'mix' ? '#FFE58A' : EL[nw.el];
-    wp.innerHTML = `${S.waveIdx ? `Wave ${S.waveIdx} of ${WV.length} · ` : ''}next <i style="--c:${col}">${nw.el === 'mix' ? 'everything' : ELNAME[nw.el]}</i> in ${left}s${nw.el === 'mix' ? '' : `<small>beat it with ${weakTo(nw.el).map(k => `<i style="--c:${EL[k]}">${ELNAME[k]}</i>`).join(' or ')}</small>`}`; }
+  else if (nw) { const left = Math.max(0, Math.ceil(nw.t - S.t)), ech = k => `<i class="ech" style="--c1:${CARDC[k][0]};--c2:${CARDC[k][1]}">${ELNAME[k]}</i>`;
+    wp.innerHTML = `${S.waveIdx ? `<span class="wv">Wave ${S.waveIdx}/${WV.length}</span>` : ''}Next ${nw.el === 'mix' ? '<i class="ech" style="--c1:#FFD66E;--c2:#E98A12">everything</i>' : ech(nw.el)} in ${left}s${nw.el === 'mix' ? '' : `<small>Beat it with ${weakTo(nw.el).map(ech).join(' ')}</small>`}`; }
   else wp.innerHTML = `Wave ${WV.length} of ${WV.length} · boss in ${Math.max(0, Math.ceil(170 - S.t))}s`;
   if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = `The Still Warden · ${ELNAME[S.boss.el]}`; }
 }
