@@ -1330,7 +1330,8 @@ function startRun() {
   paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
-  AU.song(['rise', 'lantern', 'path', 'lantern'][S.level - 1]); AU.music(true);   // Afterglow opens, then the level themes take turns; every boss shares the Warden's new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
+  // Afterglow opens, then the level themes take turns; every boss shares the Warden's
+  AU.song(['rise', 'lantern', 'path', 'lantern'][S.level - 1]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -2142,7 +2143,8 @@ function direct(dt) {
     if (ph !== b.phase) {
       b.phase = ph; b.el = LV().boss[ph];
       cue(`The Warden turns to ${ELNAME[b.el]}`, `${beatenBy(b.el)} beat ${ELNAME[b.el]}`, 2200, true);
-      if (eff(b.el, keeperEl) > 1) { const a = rnd(0, TAU); S.items.push({ x:S.p.x + Math.cos(a) * 90, y:S.p.y + Math.sin(a) * 90, kind:'ward', t:0, z:10, vz:260 }); }   // the shore helps a Keeper this element beats ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5; ring2(16 + ph * 6);
+      if (eff(b.el, keeperEl) > 1) { const a = rnd(0, TAU); S.items.push({ x:S.p.x + Math.cos(a) * 90, y:S.p.y + Math.sin(a) * 90, kind:'ward', t:0, z:10, vz:260 }); }   // the shore helps a Keeper this element beats
+      ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5;
     }
     bossFight(b, ph, dt);
     S.spawnAcc += dt * 1.2; while (S.spawnAcc > 1) { S.spawnAcc--; spawn('critter'); }
