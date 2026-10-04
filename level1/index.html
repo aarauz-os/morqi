@@ -580,7 +580,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .ibtn.off::after{content:"";position:absolute;width:22px;height:2.5px;border-radius:2px;background:#fff;transform:rotate(-40deg)}
 .tlvl{display:flex;align-items:center;gap:6px;width:min(100%,380px);justify-content:space-between}
 .tname{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;flex:1}
-.tname span#lvNum{font:800 12px var(--round);letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.tname span#lvNum{font:800 12px var(--round);letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,var(--c) 55%,#fff)}
 #title .tname h1{margin:0;font-size:clamp(22px,7.2vw,32px);line-height:1.05;white-space:nowrap;text-shadow:0 2px 12px rgba(0,0,0,.45)}
 .tstars{display:flex;gap:4px;font-size:15px;line-height:1}
 .tstars i{font-style:normal;color:rgba(255,255,255,.28)}
@@ -609,6 +609,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .riseTip p{margin:0;font-size:13.5px;line-height:1.35;color:rgba(255,255,255,.7)}
 #riseBtn{width:100%}
 @media (max-height:700px){.riseBg{height:52%}}
+/* each realm's name wears its element's colour, glossy like the logo: water blue, wood green, fire red, earth gold, metal silver */
+.ribbon.elname,#title .tname h1.elname{background:linear-gradient(180deg,#fff 6%,color-mix(in srgb,var(--c) 45%,#fff) 40%,var(--c) 92%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 2px 0 color-mix(in srgb,var(--c) 40%,#0A0E30)) drop-shadow(0 6px 14px rgba(0,0,0,.4))}
 </style>
 
 <div id="stage">
@@ -647,7 +649,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     </div>
     <div class="tlvl">
       <button class="tarr" id="lvPrev" aria-label="Previous level"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <div class="tname"><span id="lvNum">Level 1</span><h1 class="ck" id="lvName">The Frozen Shore</h1><span class="tstars" id="lvStars"></span></div>
+      <div class="tname" style="--c:#4E9BE0"><span id="lvNum">Level 1</span><h1 class="ck elname" id="lvName">The Pearl Shore</h1><span class="tstars" id="lvStars"></span></div>
       <button class="tarr" id="lvNext" aria-label="Next level"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <button class="btn green" id="playBtn">Play</button>
@@ -760,7 +762,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 
   <section class="scr popup" id="intro" hidden>
     <div class="panel pop" style="padding-top:36px">
-      <div class="rb"><span class="ribbon" id="introT">Level 2</span></div>
+      <div class="rb"><span class="ribbon elname" id="introT">Level 2</span></div>
       <p style="margin:0;font-size:14px;color:#BFD3E6" id="introP"></p>
       <div class="beasts" id="introList"></div>
       <button class="btn green" id="introGo">Let's go!</button>
@@ -951,7 +953,10 @@ const lookSrc = p => p;   // the bold look is the only look now; kept so image p
 const texF = load('tf', 'art4/t-frozen.jpg?v=8'), texM = load('tm', 'art4/t-meadow.jpg?v=8');
 // the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
 // every world's ground, frozen and restored; each pair loads when its world first needs it
-const GROUND_ART = { water:['t-frozen', 't-meadow'], wood:['t-grove-frozen', 't-grove'], fire:['t-ridge-frozen', 't-ridge'], earth:['t-harvest-frozen', 't-harvest'], metal:['t-city-frozen', 't-city'] };
+// the Pearl Shore is a real shore: sand below a wavy coastline and the sea above it, each frozen and then alive
+// (A: "should be a shore not a patch of grassy lands"); every other realm is one ground
+const seaLine = x => 1500 + Math.sin(x * .0019) * 110 + Math.sin(x * .0053 + 1.3) * 45;
+const GROUND_ART = { water:['t-sand-frozen', 't-sand', 't-sea-frozen', 't-sea'], wood:['t-grove-frozen', 't-grove'], fire:['t-ridge-frozen', 't-ridge'], earth:['t-harvest-frozen', 't-harvest'], metal:['t-city-frozen', 't-city'] };
 const groundArt = w => (GROUND_ART[w] || GROUND_ART.water).map(n => IMG[n] || load(n, `art4/${n}.jpg?v=8`));
 const ok = i => i && i.complete && i.naturalWidth > 0;
 
@@ -1202,7 +1207,7 @@ const AU = (() => {
      comes alive in three steps as its waves are cleared, after waves 3, 6 and 9 (M.rest 1/3, 2/3, 1): its own
      instrument joins, then its colour lifts, then everything plays. Under the music, ambStep plays the world's
      weather, crossfading from out of balance to restored.
-       water, the Frozen Shore: "Afterglow" with silk-string ripples, swells, and the zither answering the hook
+       water, the Pearl Shore: "Afterglow" with silk-string ripples, swells, and the zither answering the hook
        wood, the Bamboo Grove: "Bamboo Rain", new: a breathy low bamboo flute, wooden knocks, a plucked zither
        fire, the Lantern Ridge: "Lantern Night" with festival drums and tremolo plucks; when the ridge is restored the
          whole tune lifts from minor into major: joy coming back
@@ -1739,6 +1744,7 @@ function scatterProps(w) {
     if (Math.random() > .6) continue;
     const x = (gx + rnd(.15, .85)) * cell, y = (gy + rnd(.15, .85)) * cell;
     if (Math.hypot(x - WORLD / 2, y - WORLD / 2) < 220) continue;
+    if (w === 'water' && y < seaLine(x) + 60) continue;
     out.push({ x, y, n:kinds[(Math.random() * kinds.length) | 0], s:rnd(62, 84), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 });
   }
   return out.sort((a, b) => a.y - b.y);
@@ -2442,7 +2448,7 @@ const ITEM_INFO = { magnet:["Luma's Call", 'Pulls every gem on the map to you.']
 // order itself teaches the feeding cycle; paced the way the genre does it: level 1 is simple chasers of two elements (built per Keeper by shapeLevel1);
 // each later level brings back what you know and adds one or two new creatures with a trick, introduced before it starts
 const LEVELS = [
-  { name:'The Frozen Shore', fresh:[], allow:[], boss:['water', 'metal', 'earth'], waves:[
+  { name:'The Pearl Shore', fresh:[], allow:[], boss:['water', 'metal', 'earth'], waves:[
     { t:14,  el:'fire',  form:'line',   mix:[['critter', 16]], name:'Cinder Imps race in' },
     { t:30,  el:'wood',  form:'ring',   mix:[['critter', 20]], name:'Bramble Sprouts close in' },
     { t:46,  el:'water', form:'pincer', mix:[['critter', 22]], name:'Frost Jellies' },
@@ -2475,7 +2481,7 @@ const LEVELS = [
     { t:118, el:'wood',  form:'pincer', mix:[['critter', 20], ['wolf', 6]], name:'Sprouts and moths' },
     { t:134, el:'earth', form:'ring',   mix:[['critter', 26]], name:'A ring of Pebble Crabs' },
     { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 12], ['golem', 1]], name:'The Still sends everything' } ] },
-  { name:'The Harvest Hold', fresh:['earth-b'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b', 'earth-b'], boss:['earth', 'fire', 'water'], waves:[
+  { name:'The Harvest Hills', fresh:['earth-b'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b', 'earth-b'], boss:['earth', 'fire', 'water'], waves:[
     { t:14,  el:'earth', form:'line',   mix:[['critter', 12], ['wolf', 3]], name:'Boulder Armadillos roll in' },
     { t:30,  el:'fire',  form:'ring',   mix:[['critter', 18], ['wolf', 4]], name:'Imps and beetles' },
     { t:46,  el:'earth', form:'elite',  mix:[['golem', 1], ['critter', 12]], name:'A Stone Ox and its crabs' },
@@ -2801,7 +2807,7 @@ function separate() {
 // balance (six seconds to start, growing with stars), the way the best-loved platformers flip a level for a moment. The colours shift into a dream of the world,
 // the theme plays at full power with a low chant, and every creature stops attacking and dances to the beat; run through
 // one and it is freed in a shower of gems. When balance comes back, the fighting stops. Each world adds its own flourish:
-// a wave on the shore, vines in the grove, fireworks on the ridge, golden ripples in the Harvest Hold, bells in the city.
+// a wave on the shore, vines in the grove, fireworks on the ridge, golden ripples in the Harvest Hills, bells in the city.
 const BLOOM = { at:6, r:70 };
 // A asked for six seconds that grows through upgrades: the Bloom's fuel is stars. Each level keeps your best stars (up
 // to three), and your total grows the Bloom: 6 s, 9 s at 6 stars, 12 s at 12 stars (of 15), so replaying for missing
@@ -3027,7 +3033,7 @@ function fireFloor() {
 // each tile renders a padded margin that overlaps its neighbours, so no seam can show between them
 const TILE = 512, TPAD = 8, TS = .7, tiles = new Map(), tmpT = document.createElement('canvas'), tmpX = tmpT.getContext('2d');
 const TPX = Math.ceil((TILE + TPAD * 2) * TS); tmpT.width = tmpT.height = TPX;
-let icePat = null, grassPat = null;
+let icePat = null, grassPat = null, seaIcePat = null, seaPat = null;
 // each level's ground: frozen and restored
 const groundTex = () => S ? groundArt(worldOf()) : [texF, texM];
 let patW = '';
@@ -3040,23 +3046,39 @@ function mirror(im) {
   return c;
 }
 function renderTile(t, i, j) {
-  const [tf, tm] = groundTex(), wk = worldOf(); if (patW !== wk) { icePat = grassPat = null; patW = wk; }
+  const [tf, tm, sf, sm] = groundTex(), wk = worldOf(); if (patW !== wk) { icePat = grassPat = seaIcePat = seaPat = null; patW = wk; }
+  if (sf && !seaIcePat && ok(sf)) seaIcePat = t.x.createPattern(mirror(sf), 'repeat');
+  if (sm && !seaPat && ok(sm)) seaPat = t.x.createPattern(mirror(sm), 'repeat');
   if (!icePat && ok(tf)) icePat = t.x.createPattern(mirror(tf), 'repeat');
   if (!grassPat && ok(tm)) grassPat = t.x.createPattern(mirror(tm), 'repeat');
   const ox = i * TILE - TPAD, oy = j * TILE - TPAD, SZ = TILE + TPAD * 2, m = new DOMMatrix(); m.a = m.d = .5;
   const x = t.x; x.setTransform(TS, 0, 0, TS, -ox * TS, -oy * TS);
   if (icePat) { icePat.setTransform(m); x.fillStyle = icePat; } else x.fillStyle = '#2B3640';
   x.fillRect(ox, oy, SZ, SZ);
+  if (sf) shoreLayer(x, ox, oy, SZ, seaIcePat, m, false);
   tmpX.globalCompositeOperation = 'source-over'; tmpX.setTransform(TS, 0, 0, TS, -ox * TS, -oy * TS);
   const mg = new DOMMatrix(); mg.a = mg.d = .9;   // the meadow at a larger scale than the ice, softened so creatures read on top
   if (grassPat) { grassPat.setTransform(mg); tmpX.fillStyle = grassPat; } else tmpX.fillStyle = '#5E9A3A';
   tmpX.fillRect(ox, oy, SZ, SZ);
-  tmpX.fillStyle = 'rgba(24,52,58,.22)'; tmpX.fillRect(ox, oy, SZ, SZ);
+  if (sf) shoreLayer(tmpX, ox, oy, SZ, seaPat, mg, true);
+  tmpX.fillStyle = sf ? 'rgba(24,52,58,.1)' : 'rgba(24,52,58,.22)'; tmpX.fillRect(ox, oy, SZ, SZ);
   tmpX.setTransform(1, 0, 0, 1, 0, 0); tmpX.globalCompositeOperation = 'destination-in';
   tmpX.drawImage(thaw, ox * MASK, oy * MASK, SZ * MASK, SZ * MASK, 0, 0, TPX, TPX);
   tmpX.globalCompositeOperation = 'source-over';
   x.setTransform(1, 0, 0, 1, 0, 0); x.drawImage(tmpT, 0, 0);
-  t.dirty = false; t.ready = ok(tf) && ok(tm);
+  t.dirty = false; t.ready = ok(tf) && ok(tm) && (!sf || (ok(sf) && ok(sm)));
+}
+// the sea above the coastline, and the line where it meets the sand: a rim of frost while frozen, a band of foam
+// with darker wet sand once it is alive
+function shoreLayer(x, ox, oy, SZ, pat, m, alive) {
+  if (oy > 1750) return;
+  const line = () => { for (let px = ox - 16; px <= ox + SZ + 16; px += 16) x.lineTo(px, seaLine(px)); };
+  x.save(); x.beginPath(); x.moveTo(ox - 16, oy - 16); line(); x.lineTo(ox + SZ + 16, oy - 16); x.closePath();
+  if (pat) { pat.setTransform(m); x.fillStyle = pat; } else x.fillStyle = alive ? '#3FB8C8' : '#CFE4F0';
+  x.fill(); if (!alive) { x.fillStyle = 'rgba(110,170,230,.2)'; x.fill(); } x.restore();
+  const edge = (w, col, dy) => { x.beginPath(); x.moveTo(ox - 16, seaLine(ox - 16) + dy); for (let px = ox - 16; px <= ox + SZ + 16; px += 16) x.lineTo(px, seaLine(px) + dy); x.strokeStyle = col; x.lineWidth = w; x.lineJoin = 'round'; x.stroke(); };
+  if (alive) { edge(26, 'rgba(110,80,40,.16)', 22); edge(16, 'rgba(255,255,255,.55)', 4); edge(6, 'rgba(255,255,255,.85)', -2); }
+  else { edge(14, 'rgba(244,250,255,.75)', 0); edge(4, 'rgba(160,200,230,.6)', 9); }
 }
 function drawGround(cx, cy) {
   let budget = 3;
@@ -4008,6 +4030,7 @@ function paintShore(c, size, ox, oy, s, round) {
   c.save(); c.beginPath(); if (round) c.arc(half, half, half, 0, TAU); else c.rect(0, 0, size, size); c.clip();
   c.fillStyle = '#26323F'; c.fillRect(0, 0, size, size);                                 // beyond the shore
   c.fillStyle = '#DCEAF5'; c.fillRect(X(0), Y(0), WORLD * s, WORLD * s);                  // the frozen shore, pale like the ice
+  if (worldOf() === 'water') { c.fillStyle = '#9CC6E4'; c.beginPath(); c.moveTo(X(0), Y(0)); for (let x = 0; x <= WORLD; x += 120) c.lineTo(X(x), Y(seaLine(x))); c.lineTo(X(WORLD), Y(0)); c.closePath(); c.fill(); }
   c.imageSmoothingEnabled = true; c.globalAlpha = 1; c.drawImage(greenCv, X(0), Y(0), WORLD * s, WORLD * s);   // the green you brought back
   c.strokeStyle = '#FFFFFF'; c.lineWidth = 1.5; c.strokeRect(X(0), Y(0), WORLD * s, WORLD * s);   // the shore's edge
   const A = S.arena; if (A) { c.strokeStyle = 'rgba(255,106,87,.8)'; c.lineWidth = 1.5; c.beginPath(); c.arc(X(A.x), Y(A.y), A.r * s, 0, TAU); c.stroke(); }
@@ -4391,7 +4414,7 @@ function intro(n) {
   L.fresh.forEach(markSeen);
   const prev = path[n - 2], foe = CONTROLS[fresh] && weakTo(prev).find(k => beats(fresh).includes(k));
   const pw = Object.keys(POW).filter(id => POW[id].e === fresh);
-  $('#introT').textContent = `Level ${n} · ${L.name}`;
+  $('#introT').textContent = `Level ${n} · ${L.name}`; $('#introT').style.setProperty('--c', EL[REALM[n - 1]]);
   $('#introP').innerHTML = `<div class="learn" style="--c:${EL[fresh]}"><span class="ek">New element</span><b>You learned ${chip(fresh)}</b><span class="pw2">${pw.map(id => `<span><img src="${icon(POW[id].icon)}" alt="">${POW[id].n}</span>`).join('')}</span><small>${ELNAME[prev]} feeds ${ELNAME[fresh]}, and ${ELNAME[fresh]} ${foe ? `${VERB[fresh][foe][0]} ${ELNAME[foe]}, which beats your ${ELNAME[prev]}` : 'covers you'}. Apprentice powers reach three stars for now.</small></div>`
     + (threats.length ? `<span class="hint" style="margin-top:6px">Watch out: ${threats.length > 1 ? 'these new creatures beat' : 'this new creature beats'} your ${chip(me)} · lanterns here carry Jade Wards</span>` : '');
   $('#introList').innerHTML = threats.map(k => beastHTML(k)).join('');
@@ -4416,7 +4439,7 @@ $('#chartOk').onclick = () => { SFX.select(); show(chartFrom); };
 const REALM = ['water', 'wood', 'fire', 'earth', 'metal'];
 function renderLevels() {
   const u = unlocked(), st = starsOf(LVL);
-  $('#lvNum').textContent = `Level ${LVL}`; $('#lvName').textContent = LEVELS[LVL - 1].name;
+  $('#lvNum').textContent = `Level ${LVL}`; $('#lvName').textContent = LEVELS[LVL - 1].name; $('.tname').style.setProperty('--c', EL[REALM[LVL - 1]]);
   $('#lvStars').innerHTML = [0, 1, 2].map(i => `<i class="${i < st ? 'on' : ''}">\u2605</i>`).join('');
   $('#lvStars').setAttribute('aria-label', `${st} of 3 stars`);
   $('#lvPrev').disabled = LVL <= 1; $('#lvNext').disabled = LVL >= Math.min(u, LEVELS.length);
