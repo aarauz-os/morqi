@@ -391,6 +391,13 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 /* the joystick stays out of the way: a faint ring and a soft, see-through knob */
 #joy{width:76px!important;height:76px!important;margin:-38px 0 0 -38px!important;background:none!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 #joy i{width:26px!important;height:26px!important;margin:-13px 0 0 -13px!important;background:rgba(255,255,255,.11)!important;box-shadow:none!important}
+/* the powers row lives at the bottom, out of the way of the top bar and the banners */
+#hud > .skills{position:absolute;left:10px;right:10px;bottom:calc(14px + env(safe-area-inset-bottom));justify-content:center;flex-wrap:wrap;gap:9px}
+#hud > .skills .slot{width:34px;height:34px}
+.petchip{width:40px!important;height:40px!important;padding:0!important;border-radius:50%!important;justify-content:center;font-size:0!important}
+.petchip img{width:34px!important;height:34px!important}
+.petchip em{font-size:10px!important;min-width:26px!important;right:-12px!important}
+#toast{bottom:76px}
 </style>
 
 <div id="stage">
@@ -406,8 +413,8 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
       <div class="toprow"><div class="xp" id="xpBar"><i></i></div><span class="lvbadge" id="lvPill">1</span></div>
       <span id="wavePill"></span>
       <div id="bossWrap"><div class="bossname" id="bossName">The Still Warden</div><div id="bossBar"><i></i></div></div>
-      <div class="skills" id="skills"></div>
     </div>
+    <div class="skills" id="skills"></div>
     <div id="cue"></div>
     <div id="toast"></div>
     <div id="joy"><i></i></div>
@@ -993,7 +1000,9 @@ $('#riseBtn').onclick = () => {
 let toastT = 0;
 function toast(m, ms = 2400) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms); }
 let cueT = 0;
-function cue(big, small, ms = 1800, warn) { const c = $('#cue'); c.className = warn ? 'warn' : ''; c.innerHTML = `<b>${big}</b>${small ? `<span>${small}</span>` : ''}`; c.style.opacity = 1; clearTimeout(cueT); cueT = setTimeout(() => { c.style.opacity = 0; }, ms); }
+function pickupPop(name, col) { floatText(S.p.x, S.p.y - 96, name, col, 24); }
+// big banners sit just under whatever the top bar is showing, so they never cover it
+function cue(big, small, ms = 1800, warn) { const c = $('#cue'), top = $('#hud .top'); if (top) c.style.top = (top.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 14) + 'px'; c.className = warn ? 'warn' : ''; c.innerHTML = `<b>${big}</b>${small ? `<span>${small}</span>` : ''}`; c.style.opacity = 1; clearTimeout(cueT); cueT = setTimeout(() => { c.style.opacity = 0; }, ms); }
 
 /* ================= enemies ================= */
 const ETYPE = {
@@ -1145,18 +1154,18 @@ function crates(dt) {
 }
 function useItem(k) {
   const P = S.p;
-  if (k === 'magnet') { for (const q of S.gems) q.pull = true; cue("Luma's Call!", 'Every gem comes to you', 1500); SFX.sweep(); ring(P.x, P.y, 20, 900, '#7FC4FF', .7, 12, true); }
+  if (k === 'magnet') { for (const q of S.gems) q.pull = true; pickupPop("Luma's Call!", '#9FD4FF'); SFX.sweep(); ring(P.x, P.y, 20, 900, '#7FC4FF', .7, 12, true); }
   else if (k === 'dumpling' || k === 'peach') {
     const h = k === 'peach' ? P.max : P.max * .3; P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
-    if (k === 'peach') cue('Peach of Immortality!', 'Fully healed', 1500); SFX.heal();
+    if (k === 'peach') pickupPop('Peach!', '#FFB0C8'); SFX.heal();
     for (let i = 0; i < 14; i++) fx({ k:'plus', x:P.x + rnd(-40, 40), y:P.y + rnd(-30, 20), vx:0, vy:-rnd(60, 120), life:rnd(.5, .9), s:rnd(7, 11), c:'#8FF0A0' });
-  } else if (k === 'ward') { S.buffs.ward = 15; cue('Jade Ward!', `Elements that beat ${ELNAME[keeperEl]} hurt you half as much`, 1800); SFX.bell(true); ring(P.x, P.y, 20, 240, '#5FE3B4', .6, 14, true); }
-  else if (k === 'tiger') { S.buffs.tiger = 12; cue('Tiger Talisman!', 'Every power hits 50% harder for 12 seconds', 1800); SFX.roar(); ring(P.x, P.y, 20, 300, '#FFB347', .6, 14, true); stars(P.x, P.y - 30, 24, '#FFB347', 320); }
+  } else if (k === 'ward') { S.buffs.ward = 15; pickupPop('Jade Ward!', '#7FF0C0'); SFX.bell(true); ring(P.x, P.y, 20, 240, '#5FE3B4', .6, 14, true); }
+  else if (k === 'tiger') { S.buffs.tiger = 12; pickupPop('Tiger Talisman!', '#FFC27A'); SFX.roar(); ring(P.x, P.y, 20, 300, '#FFB347', .6, 14, true); stars(P.x, P.y - 30, 24, '#FFB347', 320); }
   else if (k === 'frost') {
     S.freeze = 3.2; for (const e of S.en) if (!e.boss && Math.abs(e.x - P.x) < VW * .7 && Math.abs(e.y - P.y) < VH * .7) e.frozen = 3.2;
-    cue('Frost Bell!', 'Everything on screen is frozen', 1600); SFX.freeze(); S.flashT = .25; S.flashC = '200,235,255'; ring(P.x, P.y, 20, 1000, '#CFEFFF', .8, 16, true);
+    pickupPop('Frost Bell!', '#CFEFFF'); SFX.freeze(); S.flashT = .25; S.flashC = '200,235,255'; ring(P.x, P.y, 20, 1000, '#CFEFFF', .8, 16, true);
   } else {
-    cue('Firecrackers!', '', 1400); SFX.firecrackers(); S.shake = .7; S.flashT = .2; S.flashC = '255,220,170';
+    pickupPop('Firecrackers!', '#FFB08A'); SFX.firecrackers(); S.shake = .7; S.flashT = .2; S.flashC = '255,220,170';
     for (const e of S.en) if (!e.dead && Math.abs(e.x - P.x) < VW * .62 && Math.abs(e.y - P.y) < VH * .62) { if (e.boss) hurt(e, e.max * .05, 'fire'); else hurt(e, 9999, 'fire', { spark:false }); }
     for (let i = 0; i < 26; i++) { const a = rnd(0, TAU), d = rnd(0, VW * .55); const x = P.x + Math.cos(a) * d, y = P.y + Math.sin(a) * d * 1.6; setTimeout(() => { if (!S) return; flash(x, y, 140, '#FFD24A', .2); confetti(x, y, 8, 260); burst(x, y, '#FFB347', 8, 300); }, i * 40); }
   }
@@ -2451,7 +2460,7 @@ addEventListener('keydown', e => { if (COACH.cur && (e.key === 'Enter' || e.key 
 function renderSkills() {
   const box = $('#skills'); if (!S) return;
   const nextAw = AWAKEN_AT[S.awakeIdx] || null, A = ANIMAL[animal];
-  let h = `<span class="slot petchip" style="--c:${EL[A.e]}"><img src="art4/a-${animal}-y.png?v=6" alt="">${nextAw ? `Awakens Lv ${nextAw}` : A.y}</span>`;
+  let h = `<span class="slot petchip" style="--c:${EL[A.e]}" title="${nextAw ? `Awakens at level ${nextAw}` : A.y}"><img src="art4/a-${animal}-y.png?v=6" alt="${A.y}"><em>${nextAw ? `Lv ${nextAw}` : '★'}</em></span>`;
   for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
   for (const id in S.gifts) h += `<span class="slot gift" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
   box.innerHTML = h;
@@ -2463,7 +2472,8 @@ function hud() {
   $('#freedN').textContent = S.thawed;
   const sec = Math.floor(S.t); $('#timePill').textContent = `${String((sec / 60) | 0).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
   const WV = LEVELS[S.level - 1].waves, nw = WV[S.waveIdx], wp = $('#wavePill');
-  if (S.bossSpawned) wp.innerHTML = 'All 10 waves cleared · <i>Boss</i>';
+  wp.style.display = S.bossSpawned ? 'none' : '';   // the boss bar says it all once the boss is here
+  if (S.bossSpawned) wp.innerHTML = '';
   else if (nw) { const left = Math.max(0, Math.ceil(nw.t - S.t)), ech = k => `<i class="ech" style="--c1:${CARDC[k][0]};--c2:${CARDC[k][1]}">${ELNAME[k]}</i>`;
     wp.innerHTML = `${S.waveIdx ? `<span class="wv">Wave ${S.waveIdx}/${WV.length}</span>` : ''}Next ${nw.el === 'mix' ? '<i class="ech" style="--c1:#FFD66E;--c2:#E98A12">everything</i>' : ech(nw.el)} in ${left}s${nw.el === 'mix' ? '' : `<small>Beat it with ${weakTo(nw.el).map(ech).join(' ')}</small>`}`; }
   else wp.innerHTML = `Wave ${WV.length} of ${WV.length} · boss in ${Math.max(0, Math.ceil(170 - S.t))}s`;
