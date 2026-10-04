@@ -922,7 +922,9 @@ if (LOOK) { const n = 'art5/', v = '?v=2';
 ['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=6`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=6'), texM = load('tm', 'art4/t-meadow.jpg?v=6');
 // the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
-const texCF = load('tcf', 'art4/t-city-frozen.jpg?v=6'), texCM = load('tcm', 'art4/t-city.jpg?v=6');
+// every world's ground, frozen and restored; each pair loads when its world first needs it
+const GROUND_ART = { water:['t-frozen', 't-meadow'], wood:['t-grove-frozen', 't-grove'], fire:['t-ridge-frozen', 't-ridge'], earth:['t-harvest-frozen', 't-harvest'], metal:['t-city-frozen', 't-city'] };
+const groundArt = w => (GROUND_ART[w] || GROUND_ART.water).map(n => IMG[n] || load(n, `art4/${n}.jpg?v=6`));
 const ok = i => i && i.complete && i.naturalWidth > 0;
 
 /* ================= sound: a small synth with a compressor, voice gates and a looping score ================= */
@@ -1671,7 +1673,7 @@ function need(lv) { return Math.round(4 + lv * lv * 4.2); }
 // each level's world, and the theme that belongs to it; ?world=earth (or water, wood, fire, metal) plays any world's music
 // and weather on any level, so the earth theme can be heard before the earth world exists
 const SONG_OF = { water:'rise', wood:'grove', fire:'lantern', metal:'silver', earth:'harvest' };
-const worldOf = () => (/[?&]world=(water|wood|fire|earth|metal)/.exec(location.search) || [])[1] || ['water', 'wood', 'fire', 'metal'][S.level - 1];
+const worldOf = () => (/[?&]world=(water|wood|fire|earth|metal)/.exec(location.search) || [])[1] || ['water', 'wood', 'fire', 'earth', 'metal'][S.level - 1];
 /* ================= input ================= */
 const keys = {}; let joy = null;
 addEventListener('keydown', e => {
@@ -1735,7 +1737,7 @@ const ETYPE = {
   golem:{ img:'e-golem', r:38, hp:420, sp:48, dmg:24, xp:12, size:156 }
 };
 const ELS = ['wood', 'fire', 'earth', 'metal', 'water'];
-function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.86, 1.05, 1.22, 1.4][S.level - 1]; }   // level 1 eases you in; later levels are tougher   // toughness keeps pace with the player's growing powers
+function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.86, 1.05, 1.22, 1.32, 1.45][S.level - 1]; }   // level 1 eases you in; later levels are tougher   // toughness keeps pace with the player's growing powers
 function spawn(type, at, rush, el) {
   if (S.en.length >= CAP && type !== 'golem') return null;
   let T = ETYPE[type]; const sc = hpScale(); let x, y;
@@ -1770,7 +1772,7 @@ function ring2(n) {
 function spawnBoss() {
   S.bossSpawned = true;
   const e = { type:'boss', boss:true, x:S.p.x, y:S.p.y - 260, r:70, hp:1, max:1, sp:62, dmg:16, xp:0, el:LEVELS[S.level - 1].boss[0], size:260, img:'b-warden', hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:0, phase:0, atk:3, summon:5, frozen:0 };
-  e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5) * [2.6, 3, 3.3, 3.6][S.level - 1]);   // a real fight: about a minute
+  e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1]);   // a real fight: about a minute
   S.en.push(e); S.boss = e;
   if (eff(e.el, keeperEl) > 1) S.items.push({ x:S.p.x + 80, y:S.p.y + 40, kind:'ward', t:0, z:10, vz:260 });
   // room to dodge, so the boss can really attack; the whole arena always sits inside the world (playtest 2: a boss that
@@ -2362,7 +2364,8 @@ function teach() {
 }
 const ITEM_INFO = { magnet:["Luma's Call", 'Pulls every gem on the map to you.'], cracker:['Firecrackers', 'Clears every creature on screen.'], dumpling:['Dumpling', 'Heals you.'], heart:['Heart', 'Restores a quarter of your health. Health barely refills on its own.'], peach:['Peach of Immortality', 'Heals you fully.'], tiger:['Tiger Talisman', 'Your powers hit 50% harder for a while.'], frost:['Frost Bell', 'Freezes everything on screen.'], ward:['Jade Ward', 'For a while, elements that beat yours hurt you half as much.'] };
 // ten scripted waves before the boss: each one a single element, in a shape you can read, announced two seconds ahead
-// levels, paced the way the genre does it: level 1 is simple chasers of two elements (built per Keeper by shapeLevel1);
+// five levels, one world per element in the order they feed each other (water, wood, fire, earth, metal), so the level
+// order itself teaches the feeding cycle; paced the way the genre does it: level 1 is simple chasers of two elements (built per Keeper by shapeLevel1);
 // each later level brings back what you know and adds one or two new creatures with a trick, introduced before it starts
 const LEVELS = [
   { name:'The Frozen Shore', fresh:[], allow:[], boss:['water', 'metal', 'earth'], waves:[
@@ -2398,7 +2401,18 @@ const LEVELS = [
     { t:118, el:'wood',  form:'pincer', mix:[['critter', 20], ['wolf', 6]], name:'Sprouts and moths' },
     { t:134, el:'earth', form:'ring',   mix:[['critter', 26]], name:'A ring of Pebble Crabs' },
     { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 12], ['golem', 1]], name:'The Still sends everything' } ] },
-  { name:'The Silver City', fresh:['earth-b', 'metal-c'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b', 'earth-b'], boss:['earth', 'wood', 'metal'], waves:[
+  { name:'The Harvest Hold', fresh:['earth-b'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b', 'earth-b'], boss:['earth', 'fire', 'water'], waves:[
+    { t:14,  el:'earth', form:'line',   mix:[['critter', 12], ['wolf', 3]], name:'Boulder Armadillos roll in' },
+    { t:30,  el:'fire',  form:'ring',   mix:[['critter', 18], ['wolf', 4]], name:'Imps and beetles' },
+    { t:46,  el:'earth', form:'elite',  mix:[['golem', 1], ['critter', 12]], name:'A Stone Ox and its crabs' },
+    { t:58,  el:'wood',  form:'pincer', mix:[['critter', 18], ['wolf', 5]], name:'Sprouts and moths' },
+    { t:72,  el:'earth', form:'column', mix:[['critter', 16], ['wolf', 6]], name:'Crabs and Armadillos charge' },
+    { t:88,  el:'water', form:'ring',   mix:[['critter', 20], ['wolf', 6]], name:'Frogs and jellies' },
+    { t:102, el:'earth', form:'elite',  mix:[['golem', 1], ['wolf', 6]], name:'A Stone Ox and its armadillos' },
+    { t:118, el:'metal', form:'pincer', mix:[['critter', 18], ['wolf', 6]], name:'Hornets and Mantises' },
+    { t:134, el:'mix',   form:'ring',   mix:[['critter', 24], ['wolf', 8]], name:'Every element closes in' },
+    { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 12], ['golem', 1]], name:'The Still sends everything' } ] },
+  { name:'The Silver City', fresh:['metal-c'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b', 'earth-b'], boss:['metal', 'earth', 'wood'], waves:[
     { t:14,  el:'earth', form:'line',   mix:[['critter', 12], ['wolf', 3]], name:'Boulder Armadillos roll in' },
     { t:30,  el:'metal', form:'pincer', mix:[['critter', 16], ['wolf', 5]], name:'Hornets and Mantises' },
     { t:46,  el:'metal', form:'elite',  mix:[['golem', 1], ['critter', 12]], name:'A Bell Knight and its hornets' },
@@ -2581,7 +2595,7 @@ function bossFight(b, ph, dt) {
 
 /* ================= creature tricks ================= */
 // every attack winds up first, with a red circle or lane on the ground, so a watchful player can always step clear
-const bossHit = () => [2 / 3, 5 / 6, 1, 1][S.level - 1];   // the first bosses teach; the later ones punish
+const bossHit = () => [2 / 3, 5 / 6, 1, 1, 1][S.level - 1];   // the first bosses teach; the later ones punish
 const lvHit = () => S.level === 1 ? 2 / 3 : 1;              // level 1's creatures bite softer while you learn
 // tap to break out (playtest 1: "I want one way to create a big hole through the middle", and Abby kept tapping to see
 // whether it would fire): a short dash you can't be hurt during, with a shockwave that throws the crowd back and slows it.
@@ -2806,9 +2820,10 @@ function fireFloor() {
 // each tile renders a padded margin that overlaps its neighbours, so no seam can show between them
 const TILE = 512, TPAD = 8, TS = .7, tiles = new Map(), tmpT = document.createElement('canvas'), tmpX = tmpT.getContext('2d');
 const TPX = Math.ceil((TILE + TPAD * 2) * TS); tmpT.width = tmpT.height = TPX;
-let icePat = null, grassPat = null, patLv = 0;
+let icePat = null, grassPat = null;
 // each level's ground: frozen and restored
-const groundTex = () => S && S.level === 4 ? [texCF, texCM] : [texF, texM];
+const groundTex = () => S ? groundArt(worldOf()) : [texF, texM];
+let patW = '';
 function markThaw(x, y, r) { r += TPAD; for (let i = Math.floor((x - r) / TILE); i <= Math.floor((x + r) / TILE); i++) for (let j = Math.floor((y - r) / TILE); j <= Math.floor((y + r) / TILE); j++) { const t = tiles.get(i * 64 + j); if (t) t.dirty = true; } }
 function resetTiles() { tiles.clear(); }
 // generated textures rarely wrap perfectly, so each is mirrored into a 2×2 block, which always tiles without a seam
@@ -2818,7 +2833,7 @@ function mirror(im) {
   return c;
 }
 function renderTile(t, i, j) {
-  const [tf, tm] = groundTex(); if (patLv !== S.level) { icePat = grassPat = null; patLv = S.level; }
+  const [tf, tm] = groundTex(), wk = worldOf(); if (patW !== wk) { icePat = grassPat = null; patW = wk; }
   if (!icePat && ok(tf)) icePat = t.x.createPattern(mirror(tf), 'repeat');
   if (!grassPat && ok(tm)) grassPat = t.x.createPattern(mirror(tm), 'repeat');
   const ox = i * TILE - TPAD, oy = j * TILE - TPAD, SZ = TILE + TPAD * 2, m = new DOMMatrix(); m.a = m.d = .5;
@@ -2948,6 +2963,34 @@ function flameAt(x, y, s, k, seed, a = 1) {
 }
 function oct(x, y, r, rot) { g.beginPath(); for (let i = 0; i < 8; i++) { const a = rot + i * TAU / 8; g.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } g.closePath(); }
 
+// Each world's weather, out of balance at first and restored as its waves are cleared: snow becomes sea mist, dust
+// becomes falling leaves, grey ash becomes rising embers, blowing grit becomes golden pollen, fog becomes glints of
+// light. The screen also starts a little drained of colour and gets it back. A world that is never still, the way the
+// best-loved platformers keep something moving everywhere. Positions come from time alone, so there is nothing to keep.
+const WEATHER = { water:['snow', 'mist'], wood:['dust', 'leaf'], fire:['ash', 'ember'], earth:['grit', 'pollen'], metal:['fog', 'glint'] };
+const hsh = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+function drawWeather() {
+  if (reduce || !S || !S.p) return;
+  const r = S.bossSpawned ? 1 : Math.min(1, S.waveIdx / LV().waves.length), [off, on] = WEATHER[worldOf()] || WEATHER.water;
+  if (r < 1) { g.globalCompositeOperation = 'saturation'; g.fillStyle = `rgba(128,128,128,${(.3 * (1 - r)).toFixed(3)})`; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over'; }
+  weather(off, 1 - r); weather(on, r); g.globalAlpha = 1;
+}
+function weather(kind, a) {
+  if (a < .03) return; const T = S.t, wrap = (v, m) => ((v % m) + m) % m;
+  const N = { snow:36, mist:7, dust:22, leaf:18, ash:30, ember:26, grit:26, pollen:22, fog:7, glint:14 }[kind];
+  for (let i = 0; i < N; i++) {
+    const h1 = hsh(i + 1), h2 = hsh(i + 51), h3 = hsh(i + 101);
+    if (kind === 'snow') { const x = wrap(h1 * W + Math.sin(T * .8 + i) * 20 + T * 12, W), y = wrap(h2 * H + T * (40 + h3 * 30), H); g.globalAlpha = .7 * a; g.fillStyle = '#F4FAFF'; g.beginPath(); g.arc(x, y, 1.6 + h3 * 2, 0, TAU); g.fill(); }
+    else if (kind === 'mist' || kind === 'fog') { const x = wrap(h1 * (W + 320) + T * (8 + h3 * 8), W + 320) - 160, y = h2 * H; add(() => glowAt(x, y, 180 + h3 * 140, kind === 'mist' ? '#CFF4FF' : '#DDE3EE', (kind === 'mist' ? .16 : .2) * a)); }
+    else if (kind === 'dust' || kind === 'grit') { const sp = kind === 'grit' ? 220 : 160, x = wrap(h1 * W + T * (sp + h3 * 80), W), y = h2 * H + Math.sin(T + i) * 8; g.globalAlpha = .35 * a; g.strokeStyle = kind === 'grit' ? '#E3CFA4' : '#D8CDB4'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x, y); g.lineTo(x - 10 - h3 * 8, y); g.stroke(); }
+    else if (kind === 'leaf') { const x = wrap(h1 * W + Math.sin(T * 1.2 + i * 2) * 30 + T * 20, W), y = wrap(h2 * H + T * (50 + h3 * 20), H); g.save(); g.globalAlpha = .85 * a; g.translate(x, y); g.rotate(T * 2 + i); g.fillStyle = ['#7FD45A', '#5FBF4A', '#A6E36B'][i % 3]; g.beginPath(); g.ellipse(0, 0, 5, 2.4, 0, 0, TAU); g.fill(); g.restore(); }
+    else if (kind === 'ash') { const x = wrap(h1 * W + Math.sin(T * .6 + i) * 25, W), y = wrap(h2 * H + T * (18 + h3 * 12), H); g.globalAlpha = .55 * a; g.fillStyle = '#B9B4AE'; g.fillRect(x, y, 2.5, 2.5); }
+    else if (kind === 'ember') { const x = wrap(h1 * W + Math.sin(T * 2 + i * 3) * 14, W), y = H - wrap(h2 * H + T * (40 + h3 * 40), H), f = .6 + .4 * Math.sin(T * 9 + i); add(() => glowAt(x, y, 10 + h3 * 8, '#FFB347', .9 * a * f)); }
+    else if (kind === 'pollen') { const x = wrap(h1 * W + Math.sin(T * .9 + i * 2) * 18, W), y = H - wrap(h2 * H + T * (14 + h3 * 10), H), tw = .5 + .5 * Math.sin(T * 3 + i * 1.7); add(() => glowAt(x, y, 7 + h3 * 6, '#FFE58A', .8 * a * tw)); }
+    else if (kind === 'glint') { const x = h1 * W, y = h2 * H, k = Math.pow(Math.max(0, Math.sin(T * 1.7 + i * 1.3)), 6); if (k > .02) add(() => glowAt(x, y, 14 + h3 * 8, '#F4F8FF', a * k)); }
+  }
+  g.globalAlpha = 1;
+}
 function draw() {
   const P = S.p;
   // in the boss arena the camera follows you, held within the arena so its edge stays in view
@@ -3258,6 +3301,7 @@ function draw() {
     if (s.k === 'blade') { add(() => glowAt(s.x, s.y, 50, '#FFE6A0', .5)); g.save(); g.translate(s.x, s.y); g.rotate(s.rot * 2); g.fillStyle = '#E6EEF4'; g.strokeStyle = '#2A3440'; g.lineWidth = 2.5; g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? 6 : 17; g.lineTo(Math.cos(i * TAU / 8) * r, Math.sin(i * TAU / 8) * r); } g.closePath(); g.fill(); g.stroke(); g.fillStyle = '#E6B23A'; g.beginPath(); g.arc(0, 0, 4, 0, TAU); g.fill(); g.restore(); continue; }
     add(() => glowAt(s.x, s.y, 50, '#7FC4FF', .7)); g.save(); g.translate(s.x, s.y); g.rotate(s.rot); g.fillStyle = '#E6F6FF'; g.strokeStyle = '#2A5A8A'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(14, 0); g.lineTo(0, 6); g.lineTo(-14, 0); g.lineTo(0, -6); g.closePath(); g.fill(); g.stroke(); g.restore(); }
   // particles on top
+  g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
   if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
   drawFX(true);
   // damage numbers and callouts
@@ -3945,7 +3989,7 @@ function results() {
     + `<span class="chip3" style="--a:#A99CFF;--b:#6F5CF0">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
     + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('');
   $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:18 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${8 + (i * 7) % 9}px;--c:${['#FFE08A', '#7FF0C0', '#FFFFFF', '#FFB8D0'][i % 4]};--t:${5 + (i * 3) % 5}s;--d:${(i * .43) % 4}s"></i>`).join('');
-  const next = S.won && LVL < 4;
+  const next = S.won && LVL < LEVELS.length;
   if (next) { store.set('morqi.unlocked', Math.max(unlocked(), LVL + 1)); $('#nextLvBtn').textContent = `Level ${LVL + 1} ▶`; }
   // one green button: the next level when there is one
   $('#nextLvBtn').hidden = !next; $('#againBtn').classList.toggle('quiet', next);
@@ -3998,7 +4042,7 @@ $('#chartBtn2').onclick = () => { SFX.pop(); chart('paused'); };
 $('#chartOk').onclick = () => { SFX.select(); show(chartFrom); };
 function renderLevels() {
   const u = unlocked();
-  $('#lvls').innerHTML = [1, 2, 3, 4].map(n => `<button class="btn ${n === LVL ? 'green' : 'blue'} small" data-n="${n}" ${n > u ? 'disabled' : ''}>${n > u ? '🔒 ' : ''}Level ${n}</button>`).join('');
+  $('#lvls').innerHTML = LEVELS.map((_, i) => i + 1).map(n => `<button class="btn ${n === LVL ? 'green' : 'blue'} small" data-n="${n}" ${n > u ? 'disabled' : ''}>${n > u ? '🔒 ' : ''}Level ${n}</button>`).join('');
   $('#lvls').querySelectorAll('button').forEach(b => b.onclick = () => { LVL = +b.dataset.n; SFX.select(); renderLevels(); });
 }
 renderLevels();
