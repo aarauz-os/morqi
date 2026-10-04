@@ -660,6 +660,21 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #hud #bossBar i{background:linear-gradient(90deg,#FF9A7A,#E8553F)}
 #hud #mapBtn{padding:3px}
 #hud #mapBtn canvas{left:3px;top:3px;width:66px;height:66px}
+/* winning, the same quiet way as losing: no box. The person you freed stands in the dawn light over the night the
+   fight ended in, then the title, their words, the stars, one line of numbers, your companion, and one loud button */
+#results{background:radial-gradient(120% 60% at 50% 12%,rgba(255,200,90,.32),rgba(255,200,90,0) 60%),linear-gradient(180deg,#141A4A,#080A22 70%);padding:calc(16px + env(safe-area-inset-top)) 24px calc(22px + env(safe-area-inset-bottom))}
+#results .victory{width:260px;height:210px;margin-bottom:-6px}
+#results .victory img{width:176px}
+#results .res{background:none!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:0!important;gap:12px;max-width:360px;width:100%}
+#results .resQ{font-size:15px;color:rgba(255,255,255,.75);max-width:30ch}
+#results .chips3{gap:0}
+#results .chip3{height:auto;padding:0;background:none;box-shadow:none;font:800 14px var(--round);color:rgba(255,255,255,.72)}
+#results .chip3 + .chip3::before{content:"\00B7";margin:0 10px;color:rgba(255,255,255,.4)}
+#results .chip3 i{width:10px;height:13px}
+#results .chip3 svg{width:14px;height:14px;opacity:.8}
+#results .chip3.evo{padding:0}#results .chip3.evo img{width:20px;height:20px;box-shadow:0 0 0 1.5px #FFE08A}
+#petProg .pp,#petProg .pp.evo{background:none!important;box-shadow:none!important;padding:4px 0}
+#results .resLink{margin-top:2px;color:rgba(255,255,255,.4)}
 </style>
 
 <div id="stage">
@@ -1555,6 +1570,42 @@ const AU = (() => {
       if (i === 8 || i === 12) mv({ t, f:W.lead[ch] / 2, type:'square', dur:.09, vol:.025, lp:1600 });
     }
   }
+  /* "Ascend": the Highest Self theme, and MorQi's signature (A, 2026-10-04: its own cool theme song, moody and late at
+     night, but cooler). Dark gold: a slow half-time 808 that slides, warm keys over a low pad, breathy whispers on the
+     backbeat, and a hook sung by the vocal chop over a low zither that climbs the five tones of F minor (F, A flat,
+     B flat, C, E flat, one for each element), rests, and arrives on the high F: becoming whole. House rules kept: the
+     hook peaks 62% through its phrase and repeats its peak note once, a surprise G flat chord with whispers at the
+     golden point, the four-part form, nothing high on repeat, whispers kept under 1.2 kHz. In play it starts on the
+     hook at full power, because the Highest Self lasts six seconds; the whole song is there for the title and trailer. */
+  const HIGH = {
+    keys:[[174.61, 207.65, 261.63, 311.13, 392], [138.59, 174.61, 207.65, 261.63, 311.13], [116.54, 138.59, 174.61, 207.65, 261.63], [130.81, 174.61, 196, 233.08]],
+    tens:[null, null, null, [130.81, 164.81, 196, 233.08]],   // the C sus resolves to C7, whose E leans home to F
+    root:[43.65, 34.65, 58.27, 32.7],
+    // in the voice's middle (F4 to F5, never above 700 Hz), an octave over the zither that doubles it
+    hook:[[[0, 349.23], [3, 415.3], [6, 466.16], [9, 523.25], [12, 622.25], [20, 698.46], [22, 698.46], [26, 622.25], [28, 523.25]],
+          [[0, 349.23], [3, 415.3], [6, 466.16], [9, 523.25], [12, 622.25], [20, 698.46], [22, 622.25], [26, 523.25], [29, 466.16]]],
+    surp:[185, 233.08, 277.18, 349.23],   // G flat major 7: a warm lift from just outside the key
+    kicks:[[0, 10], [0, 3, 10]] };   // sparse and laid back
+  // a breathy whisper: air through two vowel shapes, below 1.2 kHz, so it reads as a voice and never hisses
+  const whisper = (t, len, v) => { for (const [f, q, g] of [[720, 5, 1], [1180, 6, .7]]) mn({ t, f, ft:'bandpass', q, dur:len, att:len * .4, vol:v * g, rev:.6, dly:.3 }); };
+  function highestStep(s, t) {
+    const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HIGH, gold = golden(bar), p = part(bar);
+    // the arrival: a deep 808 dropping into the first beat, and one long whisper
+    if (s === 0) { b808(t, 43.65, 1.4, 87.31, .62); whisper(t, SIX * 14, .08); }
+    if (k === 0 && !gold) { keys(t, R.keys[ch], SIX * 30, .03, 2200); pad(t, [R.keys[ch][0], R.keys[ch][2]], SIX * 32, .011); sub(t, R.root[ch] * 2, SIX * 32, .08); }
+    if (k === 16 && R.tens[ch]) keys(t, R.tens[ch], SIX * 14, .026, 2200);
+    if (gold && i === 0) { keys(t, R.surp, SIX * 14, .034, 2600); whisper(t, SIX * 12, .08); }
+    if (gold && i < 8) return;   // the drums hold their breath for two beats
+    if (hookOn(bar)) {
+      sing(R.hook[(bar >> 1) & 1], bar, k, (f, d, g, l) => { chop(t + d, f, .075 * g, SIX * 2 * l); qin(t + d, f / 2, .05 * g, 1.2); });
+      if (k === 16) whisper(t, SIX * 8, .05);
+    } else if (i === 4 || i === 12) whisper(t, SIX * 6, .065);   // while the hook rests, the whispers breathe on the backbeat
+    if (p === 2 && k === 0) qin(t, R.keys[ch][1], .05, 2.4);   // part C: no hook, one slow low zither line
+    groove(t, bar, i, R, ch, 2, .6);
+    if (i === 8) clap(t, .2, .45);
+    if (i % 2 === 0) hat(t, p === 2 ? .01 : i % 4 ? .013 : .02);
+    if ((bar & 3) === 3 && i >= 12 && i % 2 === 0) for (let r = 1; r < 3; r++) hat(t + r * SIX * 2 / 3, .014);   // a triplet roll into each fourth bar
+  }
   function music(play) {
     if (!c) return;
     if (!play) { if (M.timer) { clearInterval(M.timer); M.timer = null; } return; }
@@ -1566,8 +1617,8 @@ const AU = (() => {
       if (!c) return; if (M.next < c.currentTime - .1) M.next = c.currentTime + .05;  // back from a hidden tab: skip, don't pile up
       while (M.next < c.currentTime + .2) {
         if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
-        if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep }[M.song] || pathStep)(M.step, M.next);
-        if (musOn && M.bloom && M.song !== 'boss') bloomLayer(M.step, M.next);
+        if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep }[M.song] || pathStep)(M.step, M.next);
+        if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest') bloomLayer(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
         M.next += SIX; M.step++;
       }
@@ -2921,7 +2972,8 @@ function hsTick(dt) {
   H.on.t += dt; H.on.p -= dt;
   if (H.on.p <= 0) { H.on.p = HIGHEST.pulse; hsPulse(); }
   if (H.on.t >= HIGHEST.life) {
-    const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); flushLevels();
+    // after the final one "Ascend" plays on until the Warden's theme lands on the next bar; otherwise the world's own song returns
+    const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); flushLevels(); if (!final) AU.song(SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
     if (!SEEN.has('_highest')) { markSeen('_highest'); S.taught.c_highest = 0;
       coach('highest', 'Your Highest Self', 'Your Qi Stones made you whole: that is who you are becoming. Gather them on every shore and you will rise again.',
@@ -2930,7 +2982,7 @@ function hsTick(dt) {
 }
 function hsStart(final) {
   const H = S.hs, P = S.p; H.used = true; H.on = { t:0, p:.35, final };
-  S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); SFX.power(); SFX.jackpot(true);
+  S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); SFX.power(); SFX.jackpot(true);
   ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true); stars(P.x, P.y - 60, 50, '#FFE58A', 600);
   for (const q of S.gems) q.pull = true;
 }
