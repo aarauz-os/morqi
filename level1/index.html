@@ -911,6 +911,8 @@ const KIND = {
 Object.keys(KIND).forEach(k => load('e-' + k, `art4/e-${k}.png?v=6`));
 ['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=6`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=6'), texM = load('tm', 'art4/t-meadow.jpg?v=6');
+// the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
+const texCF = load('tcf', 'art4/t-city-frozen.jpg?v=6'), texCM = load('tcm', 'art4/t-city.jpg?v=6');
 const ok = i => i && i.complete && i.naturalWidth > 0;
 
 /* ================= sound: a small synth with a compressor, voice gates and a looping score ================= */
@@ -2229,7 +2231,7 @@ const LEVELS = [
     { t:118, el:'wood',  form:'pincer', mix:[['critter', 20], ['wolf', 6]], name:'Sprouts and moths' },
     { t:134, el:'earth', form:'ring',   mix:[['critter', 26]], name:'A ring of Pebble Crabs' },
     { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 12], ['golem', 1]], name:'The Still sends everything' } ] },
-  { name:'The Bell Temple', fresh:['earth-b', 'metal-c'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b', 'earth-b'], boss:['earth', 'wood', 'metal'], waves:[
+  { name:'The Silver City', fresh:['earth-b', 'metal-c'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b', 'earth-b'], boss:['earth', 'wood', 'metal'], waves:[
     { t:14,  el:'earth', form:'line',   mix:[['critter', 12], ['wolf', 3]], name:'Boulder Armadillos roll in' },
     { t:30,  el:'metal', form:'pincer', mix:[['critter', 16], ['wolf', 5]], name:'Hornets and Mantises' },
     { t:46,  el:'metal', form:'elite',  mix:[['golem', 1], ['critter', 12]], name:'A Bell Knight and its hornets' },
@@ -2635,7 +2637,9 @@ function fireFloor() {
 // each tile renders a padded margin that overlaps its neighbours, so no seam can show between them
 const TILE = 512, TPAD = 8, TS = .7, tiles = new Map(), tmpT = document.createElement('canvas'), tmpX = tmpT.getContext('2d');
 const TPX = Math.ceil((TILE + TPAD * 2) * TS); tmpT.width = tmpT.height = TPX;
-let icePat = null, grassPat = null;
+let icePat = null, grassPat = null, patLv = 0;
+// each level's ground: frozen and restored
+const groundTex = () => S && S.level === 4 ? [texCF, texCM] : [texF, texM];
 function markThaw(x, y, r) { r += TPAD; for (let i = Math.floor((x - r) / TILE); i <= Math.floor((x + r) / TILE); i++) for (let j = Math.floor((y - r) / TILE); j <= Math.floor((y + r) / TILE); j++) { const t = tiles.get(i * 64 + j); if (t) t.dirty = true; } }
 function resetTiles() { tiles.clear(); }
 // generated textures rarely wrap perfectly, so each is mirrored into a 2×2 block, which always tiles without a seam
@@ -2645,8 +2649,9 @@ function mirror(im) {
   return c;
 }
 function renderTile(t, i, j) {
-  if (!icePat && ok(texF)) icePat = t.x.createPattern(mirror(texF), 'repeat');
-  if (!grassPat && ok(texM)) grassPat = t.x.createPattern(mirror(texM), 'repeat');
+  const [tf, tm] = groundTex(); if (patLv !== S.level) { icePat = grassPat = null; patLv = S.level; }
+  if (!icePat && ok(tf)) icePat = t.x.createPattern(mirror(tf), 'repeat');
+  if (!grassPat && ok(tm)) grassPat = t.x.createPattern(mirror(tm), 'repeat');
   const ox = i * TILE - TPAD, oy = j * TILE - TPAD, SZ = TILE + TPAD * 2, m = new DOMMatrix(); m.a = m.d = .5;
   const x = t.x; x.setTransform(TS, 0, 0, TS, -ox * TS, -oy * TS);
   if (icePat) { icePat.setTransform(m); x.fillStyle = icePat; } else x.fillStyle = '#2B3640';
@@ -2660,7 +2665,7 @@ function renderTile(t, i, j) {
   tmpX.drawImage(thaw, ox * MASK, oy * MASK, SZ * MASK, SZ * MASK, 0, 0, TPX, TPX);
   tmpX.globalCompositeOperation = 'source-over';
   x.setTransform(1, 0, 0, 1, 0, 0); x.drawImage(tmpT, 0, 0);
-  t.dirty = false; t.ready = ok(texF) && ok(texM);
+  t.dirty = false; t.ready = ok(tf) && ok(tm);
 }
 function drawGround(cx, cy) {
   let budget = 3;
