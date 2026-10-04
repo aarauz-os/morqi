@@ -792,6 +792,7 @@ const AU = (() => {
   const save = (k, v) => { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
   let c = null, comp, sfx, mus, noiseBuf, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music2', true);
   const last = {};
+  const MUSVOL = .15;   // music at about 5 out of 10 (A, 2026-10-04; it was 4)
   function init() {
     if (c) { if (c.state === 'suspended') c.resume(); return c; }
     try { c = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
@@ -799,7 +800,7 @@ const AU = (() => {
     comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 14; comp.ratio.value = 5; comp.attack.value = .002; comp.release.value = .18;
     const master = c.createGain(); master.gain.value = .95; comp.connect(master).connect(c.destination);
     sfx = c.createGain(); sfx.gain.value = .51; sfx.connect(comp);   // sound effects at about 6 out of 10 (A, 2026-10-04)
-    mus = c.createGain(); mus.gain.value = .12; mus.connect(comp);   // music sits under the action: about 4 out of 10
+    mus = c.createGain(); mus.gain.value = MUSVOL; mus.connect(comp);
     noiseBuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     return c;
   }
@@ -893,7 +894,7 @@ const AU = (() => {
     heart:['heart', 1], heartbeat:['heartbeat', 1], charge:['charge', 1], spikes:['spikes', 1], bossdown:['bossdown', 0] };
   const SGATE = { dart:55, boom:55, splash:89, bloop:89, whip:89, thwip:55, thud:55, bell:144, ting:144, shing:55, shatter:34, crackle:144, hurt:144, wave:233, firework:144, pop:34, cardIn:34 };
   function duck() {   // the music dips to .618 for a moment under a hero sound
-    if (!mus) return; const t = c.currentTime, v = .12; mus.gain.cancelScheduledValues(t); mus.gain.setTargetAtTime(v / PHI, t, .03); mus.gain.setTargetAtTime(v, t + .618, .25);
+    if (!mus) return; const t = c.currentTime, v = MUSVOL; mus.gain.cancelScheduledValues(t); mus.gain.setTargetAtTime(v / PHI, t, .03); mus.gain.setTargetAtTime(v, t + .618, .25);
   }
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=6`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
@@ -2012,11 +2013,14 @@ function ultTick(dt) {
 }
 
 /* ================= the director ================= */
+// a tip opens a moment after it is queued; by then its creature may be gone or its gem collected, so it shows the
+// nearest live one instead of an empty patch of ground
+const live = (o, pool) => (o && !o.dead && !o.pull && (S.en.includes(o) || S.gems.includes(o))) ? o : pool.sort((a, b) => Math.hypot(a.x - S.p.x, a.y - S.p.y) - Math.hypot(b.x - S.p.x, b.y - S.p.y))[0] || o;
 function teach() {
   const P = S.p, A = ANIMAL[animal], tg = S.taught;
   if (!tg.c_pet && S.t > 6) note('pet', `Your ${A.y} fights beside you, firing ${ELNAME[A.e]} at the creatures ${ELNAME[A.e]} beats.`);
-  if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. Some elements hit it twice as hard (Super effective!), others only half. Watch the numbers.', () => ({ x:e.x, y:e.y - e.size * .16, r:e.size * .62 }), 5.5); }
-  if (!tg.c_gem && tg.c_enemy) { const q = S.gems.find(q => !q.pull); if (q) coach('gem', 'Qi gems', 'Walk over gems to collect qi. When the bar at the top fills, you level up and pick a new power.', () => ({ x:q.x, y:q.y - 6, r:34 }), 4); }
+  if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. Some elements hit it twice as hard (Super effective!), others only half. Watch the numbers.', () => { const t = live(e, S.en.filter(o => !o.dead && !o.boss)); return { x:t.x, y:t.y - t.size * .16, r:t.size * .62 }; }, 5.5); }
+  if (!tg.c_gem && tg.c_enemy) { const q = S.gems.find(q => !q.pull); if (q) coach('gem', 'Qi gems', 'Walk over gems to collect qi. When the bar at the top fills, you level up and pick a new power.', () => { const t = live(q, S.gems.filter(o => !o.pull)); return { x:t.x, y:t.y - 6, r:34 }; }, 4); }
   if (!tg.c_crate && S.t > 14 && S.crates.some(c => Math.abs(c.x - P.x) < VW * .42 && Math.abs(c.y - P.y) < VH * .4)) note('crate', 'Frozen lanterns hold gifts: magnets, heals, firecrackers. Break them open!');
   if (!tg.c_item && S.items.length) { const nm = ITEM_INFO[S.items[0].kind]; note('item', `${nm[0]}: ${nm[1]} Walk over it to use it.`); }
   if (!tg.c_chest && S.chests.length) note('chest', 'A Spirit Chest! Walk to it for free upgrades, the best way to evolve a power.');
@@ -3165,9 +3169,11 @@ function showCoach(c) {
   if (c.id === 'move') box.innerHTML = '<div class="dragdemo"><span>Drag anywhere</span><i></i></div>';
   else {
     // the thing being explained stays in full colour; everything else goes grey and dim, and an arrow points at it
+    // draw the clean frame first (no floating numbers), then aim at the target in that same frame: drawing moves the
+    // camera, so aiming before drawing put the spotlight beside the subject whenever the player was on the move
+    const keep = [S.txt, S.nums]; S.txt = []; S.nums = []; draw();
     const p = c.where(); let sx = p.sx, sy = p.sy, sr = p.sr || 34; if (sx == null) { sx = (p.x - camX) * Z; sy = (p.y - camY) * Z; sr = (p.r || 50) * Z; }
     const k = cv.width / cv.clientWidth, cw = Math.min(W, Math.max(200, sr * 4.6)), ch = cw * .75, x0 = clamp(sx - cw / 2, 0, W - cw), y0 = clamp(sy - ch / 2, 0, H - ch);
-    const keep = [S.txt, S.nums]; S.txt = []; S.nums = []; draw();   // a clean frame: no floating numbers over the subject
     const sc = document.createElement('canvas'); sc.width = 400; sc.height = 300; const g = sc.getContext('2d'); g.drawImage(cv, x0 * k, y0 * k, cw * k, ch * k, 0, 0, 400, 300);
     S.txt = keep[0]; S.nums = keep[1]; draw();
     const tx = (sx - x0) / cw * 400, ty = (sy - y0) / ch * 300, tr = sr / cw * 400;
