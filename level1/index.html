@@ -1662,7 +1662,7 @@ function startRun() {
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0, z:0 },
     ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null,
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
-    lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, evo:{}, cds:{}, ang:{},
+    lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
     strongT:-9, taught:{}, shake:0, buffs:{ tiger:0, ward:0 }, freeze:0, flashT:0, swords:[], pearls:[]
@@ -1825,7 +1825,7 @@ function hurt(e, dmg, el, o = {}) {
   const dealt = dmg * m;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
-  if (strong && e.hp <= 0 && !e.boss && !e.wise) { e.wise = 1; S.wise = (S.wise || 0) + 1; }
+  if (strong && e.hp <= 0 && !e.boss && !e.wise) { e.wise = 1; S.wise = (S.wise || 0) + 1; if (!S.hs.on) S.hs.charge = Math.min(1, S.hs.charge + 1 / HIGHEST.need); }
   if (!e.boss) {
     const P = S.p, d = Math.hypot(e.x - P.x, e.y - P.y) || 1, k = (o.kb || 5) * (e.heavy ? .25 : 1);
     if (e.heavy && o.kb) o = { ...o, kb:o.kb * .3 };
@@ -2646,7 +2646,7 @@ function breakOut() {
   return true;
 }
 function ouch(dmg, fx, fy, o = {}) {
-  const P = S.p; if (P.hurt > 0 || S.bloom) return false;
+  const P = S.p; if (P.hurt > 0 || S.bloom || hsOn()) return false;
   const hit = dmg * armourVs(o.el) * (o.src === 'spikes' || o.src === 'stomp' || o.src === 'charge' ? bossHit() : lvHit());
   P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1; P.rx = (P.x - fx) / d * 14; P.ry = (P.y - fy) / d * 14;
   if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30); }
@@ -2781,7 +2781,9 @@ function startBloom() {
   S.eshots = []; S.flashT = .35; S.flashC = '255,246,214'; S.shake = .5; AU.bloom(true); SFX.jackpot(true);
   ring(P.x, P.y, 20, 1400, BLOOM_COL[w], 1.4, 30, true); stars(P.x, P.y - 40, 60, '#FFE58A', 700); paintThaw(P.x, P.y, 520);
 }
-function endBloom() { const P = S.p; S.bloom = null; AU.bloom(false); SFX.sweep(); ring(P.x, P.y, 20, 900, '#FFFFFF', .9, 18, true); paintThaw(P.x, P.y, 700); }
+function endBloom() { const P = S.p; S.bloom = null; AU.bloom(false); SFX.sweep(); ring(P.x, P.y, 20, 900, '#FFFFFF', .9, 18, true); paintThaw(P.x, P.y, 700); flushLevels(); }
+// level-ups that waited for a Bloom or a Highest Self
+function flushLevels() { if (!S.lvlDefer) return; S.queued += S.lvlDefer - 1; S.lvlDefer = 0; levelUp(); }
 function bloomFlourish(B) {
   const P = S.p, x = P.x + rnd(-VW * .45, VW * .45), y = P.y + rnd(-VH * .4, VH * .4), w = B.w;
   if (w === 'fire') { B.f = .7; stars(x, y - 120, 26, ['#FFD24A', '#FF8A5B', '#FFFFFF'][(Math.random() * 3) | 0], 420); flash(x, y - 120, 160, '#FFB347', .25); SFX.firework(); }
@@ -2794,6 +2796,47 @@ function bloomFlourish(B) {
 function bloomCreature(e, d, dt) {
   e.x += Math.sin(S.t * 2 + e.ph) * 18 * dt;
   if (d < e.r + S.p.r + 16) { stars(e.x, e.y - 30, 5, '#FFE58A', 200); kill(e); }
+}
+/* ================= Highest Self ================= */
+// MorQi's point is becoming your highest self, and for six seconds you are it (A: "yes you should build Highest Self the
+// way you described"). A thin gold ring around your health bar fills each time you free a creature with the element
+// that beats it, so the power comes from practising the lesson. When the ring is full it fires on its own at the clutch
+// moment, surrounded or under a third of your health, at most once a level: you float up in radiant robes with the five
+// elements circling you, nothing can touch you, every half second a wave of all five elements breaks over everything
+// near you (cycling, so the strong one always lands), and every gem flies to you. On a player's very first Level 1 it
+// happens once for free when the shore swarms them, followed by a card: that's who you're becoming.
+const HIGHEST = { need:66, life:6, pulse:.45, R:470, taste:50 };
+const hsOn = () => !!(S && S.hs && S.hs.on);
+function hsTick(dt) {
+  const H = S.hs, P = S.p;
+  if (H.on) {
+    H.on.t += dt; H.on.p -= dt;
+    if (H.on.p <= 0) { H.on.p = HIGHEST.pulse; hsPulse(); }
+    if (H.on.t >= HIGHEST.life) { H.on = null; AU.bloom(false); SFX.sweep(); ring(P.x, P.y, 20, 700, '#FFE6A3', .8, 16, true); flushLevels();
+      if (H.taste) { H.taste = false; coach('highest', 'Your Highest Self', 'That is who you are becoming. Free creatures with the element that beats them to fill the gold ring, and it will rise again when you need it most.',
+        () => { const cam = S.cam || { x:0, y:0 }; return { sx:(P.x - cam.x) * Z, sy:(P.y - 30 - cam.y) * Z, sr:70 }; }); } }
+    return;
+  }
+  if (H.used || S.bloom || S.over) return;
+  if (S.level === 1 && !SEEN.has('_highest') && S.t >= HIGHEST.taste) { markSeen('_highest'); S.taught.c_highest = 0; H.taste = true; return hsStart(); }
+  if (H.charge < 1) return;
+  let near = 0; for (const e of S.en) if (!e.dead && !e.boss && Math.abs(e.x - P.x) < 220 && Math.abs(e.y - P.y) < 220) near++;
+  if (near >= 15 || P.hp < P.max / 3) hsStart();
+}
+function hsStart() {
+  const H = S.hs, P = S.p; H.used = true; H.charge = 0; H.on = { t:0, p:.35 };
+  S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); SFX.power(); SFX.jackpot(true);
+  ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true); stars(P.x, P.y - 60, 50, '#FFE58A', 600);
+  for (const q of S.gems) q.pull = true;
+}
+function hsPulse() {
+  const P = S.p, el = ELS[(S.hs.on.n = ((S.hs.on.n ?? -1) + 1)) % 5];
+  ring(P.x, P.y, 30, HIGHEST.R, EL[el], .55, 22, true); SFX.boom(true); S.shake = Math.max(S.shake, .3);
+  for (const e of S.en) if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) < HIGHEST.R) {
+    // every element in turn, so the one that beats each creature always lands; the boss feels it, but is not one-shot
+    for (const k of ELS) if (eff(k, e.el) > 1) { hurt(e, e.boss ? 260 : 900, k); break; }
+  }
+  for (const q of S.gems) q.pull = true;
 }
 function update(dt) {
   S.t += dt;
@@ -2826,7 +2869,7 @@ function update(dt) {
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); crates(dt); shrines(dt); bloomTick(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
@@ -2835,14 +2878,14 @@ function update(dt) {
     if (S.bloom && !e.boss) { bloomCreature(e, Math.hypot(P.x - e.x, P.y - e.y), dt); continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
     if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
-    if (d < e.r + P.r && P.hurt <= 0) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
+    if (d < e.r + P.r && P.hurt <= 0 && !hsOn()) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
       const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el); P.hp -= hit; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy }; floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
   for (const s of S.eshots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; s.rot += dt * 8;
-    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !S.bloom) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.boss ? 'spiral' : 'shot', el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, s.k === 'bubble' ? '#7FC4FF' : '#CFE9FF', 4, 160); SFX.hurt(); } }
+    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.boss ? 'spiral' : 'shot', el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, s.k === 'bubble' ? '#7FC4FF' : '#CFE9FF', 4, 160); SFX.hurt(); } }
   S.eshots = S.eshots.filter(s => s.life > 0);
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
@@ -3381,7 +3424,8 @@ function draw() {
   const pose = n => ok(IMG['k' + keeper + n]) ? 'k' + keeper + n : null;
   const posed = S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
   // the bold look's bigger heads read best drawn a little larger
-  const kName = posed || (useRun ? runName : 'k' + keeper), kim = IMG[kName], ks = 120;
+  const hs = hsOn(), hsIm = hs ? (IMG['k' + keeper + 'hs'] || load('k' + keeper + 'hs', `art4/k${keeper}-highest.png?v=7`)) : null;
+  const kName = posed || (useRun ? runName : 'k' + keeper), kim = hs && ok(hsIm) ? hsIm : IMG[kName], ks = hs ? 150 : 120;
   if (P.slowT > 0) { const k = Math.min(1, P.slowT * 2); g.strokeStyle = `rgba(110,190,255,${.8 * k})`; g.fillStyle = `rgba(110,190,255,${.25 * k})`; g.lineWidth = 3; g.beginPath(); g.ellipse(P.x, P.y + 26, 40, 15, 0, 0, TAU); g.fill(); g.stroke(); g.lineWidth = 1; if (Math.random() < .3) fx({ k:'drop', x:P.x + rnd(-24, 24), y:P.y + rnd(-50, 10), z:0, vx:0, vy:30, life:.5, s:3 }); }
   const run = P.moving, cyc = S.t * 13, bob = run ? (useRun ? Math.abs(Math.sin(S.t * Math.PI * 5)) * 3 : Math.abs(Math.sin(cyc)) * 6) : 0;
   const lean = run ? P.mx * (useRun ? .05 : .13) : 0, ksx = run ? 1 - Math.abs(Math.cos(cyc)) * .04 : 1 - Math.sin(S.t * 2.6) * .01, ksy = run ? 1 + Math.abs(Math.cos(cyc)) * .05 : 1 + Math.sin(S.t * 2.6) * .022;
@@ -3389,7 +3433,12 @@ function draw() {
   g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(P.x, P.y + 30, 26 - bob * .8, 9, 0, 0, TAU); g.fill();
   if (S.buffs.ward > 0) { const k = Math.min(1, S.buffs.ward / 2); g.save(); g.globalAlpha = .55 * k; g.strokeStyle = '#5FE3B4'; g.lineWidth = 4; g.beginPath(); for (let i = 0; i <= 6; i++) { const a = i / 6 * TAU + S.t * .6; g.lineTo(kx + Math.cos(a) * 52, ky - 26 + Math.sin(a) * 40); } g.stroke(); g.restore(); g.lineWidth = 1; }
   if (S.buffs.tiger > 0) add(() => { glowAt(kx, ky - 30, 170 + Math.sin(S.t * 18) * 14, '#FF9A3A', .8); if (Math.random() < .5) flames(kx, ky - 10, 1, 20, 22, 120); });
-  if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob); g.rotate(lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
+  if (hs) {   // Highest Self: a golden aura, the five elements circling, floating a little above the ground
+    const T = S.hs.on.t, k = Math.min(1, T / .3, (HIGHEST.life - T) / .3);
+    add(() => { glowAt(kx, ky - 50, 260 + Math.sin(S.t * 6) * 20, '#FFE08A', .75 * k); glowAt(kx, ky - 50, 120, '#FFFFFF', .4 * k); });
+    ELS.forEach((el, i) => { const a = S.t * 2.4 + i * TAU / 5, ox = Math.cos(a) * 78, oy = Math.sin(a) * 30 - 60; add(() => glowAt(kx + ox, ky + oy, 44, EL[el], .9 * k)); g.fillStyle = EL[el]; g.beginPath(); g.arc(kx + ox, ky + oy, 9, 0, TAU); g.fill(); });
+  }
+  if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob - (hs ? 18 + Math.sin(S.t * 3) * 6 : 0)); g.rotate(hs ? 0 : lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
     g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1));
     // the look's signature: a soft rim of light in the Keeper's element colour
     { const rim = silhouette(kName, EL[keeperEl]); if (rim) add(() => { g.globalAlpha = .6; g.drawImage(rim, -ks * .53, -ks * .75 - 24, ks * 1.06, ks * 1.06); g.globalAlpha = 1; }); }
@@ -3404,6 +3453,11 @@ function draw() {
   if (hb > 0) { const gr = g.createLinearGradient(0, P.y + 43, 0, P.y + 53); if (hb > .3) { gr.addColorStop(0, '#B6F58A'); gr.addColorStop(1, '#3FB24A'); } else { gr.addColorStop(0, '#FFB19A'); gr.addColorStop(1, '#D63A2C'); }
     g.fillStyle = gr; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, Math.max(10, 78 * hb), 10, 5); g.fill();
     g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.roundRect(P.x - 36, P.y + 44.5, Math.max(4, 78 * hb - 6), 3, 2); g.fill(); }
+  // the Highest Self ring: gold tracing round the health capsule as it fills; full, it glows and waits for the moment
+  { const ch = S.hs ? S.hs.charge : 0; if (ch > 0 && !hsOn()) { const len = 2 * (84 - 16) + Math.PI * 16, full = ch >= 1, pulse = full ? .6 + .4 * Math.sin(S.t * 8) : 1;
+    g.save(); g.strokeStyle = full ? `rgba(255,214,90,${pulse})` : '#FFC94A'; g.lineWidth = full ? 4 : 3; g.setLineDash([len * ch, len]); g.lineCap = 'round';
+    g.beginPath(); g.roundRect(P.x - 44, P.y + 38, 88, 20, 10); g.stroke(); g.restore();
+    if (full) add(() => glowAt(P.x, P.y + 48, 120, '#FFD24A', .35 * pulse)); } }
   // enemy ice shards
   // spirit animal shots, each in its element
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue;
@@ -3602,6 +3656,8 @@ function options() {
   return opts.slice(0, 3);
 }
 function levelUp() {
+  // never break a Bloom or a Highest Self: level-ups wait for it to end, then come one after another
+  if (S.bloom || hsOn()) { S.lvlDefer = (S.lvlDefer || 0) + 1; return; }
   running = false; S.pendingLevel = true;
   const P = S.p;
   ring(P.x, P.y, 20, 260, '#FFE58A', .5, 14, true); stars(P.x, P.y - 40, 26, '#FFE58A', 380); flash(P.x, P.y - 40, 260, '#FFF1C0', .3);
