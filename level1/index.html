@@ -919,7 +919,7 @@ if (LOOK) { const n = 'art5/', v = '?v=2';
   ['dash', 'hurt', 'cheer'].forEach(p => load('k1' + p, `${n}k1-${p}.png${v}`));
   load('horsey', `${n}a-horse-y.png${v}`); load('e-water-a', `${n}e-water-a.png${v}`); load('e-earth-a', `${n}e-earth-a.png${v}`);
   load('b-warden', `${n}b-warden.png${v}`); ['f1', 'up', 'dash', 'cast'].forEach(p => load('w-' + p, `${n}b-warden.png${v}`)); load('w-slam', `${n}warden-slam.png${v}`); }
-['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=6`));
+['x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=6`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=6'), texM = load('tm', 'art4/t-meadow.jpg?v=6');
 // the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
 // every world's ground, frozen and restored; each pair loads when its world first needs it
@@ -1471,13 +1471,14 @@ const AU = (() => {
       while (M.next < c.currentTime + .2) {
         if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
         if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep }[M.song] || pathStep)(M.step, M.next);
+        if (musOn && M.bloom && M.song !== 'boss') bloomLayer(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
         M.next += SIX; M.step++;
       }
     }, 25);
   }
   function startSong(name, t) {
-    M.pend = null; M.song = name; M.step = 0; if (name !== 'boss') { M.world = null; M.rest = 0; } M.sw = -1; M.threat = 0; M.tier = M.want = name === 'boss' ? 1 : 0;
+    M.pend = null; M.song = name; M.step = 0; M.t0 = t; M.bloom = false; if (name !== 'boss') { M.world = null; M.rest = 0; } M.sw = -1; M.threat = 0; M.tier = M.want = name === 'boss' ? 1 : 0;
     if (!c || !M.built) return;
     mBus.gain.cancelScheduledValues(t);
     if (name === 'boss') {   // the old theme ducks out under a sub drop and a crash, and the Warden's bell takes the downbeat
@@ -1500,12 +1501,24 @@ const AU = (() => {
     if (!c || !M.built) return; const now = performance.now();
     M.threat += (v - M.threat) * .04;
     if (M.song === 'boss') M.want = bossPh >= 2 ? 2 : 1;
+    else if (M.bloom) { M.want = 2; M.hold = now; }
     else { const up = M.threat > .72 ? 2 : M.threat > .38 ? 1 : 0; if (up >= M.want) { M.want = up; M.hold = now; } else if (now - M.hold > 9000) M.want = up; }
     if (low !== M.low) { M.low = low; mLow.frequency.setTargetAtTime(low ? 950 : 18000, c.currentTime, low ? .35 : .15); }
   }
+  // where the beat is right now, for scenery that dances: how far through the current beat (0..1) and which beat.
+  // With the music off or the audio not running, the same tempo comes from the clock, so the world still moves together.
+  function beat() { const live = c && c.state === 'running' && M.timer && M.t0 !== undefined, s = (live ? c.currentTime - M.t0 : performance.now() / 1000) / (SIX * 4); return { ph:s - Math.floor(s), n:Math.floor(s) }; }
   // which world is playing and how restored it is (0..1); the game calls it every frame during a level
   function world(w, r) { M.world = w; M.rest = Math.max(0, Math.min(1, r)); }
-  return { init, S, music, song, threat, world, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; },
+  // the Element Bloom: the theme jumps to full power and a low chant joins on the backbeat, with a four-on-the-floor kick
+  const BLOOM_ROOT = { water:130.81, wood:164.81, fire:146.83, earth:103.83, metal:174.61 };
+  function bloom(on) { M.bloom = !!on; if (on) { M.want = 2; if (c && M.built) { riser(c.currentTime, SIX * 8, .09); filt(5200, c.currentTime + SIX * 8); } } }
+  function bloomLayer(s, t) {
+    const i = s & 15, f = BLOOM_ROOT[M.world] || 146.83;
+    if (i === 4 || i === 12) { chant(t, f, .05); chant(t, f * 1.5, .03); kick(t, .4); }
+    if (i === 0 && ((s >> 4) & 1)) mv({ t, f:f / 2, dur:SIX * 14, vol:.03, att:.3, hold:SIX * 8, rev:.6 });
+  }
+  return { init, S, music, song, threat, world, beat, bloom, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; },
     meter() {   // test hook: the loudness of the effects and the music right now, in dB
       if (!c) return null; if (!this._m) { const m = n => { const a = c.createAnalyser(); a.fftSize = 2048; n.connect(a); return a; }; this._m = { s:m(sfx), u:m(mus), b:new Float32Array(2048) }; }
       const db = a => { a.getFloatTimeDomainData(this._m.b); let e = 0; for (const x of this._m.b) e += x * x; return 10 * Math.log10(e / this._m.b.length + 1e-12); };
@@ -1662,6 +1675,7 @@ function startRun() {
   for (let i = 0; i < 3; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   // Afterglow opens, then the level themes take turns; every boss shares the Warden's
+  S.props = scatterProps(worldOf());
   AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
@@ -1670,6 +1684,20 @@ function startRun() {
 }
 function need(lv) { return Math.round(4 + lv * lv * 4.2); }
 
+// each world's scenery: two kinds of small prop, scattered across the shore on a jittered grid, never in the
+// clearing where you start
+const PROPS = { water:['x-p-reed', 'x-p-shellbush'], wood:['x-p-shoot', 'x-p-fern'], fire:['x-p-lantern', 'x-p-fireflower'], earth:['x-p-wheat', 'x-p-sunflower'], metal:['x-p-lamp', 'x-p-bellpot'] };
+function scatterProps(w) {
+  const kinds = PROPS[w] || PROPS.water, out = [], cell = 240;
+  kinds.forEach(n => IMG[n] || load(n, `art4/props/${n}.png?v=6`));
+  for (let gy = 0; gy < WORLD / cell; gy++) for (let gx = 0; gx < WORLD / cell; gx++) {
+    if (Math.random() > .6) continue;
+    const x = (gx + rnd(.15, .85)) * cell, y = (gy + rnd(.15, .85)) * cell;
+    if (Math.hypot(x - WORLD / 2, y - WORLD / 2) < 220) continue;
+    out.push({ x, y, n:kinds[(Math.random() * kinds.length) | 0], s:rnd(62, 84), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 });
+  }
+  return out.sort((a, b) => a.y - b.y);
+}
 // each level's world, and the theme that belongs to it; ?world=earth (or water, wood, fire, metal) plays any world's music
 // and weather on any level, so the earth theme can be heard before the earth world exists
 const SONG_OF = { water:'rise', wood:'grove', fire:'lantern', metal:'silver', earth:'harvest' };
@@ -2619,7 +2647,7 @@ function breakOut() {
   return true;
 }
 function ouch(dmg, fx, fy, o = {}) {
-  const P = S.p; if (P.hurt > 0) return false;
+  const P = S.p; if (P.hurt > 0 || S.bloom) return false;
   const hit = dmg * armourVs(o.el) * (o.src === 'spikes' || o.src === 'stomp' || o.src === 'charge' ? bossHit() : lvHit());
   P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1; P.rx = (P.x - fx) / d * 14; P.ry = (P.y - fy) / d * 14;
   if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30); }
@@ -2713,6 +2741,48 @@ function separate() {
     }
   }
 }
+/* ================= the Element Bloom ================= */
+// Once a level, after wave 6, a glowing five-petal seed appears somewhere away from you (on the corner map, and with an
+// arrow at the screen's edge when it is off screen). Touch it and the world blooms for twenty seconds: its element in full
+// balance, the way the best-loved platformers flip a level for a moment. The colours shift into a dream of the world,
+// the theme plays at full power with a low chant, and every creature stops attacking and dances to the beat; run through
+// one and it is freed in a shower of gems. When balance comes back, the fighting stops. Each world adds its own flourish:
+// a wave on the shore, vines in the grove, fireworks on the ridge, golden ripples in the Harvest Hold, bells in the city.
+const BLOOM = { at:6, life:20, r:70 };
+const BLOOM_COL = { water:'#7FE3FF', wood:'#7FE08A', fire:'#FFB347', earth:'#FFD66E', metal:'#E8EEFF' };
+function bloomTick(dt) {
+  const P = S.p;
+  if (!S.bloomSeed && !S.bloomDone && !S.bossSpawned && S.waveIdx >= BLOOM.at) {
+    const a = rnd(0, TAU), d = rnd(560, 760); S.bloomSeed = { x:clamp(P.x + Math.cos(a) * d, 160, WORLD - 160), y:clamp(P.y + Math.sin(a) * d, 160, WORLD - 160), t:0 }; SFX.chestDrop();
+  }
+  const sd = S.bloomSeed;
+  if (sd && !S.bloom) { sd.t += dt; if (S.bossSpawned) { S.bloomSeed = null; S.bloomDone = true; } else if (Math.hypot(sd.x - P.x, sd.y - P.y) < BLOOM.r) startBloom(); }
+  const B = S.bloom; if (!B) return;
+  B.t += dt;
+  // the ground blooms wherever you run
+  paintThaw(P.x, P.y, 220);
+  if ((B.f = (B.f || 0) - dt) <= 0) bloomFlourish(B);
+  if (B.t >= BLOOM.life || S.bossSpawned) endBloom();
+}
+function startBloom() {
+  const P = S.p, w = worldOf(); S.bloomSeed = null; S.bloomDone = true; S.bloom = { t:0, w, f:.4 };
+  S.eshots = []; S.flashT = .35; S.flashC = '255,246,214'; S.shake = .5; AU.bloom(true); SFX.jackpot(true);
+  ring(P.x, P.y, 20, 1400, BLOOM_COL[w], 1.4, 30, true); stars(P.x, P.y - 40, 60, '#FFE58A', 700); paintThaw(P.x, P.y, 520);
+}
+function endBloom() { const P = S.p; S.bloom = null; AU.bloom(false); SFX.sweep(); ring(P.x, P.y, 20, 900, '#FFFFFF', .9, 18, true); paintThaw(P.x, P.y, 700); }
+function bloomFlourish(B) {
+  const P = S.p, x = P.x + rnd(-VW * .45, VW * .45), y = P.y + rnd(-VH * .4, VH * .4), w = B.w;
+  if (w === 'fire') { B.f = .7; stars(x, y - 120, 26, ['#FFD24A', '#FF8A5B', '#FFFFFF'][(Math.random() * 3) | 0], 420); flash(x, y - 120, 160, '#FFB347', .25); SFX.firework(); }
+  else if (w === 'water') { B.f = 2.4; ring(P.x, P.y, 40, 1200, '#7FE3FF', 1.2, 26, true); SFX.splash(); for (let i = 0; i < 18; i++) stars(P.x + rnd(-300, 300), P.y + rnd(-200, 200), 2, '#CFF4FF', 220); }
+  else if (w === 'wood') { B.f = .9; leaves(x, y, 14, 260); ring(x, y, 10, 220, '#7FE08A', .6, 10, true); }
+  else if (w === 'earth') { B.f = 1.6; ring(P.x, P.y, 30, 1100, '#FFD66E', 1.3, 22, true); stars(x, y, 14, '#FFE58A', 260); }
+  else { B.f = 2.2; ring(P.x, P.y, 20, 1300, '#FFFFFF', 1.1, 16, true); SFX.bell(true); }
+}
+// during a Bloom, creatures dance where they are; touch one and it is freed
+function bloomCreature(e, d, dt) {
+  e.x += Math.sin(S.t * 2 + e.ph) * 18 * dt;
+  if (d < e.r + S.p.r + 16) { stars(e.x, e.y - 30, 5, '#FFE58A', 200); kill(e); }
+}
 function update(dt) {
   S.t += dt;
   const P = S.p;
@@ -2744,12 +2814,13 @@ function update(dt) {
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); crates(dt); shrines(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); crates(dt); shrines(dt); bloomTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
     if (e.frozen > 0) continue;
     if (e.kb > 0) { e.kb -= dt; e.x += e.kx * dt; e.y += e.ky * dt; continue; }
+    if (S.bloom && !e.boss) { bloomCreature(e, Math.hypot(P.x - e.x, P.y - e.y), dt); continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
     if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
     if (d < e.r + P.r && P.hurt <= 0) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
@@ -2759,7 +2830,7 @@ function update(dt) {
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
   for (const s of S.eshots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; s.rot += dt * 8;
-    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.boss ? 'spiral' : 'shot', el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, s.k === 'bubble' ? '#7FC4FF' : '#CFE9FF', 4, 160); SFX.hurt(); } }
+    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !S.bloom) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.boss ? 'spiral' : 'shot', el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, s.k === 'bubble' ? '#7FC4FF' : '#CFE9FF', 4, 160); SFX.hurt(); } }
   S.eshots = S.eshots.filter(s => s.life > 0);
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
@@ -2974,6 +3045,10 @@ function drawWeather() {
   const r = S.bossSpawned ? 1 : Math.min(1, S.waveIdx / LV().waves.length), [off, on] = WEATHER[worldOf()] || WEATHER.water;
   if (r < 1) { g.globalCompositeOperation = 'saturation'; g.fillStyle = `rgba(128,128,128,${(.3 * (1 - r)).toFixed(3)})`; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over'; }
   weather(off, 1 - r); weather(on, r); g.globalAlpha = 1;
+  // a Bloom shifts the whole picture into a dream of the world, easing in and out
+  const B = S.bloom; if (B) { const k = Math.min(1, B.t / .8, (BLOOM.life - B.t) / .8);
+    g.globalCompositeOperation = 'overlay'; g.fillStyle = BLOOM_COL[B.w] || '#FFE08A'; g.globalAlpha = .32 * k; g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; weather(on, k); weather(on, k); }
 }
 function weather(kind, a) {
   if (a < .03) return; const T = S.t, wrap = (v, m) => ((v % m) + m) % m;
@@ -2991,6 +3066,31 @@ function weather(kind, a) {
   }
   g.globalAlpha = 1;
 }
+// The world's scenery dances (the way the best-loved platformers make the whole world move to the music): while the
+// ground under a prop is frozen it stands still, drained and icy; when that patch is restored it pops to life with a
+// sparkle and sways on every beat of the world's theme, with a little hop on the downbeat.
+const FROZEN = {};
+function frozenOf(n) {
+  if (FROZEN[n]) return FROZEN[n]; const im = IMG[n]; if (!ok(im)) return null;
+  const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height), a = d.data;
+  // drained and icy but still solid: a little of its colour left, cooled to blue, with its shading kept so it reads on any ground
+  for (let i = 0; i < a.length; i += 4) { const l = a[i] * .3 + a[i + 1] * .59 + a[i + 2] * .11; a[i] = l * .78 + a[i] * .12 + 4; a[i + 1] = l * .82 + a[i + 1] * .12 + 14; a[i + 2] = Math.min(255, l * .9 + a[i + 2] * .12 + 34); }
+  x.putImageData(d, 0, 0); return FROZEN[n] = c;
+}
+function drawProps(inView) {
+  if (!S.props) return; const b = AU.beat(), sway = Math.sin(b.ph * TAU), hop = Math.pow(1 - b.ph, 6) * (b.n % 2 ? .5 : 1); let pops = 0;
+  for (const p of S.props) {
+    if (!inView(p.x, p.y, 120)) continue;
+    const live = thawGrid[((p.y / 60) | 0) * gridN + ((p.x / 60) | 0)];
+    if (live && !p.live) { p.live = true; p.pop = S.t; if (pops++ < 3) stars(p.x, p.y - 40, 8, '#FFE58A', 200); }
+    const im = live ? IMG[p.n] : frozenOf(p.n); if (!im || (im instanceof HTMLImageElement && !ok(im))) continue;
+    const s = p.s, k = p.pop ? Math.min(1, (S.t - p.pop) / .5) : 1, pop = live ? 1 + Math.sin(k * Math.PI) * .35 * (1 - k) : 1;
+    g.save(); g.translate(p.x, p.y);
+    if (live && !reduce) { g.rotate(sway * .09 * p.d); g.scale(pop * (1 + hop * .05), pop * (1 - hop * .09)); } else if (!live) g.scale(1, .92);
+    g.drawImage(im, -s / 2, -s * .92, s, s); g.restore();
+  }
+}
 function draw() {
   const P = S.p;
   // in the boss arena the camera follows you, held within the arena so its edge stays in view
@@ -3007,6 +3107,9 @@ function draw() {
   g.setTransform(DPR, 0, 0, DPR, 0, 0); g.fillStyle = '#2B3640'; g.fillRect(0, 0, W, H);
   world(g); drawGround(cx, cy);
   const inView = (x, y, m) => x > cx - m && x < cx + VW + m && y > cy - m && y < cy + VH + m;
+  drawProps(inView);
+  // the Bloom Seed: a five-petal flower that floats and glows, too good not to chase
+  { const sd = S.bloomSeed; if (sd && inView(sd.x, sd.y, 120)) { const f = Math.sin(S.t * 3) * 6; add(() => glowAt(sd.x, sd.y - 50 + f, 220 + Math.sin(S.t * 4) * 20, '#FFE08A', .8)); if (!spr('x-bloom', sd.x, sd.y - 50 + f, 96, Math.sin(S.t * 1.5) * .12)) { g.fillStyle = '#FFD24A'; g.beginPath(); g.arc(sd.x, sd.y - 50 + f, 26, 0, TAU); g.fill(); } } }
 
   // ground marks: scorch, cracks, burning ground
   for (const d of GROUND) {
@@ -3119,7 +3222,8 @@ function draw() {
     else {
       hop = fly ? 10 + Math.sin(e.wob * 1.3) * 6 : Math.abs(step) * (e.type === 'golem' ? 3 : 6); rot = step * (fly ? .04 : e.type === 'wolf' ? .05 : .1) + toward * (.06 + bk * .25); sx = 1 + hk * .26 - Math.abs(step) * .03; sy = 1 - hk * .22 + Math.abs(step) * .05;
       if (wind) { const j = Math.sin(S.t * 40) * wind; sx += wind * .16 + j * .04; sy += wind * .12 - j * .04; rot = j * .06; hop = 0; }
-      if (rolling) { rot = S.t * 18 * (e.act.dx >= 0 ? 1 : -1); hop = 0; } }
+      if (rolling) { rot = S.t * 18 * (e.act.dx >= 0 ? 1 : -1); hop = 0; }
+      if (S.bloom) { const b = AU.beat(), q = Math.pow(1 - b.ph, 6); rot = Math.sin(b.ph * TAU + e.ph) * .18; hop = Math.pow(1 - b.ph, 4) * 14; sx = 1 + q * .12; sy = 1 - q * .14; } }
     const flip = e.own ? (e.K.face === -1 && toward > 0) : (e.type === 'wolf' && toward > 0);
     if (e.own && !e.boss && fly) { g.fillStyle = 'rgba(10,20,30,.25)'; g.beginPath(); g.ellipse(e.x, e.y + e.r * .6, e.r * .9, e.r * .35, 0, 0, TAU); g.fill(); }
     if (e.boss) { drawWarden(e, hk); continue; }
@@ -3312,6 +3416,11 @@ function draw() {
   g.globalAlpha = 1; g.lineWidth = 1;
   // screen space: arrows to off-screen chests, flashes, the cold edge of low health
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (S.bloomSeed) {   // the seed off screen gets a golden arrow that pulses
+    const sd = S.bloomSeed, sx = (sd.x - cx) * Z, sy = (sd.y - cy) * Z;
+    if (!(sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20)) { const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40), k = 1 + Math.sin(S.t * 6) * .15;
+      g.save(); g.translate(ex, ey); g.rotate(a); g.scale(k, k); g.fillStyle = '#FFD24A'; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-9, -13); g.lineTo(-9, 13); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+  }
   for (const sh of S.shrines || []) {   // a shrine off-screen gets an arrow in its element's colour
     const sx = (sh.x - cx) * Z, sy = (sh.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
     const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40);
@@ -3757,6 +3866,7 @@ function paintShore(c, size, ox, oy, s, round) {
   for (const ch of S.chests) mark(ch.x, ch.y, 2.8 * k, '#FFD24A', 'sq', true);
   for (const sh of S.shrines) mark(sh.x, sh.y, (3.4 + Math.sin(S.t * 6) * .5) * k, EL[sh.el], 'sq', true);
   if (S.boss && !S.boss.dead) mark(S.boss.x, S.boss.y, 4.6 * k, '#8C7BFF', 'o', true);
+  if (S.bloomSeed) mark(S.bloomSeed.x, S.bloomSeed.y, (4 + Math.sin(S.t * 6)) * k, '#FFD24A', 'o', true);
   // you: your companion's face, ringed in white
   const fr = 10 * k, [px, py] = [X(P.x), Y(P.y)], face = mapFace();
   c.save(); c.beginPath(); c.arc(px, py, fr, 0, TAU); c.fillStyle = '#1B2257'; c.fill(); c.clip();
