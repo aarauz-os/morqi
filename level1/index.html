@@ -943,24 +943,38 @@ const AU = (() => {
   // the kit
   const kick = (t, v = .62) => { mv({ t, f:165, f1:48, gl1:.12, dur:.3, vol:v * .85 }); mn({ t, f:3200, ft:'bandpass', dur:.014, vol:v * .3 }); };
   const clap = (t, v = .3, rv = .32) => { for (let i = 0; i < 3; i++) mn({ t:t + i * .012, f:1250, ft:'bandpass', q:1.3, dur:i === 2 ? .22 : .03, vol:v, rev:i === 2 ? rv : 0 }); mv({ t, f:230, f1:150, dur:.07, vol:v * .35 }); };
-  const hat = (t, v = .045, open) => mn({ t, f:open ? 6200 : 8600, dur:open ? .24 : .032, vol:v });
+  const hat = (t, v = .045, open) => mn({ t, f:open ? 6200 : 8600, dur:open ? .24 : .032, vol:v * .8 });
   const rim = (t, v = .12) => { mn({ t, f:2500, ft:'bandpass', q:3, dur:.045, vol:v, rev:.45 }); mv({ t, f:830, dur:.03, vol:v * .5 }); };
   const crash = (t, v = .1) => mn({ t, f:3800, dur:1.8, vol:v, rev:.5 });
   const b808 = (t, f, dur, from, v = .55) => mv({ t, f, f0:from, gl:.09, dur, vol:v, att:.006, hold:Math.max(.01, dur * .5), to:drv });
   const sub = (t, f, dur, v = .1) => mv({ t, f, dur, vol:v, att:.25, hold:Math.max(.01, dur - .9) });
   const pad = (t, notes, dur, v, type) => { for (const f of notes) for (const d of [-9, 9]) mv({ t, f, det:d, type:type || 'sawtooth', dur, vol:v, att:.7, hold:Math.max(.01, dur - 1.6), to:padF, rev:.5 }); };
-  const bell = (t, f, v) => { mv({ t, f, dur:1.2, vol:v, att:.003, dly:.55, rev:.35 }); mv({ t, f:f * 2.76, dur:.32, vol:v * .22, dly:.3 }); };
+  const bell = (t, f, v) => { mv({ t, f, dur:1.1, vol:v, att:.004, dly:.4, rev:.35, lp:1800 }); mv({ t, f:f * 2, dur:.18, vol:v * .12 }); };
   const toll = (t, f, v = .12) => { mv({ t, f, dur:3, vol:v, att:.004, rev:.8 }); mv({ t, f:f * 2.4, dur:1.6, vol:v * .35, rev:.8 }); mv({ t, f:f * 5.95, dur:.6, vol:v * .12, rev:.6 }); mv({ t, f:f / 2, dur:2.4, vol:v * .6 }); };
   const riser = (t, len, v = .09) => mn({ t, f:350, f1:9000, dur:len + .05, att:len * .92, vol:v, to:mLow, rev:.3 });
   const breath = (t, len) => { mBus.gain.setValueAtTime(1, t); mBus.gain.linearRampToValueAtTime(.12, t + .05); mBus.gain.setValueAtTime(.12, t + len - .02); mBus.gain.linearRampToValueAtTime(1, t + len + .01); };
   const filt = (f, t) => padF.frequency.setTargetAtTime(f, t, .6);
+  /* How every theme is written (A's standing rule plus the research, 2026-10-04):
+     - no high-pitched instrument on endless repeat: hooks sit in the warm middle register and rest;
+     - a Fibonacci cycle of 13 bars: the hook sings for 8, rests for 5 (8 / 5 is about the golden ratio);
+     - at bar 8 of the 13, the golden point, one surprise chord lands in a bar that is otherwise predictable, with the
+       drums holding their breath for two beats (pleasure peaks on surprise inside a predictable loop: Cheung 2019);
+     - hooks rise, then fall, with one distinctive leap and one repeated note, peaking about 62% through the phrase
+       (the shape of earworms: Jakubowski 2016);
+     - while calm, only a three-note preview of the hook plays, so the full hook lands when the beat drops
+       (melodic previews, the Max Martin way; anticipation is where the dopamine is: Salimpoor 2011);
+     - medium syncopation in kick and 808, never busier (Witek 2014). */
+  const hookOn = bar => bar % 13 < 8;
+  const golden = bar => bar % 13 === 8;
+  const preview = (bar, k) => (bar & 3) === 0 && k < 8;   // three notes, once every four bars
 
   const PATH = {  // Fm7, Dbmaj7, Abmaj7, Eb add9; two bars each
     pad:[[174.61, 207.65, 261.63, 311.13], [138.59, 174.61, 207.65, 261.63], [207.65, 261.63, 311.13, 392], [155.56, 196, 233.08, 349.23]],
     root:[43.65, 34.65, 51.91, 38.89],
-    hookA:[[0, 3], [3, 2], [6, 0], [10, 1], [12, 2], [16, 4], [19, 3], [22, 2], [26, 1], [28, 0]],
-    hookB:[[0, 4], [3, 3], [6, 2], [8, 3], [12, 5], [16, 4], [18, 3], [22, 1], [26, 2], [30, 3]],
-    pent:[698.46, 830.61, 932.33, 1046.5, 1244.51, 1396.91],
+    hookA:[[0, 349.23], [3, 349.23], [6, 415.3], [10, 466.16], [12, 415.3], [16, 311.13], [20, 523.25], [24, 466.16], [26, 415.3], [28, 415.3]],   // ends open
+    hookB:[[0, 349.23], [3, 349.23], [6, 415.3], [10, 466.16], [12, 415.3], [16, 311.13], [20, 523.25], [24, 466.16], [27, 415.3], [30, 349.23]],   // comes home
+    surp:[369.99, 466.16, 554.37],   // Gb major, the Neapolitan: the golden-point surprise
+    pent:[349.23, 415.3, 466.16, 523.25, 622.25, 698.46],
     kicks:[[0, 6, 10], [0, 3, 10, 13]] };
   const WARD = {  // Dm, Eb, Dm, A: the Phrygian half-step that means trouble
     pad:[[146.83, 174.61, 220], [155.56, 196, 233.08], [146.83, 174.61, 220], [138.59, 164.81, 220]],
@@ -991,19 +1005,21 @@ const AU = (() => {
   const LANT = {
     pad:[[293.66, 349.23, 440], [233.08, 293.66, 349.23], [196, 233.08, 293.66], [220, 277.18, 329.63]],   // Dm, Bb, Gm, A
     root:[36.71, 58.27, 49, 55],
-    hook:[[[0, 587.33], [3, 698.46], [6, 880], [8, 783.99], [10, 698.46], [12, 659.25], [14, 587.33]],
-          [[0, 587.33], [3, 698.46], [6, 932.33], [10, 880], [12, 698.46], [14, 587.33]],
-          [[0, 783.99], [3, 932.33], [6, 1174.66], [10, 1046.5], [12, 932.33], [14, 880]],
-          [[0, 880], [3, 1108.73], [6, 1318.51], [8, 1174.66], [10, 1108.73], [12, 880], [14, 659.25]]],
+    hook:[[[0, 293.66], [3, 293.66], [6, 349.23], [10, 440], [12, 392]],
+          [[0, 293.66], [4, 466.16], [8, 440], [10, 392], [12, 349.23]],
+          [[0, 392], [3, 392], [6, 349.23], [10, 293.66], [12, 233.08]],
+          [[0, 220], [3, 277.18], [6, 329.63], [10, 293.66], [12, 277.18]]],
+    surp:[311.13, 392, 466.16],   // Eb major, the Warden's own Phrygian step: a preview of the boss
     kicks:[[0, 7, 10], [0, 3, 6, 11]] };
-  const pluck = (t, f, v) => { mv({ t, f, type:'triangle', dur:.26, vol:v, att:.002, dly:.35, rev:.2 }); mv({ t, f:f * 2, dur:.09, vol:v * .35, att:.002 }); mv({ t, f:f * 3.01, dur:.05, vol:v * .15 }); };
+  const pluck = (t, f, v) => { mv({ t, f, type:'triangle', dur:.3, vol:v, att:.003, dly:.3, rev:.2, lp:1600 }); mv({ t, f:f * 2, dur:.08, vol:v * .15, att:.002 }); };
   const chant = (t, f, v = .05) => { for (const [lp, q] of [[820, 6], [1300, 7]]) mv({ t, f, type:'sawtooth', dur:.16, vol:v, att:.01, lp, ft:'bandpass', q, rev:.3 }); mn({ t, f:2200, ft:'bandpass', q:2, dur:.05, vol:v * .5 }); };
   function lanternStep(s, t) {
     const bar = s >> 4, i = s & 15, ch = bar & 3, L = LANT, sw = i % 4 === 2 ? SIX * .2 : 0;   // a little swing on the off-beats
     if (i === 0) phrase(bar, t);
     const tier = M.tier, fill = M.sw === bar + 1;
     if (i === 0) { pad(t, L.pad[ch], SIX * 16 + .7, tier ? .015 : .02, 'triangle'); if (!tier) sub(t, L.root[ch] * 2, SIX * 16, .09); }
-    const hk = L.hook[ch].find(h => h[0] === i); if (hk && !(fill && i >= 13)) pluck(t, hk[1], tier ? .07 : .085);
+    const hk = L.hook[ch].find(h => h[0] === i); if (hk && (tier ? hookOn(bar) : preview(bar, i)) && !(fill && i >= 13)) pluck(t, hk[1], tier ? .085 : .07);
+    if (tier && golden(bar) && i < 8) { if (i === 0) pad(t, L.surp, SIX * 10, .028, 'triangle'); return; }
     if (fill && tier === 0) { if (i >= 8 && i < 13) clap(t, .07 + (i - 8) * .035, .1); if (i < 13 && i % 2 === 0) hat(t + sw, .03); if (i === 0) kick(t, .35); return; }
     if (tier === 0) {   // already catchy before the drop: snaps, a shaker and a soft kick under the riff
       if (i === 0 || i === 10) kick(t, .3); if (i === 8) rim(t, .1); if (i % 2 === 0) hat(t + sw, .02); else hat(t, .008); return;
@@ -1013,50 +1029,52 @@ const AU = (() => {
     if (i === 6) hat(t + sw, .05, true); else if (tier >= 2 || i % 2 === 0) hat(t + (i % 2 ? 0 : sw), i % 2 ? .025 : .045);
     if (bar & 1 && i >= 12 && i % 2 === 0) for (let r = 1; r < 3; r++) hat(t + r * SIX * 2 / 3, .035);
     if ((bar & 1) && (i === 12 || i === 14)) chant(t, L.pad[ch][0] / 2, .045);   // "hey, hey"
-    if (tier >= 2) { if (i === 4) chant(t, L.pad[ch][1] / 2, .03); const n = L.pad[ch][[0, 2, 1, 2][i & 3]] * 2; mv({ t, f:n, type:'square', dur:.1, vol:.014, lp:2200, dly:.2 }); }
+    if (tier >= 2 && i === 4) chant(t, L.pad[ch][1] / 2, .03);
   }
-  // "Rising Qi": the main theme, for the menu and Level 1. An original, bright, bouncy anthem: a brass-stab riff on the
-  // off-beats, a whistle-like lead hook over Gm, Eb, Bb, F, claps on every other beat for drive, and chant stabs. It is
-  // the menu's full beat, then Level 1 starts it calm and lets the danger bring the beat back in.
-  const RISE = {
-    pad:[[196, 233.08, 293.66], [196, 233.08, 311.13], [174.61, 233.08, 293.66], [174.61, 220, 261.63]],   // Gm, Eb/G, Bb/F, F
-    root:[49, 38.89, 58.27, 43.65],
-    stab:[[0, 3, 6, 10, 12], [0, 3, 6, 10, 12], [0, 3, 6, 10, 12], [0, 3, 6, 8, 10, 12, 14]],
-    lead:[[[0, 587.33], [2, 587.33], [4, 466.16], [6, 523.25], [8, 587.33], [11, 698.46], [14, 587.33]],
-          [[0, 622.25], [2, 622.25], [4, 587.33], [6, 523.25], [8, 466.16], [11, 523.25], [14, 392]],
-          [[0, 587.33], [2, 587.33], [4, 698.46], [6, 783.99], [8, 698.46], [11, 587.33], [14, 466.16]],
-          [[0, 523.25], [2, 523.25], [4, 587.33], [6, 698.46], [8, 698.46], [10, 622.25], [12, 587.33], [14, 523.25]]],
-    kicks:[[0, 6, 10], [0, 3, 8, 11]] };
-  function brass(t, notes, v, open) {   // a horn stab: detuned saws through a filter that snaps open and shuts
-    const f = c.createBiquadFilter(), gn = c.createGain(); f.type = 'lowpass'; f.Q.value = 2;
-    f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(open, t + .025); f.frequency.exponentialRampToValueAtTime(700, t + .2);
-    gn.gain.setValueAtTime(.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + .008); gn.gain.exponentialRampToValueAtTime(.0001, t + .24);
-    f.connect(gn).connect(mBus); const sd = c.createGain(); sd.gain.value = .3; gn.connect(sd).connect(rev);
-    for (const n of notes) for (const d of [-12, 12]) { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = n; o.detune.value = d; o.connect(f); o.start(t); o.stop(t + .28); }
+  // "Afterglow": the main theme, for the menu and Level 1. Original, moody and late-night: muffled Rhodes chords with
+  // ninths (Cm9, Abmaj9, Fm9, G7sus to G7b9), a short chopped-vocal hook that slides up into its notes and repeats until
+  // it sticks, knocking drums, rolling hats and sliding 808s. Calm, it sounds underwater; when the danger rises, the
+  // filter opens and the beat drops. Same tempo as the boss theme, so the Warden can land on the next bar.
+  const GLOW = {
+    keys:[[130.81, 155.56, 196, 233.08, 293.66], [103.83, 130.81, 155.56, 196, 233.08], [87.31, 103.83, 130.81, 155.56, 196], [98, 130.81, 146.83, 174.61, 233.08]],
+    tens:[null, null, null, [98, 123.47, 146.83, 174.61, 207.65]],   // the second bar of G resolves the sus into G7b9
+    root:[32.7, 51.91, 43.65, 49],
+    hook:[[[0, 392], [3, 392], [6, 466.16], [10, 392], [12, 349.23], [16, 311.13], [20, 523.25], [24, 466.16], [26, 392], [28, 349.23]],   // ends open
+          [[0, 392], [3, 392], [6, 466.16], [10, 392], [12, 349.23], [16, 311.13], [20, 523.25], [24, 466.16], [27, 415.3], [30, 392]]],   // lands on G for the G7
+    surp:[174.61, 220, 261.63, 329.63],   // F major 7, a Dorian lift of warmth inside the minor
+    kicks:[[0, 7, 10], [0, 3, 10, 13]] };
+  function keys(t, notes, dur, v, open) {   // an electric piano: a soft sine body, a tine on top, a slow tremolo
+    for (const f of notes) { mv({ t, f, dur, vol:v, att:.008, hold:dur * .35, lp:open, rev:.5 }); mv({ t, f:f * 2, dur:.5, vol:v * .28, att:.004, lp:open }); mv({ t, f:f * 4.01, dur:.14, vol:v * .07 }); }
   }
-  const whistle = (t, f, v) => mv({ t, f, type:'triangle', dur:SIX * 1.9, vol:v, att:.012, hold:SIX * .9, vib:6.5, vibD:9, dly:.3, rev:.25 });
+  function chop(t, f, v, len = SIX * 1.7) {   // a chopped-vocal hook: it slides up into the note through two vowel formants
+    mv({ t, f, f0:f * .89, gl:.06, dur:len, vol:v * .55, att:.012, hold:len * .45, rev:.35, dly:.28 });
+    for (const [bp, q, gv] of [[540, 5, 1], [980, 6, .65]]) mv({ t, f, f0:f * .89, gl:.06, type:'sawtooth', dur:len, vol:v * gv, att:.012, hold:len * .45, lp:bp, ft:'bandpass', q, rev:.4 });
+  }
   function riseStep(s, t) {
-    const bar = s >> 4, i = s & 15, ch = bar & 3, R = RISE;
+    const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = GLOW;
     if (i === 0) phrase(bar, t);
-    const tier = M.tier, fill = M.sw === bar + 1;
-    if (i === 0) { pad(t, R.pad[ch], SIX * 16 + .7, tier ? .012 : .018); if (!tier) sub(t, R.root[ch] * 2, SIX * 16, .085); }
-    const ld = R.lead[ch].find(h => h[0] === i); if (ld && !(fill && i >= 13)) whistle(t, ld[1] * (tier >= 2 ? 2 : 1), tier ? .055 : .065);
-    if (R.stab[ch].includes(i) && !(fill && i >= 13)) brass(t, R.pad[ch].map(f => f * 2), tier ? .05 : .03, tier ? 4200 : 1500);
-    if (fill && tier === 0) { if (i >= 8 && i < 13) clap(t, .07 + (i - 8) * .035, .1); if (i < 13 && i % 2 === 0) hat(t, .03); if (i === 0) kick(t, .35); return; }
-    if (tier === 0) { if (i === 0 || i === 8) kick(t, .3); if (i === 4 || i === 12) rim(t, .1); if (i % 2 === 0) hat(t, .018); return; }
-    groove(t, bar, i, R, ch, tier, tier >= 2 ? .66 : .6);
-    if (i === 4 || i === 12) clap(t, i === 12 ? .32 : .26, .28);
-    if (tier >= 2 || i % 2 === 0) hat(t, i % 2 ? .025 : .045); if (i === 14 && !(bar & 1)) hat(t, .05, true);
-    if ((bar & 3) === 3 && (i === 13 || i === 14 || i === 15)) clap(t, .12, .05);
-    if ((bar & 1) && i === 14) chant(t, R.pad[ch][0] / 2, .05);
-    if (tier >= 2 && i % 4 === 2) mv({ t, f:R.pad[ch][(i >> 2) % 3] * 4, type:'square', dur:.08, vol:.012, lp:2600, dly:.2 });
+    const tier = M.tier, fill = M.sw === bar + 1, open = [1300, 2400, 3600][tier];
+    if (k === 0) keys(t, R.keys[ch], SIX * 18, tier ? .03 : .036, open);
+    if (k === 16 && R.tens[ch]) keys(t, R.tens[ch], SIX * 14, .028, open);
+    if (k === 26 && tier) keys(t, R.keys[ch].slice(2), SIX * 6, .02, open);   // a late re-strike, behind the beat
+    if (k === 0 && !tier) sub(t, R.root[ch] * 2, SIX * 32, .1);
+    const hk = R.hook[(bar >> 1) & 1].find(h => h[0] === k); if (hk && (tier ? hookOn(bar) : preview(bar, k)) && !(fill && i >= 13)) chop(t, hk[1], tier ? .06 : .045);
+    if (tier && golden(bar) && i < 8) { if (i === 0) keys(t, R.surp, SIX * 10, .032, 2400); return; }
+    if (k === 28 && tier) mn({ t, f:600, f1:6000, dur:SIX * 4 + .02, att:SIX * 3.8, vol:.05, rev:.4 });   // a reversed swell into every chord
+    if (fill && tier === 0) { if (i >= 8 && i < 13) clap(t, .06 + (i - 8) * .035, .1); if (i < 13 && i % 2 === 0) hat(t, .025); if (i === 0) kick(t, .35); return; }
+    if (tier === 0) { if (i === 0 || i === 10) kick(t, .28); if (i === 8) rim(t, .09); if (i % 2 === 0) hat(t, .012); return; }
+    groove(t, bar, i, R, ch, tier, tier >= 2 ? .68 : .62);
+    if (i === 8) clap(t, tier >= 2 ? .34 : .3, .35);
+    hats(t, bar, i, tier, .04);
+    if (tier >= 2 && (i === 7 || i === 15) && bar & 1) rim(t, .07);
   }
   function pathStep(s, t) {
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, P = PATH;
     if (i === 0) phrase(bar, t);
     const tier = M.tier, fill = M.sw === bar + 1;
     if (k === 0) { pad(t, P.pad[ch], SIX * 32 + 1, tier ? .016 : .022); if (!tier) sub(t, P.root[ch] * 2, SIX * 32, .09); }
-    const hk = (ch & 1 ? P.hookB : P.hookA).find(h => h[0] === k); if (hk) bell(t, P.pent[hk[1]], tier ? .06 : .075);
+    const hk = (ch & 1 ? P.hookB : P.hookA).find(h => h[0] === k); if (hk && (tier ? hookOn(bar) : preview(bar, k))) bell(t, hk[1], tier ? .07 : .06);
+    if (tier && golden(bar) && i < 8) { if (i === 0) pad(t, P.surp, SIX * 10, .03); return; }
     if (fill && tier === 0) {  // the run-up: a snare roll that swells into the breath
       if (i >= 8 && i < 13 && (i >= 12 || i % 2 === 0)) clap(t, .08 + (i - 8) * .03, .1);
       if (i < 13 && i % 2 === 0) hat(t, .03);
@@ -1070,7 +1088,6 @@ const AU = (() => {
     groove(t, bar, i, P, ch, tier, tier >= 2 ? .66 : .6);
     if (i === 8) clap(t, tier >= 2 ? .34 : .3); if (tier >= 2 && i === 15 && (bar & 3) === 3) clap(t, .12, .1);
     hats(t, bar, i, tier, .045);
-    if (tier >= 2) { const n = P.pad[ch][[0, 1, 2, 3, 2, 1, 3, 2][i & 7]] * 2; mv({ t, f:n, type:'sawtooth', dur:.14, vol:.02, lp:1900, dly:.18 }); }
   }
   function wardStep(s, t) {
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, W = WARD, intro = bar < 2;
@@ -1087,7 +1104,7 @@ const AU = (() => {
     if (i === 8) { clap(t, .34, .4); mv({ t, f:1800, type:'triangle', dur:.06, vol:.03 }); mv({ t, f:2650, type:'triangle', dur:.05, vol:.02 }); }
     hats(t, bar, i, tier >= 2 ? 2 : 1, .04);
     if (tier >= 2) {
-      if (k === 0) mv({ t, f:W.lead[ch], f0:W.lead[(ch + 3) & 3], gl:.18, type:'sawtooth', dur:SIX * 30, vol:.03, att:.08, hold:SIX * 20, lp:2400, vib:5.5, vibD:22, rev:.4 });
+      if (k === 0) mv({ t, f:W.lead[ch] / 2, f0:W.lead[(ch + 3) & 3] / 2, gl:.18, type:'sawtooth', dur:SIX * 30, vol:.034, att:.08, hold:SIX * 20, lp:2400, vib:5.5, vibD:22, rev:.4 });
       if (i === 4 || i === 12) kick(t, .4);
       if (i === 8 || i === 12) mv({ t, f:W.lead[ch] / 2, type:'square', dur:.09, vol:.025, lp:1600 });
     }
@@ -1275,7 +1292,7 @@ function startRun() {
   paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
-  AU.song(['rise', 'lantern', 'path', 'lantern'][S.level - 1]); AU.music(true);   // Rising Qi opens, then the level themes take turns; every boss shares the Warden's new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
+  AU.song(['rise', 'lantern', 'path', 'lantern'][S.level - 1]); AU.music(true);   // Afterglow opens, then the level themes take turns; every boss shares the Warden's new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -2562,10 +2579,16 @@ function draw() {
     const edge = path => { g.strokeStyle = 'rgba(90,0,0,.85)'; g.lineWidth = 7; path(); g.stroke(); g.strokeStyle = `rgba(255,${120 + 100 * pulse | 0},90,1)`; g.lineWidth = 3; path(); g.stroke(); };
     if (a.k === 'circle') { const el = (r) => () => { g.beginPath(); g.ellipse(a.x, a.y, r, r * .7, 0, 0, TAU); };
       g.fillStyle = 'rgba(255,30,20,.28)'; el(a.r)(); g.fill(); g.fillStyle = `rgba(255,50,30,${.5 * pulse})`; el(a.r * p)(); g.fill(); edge(el(a.r)); }
-    else if (a.k === 'lane') { g.save(); g.translate(e.x, e.y); g.rotate(Math.atan2(a.dy, a.dx)); const L = a.len + e.r, W = a.w;
-      g.fillStyle = 'rgba(255,30,20,.28)'; g.fillRect(0, -W / 2, L, W); g.fillStyle = `rgba(255,50,30,${.5 * pulse})`; g.fillRect(0, -W / 2, L * p, W); edge(() => { g.beginPath(); g.rect(0, -W / 2, L, W); });
-      g.fillStyle = '#FFFFFF'; g.strokeStyle = 'rgba(90,0,0,.85)'; g.lineWidth = 3; for (let c = 1; c <= 3; c++) { const cx = L * c / 4; g.beginPath(); g.moveTo(cx + 14, 0); g.lineTo(cx - 7, -12); g.lineTo(cx - 7, 12); g.closePath(); g.stroke(); g.fill(); }
-      g.restore(); }
+    else if (a.k === 'lane') {   // a soft, rounded lane: a warm glow that fades toward its end, a glow that fills it, drifting chevrons
+      g.save(); g.translate(e.x, e.y); g.rotate(Math.atan2(a.dy, a.dx)); const L = a.len + e.r, W = a.w, R = W / 2;
+      const cap = () => { g.beginPath(); g.moveTo(R, -R); g.lineTo(L - R, -R); g.arc(L - R, 0, R, -Math.PI / 2, Math.PI / 2); g.lineTo(R, R); g.arc(R, 0, R, Math.PI / 2, Math.PI * 1.5); g.closePath(); };
+      const gr = g.createLinearGradient(0, 0, L, 0); gr.addColorStop(0, `rgba(255,90,70,${.26 + .12 * p})`); gr.addColorStop(1, 'rgba(255,90,70,.06)');
+      g.fillStyle = gr; cap(); g.fill();
+      g.save(); cap(); g.clip(); const sw = g.createLinearGradient(0, 0, Math.max(1, L * p), 0); sw.addColorStop(0, 'rgba(255,110,80,0)'); sw.addColorStop(1, `rgba(255,130,100,${.42 * pulse})`); g.fillStyle = sw; g.fillRect(0, -R, L * p, W); g.restore();
+      g.strokeStyle = `rgba(255,190,170,${.45 + .2 * pulse})`; g.lineWidth = 2.5; g.setLineDash([16, 14]); g.lineDashOffset = -S.t * 70; cap(); g.stroke(); g.setLineDash([]);
+      g.strokeStyle = 'rgba(255,240,232,1)'; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
+      for (let c = 0; c < 3; c++) { const q = (c / 3 + S.t * .7) % 1, cx = R + q * (L - W); g.globalAlpha = Math.sin(q * Math.PI) * .7; g.beginPath(); g.moveTo(cx - 8, -10); g.lineTo(cx + 5, 0); g.lineTo(cx - 8, 10); g.stroke(); }
+      g.globalAlpha = 1; g.lineCap = 'butt'; g.lineJoin = 'miter'; g.restore(); }
   }
   g.lineWidth = 1;
   // enemies: a coloured ring at the feet names their element
