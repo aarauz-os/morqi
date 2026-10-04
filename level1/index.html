@@ -1558,8 +1558,8 @@ function draw() {
   g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(P.x, P.y + 30, 26 - bob * .8, 9, 0, 0, TAU); g.fill();
   if (S.buffs.tiger > 0) add(() => { glowAt(kx, ky - 30, 170 + Math.sin(S.t * 18) * 14, '#FF9A3A', .8); if (Math.random() < .5) flames(kx, ky - 10, 1, 20, 22, 120); });
   if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob); g.rotate(lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
-    g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1)); g.drawImage(kim, -ks / 2, -ks * .72 - 30, ks, ks);
-    if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, -ks * .72 - 30, ks, ks); g.globalAlpha = 1; } }
+    g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1)); g.drawImage(kim, -ks / 2, -ks * .72 - 24, ks, ks);   // feet on the shadow
+    if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, -ks * .72 - 24, ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
   const hb = Math.max(0, P.hp / P.max);
   g.fillStyle = '#1A1206'; g.fillRect(P.x - 40, P.y + 41, 80, 13);
