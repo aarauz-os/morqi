@@ -1356,7 +1356,7 @@ function startRun() {
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
-  coach('move', 'Drag to move', 'Put your thumb anywhere and drag. Your powers fire on their own.', () => ({ sx:W / 2, sy:H * .7 - 70 }), 7, 'above', () => S.moved > 140);
+  coach('move', 'Drag to move', 'Drag anywhere. Your powers fire on their own.', () => ({ sx:W / 2, sy:H * .7 - 70 }), 7, 'above', () => S.moved > 140);
 }
 function need(lv) { return Math.round(4 + lv * lv * 4.2); }
 
@@ -1443,16 +1443,15 @@ function spawn(type, at, rush, el) {
 const DIRS = [['the north', 0, -1], ['the east', 1, 0], ['the south', 0, 1], ['the west', -1, 0]];
 function horde() {
   S.hordes++;
-  if (S.hordes === 1) setTimeout(() => S && coach('horde', 'Hordes', 'A horde arrives every 16 seconds, bigger each time and as you level. Keep moving!', () => ({ x:S.p.x, y:S.p.y - 90 }), 5), 1600);
   const n = Math.round(22 + S.t * .42 + S.lv * 3), [name, dx, dy] = DIRS[(Math.random() * 4) | 0];
   const d = Math.hypot(VW, VH) / 2 + 60, px = -dy, py = dx;
   for (let i = 0; i < n; i++) { const spread = rnd(-.5, .5) * (VW + 200), depth = rnd(0, 260); spawn(S.t > 40 && Math.random() < .3 ? 'wolf' : 'critter', { x:S.p.x + dx * (d + depth) + px * spread, y:S.p.y + dy * (d + depth) + py * spread }, 1.3); }
-  cue('The Still is coming!', `A horde of ${n}, from ${name}`, 1900, true); SFX.alarm();
+  SFX.alarm();
 }
 function ring2(n) {
   const c = S.arena || S.p, d = S.arena ? S.arena.r - 30 : Math.hypot(VW, VH) / 2 + 30;
   for (let i = 0; i < n; i++) { const a = i / n * TAU; spawn(i % 4 ? 'critter' : 'wolf', { x:c.x + Math.cos(a) * d, y:c.y + Math.sin(a) * d }); }
-  cue('Surrounded!', 'Break out of the ring', 1800, true); SFX.alarm();
+  SFX.alarm();
 }
 function spawnBoss() {
   S.bossSpawned = true;
@@ -1464,7 +1463,7 @@ function spawnBoss() {
   e.pat = 0; e.atk = 2.2; S.bossFx = []; S.heartT = 3;
   for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.p.x, m.y - S.p.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
-  cue('The Still Warden', `${ELNAME[e.el]} first. ${andList(weakTo(e.el).map(k => ELNAME[k]))} beat ${ELNAME[e.el]}.`, 2800, true); SFX.bossroar(); SFX.stomp(); S.shake = .6; AU.song('boss'); S.flashT = .45; S.flashC = '110,96,255'; ring(e.x, e.y, 30, 900, '#8F7CFF', .9, 24, true);
+  SFX.bossroar(); SFX.stomp(); S.shake = .6; AU.song('boss'); S.flashT = .45; S.flashC = '110,96,255'; ring(e.x, e.y, 30, 900, '#8F7CFF', .9, 24, true);
   ring(e.x, e.y, 20, 400, '#BFE3FF', .8, 16, true); smoke(e.x, e.y + 60, 14, 50, '200,220,235');
   setTimeout(() => { if (S && !S.over) awaken(); }, 1400);
 }
@@ -1477,8 +1476,6 @@ function hurt(e, dmg, el, o = {}) {
   m *= k;
   if (strong && S.t - S.strongT > 1.4) { S.strongT = S.t; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
   if (weak && S.t - (S.weakT ?? -9) > 2.6 && !e.boss) { S.weakT = S.t; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
-  if (strong && !S.taught.strong && S.t > 6) { S.taught.strong = 1; toast(`Super effective! ${ELNAME[el]} ${VERB[el][e.el][0]} ${ELNAME[e.el]}: 2× damage.`, 3800); }
-  else if (weak && !S.taught.weak && S.t > 12 && el !== e.el) { S.taught.weak = 1; toast(`Resisted. ${ELNAME[e.el]} ${VERB[e.el][el][0]} ${ELNAME[el]}, so it barely feels it. Mix your elements!`, 4200); }
   const dealt = dmg * m;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   if (!e.boss) {
@@ -1855,7 +1852,7 @@ function awaken() {
   S.awake = { t:0, dur:6.5, a:rnd(0, TAU), trail:[] }; S.awakenings++;
   if (S.awakenings === 1) setTimeout(() => S && note('awake', 'Awakening! Your spirit animal takes its mythic form for a few seconds.', () => ({ x:S.p.x, y:S.p.y - 100 }), 5), 2300);
   const A = ANIMAL[animal];
-  cue(`${A.m}!`, `Your ${A.y} awakens`, 2200); SFX.roar(); S.flashT = .3; S.flashC = '255,240,200'; S.shake = .4;
+  SFX.roar(); S.flashT = .3; S.flashC = '255,240,200'; S.shake = .4;
   ring(S.pet.x, S.pet.y, 20, 600, EL[A.e], .7, 18, true); stars(S.pet.x, S.pet.y, 40, EL[A.e], 520);
 }
 function awakeTick(dt) {
@@ -1922,7 +1919,7 @@ function fireUlt() {
   const U = S && S.ult; if (!U || U.cast || U.charge < 1 || !running) return false;
   const I = S.ultInfo, A = ANIMAL[animal], el = A.e, st = I.stage, k = ULT[animal].k, pet = S.pet;
   U.charge = 0; U.uses++; U.cast = { k, t:0, i:0, el, hit:new Set() };
-  cue(I.name + '!', `${A.y} · Lv ${I.lv}`, 1500); SFX.charge(); SFX.roar(); S.flashT = .18; S.flashC = '255,244,210'; S.hitstop = .12;
+  floatText(pet.x, pet.y - 90, I.name + '!', '#FFE08A', 26); SFX.charge(); SFX.roar(); S.flashT = .18; S.flashC = '255,244,210'; S.hitstop = .12;
   ring(pet.x, pet.y, 10, 220, EL[el], .45, 12, true); stars(pet.x, pet.y - 20, 20, EL[el], 360);
   const C = U.cast;
   if (k === 'slam') Object.assign(C, { hops:[1, 2, 3, 3, 4][st], R:[150, 185, 220, 255, 300][st], ph:-1 });
@@ -2019,8 +2016,7 @@ const live = (o, pool) => (o && !o.dead && !o.pull && (S.en.includes(o) || S.gem
 function teach() {
   const P = S.p, A = ANIMAL[animal], tg = S.taught;
   if (!tg.c_pet && S.t > 6) note('pet', `Your ${A.y} fights beside you, firing ${ELNAME[A.e]} at the creatures ${ELNAME[A.e]} beats.`);
-  if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. Some elements hit it twice as hard (Super effective!), others only half. Watch the numbers.', () => { const t = live(e, S.en.filter(o => !o.dead && !o.boss)); return { x:t.x, y:t.y - t.size * .16, r:t.size * .62 }; }, 5.5); }
-  if (!tg.c_gem && tg.c_enemy) { const q = S.gems.find(q => !q.pull); if (q) coach('gem', 'Qi gems', 'Walk over gems to collect qi. When the bar at the top fills, you level up and pick a new power.', () => { const t = live(q, S.gems.filter(o => !o.pull)); return { x:t.x, y:t.y - 6, r:34 }; }, 4); }
+  if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. The right element hits twice as hard.', () => { const t = live(e, S.en.filter(o => !o.dead && !o.boss)); return { x:t.x, y:t.y - t.size * .16, r:t.size * .62 }; }, 5.5); }
   if (!tg.c_crate && S.t > 14 && S.crates.some(c => Math.abs(c.x - P.x) < VW * .42 && Math.abs(c.y - P.y) < VH * .4)) note('crate', 'Frozen lanterns hold gifts: magnets, heals, firecrackers. Break them open!');
   if (!tg.c_item && S.items.length) { const nm = ITEM_INFO[S.items[0].kind]; note('item', `${nm[0]}: ${nm[1]} Walk over it to use it.`); }
   if (!tg.c_chest && S.chests.length) note('chest', 'A Spirit Chest! Walk to it for free upgrades, the best way to evolve a power.');
@@ -2031,15 +2027,12 @@ function teach() {
       markSeen(e.kid);
       if (S.level > 1) {}   // later levels introduce what matters before the level starts
       else if (!SEEN.has('_card')) { markSeen('_card'); COACH.q.push({ id:'k' + e.kid, card:e.kid }); }
-      else cue(e.K.n, e.K.short || e.K.tip, 2800, true);
     }
     break;
   }
-  if (!tg.c_wave && S.warn) coach('wave', 'Waves', 'Every wave is one element and comes in a shape: a line, a charging column, a closing ring. The arrows show where, and the banner says which elements beat it.', () => { const [dx, dy] = SIDES[S.warn ? S.warn.dirs[0] : 0]; return dx ? { sx:dx > 0 ? W - 40 : 40, sy:H / 2, sr:42 } : { sx:W / 2, sy:dy < 0 ? 205 : H - 44, sr:42 }; }, 0, 'below');
   if (S.ult.charge >= 1 && !SEEN.has('_ult')) { markSeen('_ult'); S.taught.c_ult = 0; const I = S.ultInfo;
-    coach('ult', `${A.y}: ${I.name}!`, `Your ${A.y}'s ultimate is ready. Tap it (or press E) for one huge hit. Your ${A.y} grows stronger every run, and at companion level ${I.next || 60} its ultimate evolves.`,
+    coach('ult', `${A.y}: ${I.name}!`, `Tap your ${A.y} for one huge hit. It grows every run.`,
       () => { const r = $('#ultBtn').getBoundingClientRect(), b = stage.getBoundingClientRect(); return { sx:r.left - b.left + r.width / 2, sy:r.top - b.top + r.height / 2, sr:r.width * .62, paint:'#ultImg' }; }); }
-  if (!tg.c_boss && S.boss) coach('boss', 'The Still Warden', 'Its colour shows its element, and it changes as it weakens. Defeat it to free the shore.', () => ({ x:S.boss.x, y:S.boss.y - S.boss.size * .26, r:S.boss.size * .5 }), 6);
 }
 const ITEM_INFO = { magnet:["Luma's Call", 'Pulls every gem on the map to you.'], cracker:['Firecrackers', 'Clears every creature on screen.'], dumpling:['Dumpling', 'Heals you.'], heart:['Heart', 'Restores a quarter of your health. Health barely refills on its own.'], peach:['Peach of Immortality', 'Heals you fully.'], tiger:['Tiger Talisman', 'Your powers hit 50% harder for a while.'], frost:['Frost Bell', 'Freezes everything on screen.'], ward:['Jade Ward', 'For a while, elements that beat yours hurt you half as much.'] };
 // ten scripted waves before the boss: each one a single element, in a shape you can read, announced two seconds ahead
@@ -2158,7 +2151,7 @@ function direct(dt) {
     if (next && !S.warn && t >= next.t - 2.2) {
       S.warn = planWave(next);
       const from = next.form === 'ring' || next.form === 'storm' ? 'all around you' : next.form === 'pincer' ? 'both sides' : SIDES[S.warn.dirs[0]][2];
-      cue(`Wave ${S.waveIdx + 1} of ${WV.length}`, next.el === 'mix' ? `${next.name}, from ${from}` : `${next.name}, from ${from} · ${beatenBy(next.el)} beat ${ELNAME[next.el]}`, 2600, true); SFX.alarm();
+      SFX.alarm();
     }
     if (S.warn) { S.warn.t += dt; if (S.warn.t >= 2.2) { launchWave(S.warn); S.warn = null; S.waveIdx++; } }
     if (t > 170 && !S.warn) spawnBoss();
@@ -2166,7 +2159,6 @@ function direct(dt) {
     const b = S.boss, ph = b.hp < b.max * .34 ? 2 : b.hp < b.max * .67 ? 1 : 0;
     if (ph !== b.phase) {
       b.phase = ph; b.el = LV().boss[ph];
-      cue(`The Warden turns to ${ELNAME[b.el]}`, `${beatenBy(b.el)} beat ${ELNAME[b.el]}`, 2200, true);
       if (eff(b.el, keeperEl) > 1) { const a = rnd(0, TAU); S.items.push({ x:S.p.x + Math.cos(a) * 90, y:S.p.y + Math.sin(a) * 90, kind:'ward', t:0, z:10, vz:260 }); }   // the shore helps a Keeper this element beats
       ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5;
     }
@@ -2187,7 +2179,7 @@ function bossFight(b, ph, dt) {
     S.boltT = rnd(3, 6); const a = rnd(0, TAU), r = rnd(.3, .9) * A.r; S.bolt = { t:0, x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, seed:Array.from({ length:10 }, () => rnd(-1, 1)) };
     SFX.boom(true); S.shake = Math.max(S.shake, .35); ring(S.bolt.x, S.bolt.y, 10, 160, '#CFE0FF', .4, 10, true); shards(S.bolt.x, S.bolt.y, '#E8F1FF', 10, 300);
   }
-  if (enraged && !b.enraged) { b.enraged = true; b.castAt = S.t + .6; cue('The Warden is enraged!', 'Faster attacks. Keep moving and grab hearts.', 2200, true); SFX.bossroar(); S.shake = .6; S.hitstop = .18; }
+  if (enraged && !b.enraged) { b.enraged = true; b.castAt = S.t + .6; SFX.bossroar(); S.shake = .6; S.hitstop = .18; }
   S.heartT -= dt; if (S.heartT <= 0) { S.heartT = enraged ? 12 : 18; if (!S.items.some(it => it.kind === 'heart')) { const a = rnd(0, TAU), r = rnd(.35, .8) * A.r; S.items.push({ x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, kind:'heart', t:0, z:30, vz:200 }); } }
   // ground hazards from spikes and stomps
   for (const f of S.bossFx) { f.t += dt; if (!f.done && f.t >= f.wind) { f.done = true;
@@ -3000,9 +2992,9 @@ function levelUp() {
   draw(); hud();
   $('#luTitle').textContent = 'Level Up!';
   const opts = options(), tip = $('#luTip');
-  if (!S.taught.lu) { S.taught.lu = 1; tip.innerHTML = 'Each card is a power. <b>The bars</b> show its level, up to five. <b>NEW!</b> is a power you don\'t have yet. Your powers sit in the bar above.'; tip.hidden = false; }
-  else if (opts.some(o => o.kind === 'evo') && !S.taught.luevo) { S.taught.luevo = 1; tip.innerHTML = '<b>EVOLVE!</b> Your power is at five stars and you hold the gift that feeds it. Take it!'; tip.hidden = false; }
-  else if (opts.some(o => o.kind === 'gift') && !S.taught.lugift) { S.taught.lugift = 1; tip.innerHTML = '<b>Gifts</b> (round icons) boost everything, and each one is the key that evolves the powers of the element it feeds.'; tip.hidden = false; }
+  if (!S.taught.lu) { S.taught.lu = 1; tip.innerHTML = 'Pick one. <b>Bars</b> show its level.'; tip.hidden = false; }
+  else if (opts.some(o => o.kind === 'evo') && !S.taught.luevo) { S.taught.luevo = 1; tip.innerHTML = '<b>EVOLVE!</b> Take it.'; tip.hidden = false; }
+  else if (opts.some(o => o.kind === 'gift') && !S.taught.lugift) { S.taught.lugift = 1; tip.innerHTML = '<b>Gifts</b> (round) unlock evolutions.'; tip.hidden = false; }
   else tip.hidden = true;
   renderLoadout(); renderCards(opts);
   $('#rerollN').textContent = S.rerolls; $('#rerollBtn').disabled = !S.rerolls; $('#rerollBtn').style.opacity = S.rerolls ? 1 : .45;
@@ -3051,7 +3043,7 @@ $('#rerollBtn').onclick = () => { if (!S.rerolls || $('#cards').classList.contai
 // learning shows: a burst in the power's colour on the Keeper, its name and new level
 function applyPick(o, quiet) {
   const P = S.p, el = elOf(o), col = EL[el];
-  if (o.kind === 'evo') { S.evo[o.id] = true; if (!quiet) { cue(POW[o.id].evo, 'Evolution!', 2200); SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
+  if (o.kind === 'evo') { S.evo[o.id] = true; if (!quiet) { SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
   else if (o.kind === 'active') { S.skills[o.id] = (S.skills[o.id] || 0) + 1; floatText(P.x, P.y - 100, `${POW[o.id].n} ${S.skills[o.id] > 1 ? 'Lv ' + S.skills[o.id] : 'learned'}!`, col, 18); }
   else if (o.kind === 'gift') { S.gifts[o.id] = (S.gifts[o.id] || 0) + 1; floatText(P.x, P.y - 100, `${GIFT[o.id].n} ${S.gifts[o.id] > 1 ? 'Lv ' + S.gifts[o.id] : 'gained'}!`, col, 18); }
   else { P.hp = P.max; SFX.heal(); }
@@ -3135,7 +3127,7 @@ function landChest() {
 function finishChest() {
   if (!CH) return; const rw = CH.rewards; CH = null;
   rw.forEach((o, k) => applyPick(o, k > 0));
-  if (rw.some(o => o.kind === 'evo')) { const e = rw.find(o => o.kind === 'evo'); cue(POW[e.id].evo, 'Evolution!', 2200); SFX.power(); }
+  if (rw.some(o => o.kind === 'evo')) SFX.power();
   else SFX.levelup();
   resume();
 }
@@ -3144,7 +3136,8 @@ function finishChest() {
 const COACH = { q:[], cur:null, gap:0 };
 // smaller things are told in a banner that never stops play, one at a time
 const NOTES = { q:[], t:0 };
-function note(id, text) { if (!S || S.taught['c_' + id]) return; S.taught['c_' + id] = 1; NOTES.q.push(text); }
+// play stays quiet (A, 2026-10-04): no text toasts while you play; sound, flashes and the HUD carry the information
+function note(id) { if (S) S.taught['c_' + id] = 1; }
 function coach(id, title, text, where, secs, place = 'above') {
   if (!S || S.taught['c_' + id]) return; S.taught['c_' + id] = 1;
   COACH.q.push({ id, title, text, where, place });
@@ -3246,7 +3239,6 @@ function win() {
   const bx = S.boss.x, by = S.boss.y; let r = 0;
   shards(bx, by - 80, '#CFE9FF', 40, 520); ring(bx, by, 20, 900, '#FFE6A3', 1.2, 30, true); stars(bx, by - 60, 60, '#FFE58A', 700);
   for (let i = 0; i < 70; i++) { const an = rnd(0, TAU), sp = rnd(200, 900); fx({ k:'star', x:bx, y:by - 60, vx:Math.cos(an) * sp, vy:Math.sin(an) * sp, drag:1.6, life:rnd(1, 2), s:rnd(10, 18), c:['#5CF2FF', '#D58BFF', '#FFD24A'][i % 3] }); }
-  cue('The shore is free!', '', 3000);
   let lastF = performance.now();
   const flood = now => { const dt = Math.min(.05, (now - lastF) / 1000); lastF = now; r += 70; paintThaw(bx, by, r); for (let i = 0; i < 6; i++) paintThaw(rnd(0, WORLD), rnd(0, WORLD), 180); updateFX(dt); S.en = []; draw(); hud(); if (r < 2600) requestAnimationFrame(flood); else setTimeout(results, 500); };
   requestAnimationFrame(flood);
