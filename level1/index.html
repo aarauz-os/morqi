@@ -256,6 +256,27 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
 .tip b{color:#FFE58A}
 .tip[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.card,.card .tile::before,.card.evo::after,.stars s.n,.chestwrap .rays,.victory::before,.pop,#cue b{animation:none}}
+#wavePill small{display:block;text-align:center;font-size:11.5px;-webkit-text-stroke:2.5px var(--outline);line-height:1.2}
+/* creature cards: the creature itself, big, with its element, its trick and what beats it */
+.beasts{display:grid;gap:8px;width:100%}
+.beast{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center;padding:8px 10px;border-radius:16px;background:rgba(0,0,0,.26);box-shadow:inset 0 2px 6px rgba(0,0,0,.35);text-align:left}
+.beast .pic{width:96px;height:96px;border-radius:16px;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--c) 45%,#1C2C44),#121E30 72%);box-shadow:0 0 0 3px var(--outline),inset 0 0 0 2px var(--c)}
+.beast .pic img{width:112%;max-width:none;filter:drop-shadow(0 3px 0 rgba(0,0,0,.45))}
+.beast b{display:block;font-family:var(--chunky);font-weight:400;font-size:19px;color:#fff;-webkit-text-stroke:3.5px var(--outline);paint-order:stroke fill}
+.beast p{margin:3px 0 5px;font-size:12.5px;line-height:1.35;color:#CFE0F0;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:11px;font-weight:800;color:#9FB4C8}
+.ec{-webkit-text-stroke:0;font-style:normal;font-family:system-ui,sans-serif;line-height:1.3;display:inline-block;padding:1px 8px 2px;border-radius:99px;background:var(--c);color:#14202C;font-size:11.5px;font-weight:900;box-shadow:0 0 0 2px var(--outline)}
+.beast.big{grid-template-columns:1fr;justify-items:center;text-align:center}
+.beast.big .pic{width:170px;height:170px}
+.beast.big .chips{justify-content:center}
+/* the element chart */
+.elrows{display:grid;gap:6px;width:100%}
+.elrow{display:grid;grid-template-columns:70px 1fr;gap:8px;align-items:center;padding:6px 8px;border-radius:12px;background:rgba(0,0,0,.26);text-align:left;font-size:12px;line-height:1.35;font-weight:700;color:#CFE0F0}
+.elrow .ec{justify-self:start;font-size:13px}
+.elrow em{font-style:normal;color:#9BF0A0}.elrow s{text-decoration:none;color:#FF9A8A}
+.lvls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.lvls button{min-width:0;padding:7px 12px 9px;font-size:15px}
+.lvls button[disabled]{opacity:.4}
 </style>
 
 <div id="stage">
@@ -287,6 +308,7 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
     <h1 class="ck" style="font-size:clamp(34px,10vw,44px)">The Frozen Shore</h1>
     <p>The shore has gone still. Run in with your spirit animal and free it, one horde at a time.</p>
     <button class="btn green" id="playBtn">Play</button>
+    <div class="lvls" id="lvls"></div>
     <span class="small">Sound on. Drag anywhere to move. On a computer, use the mouse or WASD.</span>
   </section>
 
@@ -333,7 +355,7 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
       <div class="howto">
         <div class="how"><span class="ic"><span class="ghost"><i></i></span></span><div><b>Move with one thumb</b><span>Drag anywhere on the screen. Your powers <em>fire on their own</em>.</span></div></div>
         <div class="how"><span class="ic"><span class="gemi"></span></span><div><b>Free creatures, grab gems</b><span>Every creature you free drops a qi gem. Fill the bar to <em>level up and pick a power</em>.</span></div></div>
-        <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="#1A1206" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g><g stroke="#FFE58A" stroke-width="1.6" fill="none" opacity=".9"><path d="M28 16 L37 40"/><path d="M39 25 L19 41"/><path d="M33 45 L13 27"/><path d="M17 38 L23 13"/><path d="M15 21 L40 22"/></g></svg></span><div><b>Five elements</b><span>Every power and creature has one, shown by its colour. <em>Water checks Fire, Fire checks Metal, Metal checks Wood, Wood checks Earth, Earth checks Water</em>: 1.5× damage.</span></div></div>
+        <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="#1A1206" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g><g stroke="#FFE58A" stroke-width="1.6" fill="none" opacity=".9"><path d="M28 16 L37 40"/><path d="M39 25 L19 41"/><path d="M33 45 L13 27"/><path d="M17 38 L23 13"/><path d="M15 21 L40 22"/></g></svg></span><div><b>Five elements</b><span>Every power and creature has one. <em>Each element beats two and is weak to two</em>: fire burns wood, water puts out fire. Hits show <em>Super effective!</em> or <em>Resisted</em>. <button class="btn blue small" id="chartBtn" style="margin-top:6px;font-size:14px;padding:5px 12px 7px">See the chart</button></span></div></div>
         <div class="how"><span class="ic"><img src="art/props/x-chest.png" alt="" style="width:120%;max-width:none"></span><div><b>Evolve your powers</b><span>Max a power to five stars and hold the <em>gift of the element that feeds it</em>. Crystal brutes drop Spirit Chests that help.</span></div></div>
         <div class="how"><span class="ic"><img src="art/b-warden.png" alt="" style="width:130%;max-width:none"></span><div><b>Free the shore</b><span><em>Ten waves</em> come, each one element. Arrows at the edge warn you where. Survive them, then <em>defeat the Still Warden</em>.</span></div></div>
       </div>
@@ -369,6 +391,7 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
       <button class="btn green" id="resumeBtn">Resume</button>
       <button class="btn blue" id="muteBtn">Sound: On</button>
       <button class="btn blue" id="howBtn">How to play</button>
+      <button class="btn blue" id="chartBtn2">Element chart</button>
       <button class="btn" id="restartBtn">Start over</button>
     </div>
   </section>
@@ -381,14 +404,42 @@ select{font:inherit;font-size:22px;font-family:var(--chunky);color:var(--ink);ba
       <div class="stats" id="stats"></div>
       <p style="font-size:14px;color:#BFD3E6">This was one shore. MorQi is a whole world of them.</p>
       <a class="btn green" href="https://aarauz-os.github.io/morqi/" target="_blank" rel="noopener">Back to the pitch</a>
+      <button class="btn green" id="nextLvBtn" hidden>Level 2</button>
       <button class="btn blue small" id="againBtn">Play again</button>
+    </div>
+  </section>
+
+  <section class="scr popup" id="intro" hidden>
+    <div class="panel pop" style="padding-top:36px">
+      <div class="rb"><span class="ribbon" id="introT">Level 2</span></div>
+      <p style="margin:0;font-size:14px;color:#BFD3E6" id="introP"></p>
+      <div class="beasts" id="introList"></div>
+      <button class="btn green" id="introGo">Let's go!</button>
+    </div>
+  </section>
+
+  <section class="scr popup" id="beastCard" hidden>
+    <div class="panel pop" style="padding-top:36px">
+      <div class="rb red"><span class="ribbon" id="beastT">New creature!</span></div>
+      <div class="beasts" id="beastBody"></div>
+      <button class="btn green" id="beastOk">Got it</button>
+    </div>
+  </section>
+
+  <section class="scr popup" id="chart" hidden>
+    <div class="panel pop" style="padding-top:36px">
+      <div class="rb"><span class="ribbon">The five elements</span></div>
+      <p style="margin:0;font-size:13px;color:#BFD3E6">Each element <em style="font-style:normal;color:#9BF0A0">beats two</em> (2× damage) and is <em style="font-style:normal;color:#FF9A8A">weak to two</em> (much less damage). The same element barely hurts it either.</p>
+      <div class="elrows" id="elRows"></div>
+      <p style="margin:0;font-size:12.5px;color:#BFD3E6" id="elYou"></p>
+      <button class="btn green" id="chartOk">OK</button>
     </div>
   </section>
 
   <section class="scr popup" id="defeat" hidden>
     <div class="panel pop" style="gap:14px;padding-top:40px">
       <div class="rb red"><span class="ribbon">Not yet</span></div>
-      <p style="font-size:14.5px;color:#D6E1E7">Losing tells you something. Keep moving, and pick powers whose element checks the glow you're facing.</p>
+      <p style="font-size:14.5px;color:#D6E1E7">Losing tells you something. Keep moving, and pick powers that beat the element you're facing. Mixing elements helps.</p>
       <button class="btn green" id="riseBtn">Rise again</button>
       <button class="btn blue small" id="retryBtn">Start over</button>
     </div>
@@ -409,6 +460,20 @@ const ELNAME = { wood:'Wood', fire:'Fire', earth:'Earth', metal:'Metal', water:'
 const CHAR = { wood:'木', fire:'火', earth:'土', metal:'金', water:'水' };
 const CONTROLS = { water:'fire', fire:'metal', metal:'wood', wood:'earth', earth:'water' };   // key keeps value in check
 const FED_BY = { wood:'water', fire:'wood', earth:'fire', metal:'earth', water:'metal' };      // key is fed by value
+// the type chart, Pokémon-style: every element beats two, is weak to two, and resists itself.
+// It beats the element it keeps in check (water puts out fire) and the element that feeds it, which it uses up (fire burns wood).
+const EL5 = ['water', 'wood', 'fire', 'earth', 'metal'];
+const beats = el => [CONTROLS[el], FED_BY[el]];
+const weakTo = el => EL5.filter(k => beats(k).includes(el));
+const eff = (atk, def) => beats(atk).includes(def) ? 2 : .6;   // super effective, or resisted
+const VERB = {   // [what the attacker does, how the loser hears it]
+  water:{ fire:['puts out', 'put out'], metal:['rusts', 'rusted'] },
+  wood: { earth:['breaks up', 'broken up'], water:['drinks up', 'drunk up'] },
+  fire: { metal:['melts', 'melted'], wood:['burns', 'burned'] },
+  earth:{ water:['dams', 'dammed'], fire:['smothers', 'smothered'] },
+  metal:{ wood:['chops', 'chopped'], earth:['digs through', 'dug through'] }
+};
+const andList = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0];
 const ZOD = ['rat','ox','tiger','rabbit','dragon','snake','horse','goat','monkey','rooster','dog','pig'];
 const ANIMAL = {
   rat:{n:'Rat',y:'Pup',m:'Moonrat',e:'water'}, ox:{n:'Ox',y:'Calf',m:'Thunder Buffalo',e:'earth'},
@@ -495,20 +560,20 @@ ZOD.forEach(z => { load(z + 'y', `art/a-${z}-y.png`); load(z + 'm', `art/a-${z}-
 const ROLE = { critter:'a', wolf:'b', golem:'c' };
 const KIND = {
   'water-a':{ n:'Frost Jelly',       beh:'weave',  hp:1,   sp:.95, f:2.2, amp:.9 },
-  'water-b':{ n:'Spout Frog',        face:-1, beh:'spit',   hp:1.1, sp:.85, tip:'It stops at a distance and spits bubbles. A bubble slows you down, so keep moving.' },
-  'water-c':{ n:'Tide Turtle',       face:-1, beh:'pulse',  hp:1.1, sp:.9,  tip:'A red circle grows around it, then a tidal wave knocks you back. Step out of the circle.' },
+  'water-b':{ n:'Spout Frog',        face:-1, beh:'spit',   hp:1.1, sp:.85, short:'Spits bubbles that slow you down', tip:'It stops at a distance and spits bubbles. A bubble slows you down, so keep moving.' },
+  'water-c':{ n:'Tide Turtle',       face:-1, beh:'pulse',  hp:1.1, sp:.9,  short:'Its tidal wave fills a red circle: step out', tip:'A red circle grows around it, then a tidal wave knocks you back. Step out of the circle.' },
   'wood-a': { n:'Bramble Sprout',    beh:'split',  hp:1,   sp:1 },
-  'wood-b': { n:'Thorn Moth',        beh:'thorns', hp:.9,  sp:1,   f:3, amp:1, tip:'It drops thorn patches as it flies. Thorns hurt while you stand in them.' },
-  'wood-c': { n:'Old Treant',        beh:'roots',  hp:1.15,sp:.85, tip:'It sends roots up under your feet. When a red circle appears below you, move!' },
+  'wood-b': { n:'Thorn Moth',        beh:'thorns', hp:.9,  sp:1,   f:3, amp:1, short:'Drops thorn patches as it flies', tip:'It drops thorn patches as it flies. Thorns hurt while you stand in them.' },
+  'wood-c': { n:'Old Treant',        beh:'roots',  hp:1.15,sp:.85, short:'Roots burst under you: leave the red circle', tip:'It sends roots up under your feet. When a red circle appears below you, move!' },
   'fire-a': { n:'Cinder Imp',        face:-1, beh:'rush',   hp:.7,  sp:1.4 },
-  'fire-b': { n:'Ember Beetle',      face:-1, beh:'bomb',   hp:.9,  sp:1.05, tip:'It swells up and explodes. Back away from the red circle, or free it first.' },
-  'fire-c': { n:'Blaze Lion',        face:-1, beh:'charge', hp:1,   sp:1,   tip:'A red lane shows where it will charge, and it leaves fire behind. Step out of the lane.' },
+  'fire-b': { n:'Ember Beetle',      face:-1, beh:'bomb',   hp:.9,  sp:1.05, short:'Swells up and explodes: back away', tip:'It swells up and explodes. Back away from the red circle, or free it first.' },
+  'fire-c': { n:'Blaze Lion',        face:-1, beh:'charge', hp:1,   sp:1,   short:'Charges along a red lane and leaves fire', tip:'A red lane shows where it will charge, and it leaves fire behind. Step out of the lane.' },
   'earth-a':{ n:'Pebble Crab',       beh:'heavy',  hp:1.5, sp:.75 },
-  'earth-b':{ n:'Boulder Armadillo', beh:'roll',   hp:1.4, sp:.8,  tip:'It curls up and rolls along the red lane. Step aside and it rolls right past.' },
-  'earth-c':{ n:'Stone Ox',          beh:'slam',   hp:1.3, sp:.8,  tip:'It stamps the ground. Get out of the red circle before it lands.' },
+  'earth-b':{ n:'Boulder Armadillo', beh:'roll',   hp:1.4, sp:.8,  short:'Rolls along a red lane: step aside', tip:'It curls up and rolls along the red lane. Step aside and it rolls right past.' },
+  'earth-c':{ n:'Stone Ox',          beh:'slam',   hp:1.3, sp:.8,  short:'Stamps a red circle around itself', tip:'It stamps the ground. Get out of the red circle before it lands.' },
   'metal-a':{ n:'Bronze Hornet',     face:-1, beh:'zigzag', hp:.75, sp:1.3, f:5, amp:1.1 },
-  'metal-b':{ n:'Blade Mantis',      beh:'dash',   hp:1,   sp:.95, tip:'It freezes, shows a red line, then dashes along it. Sidestep the line.' },
-  'metal-c':{ n:'Bell Knight',       beh:'blades', hp:1,   sp:.85, tip:'It flashes, then throws a fan of spinning blades. Move sideways between them.' }
+  'metal-b':{ n:'Blade Mantis',      beh:'dash',   hp:1,   sp:.95, short:'Dashes along a red line: sidestep it', tip:'It freezes, shows a red line, then dashes along it. Sidestep the line.' },
+  'metal-c':{ n:'Bell Knight',       beh:'blades', hp:1,   sp:.85, short:'Throws a fan of spinning blades', tip:'It flashes, then throws a fan of spinning blades. Move sideways between them.' }
 };
 Object.keys(KIND).forEach(k => load('e-' + k, `art/e-${k}.png`));
 ['x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate'].forEach(n => load(n, `art/props/${n}.png`));
@@ -664,6 +729,11 @@ addEventListener('resize', size); size();
 
 /* ================= the opening: Keeper, year, spirit animal ================= */
 let keeper = 1, animal = 'pig';
+let LVL = Math.min(4, Math.max(1, +new URLSearchParams(location.search).get('level') || 1));
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const unlocked = () => Math.max(LVL, +(store.get('morqi.unlocked') || 1));
+const SEEN = new Set((store.get('morqi.seen') || '').split(',').filter(Boolean));
+const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(',')); };
 function show(id) { document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); }
 const kb = $('#keepers'), ksImg = $('#ksImg');
 for (let k = 1; k <= 6; k++) { const i = new Image(); i.src = `art/k${k}-hi.png`; }
@@ -703,7 +773,7 @@ $('#yearNext').onclick = () => {
   SFX.fanfare(false); show('reveal');
 };
 $('#revNext').onclick = () => { SFX.select(); show('story'); };
-$('#storyNext').onclick = () => { SFX.select(); show('howto'); };
+$('#storyNext').onclick = () => { SFX.select(); if (LVL === 1) show('howto'); else intro(LVL); };
 let howFromPause = false;
 $('#howtoGo').onclick = () => { SFX.select(); if (howFromPause) { howFromPause = false; show('paused'); return; } show(null); startRun(); };
 $('#howBtn').onclick = () => { SFX.pop(); howFromPause = true; show('howto'); };
@@ -726,10 +796,10 @@ function startRun() {
   resetThaw(); FX.length = 0; GROUND.length = 0;
   const A = ANIMAL[animal];
   S = {
-    t:0, over:false, won:false,
+    t:0, over:false, won:false, level:LVL,
     p:{ x:WORLD / 2, y:WORLD / 2, hp:220, max:220, face:1, hurt:0, r:26, mx:0, my:0 },
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0 },
-    en:[], shots:[], eshots:[], hz:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[],
+    en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[],
     lv:1, xp:0, need:need(1), skills:{ [START[A.e]]:1 }, gifts:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
@@ -740,7 +810,7 @@ function startRun() {
   for (let i = 0; i < 6; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   AU.heat(0); renderSkills(); startLoop();
-  COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); $('#wavePill').classList.add('on');
+  COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3; $('#wavePill').classList.add('on');
   coach('move', 'Drag to move', 'Put your thumb anywhere and drag. Your powers fire on their own.', () => ({ sx:W / 2, sy:H * .7 - 70 }), 7, 'above', () => S.moved > 140);
 }
 function need(lv) { return Math.round(4 + lv * lv * 4.2); }
@@ -797,17 +867,20 @@ const ETYPE = {
   golem:{ img:'e-golem', r:38, hp:420, sp:48, dmg:14, xp:12, size:156 }
 };
 const ELS = ['wood', 'fire', 'earth', 'metal', 'water'];
-function hpScale() { return 1 + S.t / 90 + (S.lv - 1) * .06; }   // toughness keeps pace with the player's growing powers
+function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.86, 1.05, 1.22, 1.4][S.level - 1]; }   // level 1 eases you in; later levels are tougher   // toughness keeps pace with the player's growing powers
 function spawn(type, at, rush, el) {
   if (S.en.length >= CAP && type !== 'golem') return null;
-  const T = ETYPE[type], sc = hpScale(); let x, y;
+  let T = ETYPE[type]; const sc = hpScale(); let x, y;
   if (at) { x = at.x; y = at.y; } else {
     const a = rnd(0, TAU);
     if (S.arena) { x = S.arena.x + Math.cos(a) * (S.arena.r - 30); y = S.arena.y + Math.sin(a) * (S.arena.r - 30); }
     else { const d = Math.hypot(VW, VH) / 2 + 50; x = S.p.x + Math.cos(a) * d; y = S.p.y + Math.sin(a) * d; }
   }
   x = clamp(x, 30, WORLD - 30); y = clamp(y, 30, WORLD - 30);
-  const E = el && el !== 'mix' ? el : ELS[(Math.random() * 5) | 0], kid = E + '-' + ROLE[type], K = KIND[kid];
+  const E = el && el !== 'mix' ? el : ELS[(Math.random() * 5) | 0];
+  if (type === 'wolf' && !LEVELS[S.level - 1].allow.includes(E + '-b')) type = 'critter';   // only this level's specialists
+  T = ETYPE[type];
+  const kid = E + '-' + ROLE[type], K = KIND[kid];
   const e = { type, x, y, r:T.r, hp:T.hp * sc * K.hp, max:T.hp * sc * K.hp, sp:T.sp * K.sp * rnd(.9, 1.1) * (rush || 1), dmg:T.dmg, xp:T.xp,
     el:E, kid, K, size:T.size, img:ok(IMG['e-' + kid]) ? 'e-' + kid : T.img, own:ok(IMG['e-' + kid]), hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:rnd(0, 6.28), ph:rnd(0, 6.28), frozen:0,
     heavy:K.beh === 'heavy' || type === 'golem', cd:rnd(.8, 2.4), act:null };
@@ -829,14 +902,14 @@ function ring2(n) {
 }
 function spawnBoss() {
   S.bossSpawned = true;
-  const e = { type:'boss', boss:true, x:S.p.x, y:S.p.y - 220, r:70, hp:1, max:1, sp:30, dmg:9, xp:0, el:'water', size:260, img:'b-warden', hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:0, phase:0, atk:3, summon:5, frozen:0 };
-  e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5));
+  const e = { type:'boss', boss:true, x:S.p.x, y:S.p.y - 220, r:70, hp:1, max:1, sp:30, dmg:9, xp:0, el:LEVELS[S.level - 1].boss[0], size:260, img:'b-warden', hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:0, phase:0, atk:3, summon:5, frozen:0 };
+  e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5) * [.85, 1.05, 1.2, 1.35][S.level - 1]);
   S.en.push(e); S.boss = e;
   S.p.hp = S.p.max; floatText(S.p.x, S.p.y - 70, 'Full health', '#8CF5A0', 20);
   S.arena = { x:S.p.x, y:S.p.y, r:Math.min(VW / 2 - 16, 330) };
   for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.p.x, m.y - S.p.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
-  cue('The Still Warden', 'Water, the element of fear. Earth checks Water.', 2800, true); SFX.alarm(); SFX.stomp(); S.shake = .6; AU.heat(1);
+  cue('The Still Warden', `${ELNAME[e.el]} first. ${andList(weakTo(e.el).map(k => ELNAME[k]))} beat ${ELNAME[e.el]}.`, 2800, true); SFX.alarm(); SFX.stomp(); S.shake = .6; AU.heat(1);
   ring(e.x, e.y, 20, 400, '#BFE3FF', .8, 16, true); smoke(e.x, e.y + 60, 14, 50, '200,220,235');
   setTimeout(() => { if (S && !S.over) awaken(); }, 1400);
 }
@@ -845,12 +918,12 @@ function spawnBoss() {
 function hurt(e, dmg, el, o = {}) {
   if (e.dead) return;
   let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1);
-  const strong = CONTROLS[el] === e.el;
-  if (strong) {
-    m *= 1.5;
-    if (S.t - S.strongT > 1.4) { S.strongT = S.t; floatText(e.x, e.y - e.r - 20, `${ELNAME[el]} checks ${ELNAME[e.el]}!`, EL[el], 14); }
-    if (!S.taught.strong && S.t > 6) { S.taught.strong = 1; toast(`${ELNAME[el]} checks ${ELNAME[e.el]}: 1.5× damage. Watch each enemy's glow.`, 3800); }
-  }
+  const k = eff(el, e.el), strong = k > 1, weak = k < 1;
+  m *= k;
+  if (strong && S.t - S.strongT > 1.4) { S.strongT = S.t; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
+  if (weak && S.t - (S.weakT ?? -9) > 2.6 && !e.boss) { S.weakT = S.t; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
+  if (strong && !S.taught.strong && S.t > 6) { S.taught.strong = 1; toast(`Super effective! ${ELNAME[el]} ${VERB[el][e.el][0]} ${ELNAME[e.el]}: 2× damage.`, 3800); }
+  else if (weak && !S.taught.weak && S.t > 12 && el !== e.el) { S.taught.weak = 1; toast(`Resisted. ${ELNAME[e.el]} ${VERB[e.el][el][0]} ${ELNAME[el]}, so it barely feels it. Mix your elements!`, 4200); }
   const dealt = dmg * m;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   if (!e.boss) {
@@ -859,7 +932,7 @@ function hurt(e, dmg, el, o = {}) {
     if (o.kb && o.kb > 40) { e.kx = (e.x - (o.fx ?? P.x)) / d * o.kb; e.ky = (e.y - (o.fy ?? P.y)) / d * o.kb; e.kb = .16; }
     else { e.x += (e.x - P.x) / d * k; e.y += (e.y - P.y) / d * k; }
   }
-  if (S.nums.length < 28 && (e.numCd || 0) <= S.t) { e.numCd = S.t + .45; S.nums.push({ x:e.x + rnd(-10, 10), y:e.y - e.size * .55, v:Math.round(dealt), t:0, strong }); }
+  if (S.nums.length < 28 && (e.numCd || 0) <= S.t) { e.numCd = S.t + .45; S.nums.push({ x:e.x + rnd(-10, 10), y:e.y - e.size * .55, v:Math.round(dealt), t:0, strong, weak }); }
   if (o.spark !== false && (e.sparkCd || 0) <= S.t) { e.sparkCd = S.t + .1; fx({ k:'hit', x:e.x + rnd(-6, 6), y:e.y - e.size * .3, life:.16, s:e.r * 1.6, c:EL[el], rot:rnd(0, TAU) }); }
   if (e.hp <= 0) kill(e);
 }
@@ -1165,13 +1238,51 @@ function powers(dt) {
   const vx = pet.x - px0; if (Math.abs(vx) > .4) pet.dir = vx > 0 ? 1 : -1;
   pet.moving = Math.hypot(pet.x - px0, pet.y - py0) > dt * 30;
 }
+// the spirit animal also fires its own element, like a drone: it picks a creature its element beats when it can.
+// A legendary spirit animal (e2) carries two elements and alternates between them.
+const PSHOT = {
+  water:{ sp:420, r:46, n:1, pierce:0, life:1.4 }, wood:{ sp:520, r:0, n:1, pierce:3, life:1.1 }, fire:{ sp:460, r:62, n:1, pierce:0, life:1.3 },
+  earth:{ sp:380, r:58, n:1, pierce:0, life:1.4 }, metal:{ sp:760, r:0, n:3, pierce:1, life:.8 }
+};
+function spiritShot(dt) {
+  const pet = S.pet, A = ANIMAL[animal]; if (S.awake) return;
+  pet.shotCd = (pet.shotCd ?? 1.2) - dt; if (pet.shotCd > 0) return;
+  const els = [A.e, A.e2].filter(Boolean), el = els[(pet.shots = (pet.shots || 0) + 1) % els.length], T = PSHOT[el];
+  const near = nearest(pet.x, pet.y, 8, 440); if (!near.length) { pet.shotCd = .3; return; }
+  const tgt = near.find(e => eff(el, e.el) > 1) || near[0];
+  pet.shotCd = Math.max(.75, 1.6 - S.lv * .05);
+  const base = Math.atan2(tgt.y - pet.y, tgt.x - pet.x), dmg = 12 + 3 * S.lv;
+  for (let i = 0; i < T.n; i++) { const a = base + (i - (T.n - 1) / 2) * .16;
+    S.pshots.push({ el, x:pet.x, y:pet.y - 22, vx:Math.cos(a) * T.sp, vy:Math.sin(a) * T.sp, life:T.life, t:0, dmg, r:T.r, pierce:T.pierce, hit:new Set(), rot:a }); }
+  pet.castAt = S.t; ({ water:SFX.bloop, wood:SFX.whip, fire:SFX.dart, earth:() => SFX.thud(false), metal:SFX.ting }[el])();
+}
+function petShots(dt) {
+  for (const s of S.pshots) {
+    s.t += dt; s.x += s.vx * dt; s.y += s.vy * dt; s.rot += dt * (s.el === 'wood' ? 16 : 6);
+    for (const e of S.en) {
+      if (e.dead || s.hit.has(e) || Math.abs(e.x - s.x) > e.r + 14 || Math.hypot(e.x - s.x, e.y - s.y) > e.r + 14) continue;
+      s.hit.add(e);
+      if (s.r) {   // a burst: splash, blast or rockfall
+        inArea(s.x, s.y, s.r, o => hurt(o, s.dmg, s.el, { kb:s.el === 'earth' ? 320 : 160, fx:s.x, fy:s.y }));
+        if (s.el === 'water') { inArea(s.x, s.y, s.r, o => o.slow = 1.5); for (let i = 0; i < 8; i++) fx({ k:'drop', x:s.x, y:s.y, z:4, vx:rnd(-160, 160), vy:rnd(-160, 160), vz:rnd(120, 260), life:.5, s:4 }); ring(s.x, s.y, 6, s.r, '#7FC4FF', .3, 5); SFX.splash(); }
+        else if (s.el === 'fire') { flames(s.x, s.y, 6, s.r * .6, 24); flash(s.x, s.y, s.r * 2, '#FF9A3A', .12); smoke(s.x, s.y, 4, s.r * .5, '90,60,50'); }
+        else { debris(s.x, s.y, 8, 260); ring(s.x, s.y, 6, s.r, '#E6B23A', .3, 6); paintThaw(s.x, s.y, 30); }
+        s.life = 0; break;
+      }
+      hurt(e, s.dmg, s.el, { kb:120, fx:s.x - s.vx * .05, fy:s.y - s.vy * .05 });
+      if (s.el === 'wood') for (let i = 0; i < 3; i++) fx({ k:'leaf', x:s.x, y:s.y, vx:rnd(-120, 120), vy:rnd(-120, 120), drag:3, rot:rnd(0, TAU), vr:rnd(-8, 8), life:.6, s:7, c:'#7FCF4A' });
+      if (s.pierce-- <= 0) { s.life = 0; break; }
+    }
+  }
+  S.pshots = S.pshots.filter(s => s.t < s.life);
+}
 function shoot(k, a, st) { S.shots.push({ k, x:S.p.x, y:S.p.y - 24, vx:Math.cos(a) * 760, vy:Math.sin(a) * 760, life:.85, pierce:st.pierce, dmg:st.dmg, hit:new Set(), gold:!!S.evo.bamboo }); }
 
 /* ================= the spirit animal awakens ================= */
 function awaken() {
   if (!S || S.awake) return;
   S.awake = { t:0, dur:6.5, a:rnd(0, TAU), trail:[] }; S.awakenings++;
-  if (S.awakenings === 1) setTimeout(() => S && coach('awake', 'Awakening!', 'For a few seconds your spirit animal takes its mythic form. It happens at levels 4, 8 and 12, and when the boss comes.', () => ({ x:S.p.x, y:S.p.y - 100 }), 5), 2300);
+  if (S.awakenings === 1) setTimeout(() => S && note('awake', 'Awakening! Your spirit animal takes its mythic form for a few seconds.', () => ({ x:S.p.x, y:S.p.y - 100 }), 5), 2300);
   const A = ANIMAL[animal];
   cue(`${A.m}!`, `Your ${A.y} awakens`, 2200); SFX.roar(); S.flashT = .3; S.flashC = '255,240,200'; S.shake = .4;
   ring(S.pet.x, S.pet.y, 20, 600, EL[A.e], .7, 18, true); stars(S.pet.x, S.pet.y, 40, EL[A.e], 520);
@@ -1192,33 +1303,78 @@ function awakeTick(dt) {
 /* ================= the director ================= */
 function teach() {
   const P = S.p, A = ANIMAL[animal], tg = S.taught;
-  if (!tg.c_pet && S.t > 6) coach('pet', `Your ${A.y}`, 'Your spirit animal pounces on the nearest creature. It grows as you level and awakens at levels 4, 8 and 12.', () => ({ x:S.pet.x, y:S.pet.y - 40 }), 5);
-  if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. Hit them with the element that checks it for 1.5× damage.', () => ({ x:e.x, y:e.y - e.size * .6 }), 5.5); }
-  if (!tg.c_gem && tg.c_enemy) { const q = S.gems.find(q => !q.pull); if (q) { coach('gem', 'Qi gems', 'Walk over them to collect qi.', () => ({ x:q.x, y:q.y - 14 }), 3.5); coach('xp', 'Your level bar', 'Fill it with qi to level up and choose a new power.', () => domPt('#xpBar'), 4, 'below'); } }
-  if (!tg.c_crate && S.t > 14) { const c = S.crates.find(c => Math.abs(c.x - P.x) < VW * .42 && Math.abs(c.y - P.y) < VH * .4); if (c) coach('crate', 'Frozen lanterns', 'Break them open for gifts: magnets, heals, firecrackers and more.', () => ({ x:c.x, y:c.y - 50 }), 4.5); }
-  if (!tg.c_item && S.items.length) { const it = S.items[0], nm = ITEM_INFO[it.kind]; coach('item', nm[0], nm[1] + ' Walk over it to use it.', () => ({ x:it.x, y:it.y - 40 }), 4.5); }
-  if (!tg.c_chest && S.chests.length) { const ch = S.chests[0]; coach('chest', 'A Spirit Chest!', 'Walk to it. It spins for free upgrades, and is the best way to evolve a power.', () => ({ x:ch.x, y:ch.y - 80 }), 6, 'above', () => ch.got); }
-  if (!COACH.cur && !COACH.q.length) { const e = S.en.find(e => e.K && e.K.tip && !tg['c_k' + e.kid] && Math.abs(e.x - P.x) < VW * .45 && Math.abs(e.y - P.y) < VH * .42);
-    if (e) coach('k' + e.kid, e.K.n + (e.type === 'golem' ? ' · drops a Spirit Chest' : ''), e.K.tip, () => ({ x:e.x, y:e.y - e.size * .62 }), 6); }
-  if (!tg.c_wave && S.warn) coach('wave', 'Waves', 'Every wave is one element and comes in a shape: a line, a charging column, a closing ring. The arrows show where. Use the element that checks it!', () => ({ sx:W / 2, sy:H * .42 }), 0, 'below');
+  if (!tg.c_pet && S.t > 6) note('pet', `Your ${A.y} fights beside you, firing ${ELNAME[A.e]} at the creatures ${ELNAME[A.e]} beats.`);
+  if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. Some elements hit it twice as hard (Super effective!), others only half. Watch the numbers.', () => ({ x:e.x, y:e.y - e.size * .6 }), 5.5); }
+  if (!tg.c_gem && tg.c_enemy) { const q = S.gems.find(q => !q.pull); if (q) coach('gem', 'Qi gems', 'Walk over gems to collect qi. When the bar at the top fills, you level up and pick a new power.', () => ({ x:q.x, y:q.y - 14 }), 4); }
+  if (!tg.c_crate && S.t > 14 && S.crates.some(c => Math.abs(c.x - P.x) < VW * .42 && Math.abs(c.y - P.y) < VH * .4)) note('crate', 'Frozen lanterns hold gifts: magnets, heals, firecrackers. Break them open!');
+  if (!tg.c_item && S.items.length) { const nm = ITEM_INFO[S.items[0].kind]; note('item', `${nm[0]}: ${nm[1]} Walk over it to use it.`); }
+  if (!tg.c_chest && S.chests.length) note('chest', 'A Spirit Chest! Walk to it for free upgrades, the best way to evolve a power.');
+  for (const e of S.en) {
+    if (!e.K || e.boss || tg['n_' + e.kid] || Math.abs(e.x - P.x) > VW * .4 || Math.abs(e.y - P.y) > VH * .36) continue;
+    tg['n_' + e.kid] = 1; e.tagT = 3.5;
+    if ((e.K.tip || e.type === 'golem') && !SEEN.has(e.kid)) {
+      markSeen(e.kid);
+      if (!SEEN.has('_card')) { markSeen('_card'); COACH.q.push({ id:'k' + e.kid, card:e.kid }); }
+      else cue(e.K.n, e.K.short || e.K.tip, 2800, true);
+    }
+    break;
+  }
+  if (!tg.c_wave && S.warn) coach('wave', 'Waves', 'Every wave is one element and comes in a shape: a line, a charging column, a closing ring. The arrows show where, and the banner says which elements beat it.', () => ({ sx:W / 2, sy:H * .42 }), 0, 'below');
   if (!tg.c_boss && S.boss) coach('boss', 'The Still Warden', 'Its colour shows its element, and it changes as it weakens. Defeat it to free the shore.', () => ({ x:S.boss.x, y:S.boss.y - 160 }), 6);
 }
 const ITEM_INFO = { magnet:["Luma's Call", 'Pulls every gem on the map to you.'], cracker:['Firecrackers', 'Clears every creature on screen.'], dumpling:['Dumpling', 'Heals you.'], peach:['Peach of Immortality', 'Heals you fully.'], tiger:['Tiger Talisman', 'Your powers hit 50% harder for a while.'], frost:['Frost Bell', 'Freezes everything on screen.'] };
 // ten scripted waves before the boss: each one a single element, in a shape you can read, announced two seconds ahead
-const WAVES = [
-  { t:14,  el:'fire',  form:'line',   mix:[['critter', 16]],               name:'Cinder Imps race in' },
-  { t:30,  el:'wood',  form:'ring',   mix:[['critter', 20]],               name:'Bramble Sprouts close in, and each splits in two' },
-  { t:46,  el:'water', form:'pincer', mix:[['critter', 16], ['wolf', 4]],  name:'Frost Jellies and Spout Frogs' },
-  { t:58,  el:'earth', form:'elite',  mix:[['golem', 1], ['critter', 10]], name:'A Stone Ox and its crabs' },
-  { t:72,  el:'metal', form:'column', mix:[['critter', 14], ['wolf', 5]],  name:'Bronze Hornets and Blade Mantises' },
-  { t:88,  el:'fire',  form:'pincer', mix:[['critter', 12], ['wolf', 7], ['golem', 1]], name:'Ember Beetles and a Blaze Lion' },
-  { t:102, el:'wood',  form:'elite',  mix:[['golem', 2], ['wolf', 4]],     name:'Two Old Treants and their Thorn Moths' },
-  { t:118, el:'earth', form:'ring',   mix:[['critter', 22], ['wolf', 6]],  name:'Pebble Crabs and rolling Armadillos' },
-  { t:134, el:'water', form:'elite',  mix:[['golem', 1], ['critter', 18], ['wolf', 4]], name:'A Tide Turtle and its jellies' },
-  { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 10], ['golem', 1]], name:'The Still sends everything' }
+// levels, paced the way the genre does it: level 1 is simple chasers of all five elements plus two brutes and the boss;
+// each later level brings back what you know and adds one or two new creatures with a trick, introduced before it starts
+const LEVELS = [
+  { name:'The Frozen Shore', fresh:[], allow:[], boss:['water', 'metal', 'earth'], waves:[
+    { t:14,  el:'fire',  form:'line',   mix:[['critter', 16]], name:'Cinder Imps race in' },
+    { t:30,  el:'wood',  form:'ring',   mix:[['critter', 20]], name:'Bramble Sprouts close in' },
+    { t:46,  el:'water', form:'pincer', mix:[['critter', 22]], name:'Frost Jellies from both sides' },
+    { t:58,  el:'earth', form:'elite',  mix:[['golem', 1], ['critter', 10]], name:'A Stone Ox and its crabs' },
+    { t:72,  el:'metal', form:'column', mix:[['critter', 20]], name:'Bronze Hornets swarm' },
+    { t:88,  el:'water', form:'ring',   mix:[['critter', 26]], name:'A ring of Frost Jellies' },
+    { t:102, el:'wood',  form:'pincer', mix:[['critter', 26]], name:'Bramble Sprouts from both sides' },
+    { t:118, el:'fire',  form:'elite',  mix:[['golem', 1], ['critter', 14]], name:'A Blaze Lion and its imps' },
+    { t:134, el:'earth', form:'column', mix:[['critter', 24]], name:'Pebble Crabs march in' },
+    { t:150, el:'mix',   form:'storm',  mix:[['critter', 46]], name:'The Still sends everything' } ] },
+  { name:'The Bamboo Grove', fresh:['water-b', 'fire-b', 'water-c'], allow:['water-b', 'fire-b'], boss:['fire', 'water', 'wood'], waves:[
+    { t:14,  el:'water', form:'line',   mix:[['critter', 14], ['wolf', 3]], name:'Spout Frogs behind the jellies' },
+    { t:30,  el:'metal', form:'ring',   mix:[['critter', 22]], name:'A ring of Bronze Hornets' },
+    { t:46,  el:'fire',  form:'pincer', mix:[['critter', 14], ['wolf', 6]], name:'Ember Beetles: back away when they swell' },
+    { t:58,  el:'water', form:'elite',  mix:[['golem', 1], ['wolf', 4]], name:'A Tide Turtle and its frogs' },
+    { t:72,  el:'wood',  form:'column', mix:[['critter', 24]], name:'Bramble Sprouts charge' },
+    { t:88,  el:'fire',  form:'ring',   mix:[['critter', 18], ['wolf', 8]], name:'Beetles and imps all around' },
+    { t:102, el:'earth', form:'pincer', mix:[['critter', 22]], name:'Pebble Crabs from both sides' },
+    { t:118, el:'earth', form:'elite',  mix:[['golem', 1], ['critter', 12]], name:'A Stone Ox returns' },
+    { t:134, el:'water', form:'pincer', mix:[['critter', 18], ['wolf', 6]], name:'Frogs and jellies from both sides' },
+    { t:150, el:'mix',   form:'storm',  mix:[['critter', 38], ['wolf', 10]], name:'The Still sends everything' } ] },
+  { name:'The Lantern Ridge', fresh:['metal-b', 'wood-b', 'wood-c'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b'], boss:['metal', 'fire', 'water'], waves:[
+    { t:14,  el:'metal', form:'line',   mix:[['critter', 14], ['wolf', 3]], name:'Blade Mantises behind the hornets' },
+    { t:30,  el:'wood',  form:'ring',   mix:[['critter', 18], ['wolf', 4]], name:'Thorn Moths drop thorns as they fly' },
+    { t:46,  el:'fire',  form:'pincer', mix:[['critter', 16], ['wolf', 6]], name:'Ember Beetles from both sides' },
+    { t:58,  el:'wood',  form:'elite',  mix:[['golem', 1], ['wolf', 4]], name:'An Old Treant and its moths' },
+    { t:72,  el:'metal', form:'column', mix:[['critter', 16], ['wolf', 6]], name:'Hornets and Mantises charge' },
+    { t:88,  el:'water', form:'ring',   mix:[['critter', 20], ['wolf', 6]], name:'Frogs and jellies all around' },
+    { t:102, el:'fire',  form:'elite',  mix:[['golem', 1], ['wolf', 5]], name:'A Blaze Lion and its beetles' },
+    { t:118, el:'wood',  form:'pincer', mix:[['critter', 20], ['wolf', 6]], name:'Sprouts and moths from both sides' },
+    { t:134, el:'earth', form:'ring',   mix:[['critter', 26]], name:'A ring of Pebble Crabs' },
+    { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 12], ['golem', 1]], name:'The Still sends everything' } ] },
+  { name:'The Bell Temple', fresh:['earth-b', 'metal-c'], allow:['water-b', 'fire-b', 'metal-b', 'wood-b', 'earth-b'], boss:['earth', 'wood', 'metal'], waves:[
+    { t:14,  el:'earth', form:'line',   mix:[['critter', 12], ['wolf', 3]], name:'Boulder Armadillos roll in' },
+    { t:30,  el:'metal', form:'pincer', mix:[['critter', 16], ['wolf', 5]], name:'Hornets and Mantises from both sides' },
+    { t:46,  el:'metal', form:'elite',  mix:[['golem', 1], ['critter', 12]], name:'A Bell Knight and its hornets' },
+    { t:58,  el:'water', form:'ring',   mix:[['critter', 20], ['wolf', 6]], name:'Frogs and jellies all around' },
+    { t:72,  el:'earth', form:'column', mix:[['critter', 16], ['wolf', 6]], name:'Crabs and Armadillos charge' },
+    { t:88,  el:'wood',  form:'elite',  mix:[['golem', 1], ['wolf', 5]], name:'An Old Treant and its moths' },
+    { t:102, el:'fire',  form:'pincer', mix:[['critter', 18], ['wolf', 8]], name:'Imps and beetles from both sides' },
+    { t:118, el:'water', form:'elite',  mix:[['golem', 1], ['wolf', 6]], name:'A Tide Turtle and its frogs' },
+    { t:134, el:'mix',   form:'ring',   mix:[['critter', 24], ['wolf', 8]], name:'Every element closes in' },
+    { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 12], ['golem', 2]], name:'The Still sends everything' } ] }
 ];
+const LV = () => LEVELS[S.level - 1];
+const beatenBy = el => andList(weakTo(el).map(k => ELNAME[k]));
 const SIDES = [[0, -1, 'the north'], [1, 0, 'the east'], [0, 1, 'the south'], [-1, 0, 'the west']];
-const checkerOf = el => Object.keys(CONTROLS).find(k => CONTROLS[k] === el);
 function planWave(w) {
   let d = (Math.random() * 4) | 0; if (d === S.lastDir) d = (d + 1) % 4; S.lastDir = d;
   const dirs = w.form === 'ring' || w.form === 'storm' ? [0, 1, 2, 3] : w.form === 'pincer' ? [d, (d + 2) % 4] : [d];
@@ -1232,7 +1388,7 @@ function launchWave(plan) {
   const brutes = list.filter(t => t === 'golem'), rest = list.filter(t => t !== 'golem');
   if (w.form === 'ring' || w.form === 'storm') {
     rest.forEach((type, i) => { const a = i / rest.length * TAU, r = D * (type === 'wolf' ? .98 : .85); spawn(type, at(P.x + Math.cos(a) * r, P.y + Math.sin(a) * r), w.form === 'storm' ? 1.1 : .85, w.el === 'mix' ? ELS[i % 5] : w.el); });
-    brutes.forEach((t, i) => { const a = rnd(0, TAU); spawn('golem', at(P.x + Math.cos(a) * D, P.y + Math.sin(a) * D), 1, w.el === 'mix' ? 'metal' : w.el); });
+    brutes.forEach((t, i) => { const a = rnd(0, TAU); spawn('golem', at(P.x + Math.cos(a) * D, P.y + Math.sin(a) * D), 1, pick(w.el)); });
   } else if (w.form === 'elite') {
     const [dx, dy] = SIDES[plan.dirs[0]], px = -dy, py = dx, n = brutes.length;
     brutes.forEach((t, i) => spawn('golem', at(P.x + dx * D + px * (i - (n - 1) / 2) * 170, P.y + dy * D + py * (i - (n - 1) / 2) * 170), 1, w.el));
@@ -1261,26 +1417,25 @@ function direct(dt) {
     // a light trickle between waves, mixed elements, growing slowly
     const rate = Math.min(9, (1 + t * .035) * (1 + (S.lv - 1) * .05));
     S.spawnAcc += dt * rate;
-    while (S.spawnAcc > 1) { S.spawnAcc--; spawn(t > 40 && Math.random() < .18 ? 'wolf' : 'critter'); }
-    const next = WAVES[S.waveIdx];
+    while (S.spawnAcc > 1) { S.spawnAcc--; spawn(t > 40 && LV().allow.length && Math.random() < .18 ? 'wolf' : 'critter'); }
+    const WV = LV().waves, next = WV[S.waveIdx];
     if (next && !S.warn && t >= next.t - 2.2) {
       S.warn = planWave(next);
-      const ch = checkerOf(next.el), from = next.form === 'ring' || next.form === 'storm' ? 'all around you' : next.form === 'pincer' ? 'both sides' : SIDES[S.warn.dirs[0]][2];
-      cue(`Wave ${S.waveIdx + 1} of ${WAVES.length}`, next.el === 'mix' ? `${next.name}, from ${from}` : `${next.name}, from ${from} · ${ELNAME[ch]} checks ${ELNAME[next.el]}`, 2600, true); SFX.alarm();
+      const from = next.form === 'ring' || next.form === 'storm' ? 'all around you' : next.form === 'pincer' ? 'both sides' : SIDES[S.warn.dirs[0]][2];
+      cue(`Wave ${S.waveIdx + 1} of ${WV.length}`, next.el === 'mix' ? `${next.name}, from ${from}` : `${next.name}, from ${from} · ${beatenBy(next.el)} beat ${ELNAME[next.el]}`, 2600, true); SFX.alarm();
     }
     if (S.warn) { S.warn.t += dt; if (S.warn.t >= 2.2) { launchWave(S.warn); S.warn = null; S.waveIdx++; } }
     if (t > 170 && !S.warn) spawnBoss();
   } else if (S.boss && !S.boss.dead) {
     const b = S.boss, ph = b.hp < b.max * .34 ? 2 : b.hp < b.max * .67 ? 1 : 0;
     if (ph !== b.phase) {
-      b.phase = ph; b.el = ['water', 'metal', 'earth'][ph];
-      const checker = checkerOf(b.el);
-      cue(`The Warden turns to ${ELNAME[b.el]}`, `${ELNAME[checker]} checks ${ELNAME[b.el]}`, 2200, true); ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5; ring2(16 + ph * 6);
+      b.phase = ph; b.el = LV().boss[ph];
+      cue(`The Warden turns to ${ELNAME[b.el]}`, `${beatenBy(b.el)} beat ${ELNAME[b.el]}`, 2200, true); ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5; ring2(16 + ph * 6);
       const P = S.p, heal = Math.round(P.max * .3); P.hp = Math.min(P.max, P.hp + heal); floatText(P.x, P.y - 70, '+' + heal, '#8CF5A0', 20); stars(P.x, P.y - 30, 10, '#8CF5A0', 220);
     }
     b.atk -= dt; b.summon -= dt;
     if (b.atk <= 0) { b.atk = 3 - ph * .4; b.stompAt = S.t; S.shake = Math.max(S.shake, .2); SFX.stomp(); smoke(b.x, b.y + 50, 6, 40, '200,220,235');
-      const n = 8 + ph * 3; for (let i = 0; i < n; i++) { const a = i / n * TAU + S.t; S.eshots.push({ x:b.x, y:b.y, vx:Math.cos(a) * 220, vy:Math.sin(a) * 220, life:3, rot:a }); } }
+      const n = 8 + ph * 3; for (let i = 0; i < n; i++) { const a = i / n * TAU + S.t; S.eshots.push({ x:b.x, y:b.y, vx:Math.cos(a) * 220, vy:Math.sin(a) * 220, life:3, rot:a, el:b.el }); } }
     if (b.summon <= 0) { b.summon = 6; for (let i = 0; i < 5; i++) spawn('critter', { x:b.x + rnd(-120, 120), y:b.y + rnd(-120, 120) }); }
     S.spawnAcc += dt * 3; while (S.spawnAcc > 1) { S.spawnAcc--; spawn('critter'); }
   }
@@ -1290,7 +1445,7 @@ function direct(dt) {
 // every attack winds up first, with a red circle or lane on the ground, so a watchful player can always step clear
 function ouch(dmg, fx, fy, o = {}) {
   const P = S.p; if (P.hurt > 0) return false;
-  const hit = dmg * (1 - (S.gifts.rooted || 0) * .08) * (ANIMAL[animal].e === 'earth' ? .85 : 1);
+  const hit = dmg * armourVs(o.el);
   P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1; P.rx = (P.x - fx) / d * 14; P.ry = (P.y - fy) / d * 14;
   if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30); }
   if (o.slow) P.slowT = Math.max(P.slowT || 0, o.slow);
@@ -1299,6 +1454,8 @@ function ouch(dmg, fx, fy, o = {}) {
   if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15);
   return true;
 }
+// your Keeper has your spirit animal's element: creatures whose element beats yours hit harder, the rest hit softer
+function armourVs(el) { const A = ANIMAL[animal]; let m = 1 - (S.gifts.rooted || 0) * .08; if (el) for (const me of [A.e, A.e2].filter(Boolean)) m *= eff(el, me) > 1 ? 1.15 : .9; return m; }
 function hazard(k, x, y, r, life, dmg) { if (S.hz.length < 60) S.hz.push({ k, x, y, r, life, t:0, dmg, tick:0, rot:rnd(0, TAU) }); }
 function brain(e, P, d, dt, s) {
   const K = e.K, a = e.act, ux = (P.x - e.x) / d, uy = (P.y - e.y) / d;
@@ -1310,7 +1467,7 @@ function brain(e, P, d, dt, s) {
       e.x = clamp(e.x + a.dx * a.spd * dt, 30, WORLD - 30); e.y = clamp(e.y + a.dy * a.spd * dt, 30, WORLD - 30);
       if (a.trail && (a.tr = (a.tr || 0) - dt) <= 0) { a.tr = .07; hazard('cinder', e.x, e.y + 10, 30, 2.6, 6); }
       if ((e.dustT = (e.dustT || 0) - dt) <= 0) { e.dustT = .05; fx({ k:'smoke', x:e.x, y:e.y + e.r * .6, vx:-a.dx * 60, vy:-a.dy * 60, drag:3, life:.4, s:14, c:'220,200,170' }); }
-      if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r) ouch(e.dmg * 2.2, e.x, e.y, { push:40 });
+      if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r) ouch(e.dmg * 2.2, e.x, e.y, { push:40, el:e.el });
       if (a.t >= a.dur) { e.act = null; e.cd = a.rest; }
       return true;
     }
@@ -1342,27 +1499,27 @@ function brain(e, P, d, dt, s) {
 }
 function strike(e, a) {
   const P = S.p, col = EL[e.el], d = Math.hypot(P.x - e.x, P.y - e.y) || 1;
-  if (a.k === 'spit') { const v = 240; S.eshots.push({ k:'bubble', x:e.x, y:e.y - 20, vx:(P.x - e.x) / d * v, vy:(P.y - e.y) / d * v, life:2.6, rot:0, dmg:6, slow:1.6 }); SFX.pop(); return; }
-  if (a.k === 'glint') { const base = Math.atan2(P.y - e.y, P.x - e.x); for (let i = -2; i <= 2; i++) { const an = base + i * .26; S.eshots.push({ k:'blade', x:e.x, y:e.y - 30, vx:Math.cos(an) * 270, vy:Math.sin(an) * 270, life:2.4, rot:0, dmg:10 }); } SFX.shing(); return; }
+  if (a.k === 'spit') { const v = 240; S.eshots.push({ k:'bubble', x:e.x, y:e.y - 20, vx:(P.x - e.x) / d * v, vy:(P.y - e.y) / d * v, life:2.6, rot:0, dmg:6, slow:1.6, el:'water' }); SFX.pop(); return; }
+  if (a.k === 'glint') { const base = Math.atan2(P.y - e.y, P.x - e.x); for (let i = -2; i <= 2; i++) { const an = base + i * .26; S.eshots.push({ k:'blade', x:e.x, y:e.y - 30, vx:Math.cos(an) * 270, vy:Math.sin(an) * 270, life:2.4, rot:0, dmg:10, el:'metal' }); } SFX.shing(); return; }
   if (a.k === 'circle') {
     const inside = Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r * .5;
     ring(a.x, a.y, 16, a.r * 1.1, col, .45, 12, true); shards(a.x, a.y, col, 8, a.r * 1.6);
     if (a.bomb) {
       flash(a.x, a.y, a.r * 2.2, '#FF8A2A', .25); flames(a.x, a.y, 10, a.r * .8, 30); smoke(a.x, a.y, 8, a.r * .6, '90,60,50'); SFX.boom(true); S.shake = Math.max(S.shake, .3);
-      if (inside) ouch(24, a.x, a.y, { push:60, shake:.35 });
+      if (inside) ouch(24, a.x, a.y, { push:60, shake:.35, el:e.el });
       inArea(a.x, a.y, a.r, o => { if (o !== e && !o.boss) hurt(o, 60, 'fire', { kb:300, fx:a.x, fy:a.y }); });   // it hurts its own crowd too
       e.xp = 1; kill(e); return;
     }
-    if (a.quake) { debris(a.x, a.y, 14, 320); SFX.stomp(); S.shake = Math.max(S.shake, .35); if (inside) ouch(26, a.x, a.y, { push:70, shake:.4 }); return; }
-    if (a.tide) { SFX.splash(); if (inside) ouch(18, a.x, a.y, { push:140, slow:1.4 }); return; }
-    if (a.roots) { for (let i = 0; i < 7; i++) { const an = i / 7 * TAU; fx({ k:'spike', x:a.x + Math.cos(an) * a.r * .5, y:a.y + Math.sin(an) * a.r * .5, life:.6, s:34, c:'#5FAE3A', rot:an }); } debris(a.x, a.y, 8, 200); SFX.thud(true); if (inside) ouch(20, a.x, a.y, { slow:1.2 }); return; }
+    if (a.quake) { debris(a.x, a.y, 14, 320); SFX.stomp(); S.shake = Math.max(S.shake, .35); if (inside) ouch(26, a.x, a.y, { push:70, shake:.4, el:e.el }); return; }
+    if (a.tide) { SFX.splash(); if (inside) ouch(18, a.x, a.y, { push:140, slow:1.4, el:e.el }); return; }
+    if (a.roots) { for (let i = 0; i < 7; i++) { const an = i / 7 * TAU; fx({ k:'spike', x:a.x + Math.cos(an) * a.r * .5, y:a.y + Math.sin(an) * a.r * .5, life:.6, s:34, c:'#5FAE3A', rot:an }); } debris(a.x, a.y, 8, 200); SFX.thud(true); if (inside) ouch(20, a.x, a.y, { slow:1.2, el:e.el }); return; }
   }
   if (a.k === 'lane') { SFX.whip(); }
 }
 function hazards(dt) {
   const P = S.p;
   for (const h of S.hz) { h.t += dt; h.tick -= dt;
-    if (h.tick <= 0 && Math.hypot(P.x - h.x, P.y - h.y) < h.r + P.r * .4) { h.tick = .6; if (ouch(h.dmg, h.x, h.y)) { if (h.k === 'thorn') shards(P.x, P.y, '#6FBF4A', 4, 140); else flames(P.x, P.y, 3, 10, 18); } } }
+    if (h.tick <= 0 && Math.hypot(P.x - h.x, P.y - h.y) < h.r + P.r * .4) { h.tick = .6; if (ouch(h.dmg, h.x, h.y, { el:h.k === 'thorn' ? 'wood' : 'fire' })) { if (h.k === 'thorn') shards(P.x, P.y, '#6FBF4A', 4, 140); else flames(P.x, P.y, 3, 10, 18); } } }
   S.hz = S.hz.filter(h => h.t < h.life);
 }
 
@@ -1399,23 +1556,22 @@ function update(dt) {
   P.hp = Math.min(P.max, P.hp + (1.4 + (S.gifts.spring || 0) * 1.5) * dt);   // healing comes mostly from gifts and pickups
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
-  direct(dt); powers(dt); awakeTick(dt); crates(dt); gems(dt); hazards(dt); updateFX(dt);
-  const armour = (1 - (S.gifts.rooted || 0) * .08) * (ANIMAL[animal].e === 'earth' ? .85 : 1);   // Earth stands firm
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); crates(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
-    e.wob += dt * 6; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
+    e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
     if (e.frozen > 0) continue;
     if (e.kb > 0) { e.kb -= dt; e.x += e.kx * dt; e.y += e.ky * dt; continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
     if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
     if (d < e.r + P.r && P.hurt <= 0) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
-      const hit = e.dmg * (1 + S.t / 300) * armour; P.hp -= hit; floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
+      const hit = e.dmg * (1 + S.t / 300) * armourVs(e.el); P.hp -= hit; floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
   for (const s of S.eshots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; s.rot += dt * 8;
-    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * armour; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, s.k === 'bubble' ? '#7FC4FF' : '#CFE9FF', 4, 160); SFX.hurt(); } }
+    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * armourVs(s.el); if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, s.k === 'bubble' ? '#7FC4FF' : '#CFE9FF', 4, 160); SFX.hurt(); } }
   S.eshots = S.eshots.filter(s => s.life > 0);
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
@@ -1647,6 +1803,9 @@ function draw() {
     if (wind) { const rd = silhouette(e.img, '#FF3A2A'); if (rd) { g.globalAlpha = wind * .45 * (.6 + .4 * Math.sin(S.t * 30)); g.drawImage(rd, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
     g.restore();
     if (wind) { const y = e.y - s * .62 - 18 - Math.sin(S.t * 12) * 3; g.font = '900 30px system-ui'; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = '#2A0A06'; g.strokeText('!', e.x, y); g.fillStyle = '#FF4A3A'; g.fillText('!', e.x, y); g.lineWidth = 1; }
+    if (e.tagT > 0) { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
+      g.strokeStyle = EL[e.el]; g.lineWidth = 4; g.beginPath(); g.ellipse(e.x, e.y + e.r * .5, e.r * 1.8 + Math.sin(S.t * 8) * 4, e.r * .8, 0, 0, TAU); g.stroke();
+      g.font = '22px "Lilita One", sans-serif'; g.textAlign = 'center'; g.lineWidth = 5; g.strokeStyle = '#1A1206'; g.strokeText(e.K.n, e.x, y); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, e.x, y); g.globalAlpha = 1; g.lineWidth = 1; }
     if (e.type === 'golem') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(e.x - 42, e.y - s * .62 - 14, 84, 10); g.fillStyle = EL[e.el]; g.fillRect(e.x - 40, e.y - s * .62 - 12, 80 * Math.max(0, e.hp / e.max), 6); }
   }
   // burning pools: fixed flame tongues flickering in place
@@ -1768,6 +1927,15 @@ function draw() {
   g.fillStyle = '#3A0A06'; g.fillRect(P.x - 37, P.y + 44, 74, 7);
   g.fillStyle = hb > .3 ? '#6BD23A' : '#E8553F'; g.fillRect(P.x - 37, P.y + 44, 74 * hb, 7);
   // enemy ice shards
+  // spirit animal shots, each in its element
+  for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue;
+    if (s.el === 'water') { add(() => glowAt(s.x, s.y, 50, '#5FB4FF', .55)); g.fillStyle = 'rgba(110,190,255,.75)'; g.strokeStyle = '#E8F6FF'; g.lineWidth = 3; g.beginPath(); g.arc(s.x, s.y, 11, 0, TAU); g.fill(); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.arc(s.x - 4, s.y - 4, 3, 0, TAU); g.fill(); }
+    else if (s.el === 'wood') { g.save(); g.translate(s.x, s.y); g.rotate(s.rot); g.fillStyle = '#7FCF4A'; g.strokeStyle = '#1A3A10'; g.lineWidth = 2.5; for (const q of [0, Math.PI]) { g.beginPath(); g.ellipse(Math.cos(q) * 9, Math.sin(q) * 9, 11, 5, q, 0, TAU); g.fill(); g.stroke(); } g.restore(); }
+    else if (s.el === 'fire') { add(() => glowAt(s.x, s.y, 60, '#FF7A2A', .6)); g.save(); g.translate(s.x, s.y); g.rotate(Math.atan2(s.vy, s.vx) - Math.PI / 2); flameAt(0, 0, 24, .1, s.x); g.restore(); g.fillStyle = '#FFF6D0'; g.beginPath(); g.arc(s.x, s.y, 6, 0, TAU); g.fill(); }
+    else if (s.el === 'earth') { g.save(); g.translate(s.x, s.y); g.rotate(s.rot); g.fillStyle = '#B8863A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); for (let i = 0; i < 7; i++) { const r = 11 + (i % 2) * 3; g.lineTo(Math.cos(i * TAU / 7) * r, Math.sin(i * TAU / 7) * r); } g.closePath(); g.fill(); g.stroke(); g.restore(); }
+    else { add(() => glowAt(s.x, s.y, 36, '#FFE58A', .5)); g.save(); g.translate(s.x, s.y); g.rotate(Math.atan2(s.vy, s.vx)); g.fillStyle = '#FFE58A'; g.strokeStyle = '#3A2A06'; g.lineWidth = 2; g.beginPath(); g.moveTo(14, 0); g.lineTo(-10, -3.5); g.lineTo(-10, 3.5); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+  }
+  g.lineWidth = 1;
   for (const s of S.eshots) {
     if (s.k === 'bubble') { add(() => glowAt(s.x, s.y, 54, '#5FB4FF', .6)); g.fillStyle = 'rgba(120,200,255,.55)'; g.strokeStyle = '#E8F6FF'; g.lineWidth = 3; g.beginPath(); g.arc(s.x, s.y, 14, 0, TAU); g.fill(); g.stroke(); g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.arc(s.x - 5, s.y - 5, 4, 0, TAU); g.fill(); continue; }
     if (s.k === 'blade') { add(() => glowAt(s.x, s.y, 50, '#FFE6A0', .5)); g.save(); g.translate(s.x, s.y); g.rotate(s.rot * 2); g.fillStyle = '#E6EEF4'; g.strokeStyle = '#2A3440'; g.lineWidth = 2.5; g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? 6 : 17; g.lineTo(Math.cos(i * TAU / 8) * r, Math.sin(i * TAU / 8) * r); } g.closePath(); g.fill(); g.stroke(); g.fillStyle = '#E6B23A'; g.beginPath(); g.arc(0, 0, 4, 0, TAU); g.fill(); g.restore(); continue; }
@@ -1776,8 +1944,8 @@ function draw() {
   drawFX(true);
   // damage numbers and callouts
   g.textAlign = 'center'; g.lineJoin = 'round';
-  for (const n of S.nums) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 26 : 19) * pk;
-    g.globalAlpha = Math.min(1, (.65 - n.t) * 5); g.font = `${sz}px "Lilita One", sans-serif`; g.lineWidth = 5; g.strokeStyle = '#1A1206'; g.strokeText(n.v, n.x, y); g.fillStyle = n.strong ? '#FFD24A' : '#FFFFFF'; g.fillText(n.v, n.x, y); }
+  for (const n of S.nums) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 28 : n.weak ? 15 : 19) * pk;
+    g.globalAlpha = Math.min(1, (.65 - n.t) * 5); g.font = `${sz}px "Lilita One", sans-serif`; g.lineWidth = 5; g.strokeStyle = '#1A1206'; g.strokeText(n.v, n.x, y); g.fillStyle = n.strong ? '#FFD24A' : n.weak ? '#AEB8C0' : '#FFFFFF'; g.fillText(n.v, n.x, y); }
   for (const t of S.txt) { g.globalAlpha = Math.min(1, (1.1 - t.t) * 3); g.font = `${Math.round(t.size / Z)}px "Lilita One", sans-serif`; g.lineWidth = 7; g.strokeStyle = '#1A1206'; const y = t.y - t.t * 50; g.strokeText(t.s, t.x, y); g.fillStyle = t.c; g.fillText(t.s, t.x, y); }
   g.globalAlpha = 1; g.lineWidth = 1;
   // screen space: arrows to off-screen chests, flashes, the cold edge of low health
@@ -1949,7 +2117,7 @@ function renderCards(opts) {
     } else if (o.kind === 'active') {
       const p = POW[o.id], lv = S.skills[o.id] || 0; b.className = 'card';
       html = `<span class="tile"><img src="${icon(p.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${p.n}</b>${lv ? '' : '<span class="flag">NEW!</span>'}</span>
-        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 4 ? `max it + ${GIFT[evoGift(o.id)].n} to evolve` : `evolves into ${p.evo}`}</small></span></span>`;
+        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 4 ? `max it + ${GIFT[evoGift(o.id)].n} to evolve` : `evolves into ${p.evo}`}</small><span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
     } else if (o.kind === 'gift') {
       const gi = GIFT[o.id], lv = S.gifts[o.id] || 0, feeds = Object.keys(POW).filter(k => evoGift(k) === o.id).map(k => POW[k].n).join(' and ');
       b.className = 'card gift';
@@ -2062,6 +2230,9 @@ function finishChest() {
 
 /* ================= the guide: one bubble at a time, pointing at the real thing ================= */
 const COACH = { q:[], cur:null, gap:0 };
+// smaller things are told in a banner that never stops play, one at a time
+const NOTES = { q:[], t:0 };
+function note(id, text) { if (!S || S.taught['c_' + id]) return; S.taught['c_' + id] = 1; NOTES.q.push(text); }
 function coach(id, title, text, where, secs, place = 'above') {
   if (!S || S.taught['c_' + id]) return; S.taught['c_' + id] = 1;
   COACH.q.push({ id, title, text, where, place });
@@ -2071,6 +2242,7 @@ const popupOpen = () => [...document.querySelectorAll('.scr')].some(s => !s.hidd
 function hideCoach() { ['#coach', '#coachDim', '#coachRing', '#moveGhost'].forEach(q => $(q).classList.remove('on')); }
 // a tip freezes the game, spotlights what it explains, and waits for OK (or Next when more are waiting)
 function coachTick(dt) {
+  NOTES.t -= dt; if (NOTES.t <= 0 && NOTES.q.length && !COACH.cur && !popupOpen()) { toast(NOTES.q.shift(), 4200); NOTES.t = 5.5; }
   if (COACH.cur) return;
   COACH.gap -= dt;
   if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel) return;
@@ -2078,6 +2250,7 @@ function coachTick(dt) {
 }
 function showCoach(c) {
   COACH.cur = c; running = false;
+  if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>'; show('beastCard'); SFX.alarm(); return; }
   const p = c.where(); let sx = p.sx, sy = p.sy;
   if (sx == null) { sx = (p.x - camX) * Z; sy = (p.y - camY) * Z; }
   $('#coachT').textContent = c.title; $('#coachP').textContent = c.text; $('#coachOk').textContent = COACH.q.length ? 'Next' : 'OK';
@@ -2085,6 +2258,7 @@ function showCoach(c) {
   const cb = el.querySelector('.cb'); cb.style.animation = 'none'; void cb.offsetWidth; cb.style.animation = '';
   const w = 240, h = el.offsetHeight || 110; let below = c.place === 'below';
   if (!below && sy - h - 18 < 90) below = true;                 // keep it on screen
+  if (below && sy + 16 + h > H - 10) below = false;
   el.className = (below ? 'below' : 'above') + ' on';
   const x = clamp(sx - w / 2, 8, W - w - 8), y = below ? sy + 16 : sy - h - 18;
   el.style.transform = `translate(${x}px,${clamp(y, 60, H - h - 10)}px)`; el.style.setProperty('--tx', clamp(sx - x, 18, w - 18) + 'px');
@@ -2094,9 +2268,10 @@ function showCoach(c) {
 }
 function coachOk() {
   if (!COACH.cur) return;
+  if (COACH.cur.card) show(null);
   hideCoach(); COACH.cur = null; SFX.select();
   if (COACH.q.length && !popupOpen()) { showCoach(COACH.q.shift()); return; }
-  COACH.gap = 2.5;
+  COACH.gap = 6;
   if (S && !S.over && !popupOpen()) startLoop();
 }
 $('#coachOk').onclick = coachOk;
@@ -2116,11 +2291,11 @@ function hud() {
   $('#xpBar i').style.width = (S.xp / S.need * 100) + '%';
   $('#freedN').textContent = S.thawed;
   const sec = Math.floor(S.t); $('#timePill').textContent = `${String((sec / 60) | 0).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
-  const nw = WAVES[S.waveIdx], wp = $('#wavePill');
+  const WV = LEVELS[S.level - 1].waves, nw = WV[S.waveIdx], wp = $('#wavePill');
   if (S.bossSpawned) wp.innerHTML = 'All 10 waves cleared · <i>Boss</i>';
   else if (nw) { const left = Math.max(0, Math.ceil(nw.t - S.t)), col = nw.el === 'mix' ? '#FFE58A' : EL[nw.el];
-    wp.innerHTML = `${S.waveIdx ? `Wave ${S.waveIdx} of ${WAVES.length} · ` : ''}next <i style="--c:${col}">${nw.el === 'mix' ? 'everything' : ELNAME[nw.el]}</i> in ${left}s`; }
-  else wp.innerHTML = `Wave ${WAVES.length} of ${WAVES.length} · boss in ${Math.max(0, Math.ceil(170 - S.t))}s`;
+    wp.innerHTML = `${S.waveIdx ? `Wave ${S.waveIdx} of ${WV.length} · ` : ''}next <i style="--c:${col}">${nw.el === 'mix' ? 'everything' : ELNAME[nw.el]}</i> in ${left}s${nw.el === 'mix' ? '' : `<small>beat it with ${weakTo(nw.el).map(k => `<i style="--c:${EL[k]}">${ELNAME[k]}</i>`).join(' or ')}</small>`}`; }
+  else wp.innerHTML = `Wave ${WV.length} of ${WV.length} · boss in ${Math.max(0, Math.ceil(170 - S.t))}s`;
   if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = `The Still Warden · ${ELNAME[S.boss.el]}`; }
 }
 function loop(now, id) {
@@ -2151,18 +2326,56 @@ function results() {
     ['Lv ' + S.lv, `${S.hordes} hordes broken`], [evos.length ? evos.join(', ') : '–', evos.length ? 'evolved' : 'no evolution yet'],
     [S.awakenings + '×', `${ANIMAL[animal].m} awoke`], [Math.min(100, Math.round(S.thawCells / (gridN * gridN) * 100)) + '%', 'of the shore restored']
   ].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+  if (S.won && LVL < 4) { store.set('morqi.unlocked', Math.max(unlocked(), LVL + 1)); $('#nextLvBtn').textContent = `Level ${LVL + 1} ▶`; $('#nextLvBtn').hidden = false; } else $('#nextLvBtn').hidden = true;
   show('results');
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { state: () => S, finish: () => results(),
+window.__morqi = { state: () => S, finish: () => results(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
-      if (COACH.cur) { if (!auto) break; hideCoach(); COACH.cur = null; }
+      if (COACH.cur) { if (!auto) break; if (COACH.cur.card) show(null); hideCoach(); COACH.cur = null; }
       if (auto) COACH.q.length = 0;
       if (!running) break; update(1 / 30); }
     if (!S.over) running = false; draw(); hud(); return { t:Math.round(S.t), lv:S.lv, hp:Math.round(S.p.hp), en:S.en.length, freed:S.thawed, fx:FX.length }; } };
+
+/* ================= creatures, levels and the element chart ================= */
+const chip = el => `<i class="ec" style="--c:${EL[el]}">${ELNAME[el]}</i>`;
+function beastHTML(kid, big) {
+  const K = KIND[kid], el = kid.split('-')[0], brute = kid.endsWith('-c');
+  const what = K.tip || { weave:'Weaves side to side as it drifts in.', split:'Splits into two little sprouts when you free it.', rush:'Very fast, but fragile.', heavy:'Slow and tough. Hard to knock back.', zigzag:'Zigzags fast and erratically.' }[K.beh];
+  return `<div class="beast${big ? ' big' : ''}" style="--c:${EL[el]}"><span class="pic"><img src="art/e-${kid}.png" alt=""></span><div><b>${K.n}</b>
+    <p>${what}${brute && !SEEN.has('_chest') ? (markSeen('_chest'), ' Brutes drop a Spirit Chest.') : ''}</p><span class="chips">${chip(el)} · beat it with ${weakTo(el).map(chip).join('')}</span></div></div>`;
+}
+function intro(n) {
+  const L = LEVELS[n - 1];
+  $('#introT').textContent = `Level ${n} · ${L.name}`;
+  $('#introP').textContent = L.fresh.length ? 'New creatures on this shore:' : '';
+  $('#introList').innerHTML = L.fresh.map(k => beastHTML(k)).join('');
+  L.fresh.forEach(markSeen);
+  show('intro');
+}
+$('#introGo').onclick = () => { SFX.select(); show(null); AU.music(true); startRun(); };
+$('#beastOk').onclick = () => coachOk();
+let chartFrom = null;
+function chart(from) {
+  chartFrom = from;
+  $('#elRows').innerHTML = EL5.map(el => `<div class="elrow">${chip(el)}<span><em>${beats(el).map(k => `${VERB[el][k][0]} ${ELNAME[k]}`).join(', ')}</em><br><s>${weakTo(el).map(k => `${VERB[k][el][1]} by ${ELNAME[k]}`).join(', ')}</s></span></div>`).join('');
+  const me = ANIMAL[animal].e;
+  $('#elYou').innerHTML = `Your Keeper fights as ${chip(me)}, your spirit animal's element: ${andList(weakTo(me).map(k => ELNAME[k]))} creatures hit you harder, the rest hit softer.`;
+  show('chart');
+}
+$('#chartBtn').onclick = () => { SFX.pop(); chart('howto'); };
+$('#chartBtn2').onclick = () => { SFX.pop(); chart('paused'); };
+$('#chartOk').onclick = () => { SFX.select(); show(chartFrom); };
+function renderLevels() {
+  const u = unlocked();
+  $('#lvls').innerHTML = [1, 2, 3, 4].map(n => `<button class="btn ${n === LVL ? 'green' : 'blue'} small" data-n="${n}" ${n > u ? 'disabled' : ''}>${n > u ? '🔒 ' : ''}Level ${n}</button>`).join('');
+  $('#lvls').querySelectorAll('button').forEach(b => b.onclick = () => { LVL = +b.dataset.n; SFX.select(); renderLevels(); });
+}
+renderLevels();
+$('#nextLvBtn').onclick = () => { SFX.select(); LVL++; renderLevels(); intro(LVL); };
 })();
 </script>
 </body></html>
