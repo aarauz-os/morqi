@@ -1165,12 +1165,18 @@ const AU = (() => {
        fire, the Lantern Ridge: "Lantern Night" with festival drums and tremolo plucks; when the ridge is restored the
          whole tune lifts from minor into major: joy coming back
        metal, the Silver City: "The Path" re-voiced as "Silver Bell": a bell-piano, a forge rhythm, one deep city bell
+       earth, the harvest lands: "Harvest Moon", new: in earth's own mode (gong), but moody, not bright: warm ninth chords,
+         a low hollow clay ocarina that slides into its notes, a big harvest drum, a plucked harvest figure
      Every new voice stays in the middle register or below and rests, per the rule against high repeating instruments. */
   const lit = n => M.rest >= n / 3 - .001;
   const silk = (t, f, v) => { mv({ t, f, type:'triangle', dur:1.3, vol:v, att:.002, lp:2600, rev:.45, dly:.25 }); mv({ t, f:f * 2, dur:.28, vol:v * .22, att:.002, lp:3000 }); mn({ t, f:2000, ft:'bandpass', q:4, dur:.02, vol:v * .22 }); };
   const flute = (t, f, v, len = SIX * 3) => {   // a low bamboo flute: it scoops into the note, breathes, and sways
     mv({ t, f, f0:f * .97, gl:.05, type:'triangle', dur:len, vol:v, att:.035, hold:len * .5, lp:2000, vib:5, vibD:9, rev:.45, dly:.2 });
     mv({ t, f, dur:len, vol:v * .45, att:.05, hold:len * .5 }); mn({ t, f:f * 2, ft:'bandpass', q:2.5, dur:len * .8, vol:v * .1, att:.04 });
+  };
+  const xun = (t, f, v, len = SIX * 3) => {   // a clay ocarina: round and hollow, sliding up into the note from below
+    mv({ t, f, f0:f * .94, gl:.09, dur:len, vol:v, att:.06, hold:len * .45, lp:1400, vib:4.5, vibD:7, rev:.5, dly:.22 });
+    mv({ t, f:f * 2, dur:len, vol:v * .1, att:.08, hold:len * .3, lp:1600 }); mn({ t, f:f * 1.5, ft:'bandpass', q:3, dur:len * .7, vol:v * .1, att:.05 });
   };
   const knock = (t, f = 460, v = .07) => { mv({ t, f, dur:.07, vol:v, att:.001, lp:1800 }); mn({ t, f:f * 1.6, ft:'bandpass', q:6, dur:.03, vol:v * .35 }); };   // a wooden fish
   const qin = (t, f, v, len = 2) => { mv({ t, f, f0:f * 1.03, gl:.12, type:'triangle', dur:len, vol:v, att:.003, lp:1100, rev:.4 }); mv({ t, f:f * 2, dur:.35, vol:v * .18, lp:1400 }); };   // a low zither, sliding into the note
@@ -1195,6 +1201,11 @@ const AU = (() => {
       if (i === 0 && a > .05) mn({ t, f:420, ft:'lowpass', dur:SIX * 16, att:SIX * 8, vol:.014 * a, to });   // cold ash wind
       if (r > .05) for (let k = 0; k < 2; k++) if (R() < .45 * r) mn({ t:t + R() * SIX, f:2400, ft:'bandpass', q:2, dur:.012, vol:.016 * r, to });   // embers crackling
       if (i === 0 && !(bar & 1) && r > .3) taiko(t, .05 * r, 66, to);   // a festival drum, far off
+    } else if (w === 'earth') {
+      if (i === 0 && a > .05) mn({ t, f:900, ft:'bandpass', q:1.2, dur:SIX * 16, att:SIX * 6, vol:.012 * a, to });   // dry dust wind
+      if (a > .3 && R() < .25 * a) mn({ t:t + R() * SIX, f:700, ft:'lowpass', dur:.02, vol:.02 * a, to });   // grit skittering
+      if (i === 0 && (bar & 1) && r > .05) mn({ t, f:500, f1:1300, ft:'lowpass', dur:SIX * 32, att:SIX * 16, vol:.022 * r, to, rev:.3 });   // wind rolling through the grain
+      if ((i === 0 || i === 6) && bar % 4 === 1 && r > .3) taiko(t, .04 * r, 104, to);   // a hand drum, far off
     } else if (w === 'metal') {
       if (i === 0 && a > .05) mn({ t, f:380, ft:'lowpass', dur:SIX * 16, att:SIX * 8, vol:.016 * a, to });   // fog and silence
       if (i === 8 && bar % 4 === 2 && r > .3) mv({ t, f:110, dur:2.6, vol:.025 * r, att:.004, rev:.7, to });   // the city's great bell, far away
@@ -1393,6 +1404,41 @@ const AU = (() => {
     if (wood && lit(1) && (bar & 1) && i >= 12) knock(t + SIX / 3, 520, .035);   // the grove waking: a wooden-fish triplet into each chord
     if (tier >= 2 && i === 15) knock(t, 560, .04);
   }
+  // "Harvest Moon": the earth world, new. In earth's own mode (gong: Ab Bb C Eb F), but kept moody so it never turns
+  // into a nursery tune: warm late-night ninth chords on the electric piano, and a low hollow clay ocarina whose hook
+  // rises to Bb at the golden point of its phrase and settles home on Ab. As the land is restored, a big harvest drum
+  // joins on the downbeats, then a plucked harvest figure, then the ocarina doubled an octave down and a warm choir.
+  const HARV = {
+    keys:[[103.83, 130.81, 155.56, 196, 233.08], [87.31, 103.83, 130.81, 155.56, 196], [69.3, 87.31, 103.83, 130.81, 155.56], [77.78, 116.54, 130.81, 174.61, 207.65]],   // Abmaj9, Fm9, Dbmaj9, Eb6/9
+    root:[51.91, 43.65, 34.65, 38.89],
+    hookA:[[0, 311.13], [3, 311.13], [6, 349.23], [10, 415.3], [12, 349.23], [16, 261.63], [20, 466.16], [22, 415.3], [24, 349.23], [28, 311.13]],   // ends open on Eb
+    hookB:[[0, 311.13], [3, 311.13], [6, 349.23], [10, 415.3], [12, 349.23], [16, 261.63], [20, 466.16], [22, 415.3], [24, 349.23], [26, 311.13], [28, 261.63], [30, 207.65]],   // settles home on Ab
+    surp:[116.54, 146.83, 174.61, 233.08],   // Bb major: a Lydian lift, sun on the field
+    counter:[207.65, 174.61, 174.61, 155.56],
+    kicks:[[0, 6, 10], [0, 3, 10, 13]] };
+  function harvestStep(s, t) {
+    const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, H = HARV, earth = M.world === 'earth';
+    if (i === 0) phrase(bar, t);
+    const tier = M.tier, fill = M.sw === bar + 1, open = [1200, 2100, 3000][tier];
+    if (k === 0) keys(t, H.keys[ch], SIX * 18, tier ? .03 : .036, open);
+    if (k === 22 && tier) keys(t, H.keys[ch].slice(2), SIX * 8, .02, open);   // a late re-strike, behind the beat
+    if (k === 0 && !tier) sub(t, H.root[ch] * 2, SIX * 32, .1);
+    if (tier && hookOn(bar) && !(fill && i >= 13)) sing(ch & 1 ? H.hookB : H.hookA, bar, k, (f, d, g, l) => xun(t + d, f, .075 * g, SIX * 3 * l));
+    else if (!tier) { const hk = H.hookA.find(h => h[0] === k); if (hk && preview(bar, k)) xun(t, hk[1], .06); }
+    if (tier && part(bar) === 2 && k === 0 && !golden(bar)) xun(t, H.counter[ch], .06, SIX * 24);
+    if (earth && lit(1) && (i === 0 || (i === 10 && bar & 1)) && part(bar) !== 2 && !golden(bar)) taiko(t, i ? .1 : .16, 76);   // the harvest drum
+    if (earth && lit(2) && (k === 8 || k === 12 || k === 24) && part(bar) !== 2) pluck(t, H.keys[ch][k === 12 ? 3 : 2], .045, .8, 1300);   // a plucked harvest figure
+    if (earth && lit(3) && tier && hookOn(bar)) { const h = (ch & 1 ? H.hookB : H.hookA).find(x => x[0] === k); if (h) xun(t, h[1] / 2, .035, SIX * 3); }
+    if (earth && lit(3) && k === 0) for (const f of H.keys[ch].slice(1, 4)) mv({ t, f:f * 2, dur:SIX * 30, vol:.007, att:.9, hold:SIX * 14, vib:4, vibD:6, rev:.6 });   // a warm choir
+    if (tier && golden(bar) && i < 8) { if (i === 0) keys(t, H.surp, SIX * 10, .032, 2400); return; }
+    if (k === 28 && tier) mn({ t, f:500, f1:5000, dur:SIX * 4 + .02, att:SIX * 3.8, vol:.045, rev:.4 });
+    if (fill && tier === 0) { if (i >= 8 && i < 13) clap(t, .06 + (i - 8) * .035, .1); if (i < 13 && i % 2 === 0) hat(t, .022); if (i === 0) kick(t, .35); return; }
+    if (tier === 0) { if (i === 0 || i === 10) kick(t, .28); if (i === 8) rim(t, .08); if (i % 2 === 0) hat(t, .012); return; }
+    groove(t, bar, i, H, ch, tier, tier >= 2 ? .68 : .62);
+    if (i === 8) clap(t, tier >= 2 ? .34 : .3, .35);
+    if (part(bar) === 2 && tier < 2) { if (i % 4 === 2) hat(t, .026); return; }
+    hats(t, bar, i, tier, .038);
+  }
   function wardStep(s, t) {
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, W = WARD, intro = bar < 2;
     if (i === 0 && !intro) {
@@ -1422,7 +1468,7 @@ const AU = (() => {
       if (!c) return; if (M.next < c.currentTime - .1) M.next = c.currentTime + .05;  // back from a hidden tab: skip, don't pile up
       while (M.next < c.currentTime + .2) {
         if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
-        if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep }[M.song] || pathStep)(M.step, M.next);
+        if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep }[M.song] || pathStep)(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
         M.next += SIX; M.step++;
       }
@@ -1614,7 +1660,7 @@ function startRun() {
   for (let i = 0; i < 3; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   // Afterglow opens, then the level themes take turns; every boss shares the Warden's
-  AU.song(['rise', 'grove', 'lantern', 'silver'][S.level - 1]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
+  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=6`; renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -1622,6 +1668,10 @@ function startRun() {
 }
 function need(lv) { return Math.round(4 + lv * lv * 4.2); }
 
+// each level's world, and the theme that belongs to it; ?world=earth (or water, wood, fire, metal) plays any world's music
+// and weather on any level, so the earth theme can be heard before the earth world exists
+const SONG_OF = { water:'rise', wood:'grove', fire:'lantern', metal:'silver', earth:'harvest' };
+const worldOf = () => (/[?&]world=(water|wood|fire|earth|metal)/.exec(location.search) || [])[1] || ['water', 'wood', 'fire', 'metal'][S.level - 1];
 /* ================= input ================= */
 const keys = {}; let joy = null;
 addEventListener('keydown', e => {
@@ -2676,7 +2726,7 @@ function update(dt) {
     const hf = P.hp / P.max, B = S.boss && !S.boss.dead ? S.boss : null;
     AU.threat(Math.min(1, near / 40 + big * .07 + (S.warn ? .3 : 0) + Math.max(0, .6 - hf) * .6 + S.waveIdx / LV().waves.length * .2), hf < .25, B ? (B.hp < B.max * .34 ? 2 : 1) : 0); }
     // the world comes alive as its waves are cleared: after 3, 6 and 9 the music and weather step up
-    AU.world(['water', 'wood', 'fire', 'metal'][S.level - 1], S.bossSpawned ? 1 : S.waveIdx / LV().waves.length);
+    AU.world(worldOf(), S.bossSpawned ? 1 : S.waveIdx / LV().waves.length);
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
