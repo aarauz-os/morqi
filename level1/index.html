@@ -780,6 +780,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #beastCard .beast.big .chips{justify-content:flex-start}
 /* the Highest Self tip: the Keeper as the hooded master in gold light */
 /* the gem card: your Keeper with gems flying in; the stone card: the five Qi Stones in an arc */
+.shrinedemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 60%,rgba(143,240,168,.38),transparent 60%),linear-gradient(180deg,#2A2F7A,#141A44)}
+.shrinedemo img{height:82%!important;width:auto!important;object-fit:contain;filter:drop-shadow(0 0 16px rgba(143,240,168,.7));animation:float 3s ease-in-out infinite}
 .gemdemo,.stonedemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 58%,rgba(127,232,255,.35),transparent 60%),linear-gradient(180deg,#2A2F7A,#141A44)}
 .gemdemo img{height:78%!important;width:auto!important;object-fit:contain;filter:drop-shadow(0 6px 12px rgba(0,0,0,.4))}
 .gemdemo i{position:absolute;width:16px;height:16px;transform:rotate(45deg);background:linear-gradient(135deg,#E6FDFF,#5FE0F5 60%,#1C9CC0);box-shadow:0 0 12px #7FE8FF;left:calc(12% + var(--i) * 15%);top:calc(14% + (var(--i) * 37 % 4) * 14%);animation:gemIn 1.6s calc(var(--i) * .22s) ease-in infinite}
@@ -1302,7 +1304,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=8`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=8`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-free-' + e])];
+  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'ascended', 'beast'].map(k => 'vo-card-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   function vo(name, delay = 0, dip = .5) {
     if (!c || !voOn || !SMP[name]) return false; const t = c.currentTime + delay; if (t < voEnd) return false;
@@ -2043,7 +2045,7 @@ function renderStory() {
   [...$('#storyDots').children].forEach((d, i) => d.classList.toggle('on', i === storyPg));
   $('#storyNext').textContent = storyPg < 2 ? 'Next' : 'Run in';
 }
-const storyGo = () => { SFX.select(); if (storyPg < 2) { storyPg++; renderStory(); return; } if (LVL === 1) show('howto'); else intro(LVL); };
+const storyGo = () => { SFX.select(); if (storyPg < 2) { storyPg++; renderStory(); return; } if (LVL === 1) { show('howto'); AU.vo('vo-card-howto'); } else intro(LVL); };
 $('#storyNext').onclick = storyGo; $('#storyArt').onclick = storyGo;
 let howFromPause = false;
 $('#howtoGo').onclick = () => { SFX.select(); if (howFromPause) { howFromPause = false; show('paused'); return; } show(null); startRun(); };
@@ -2340,9 +2342,10 @@ function crates(dt) {
     // a Qi Stone waits for you to collect it, with a glowing arrow at your side that grows the longer it waits (A,
     // 2026-10-05); after 20 s it flies to you, so a level can never stall on one (Gene's ran ten minutes on a lost stone)
     if (it.kind === 'stone' && it.t > 8 && !it.told) { it.told = true; luma('vo-wait-' + (Math.random() < .5 ? 1 : 2)); }
-    if (it.kind === 'stone' && it.t > 20) { const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1100, 160 + (it.t - 20) * 520) * dt;
+    if (it.kind === 'stone' && it.t > 20) { if (!it.flying) { it.flying = true; SFX.sweep(); ring(it.x, it.y, 10, 120, EL[it.el], .4, 10, true); } const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1400, 700 + (it.t - 20) * 1400) * dt;
       it.x += (P.x - it.x) / d * Math.min(d, v); it.y += (P.y - it.y) / d * Math.min(d, v); if (Math.random() < .6) fx({ k:'glow', x:it.x, y:it.y - 20, s:40, s1:6, c:EL[it.el], life:.35 }); }
-    if (Math.hypot(it.x - P.x, it.y - P.y) < 60) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
+    // the reach covers the item as drawn (it floats above its spot), not only its spot on the ground (A, 2026-10-05)
+    if (Math.hypot(it.x - P.x, it.y - 18 - P.y) < 84) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
   S.items = S.items.filter(it => !it.got && (it.kind === 'stone' || it.t < 40));
   for (const ch of S.chests) { ch.t += dt; if (!ch.got && !hsOn() && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
@@ -3022,7 +3025,8 @@ function raiseShrine(el) {
   // the swarm comes from that list instead, so a shrine never sneaks in an element the level is keeping back
   const pool = LV().els, fed = !pool || pool.includes(FEEDS[el]) ? FEEDS[el] : pool.find(x => x !== el) || pool[0];
   const sh = { el, x, y, t:0, life:SHRINE.life, charge:P.max / 3, r:SHRINE.r, fed, healing:false };
-  S.shrines.push(sh);
+  S.shrines.push(sh); S.lastShrineEl = el;
+  if (!SEEN.has('_shrine')) { markSeen('_shrine'); coach('shrine', 'A Healing Spring!', 'Stand inside it to heal. Free the creatures around it first.', () => ({ sx:W / 2, sy:H * .45 })); }
   ring(x, y, 20, 260, EL[el], .7, 16, true); stars(x, y - 40, 24, EL[el], 360); SFX.chestDrop();
   for (let i = 0; i < 9; i++) { const a = i / 9 * TAU, rr = rnd(170, 230); spawn('critter', { x:x + Math.cos(a) * rr, y:y + Math.sin(a) * rr }, 1, sh.fed); }
 }
@@ -3448,7 +3452,8 @@ function qiKill(e) {
   const el = e.el; S.qi[el] = (S.qi[el] || 0) + 1;
   if (stoneEls().includes(el) && !S.qiStones[el] && !S.stoneOut[el] && S.qi[el] >= stoneNeed()) {
     S.stoneOut[el] = true; S.items.push({ x:e.x, y:e.y, kind:'stone', el, t:0, z:30, vz:320 });
-    luma('vo-stone-' + el);
+    // the first stone ever gets its card (which Luma reads); after that she just names the stone
+    if (SEEN.has('_stone')) luma('vo-stone-' + el);
     if (!SEEN.has('_stone')) { markSeen('_stone'); coach('stone', 'A Qi Stone!', 'Walk to it to collect it. Gather all five to free the land and wake the boss.', () => ({ sx:W / 2, sy:H * .45 })); }
     ring(e.x, e.y, 10, 280, EL[el], .7, 14, true); stars(e.x, e.y - 30, 20, EL[el], 340); SFX.chestDrop();
   }
@@ -4258,6 +4263,7 @@ function draw() {
   // a waiting Qi Stone: a glowing arrow at your side points to it, small at first and growing brighter and bigger the
   // longer it waits (A, 2026-10-05: a reminder that does not get in the way)
   { const P = S.p; let best = null, bd = 1e9; for (const it of S.items) if (it.kind === 'stone' && it.t > 1.2) { const d = Math.hypot(it.x - P.x, it.y - P.y); if (d < bd) { bd = d; best = it; } }
+    if (!best && S.shrines && P.hp < P.max * .6) for (const sh of S.shrines) if (sh.charge > 0) { const d = Math.hypot(sh.x - P.x, sh.y - P.y); if (d < bd) { bd = d; best = { x:sh.x, y:sh.y, t:Math.min(13.2, sh.t), el:sh.el }; } }
     if (best && bd > 120) { const a = Math.atan2(best.y - P.y, best.x - P.x), gr = Math.min(1, (best.t - 1.2) / 12), pulse = .5 + .5 * Math.sin(S.t * 5), s = .8 + .7 * gr, r = 74 + 14 * gr + pulse * 6, x = P.x + Math.cos(a) * r, y = P.y - 30 + Math.sin(a) * r * .8, col = GROUND_RING[best.el];
       add(() => glowAt(x, y, 90 * s, col, .5 + .35 * pulse));
       g.save(); g.translate(x, y); g.rotate(a); g.scale(s, s); g.lineJoin = 'round';
@@ -4273,22 +4279,22 @@ function draw() {
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
   for (const it of S.items) if (it.kind === 'stone') {   // a stone off screen gets an arrow in its element's colour
     const sx = (it.x - cx) * Z, sy = (it.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40), k = 1 + Math.sin(S.t * 6) * .15;
+    const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 120), k = 1 + Math.sin(S.t * 6) * .15;
     g.save(); g.translate(ex, ey); g.rotate(a); g.scale(k, k); g.fillStyle = GROUND_RING[it.el]; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-9, -13); g.lineTo(-9, 13); g.closePath(); g.fill(); g.stroke(); g.restore();
   }
   if (S.bloomSeed) {   // the seed off screen gets a golden arrow that pulses
     const sd = S.bloomSeed, sx = (sd.x - cx) * Z, sy = (sd.y - cy) * Z;
-    if (!(sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20)) { const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40), k = 1 + Math.sin(S.t * 6) * .15;
+    if (!(sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20)) { const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 120), k = 1 + Math.sin(S.t * 6) * .15;
       g.save(); g.translate(ex, ey); g.rotate(a); g.scale(k, k); g.fillStyle = '#FFD24A'; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-9, -13); g.lineTo(-9, 13); g.closePath(); g.fill(); g.stroke(); g.restore(); }
   }
   for (const sh of S.shrines || []) {   // a shrine off-screen gets an arrow in its element's colour
     const sx = (sh.x - cx) * Z, sy = (sh.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40);
+    const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 120);
     g.save(); g.translate(ex, ey); g.rotate(a); g.fillStyle = EL[sh.el]; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(16, 0); g.lineTo(-8, -12); g.lineTo(-8, 12); g.closePath(); g.fill(); g.stroke(); g.restore();
   }
   for (const ch of S.chests) {
     const sx = (ch.x - cx) * Z, sy = (ch.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40);
+    const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 120);
     g.save(); g.translate(ex, ey); g.rotate(a); g.fillStyle = '#FFD24A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.moveTo(16, 0); g.lineTo(-8, -12); g.lineTo(-8, 12); g.closePath(); g.fill(); g.stroke(); g.restore();
   }
   // an incoming wave: the edges it comes from glow in its element, with arrows pointing in
@@ -4325,7 +4331,11 @@ function drawFX(top) {
     const k = p.t / p.life, a = 1 - k;
     if (!top) {
       if (p.k === 'smoke') { g.fillStyle = `rgba(${p.c},${.35 * a})`; g.beginPath(); arc0(p.x, p.y, p.s * (1 + k * 1.4), 0, TAU); g.fill(); }
-      else if (p.k === 'shard' || p.k === 'rock' || p.k === 'paper') {
+      else if (p.k === 'rock') {   // a rounded pebble: debris must never look like an arrow (A, 2026-10-05)
+        g.globalAlpha = Math.min(1, a * 2); g.fillStyle = p.c; g.strokeStyle = 'rgba(26,18,6,.75)'; g.lineWidth = 1.5;
+        g.beginPath(); g.ellipse(p.x, p.y - p.z, p.s * .8, p.s * .55, p.rot, 0, TAU); g.fill(); g.stroke(); g.globalAlpha = 1;
+      }
+      else if (p.k === 'shard' || p.k === 'paper') {
         const y = p.y - p.z, c = Math.cos(p.rot) * p.s, sn = Math.sin(p.rot) * p.s, q = p.p || [-1, -.6, 1, -.2, -.2, 1];
         g.globalAlpha = Math.min(1, a * 2); g.fillStyle = p.c;
         g.beginPath(); g.moveTo(p.x + q[0] * c - q[1] * sn, y + q[0] * sn + q[1] * c); g.lineTo(p.x + q[2] * c - q[3] * sn, y + q[2] * sn + q[3] * c); g.lineTo(p.x + q[4] * c - q[5] * sn, y + q[4] * sn + q[5] * c); g.closePath(); g.fill();
@@ -4465,7 +4475,7 @@ function levelUp() {
   draw(); hud();
   $('#luTitle').textContent = 'Level Up!';
   const opts = options(), tip = $('#luTip');
-  if (!S.taught.lu) { S.taught.lu = 1; tip.innerHTML = 'Pick one. The <b>bars</b> show its level.'; tip.hidden = false; }
+  if (!S.taught.lu) { S.taught.lu = 1; AU.vo('vo-card-levelup'); tip.innerHTML = 'Pick one. The <b>bars</b> show its level.'; tip.hidden = false; }
   else if (opts.some(o => o.kind === 'evo') && !S.taught.luevo) { S.taught.luevo = 1; tip.innerHTML = '<b>EVOLVE!</b> Take it.'; tip.hidden = false; }
   else if (opts.some(o => o.kind === 'gift') && !S.taught.lugift) { S.taught.lugift = 1; tip.innerHTML = '<b>Gifts</b> (round) unlock evolutions.'; tip.hidden = false; }
   else tip.hidden = true;
@@ -4573,7 +4583,7 @@ function openChest() {
   slots.forEach((pos, i) => { ringEl.children[pos].innerHTML = `<img src="${iconOf(tiles[i])}" alt="">`; });
   $('#chestWrap').classList.remove('open'); $('#chestMult').textContent = ''; $('#chestGains').innerHTML = '';
   $('#chestBtn').textContent = 'Open!'; $('#chestBtn').disabled = false;
-  const ct = $('#chestTip'); if (!S.taught.chest) { S.taught.chest = 1; ct.innerHTML = 'The wheel picks <b>free upgrades</b> and new powers: one, three or, if you\'re lucky, five. Tap <b>Open!</b>'; ct.hidden = false; } else ct.hidden = true;
+  const ct = $('#chestTip'); if (!S.taught.chest) { S.taught.chest = 1; AU.vo('vo-card-chest'); ct.innerHTML = 'The wheel picks <b>free upgrades</b> and new powers: one, three or, if you\'re lucky, five. Tap <b>Open!</b>'; ct.hidden = false; } else ct.hidden = true;
   show('chest'); SFX.chestDrop();
 }
 $('#chestBtn').onclick = () => {
@@ -4643,15 +4653,19 @@ function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
+  if (id === 'shrine') return `<div class="shrinedemo"><img src="art4/props/x-shrine-${(S && S.lastShrineEl) || 'water'}.png?v=8" alt=""></div>`;
   if (id === 'gem') return `<div class="gemdemo"><img src="art4/k${keeper}.png?v=8" alt="">${[0, 1, 2, 3, 4, 5].map(i => `<i style="--i:${i}"></i>`).join('')}</div>`;
   if (id === 'stone') return `<div class="stonedemo">${['wood', 'fire', 'earth', 'metal', 'water'].map((el, i) => `<img src="art4/props/x-stone-${el}.png?v=8" alt="" style="--i:${i}">`).join('')}</div>`;
   if (id.startsWith('boss-')) { const b = id.slice(5); return `<div class="bossart" style="--c:${BOSSES[b].glow}"><img src="art4/bosses/${b}.png?v=9" alt=""><img class="mn" src="art4/e-${b}-m.png?v=8" alt=""></div>`; }
   if (TIP_ART[id]) return `<img class="tipart" src="art4/tips/${TIP_ART[id]}.jpg?v=8" alt="">`;
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
+// every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
+const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', highest:'ascended' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false;
+  if (c.card) AU.vo('vo-card-beast'); else if (CARD_VO[c.id]) AU.vo('vo-card-' + CARD_VO[c.id]);
   if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>'; show('beastCard'); SFX.alarm(); return; }
   // every tip card shows a picture made for it, never a live snapshot of play (A, 2026-10-04: snapshots caught
   // flashes, empty ground or the wrong moment, and "I can't waste people's time with these inconsistencies")
@@ -4883,7 +4897,8 @@ function win() {
     });
     at(9, 3.75, () => { SFX.heal(); stars(T.x, T.y - 120, 40, '#FFE58A', 420); });
     at(10, 4.3, () => { floatText(T.x, T.y - T.s * .95, 'Victory!', '#FFE08A', 46); SFX.fanfare(true); });
-    at(11, 5.0, () => AU.vo('vo-free-' + (B.realm || worldOf())));
+    // the person the boss was thanks you in their own voice, with the words the Victory card then shows (A, 2026-10-05)
+    at(11, 4.9, () => AU.vo('vo-thanks-' + (B.realm || worldOf()), 0, .4));
     if (T.t > 3.3 && T.r < 2600) { T.r += 70; paintThaw(T.x, T.y, T.r); for (let i = 0; i < 6; i++) paintThaw(rnd(0, WORLD), rnd(0, WORLD), 180); }
     // night lifts into dawn
     if (T.t > 3.3) S.night = Math.max(0, (S.night || 0) - dt / 1.8);
@@ -5168,7 +5183,7 @@ function chart(from) {
   wheel(keeperEl);
   const me = keeperEl;
   $('#elYou').innerHTML = `You're a ${chip(me)} Keeper: ${andList(weakTo(me).map(k => ELNAME[k]))} creatures hit you harder. Your path: ${pathOf(me).map((k, i) => S && S.learned && S.learned.includes(k) ? chip(k) : `<span style="opacity:.45">${ELNAME[k]}</span>`).join(' → ')}`;
-  show('chart');
+  show('chart'); AU.vo('vo-card-chart');
 }
 $('#chartBtn').onclick = () => { SFX.pop(); chart('howto'); };
 $('#chartBtn2').onclick = () => { SFX.pop(); chart('paused'); };
