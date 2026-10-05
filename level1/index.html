@@ -389,6 +389,11 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 #joy i{width:26px!important;height:26px!important;margin:-13px 0 0 -13px!important;background:rgba(255,255,255,.11)!important;box-shadow:none!important}
 /* the powers row lives at the bottom, out of the way of the top bar and the banners */
 #hud > .skills{position:absolute;left:10px;right:10px;bottom:calc(14px + env(safe-area-inset-bottom));justify-content:center;flex-wrap:wrap;gap:9px}
+#hud > .skills .slot{pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
+/* what a tapped power does: a small night-glass bubble above the row, gone on its own */
+.slottip{position:absolute;max-width:min(80%,280px);padding:9px 13px;border-radius:14px;background:rgba(12,16,44,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 0 0 1px rgba(255,255,255,.16),0 8px 20px rgba(0,0,0,.35);display:grid;gap:2px;text-align:center;pointer-events:none}
+.slottip b{font:900 14px var(--round);color:#fff}
+.slottip span{font:700 12.5px/1.3 var(--round);color:rgba(255,255,255,.78)}
 #hud > .skills .slot{width:34px;height:34px}
 .petchip{width:40px!important;height:40px!important;padding:0!important;border-radius:50%!important;justify-content:center;font-size:0!important}
 .petchip img{width:34px!important;height:34px!important}
@@ -792,6 +797,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <div id="bossWrap"><div class="bossname" id="bossName"></div><div id="bossBar"><i></i></div></div>
     </div>
     <div class="skills" id="skills"></div>
+    <div class="slottip" id="slotTip" hidden></div>
     <button id="ultBtn" aria-label="Companion ultimate"><span class="ur"></span><img id="ultImg" alt=""><em id="ultLv"></em><b id="ultName"></b></button>
     <button id="mapBtn" aria-label="Shore map"><canvas id="mapCv"></canvas></button>
     <div id="combo"><b id="comboN">×0</b><span>combo</span></div>
@@ -2271,6 +2277,10 @@ function crates(dt) {
   if ((S.crateT = (S.crateT ?? 36) - dt) <= 0 && S.crates.length < 3) { S.crateT = 36; placeCrate(false); }
   for (const it of S.items) {
     it.t += dt; if (it.vz) { it.vz -= 900 * dt; it.z = Math.max(0, it.z + it.vz * dt); if (it.z === 0) it.vz = 0; }
+    // a Qi Stone shines where it fell for a moment, then flies to you on its own (Gene's playtest, 2026-10-04: one stone
+    // lay off her path for six minutes and the level never ended)
+    if (it.kind === 'stone' && it.t > 2.4) { const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1100, 160 + (it.t - 2.4) * 520) * dt;
+      it.x += (P.x - it.x) / d * Math.min(d, v); it.y += (P.y - it.y) / d * Math.min(d, v); if (Math.random() < .6) fx({ k:'glow', x:it.x, y:it.y - 20, s:40, s1:6, c:EL[it.el], life:.35 }); }
     if (Math.hypot(it.x - P.x, it.y - P.y) < 60) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
   S.items = S.items.filter(it => !it.got && (it.kind === 'stone' || it.t < 40));
@@ -4560,6 +4570,7 @@ function tipArt(id) {
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
 function showCoach(c) {
+  if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false;
   if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>'; show('beastCard'); SFX.alarm(); return; }
   // every tip card shows a picture made for it, never a live snapshot of play (A, 2026-10-04: snapshots caught
@@ -4589,11 +4600,27 @@ function renderSkills() {
   let h = '';
   const I = S.ultInfo, ub = $('#ultBtn'); ub.style.setProperty('--c', EL[A.e]); $('#ultImg').src = lookSrc(`art4/a-${animal}-y.png?v=8`); $('#ultImg').alt = A.y;
   $('#ultLv').textContent = 'Lv ' + I.lv; $('#ultName').textContent = I.name; ub.setAttribute('aria-label', `${A.y} ultimate: ${I.name}`);
-  for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
-  for (const id in S.gifts) h += `<span class="slot gift" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
-  if (S.lode) h += `<span class="slot gift" style="--c:${EL.metal}"><img src="${icon('g-lodestone')}" alt="Lodestone"><em>${S.lode}</em></span>`;
+  for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" data-k="p" data-id="${id}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
+  for (const id in S.gifts) h += `<span class="slot gift" data-k="g" data-id="${id}" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
+  if (S.lode) h += `<span class="slot gift" data-k="l" style="--c:${EL.metal}"><img src="${icon('g-lodestone')}" alt="Lodestone"><em>${S.lode}</em></span>`;
   box.innerHTML = h;
 }
+// the row at the bottom is what you have, and it all works on its own; tapping one says so in a small bubble that
+// never pauses play (Gene, playtest 2026-10-04: "How do I use all the things at the bottom?")
+const ROLE_LINE = { Shooter:'Fires on its own at nearby creatures', Guard:'Guards you on its own', Area:'Strikes around you on its own' };
+let slotTipT = 0;
+$('#skills').addEventListener('pointerdown', e => {
+  const sl = e.target.closest('.slot'); if (!sl || !S) return; e.preventDefault(); e.stopPropagation();
+  const k = sl.dataset.k, id = sl.dataset.id; let name, line;
+  if (k === 'p') { name = S.evo[id] ? POW[id].evo : `${POW[id].n} \u00b7 Level ${S.skills[id]}`; line = S.evo[id] ? EVO_DESC[id] : ROLE_LINE[POW[id].role]; }
+  else if (k === 'g') { name = `${GIFT[id].n} \u00b7 Level ${S.gifts[id]}`; line = NEXT[id](0); }
+  else { name = 'Lodestone'; line = 'Pulls nearby gems to you'; }
+  const tip = $('#slotTip'), hud = $('#hud').getBoundingClientRect(), r = sl.getBoundingClientRect();
+  tip.innerHTML = `<b>${name}</b><span>${line}</span>`; tip.hidden = false;
+  tip.style.left = Math.max(12, Math.min(hud.width - 12 - tip.offsetWidth, r.left - hud.left + r.width / 2 - tip.offsetWidth / 2)) + 'px';
+  tip.style.bottom = (hud.bottom - r.top + 10) + 'px'; SFX.pop();
+  clearTimeout(slotTipT); slotTipT = setTimeout(() => { tip.hidden = true; }, 2600);
+});
 /* ================= corner map ================= */
 // Playtests: "I didn't know how far I got until I was already trapped", and a wish to see where you are.
 // A round lens in the top-right corner with your companion in the middle, the green you have restored, the shore's
