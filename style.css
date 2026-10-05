@@ -202,3 +202,30 @@ html.paged .h em{background:none;-webkit-background-clip:border-box;background-c
   html:not(.paged) .world{flex:0 0 46%;scroll-snap-align:start}}
 html.paged .op .pt img{aspect-ratio:16/10}
 .op .pt .label{font-size:10.5px;padding:3px 9px}
+
+/* the Season Path, drawn as the game would: one gold track, five reward stops, free in jade and the Path in gold */
+.spath{display:grid;gap:12px;padding:18px 20px;border-radius:24px;background:linear-gradient(135deg,rgba(255,212,90,.1),rgba(255,255,255,.04));box-shadow:inset 0 0 0 1px rgba(255,212,90,.25)}
+.spath-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.spath-head b{font-size:18px;color:var(--gold)}
+.spath-head span{font-size:13.5px;color:var(--muted)}
+.spath-track{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}
+.spath-track::before{content:"";position:absolute;left:10%;right:10%;top:30px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--jade),var(--gold))}
+.spath-track li{position:relative;display:grid;justify-items:center;gap:3px;text-align:center}
+.spath-track .ring{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:#141A44;box-shadow:0 0 0 3px var(--c),0 0 16px color-mix(in srgb,var(--c) 50%,transparent)}
+.spath-track .free{--c:var(--jade)}.spath-track .paid{--c:var(--gold)}
+.spath-track .ring img{width:100%;height:100%;object-fit:cover}
+.spath-track .big .ring img{object-fit:contain;transform:scale(1.15)}
+.spath-track b{font-size:13px}
+.spath-track small{font-size:12px;line-height:1.25;color:var(--muted)}
+.spath-track i{font-style:normal;font-size:10.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+@media (max-width:860px){html:not(.paged) .spath-track .ring{width:48px;height:48px}html:not(.paged) .spath-track::before{top:24px}}
+html.paged #business .lede{font-size:15px}
+html.paged #business .tbl td{padding:6px 0}
+html.paged #business > .in{gap:12px}
+html.paged #business .h{font-size:36px}
+html.paged #business .stat{padding:14px}
+html.paged #business .stat b{font-size:36px}
+html.paged #business .beats{gap:8px}
+html.paged #business .spath{padding:12px 18px;gap:8px}
+html.paged #business .spath-track .ring{width:50px;height:50px}
+html.paged #business .spath-track::before{top:25px}

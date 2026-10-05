@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 </head><body>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MorQi Level 1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -752,6 +753,9 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #beastCard .beast.big{grid-template-columns:120px 1fr;justify-items:start;text-align:left}
 #beastCard .beast.big .pic{width:120px;height:120px;border-radius:30px}
 #beastCard .beast.big .chips{justify-content:flex-start}
+/* the Highest Self tip: the Keeper as the hooded master in gold light */
+.hsdemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 55%,rgba(255,224,138,.55),rgba(255,197,74,.12) 45%,transparent 70%),linear-gradient(180deg,#2A2F7A,#141A44)}
+.hsdemo img{height:92%!important;width:auto!important;max-width:none;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,224,138,.8));animation:float 3s ease-in-out infinite}
 </style>
 
 <div id="stage">
@@ -3092,7 +3096,7 @@ function hsTick(dt) {
     const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); flushLevels(); if (!final) AU.song(SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
     if (!SEEN.has('_highest')) { markSeen('_highest'); S.taught.c_highest = 0;
-      coach('highest', 'Your Highest Self', 'Your Qi Stones made you whole: that is who you are becoming. Gather them on every shore and you will rise again.',
+      coach('highest', 'Your Highest Self', 'Your Qi Stones made you whole: that is who you are becoming. Gather them on every shore to become your Highest Self again.',
         () => { const cam = S.cam || { x:0, y:0 }; return { sx:(P.x - cam.x) * Z, sy:(P.y - 30 - cam.y) * Z, sr:70 }; }); }
   }
 }
@@ -3324,10 +3328,14 @@ function ringSprite(col) {
 function drawNight(cx, cy) {
   const n = S.night, P = S.p, px = (P.x - cx) * Z, py = (P.y - cy) * Z - 20, B = S.boss && !S.boss.dead ? S.boss : null;
   g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
-  // a night grade, not a grey veil: multiply everything toward indigo, gently near the Keeper and deeply at the edges
+  // a night grade, not a grey veil: the arena is moonlit and clear so the fight always reads, and the night deepens
+  // to indigo only outside its ring (A, 2026-10-04: the old grade, centred on the Keeper and dark 200 px away,
+  // left the fight "muddled in fog")
   const mix = (a, b) => `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * n)).join(',')})`, wt = [255, 255, 255];
-  const v = g.createRadialGradient(px, py, 40, px, py, Math.max(W, H) * .78);
-  v.addColorStop(0, mix(wt, [196, 192, 236])); v.addColorStop(.32, mix(wt, [104, 108, 186])); v.addColorStop(1, mix(wt, [34, 38, 104]));
+  const AR = S.arena, ax = AR ? (AR.x - cx) * Z : px, ay = AR ? (AR.y - cy) * Z : py, ar = AR ? AR.r * Z : 220, R = Math.max(ar * 1.35, 260);
+  const v = g.createRadialGradient(ax, ay, 0, ax, ay, R);
+  v.addColorStop(0, mix(wt, [240, 238, 255])); v.addColorStop(ar / R * .9, mix(wt, [214, 212, 248]));
+  v.addColorStop(Math.min(.99, ar / R * 1.12), mix(wt, [118, 122, 196])); v.addColorStop(1, mix(wt, [40, 44, 112]));
   g.globalCompositeOperation = 'multiply'; g.fillStyle = v; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
   g.globalCompositeOperation = 'lighter';
   if (B) glowAt((B.x - cx) * Z, (B.y - cy) * Z - B.size * .3 * Z, 420 * Z * 1.6, EL[B.el], (B.enraged ? .5 : .32) * n);
@@ -3339,9 +3347,10 @@ function drawNight(cx, cy) {
     for (let x = W + 16; x >= 0; x -= 16) g.lineTo(x, base + 80 + Math.sin(x * .011 + S.t * (.5 + k * .2) + k * 2 + .7) * 34);
     g.closePath(); g.fill();
   }
-  for (let i = 0; i < 46; i++) {   // spirit motes
+  // spirit motes, few and soft so they sparkle without fogging the fight
+  for (let i = 0; i < 24; i++) {
     const x = ((i * 97.3 + S.t * 18 * (1 + i % 3)) % (W + 40)) - 20, y = (((i * 53.7 - S.t * 22 * (1 + i % 2)) % (H + 40)) + H + 40) % (H + 40) - 20, tw = .5 + .5 * Math.sin(S.t * 3 + i * 1.7);
-    glowAt(x, y, 14 + 10 * tw, i % 4 ? '#9FE8FF' : '#FFE08A', .7 * tw * n);
+    glowAt(x, y, 12 + 8 * tw, i % 4 ? '#9FE8FF' : '#FFE08A', .45 * tw * n);
   }
   const bt = S.bolt;
   if (bt && bt.t < .45) {   // lightning: a jagged white bolt from the sky to the arena, then the screen flares
@@ -4179,6 +4188,8 @@ function showCoach(c) {
   $('#tipT').textContent = c.title; $('#tipP').textContent = c.text; $('#tipOk').textContent = COACH.q.length ? 'Next' : 'OK';
   const box = $('#tipSnap'); box.innerHTML = '';
   if (c.id === 'move') box.innerHTML = '<div class="dragdemo"><i></i></div>';
+  // the Highest Self tip shows the Keeper's Highest Self art, not a snapshot (the stones burst in a white flash)
+  else if (c.id === 'highest') box.innerHTML = `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   else {
     // the thing being explained stays in full colour; everything else goes grey and dim, and an arrow points at it
     // draw the clean frame first (no floating numbers), then aim at the target in that same frame: drawing moves the
@@ -4351,7 +4362,7 @@ function hud() {
   { const need = stoneNeed(), key = (freeMore ? 'F' : '') + stoneEls().map(el => S.qiStones[el] ? 'S' : Math.min(20, Math.floor((S.qi[el] || 0) / need * 20))).join(',');
     const row = $('#stoneRow'); if (row.dataset.k !== key) { row.dataset.k = key;
       row.innerHTML = ELS.filter(el => stoneEls().includes(el)).map(el => `<i class="sk${S.qiStones[el] ? ' got' : freeMore ? ' need' : ''}" style="--c:${EL[el]};--p:${Math.min(1, (S.qi[el] || 0) / need).toFixed(2)}">${S.qiStones[el] ? `<img src="art4/props/x-stone-${el}.png?v=8" alt="${ELNAME[el]} stone">` : ''}</i>`).join(''); } }
-  if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = `The Still Warden · ${ELNAME[S.boss.el]}`; }
+  if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = `The Still Warden \u00b7 ${ELNAME[S.boss.el]}`; }
 }
 function loop(now, id) {
   if (!running || id !== loopId) return;
