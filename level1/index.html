@@ -2276,60 +2276,59 @@ const AU = (() => {
       if (i === 8 || i === 12) mv({ t, f:W.lead[ch] / 2, type:'square', dur:.09, vol:.025, lp:1600 });
     }
   }
-  /* "Ascend": the Ascended theme, and MorQi's signature. A asked for its own cool theme (moody, late at night),
-     then: "its not epic and dramatic enough … it should feel Goku Ultimate Form level". So it is a transformation
-     anthem built on the moody low end: the half-time 808 stays for the cool, and over it a chanting choir, war drums,
-     low brass hits, driving strings and a full-time beat take it to epic. The choir and brass sing a hook that climbs
-     the five tones of F minor (F, A flat, B flat, C, E flat, one for each element) and arrives on the high F:
-     becoming whole. It opens like a transformation: one huge hit, the choir swelling, a war-drum roll, then the drop.
-     House rules kept: the hook peaks 62% through its phrase, a surprise G flat chord at the golden point with the
-     drums holding their breath, the four-part form (C is a breakdown of choir and heartbeat drums, D lifts the whole
-     song a whole step), everything at or below 700 Hz except breath and the one crash at the start. */
+  /* "Ascend": the Ascended theme, and MorQi's signature. A, 2026-10-05: "i find myself REALLY jamming heavy on the boss
+     fight cause it has such a dope swag to it. I need Ascended to make me feel the same". So Ascended is the Warden's
+     swagger turned to your side: the same key (D), the same half-time bounce with sliding 808s, the clap on beat three
+     and rolling hats, but with the third raised (D Phrygian dominant: D, E flat, F sharp, G, A, B flat, C), so the
+     boss's threat becomes yours. On top, the rolling hand drums, shaker and hypnotic low pluck of A's own playlist
+     ("The Haven", organic Afro house), and a cocky low vocal-chop hook with "hey" calls between its lines.
+     Ascended lasts twelve seconds, so it drops on its very first beat. House rules kept: the hook peaks 62% through
+     its phrase with one leap and one repeated note, a surprise B flat chord at the golden point with the drums holding
+     their breath, the four-part form, every pitched voice at or below about 700 Hz. */
   const HIGH = {
-    ch:[[174.61, 207.65, 261.63], [138.59, 174.61, 207.65], [155.56, 196, 233.08], [130.81, 164.81, 196]],   // Fm, Db, Eb, C: the epic i, VI, VII, V
-    root:[43.65, 34.65, 38.89, 32.7],
-    hook:[[[0, 349.23], [3, 415.3], [6, 466.16], [9, 523.25], [12, 622.25], [20, 698.46], [22, 698.46], [26, 622.25], [28, 523.25]],
-          [[0, 349.23], [3, 415.3], [6, 466.16], [9, 523.25], [12, 622.25], [20, 698.46], [22, 622.25], [26, 523.25], [29, 466.16]]],
-    surp:[185, 233.08, 277.18],   // G flat major: the lift from just outside the key
-    kicks:[[0, 4, 8, 12], [0, 4, 8, 10, 12]] };
-  // a choir singing "ah": detuned voices through the two formants of the vowel, swelling in
-  const choir = (t, notes, len, v, att = .35) => { for (const f of notes) for (const d of [-11, 0, 11]) {
-    mv({ t, f, det:d, type:'sawtooth', dur:len, vol:v, att, hold:len * .55, lp:760, ft:'bandpass', q:3.5, rev:.7 });
-    mv({ t, f, det:d, type:'sawtooth', dur:len, vol:v * .55, att, hold:len * .55, lp:1150, ft:'bandpass', q:4.5, rev:.7 }); } };
-  // a low brass hit: a stack of saws whose filter opens fast and closes, so it barks and then sits back
-  const brass = (t, notes, len, v) => { for (const f of notes) for (const d of [-6, 6]) mv({ t, f, det:d, type:'sawtooth', dur:len, vol:v, att:.012, hold:len * .3, lp:1500, q:1.2, rev:.35 }); };
-  // the lead: choir and brass on one line, with a slow vibrato, the brass an octave under
-  const anthem = (t, f, len, v) => { choir(t, [f], len, v * .55, .05); mv({ t, f:f / 2, type:'sawtooth', dur:len, vol:v * .5, att:.03, hold:len * .5, lp:1300, vib:5, vibD:10, rev:.4 }); mv({ t, f, dur:len, vol:v * .35, att:.03, hold:len * .5, vib:5, vibD:12, dly:.25 }); };
-  const whisper = (t, len, v) => { for (const [f, q, g] of [[720, 5, 1], [1180, 6, .7]]) mn({ t, f, ft:'bandpass', q, dur:len, att:len * .4, vol:v * g, rev:.6, dly:.3 }); };
+    ch:[[146.83, 185, 220], [155.56, 196, 233.08], [146.83, 185, 220], [130.81, 155.56, 196]],   // D, E flat, D, C minor
+    root:[36.71, 38.89, 36.71, 32.7],
+    hook:[[[0, 293.66], [2, 293.66], [4, 369.99], [7, 440], [10, 466.16], [12, 440], [20, 587.33], [22, 587.33], [24, 523.25], [27, 440], [29, 369.99]],
+          [[0, 293.66], [2, 293.66], [4, 369.99], [7, 440], [10, 466.16], [12, 440], [20, 587.33], [22, 523.25], [24, 466.16], [26, 440], [28, 311.13], [30, 293.66]]],
+    surp:[116.54, 146.83, 174.61],   // B flat major: the lift from outside the key
+    kicks:[[0, 3, 7, 10], [0, 6, 9, 11, 14]] };
+  // a hand drum: a pitched skin that drops a little, with a slap on top
+  const conga = (t, f, v) => { mv({ t, f:f * 1.25, f1:f, gl1:.05, dur:.22, vol:v, att:.002, rev:.25 }); mn({ t, f:1400, ft:'bandpass', q:1.6, dur:.025, vol:v * .5 }); };
+  const shaker = (t, v) => mn({ t, f:7200, dur:.05, att:.012, vol:v });
+  // the low roll under everything: a round, short pluck
+  const roll = (t, f, v) => mv({ t, f, type:'triangle', dur:.24, vol:v, att:.002, lp:900, dly:.18 });
+  // the lead: the vocal chop with a growl an octave under it
+  const swag = (t, f, len, v) => { chop(t, f, v, len); mv({ t, f:f / 2, f0:f * .45, gl:.05, type:'sawtooth', dur:len, vol:v * .4, att:.01, hold:len * .4, lp:700, to:drv }); };
+  const hey = (t, v = .06) => { chop(t, 220, v, SIX * 1.3); mn({ t, f:900, ft:'bandpass', q:2, dur:.09, vol:v * .5, rev:.4 }); };
+  const CONGA = [[2, 196], [5, 261.63], [8, 196], [10, 261.63], [13, 220], [15, 196]];
   function highestStep(s, t) {
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HIGH, gold = golden(bar), p = part(bar);
-    const up = p === 3 ? 1.1225 : 1, C = R.ch[ch].map(f => f * up), r = R.root[ch] * up;   // part D: a whole step higher
-    // the transformation: one huge hit, the choir swelling, a war-drum roll, then the drop on bar 1
-    if (s === 0) { b808(t, 43.65, 2.2, 87.31, .7); crash(t, .09); taiko(t, .4, 70); choir(t, R.ch[0], SIX * 16, .05, .5); whisper(t, SIX * 12, .07); }
-    if (bar === 0) { if (i >= 8) taiko(t, .1 + (i - 8) * .035, 80 + (i & 1) * 18); if (i === 12) riser(t, SIX * 4, .1); return; }
-    if (gold && i === 0) { choir(t, R.surp.map(f => f * up), SIX * 16, .06, .08); brass(t, [R.surp[0] / 2 * up, R.surp[1] / 2 * up], SIX * 6, .035); b808(t, 46.25 * up, SIX * 8, null, .6); }
+    const C = R.ch[ch], r = R.root[ch];
+    // the drop, on the very first beat: an 808 diving in, a crash and a call
+    if (s === 0) { b808(t, 36.71, SIX * 7, 73.42, .72); crash(t, .1); kick(t, .9); hey(t + SIX * 2, .07); }
+    if (gold && i === 0) { keys(t, R.surp, SIX * 30, .03, 1800); b808(t, 58.27, SIX * 8, null, .6); hey(t + SIX * 4, .06); }
     if (gold && i < 8) return;   // the drums hold their breath for two beats
-    if (k === 0 && !gold) { choir(t, C, SIX * 31, p === 2 ? .045 : .035); sub(t, r * 2, SIX * 32, .07); }
-    if (p === 2) {   // the breakdown: choir, heartbeat drums, a whisper, the 808 breathing under it
-      if (i === 0 || i === 3) taiko(t, i ? .16 : .26, 70);
+    if (k === 0 && !gold) { keys(t, C, SIX * 30, .022, 1600); sub(t, r * 2, SIX * 32, .06); }
+    // the Haven layer: shaker on every sixteenth leaning on the offbeats, hand drums rolling, the low pluck
+    shaker(t, i % 4 === 2 ? .03 : .014);
+    for (const [st, f] of CONGA) if (st === i || (bar & 1 && st === i - 1 && i === 12)) conga(t, f, p === 2 ? .09 : .07);
+    if (p !== 2 && i % 2 === 0) roll(t, C[[0, 2, 1, 2, 0, 1, 2, 1][(i >> 1) & 7]] / 2 * (i === 6 ? 2 : 1), .05);
+    if (p === 2) {   // the breakdown: hand drums, the 808 breathing, calls back and forth
       if (i === 0) b808(t, r, SIX * 14, null, .5);
-      if (i === 8 && bar & 1) whisper(t, SIX * 8, .06);
-      if ((bar % 13) === 12 && i >= 8) taiko(t, .1 + (i - 8) * .04, 84);   // a roll back into the last part
+      if (i === 8) clap(t, .2, .5);
+      if (i === 12 && bar & 1) hey(t, .05);
+      if ((bar % 13) === 12 && i >= 8) clap(t, .08 + (i - 8) * .03, .2);   // a clap roll back in
       return;
     }
-    // driving strings: a sixteenth-note figure in the low middle, root, octave, fifth, octave
-    const fig = [C[0], C[0] * 2, C[2], C[0] * 2][i & 3];
-    mv({ t, f:fig, type:'triangle', dur:SIX * .9, vol:.022, att:.004, lp:1700, rev:.2 });
-    // brass hits on the push of the bar
-    if (i === 0 || i === 6 || (i === 12 && bar & 1)) brass(t, [C[0] / 2, C[2] / 2], SIX * (i === 0 ? 4 : 2), .03);
-    // the hook, sung by choir and brass
-    if (hookOn(bar)) sing(R.hook[(bar >> 1) & 1].map(([st, f]) => [st, f * up]), bar, k, (f, d, g, l) => anthem(t + d, f, SIX * 2.2 * l, .07 * g));
-    // full-time drums over the sliding 808, war drums on the one and the push
-    groove(t, bar, i, { kicks:R.kicks, root:R.root.map(x => x * up) }, ch, 2, .62);
-    if (i === 0 || i === 10) taiko(t, .26, 74);
-    if (i === 4 || i === 12) clap(t, .26, .4);
-    if (i % 2 === 0) hat(t, i % 4 ? .014 : .022);
-    if ((bar & 3) === 3 && i >= 12) taiko(t, .12 + (i - 12) * .05, 90);   // a war-drum fill into every fourth bar
+    // the hook; while it rests, "hey" on the push
+    if (hookOn(bar)) sing(R.hook[(bar >> 1) & 1], bar, k, (f, d, g, l) => swag(t + d, f, SIX * 1.9 * l, .075 * g));
+    else if (i === 12 || (i === 6 && bar & 1)) hey(t, .055);
+    // the bounce: syncopated kicks over sliding 808s, a heavy clap and rim on three, rolling hats
+    groove(t, bar, i, R, ch, 2, .7);
+    if (i === 8) { clap(t, .36, .4); rim(t, .1); }
+    if (i === 15 && bar & 1) clap(t, .1, .2);
+    hats(t, bar, i, 2, .038);
+    if ((bar & 3) === 3 && i >= 12) for (let n = 1; n < 4; n++) hat(t + n * SIX / 4, .02 + n * .006);   // a 32nd roll into every fourth bar
   }
   /* "Blossom": the Element Bloom's own song (A, 2026-10-04: in dance mode "the world and the music has to be
      somewhat different to show that change"). The battle stops and the shore throws a party: C major, the happiest
@@ -4098,7 +4097,7 @@ function hsTick(dt) {
   if (H.on.p <= 0) { H.on.p = HIGHEST.pulse; hsPulse(); }
   if (H.on.t >= HIGHEST.life) {
     // after the final one "Ascend" plays on until the Warden's theme lands on the next bar; otherwise the world's own song returns
-    const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(SONG_OF[worldOf()]);
+    const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
   }
 }
