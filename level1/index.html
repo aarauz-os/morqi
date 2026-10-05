@@ -1160,6 +1160,68 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .bk-sheet{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
 .bk-sheet .beast.big .pic{width:132px;height:132px;flex:none}
 .bk-sheet .beast.big{gap:10px}
+
+/* the Sanctuary: Qi and Settings on the home bar, the grow and settings sheets, greyed tabs in the pitch build */
+.hm-right{display:flex;gap:8px;align-items:center}
+.hm-qi{display:flex;align-items:center;gap:6px;min-height:48px;padding:4px 14px 4px 6px;border:0;border-radius:99px;background:rgba(12,16,44,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);color:#fff;font-family:var(--round);cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.hm-qi img{width:30px;height:30px;object-fit:contain}
+.hm-qi b{font-weight:900;font-size:17px;font-variant-numeric:tabular-nums}
+.hm-qi span{font-weight:800;font-size:12px;padding:3px 8px;border-radius:99px;background:rgba(123,216,96,.25);color:#C8F5B8}
+.hm-gear{width:48px;height:48px;border:0;padding:4px;border-radius:50%;background:rgba(12,16,44,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.hm-gear img{width:100%;height:100%;object-fit:contain}
+.hm-over{position:absolute;inset:0;z-index:40;background:rgba(6,8,24,.55);display:flex;align-items:flex-end}
+.hm-over[hidden]{display:none!important}
+.hm-sheet{position:relative;width:100%;max-height:86%;overflow-y:auto;padding:26px 16px calc(20px + env(safe-area-inset-bottom));border-radius:28px 28px 0 0;background:rgba(18,22,60,.98);box-shadow:0 -1px 0 rgba(255,255,255,.18);color:#fff;animation:sheetUp .28s ease-out;display:grid;gap:12px}
+.hm-sheet::before{content:"";position:absolute;left:50%;top:9px;width:40px;height:5px;margin-left:-20px;border-radius:5px;background:rgba(255,255,255,.35)}
+.hm-sheet h3{font-family:var(--round);font-weight:900;font-size:22px;text-align:center}
+.gr-qi{display:flex;align-items:center;justify-content:center;gap:6px;font-weight:800;font-size:14px;opacity:.9}
+.gr-qi img{width:24px;height:24px}.gr-qi b{font-size:18px;font-variant-numeric:tabular-nums}
+.gr-list{display:grid;gap:8px}
+.gr-row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border-radius:18px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c) 45%,transparent)}
+.gr-row > img{width:56px;height:56px;object-fit:contain}
+.gr-t{display:grid;gap:2px;min-width:0}.gr-t b{font-family:var(--round);font-weight:900;font-size:16px}.gr-t span{font-size:12.5px;opacity:.78}
+.gr-lv{display:flex;gap:4px;margin-top:3px}.gr-lv s{width:16px;height:6px;border-radius:99px;background:rgba(255,255,255,.18)}.gr-lv s.on{background:var(--c)}
+.gr-go{display:flex;align-items:center;gap:4px;min-width:84px;min-height:46px;justify-content:center;border:0;border-radius:16px;background:linear-gradient(180deg,#7BE07A,#3FB45A);box-shadow:inset 0 2px 0 rgba(255,255,255,.45),0 4px 0 #23803B;color:#fff;font-family:var(--round);font-weight:900;font-size:16px;cursor:pointer}
+.gr-go img{width:22px;height:22px}
+.gr-go.off{background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);color:rgba(255,255,255,.7)}
+.gr-go:disabled{background:none;box-shadow:inset 0 0 0 1.5px var(--c);color:#fff}
+.gr-go.nope{animation:frostNo .4s}
+.gr-row.grew{animation:grew .7s ease-out}
+@keyframes grew{30%{box-shadow:inset 0 0 0 2px var(--c),0 0 26px var(--c)}}
+.set-row{display:grid;grid-template-columns:repeat(3,auto 1fr);align-items:center;gap:8px 8px;justify-content:center;font-weight:800}
+.set-row .ibtn{width:48px;height:48px}
+.set-grown{display:grid;gap:4px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.06);font-size:13.5px;line-height:1.4}.set-grown b{font-size:14px}
+#setDone{justify-self:center;min-width:220px}
+.qiRise{display:inline-flex!important;align-items:center;justify-content:center;gap:8px}.qiRise img{width:28px;height:28px}
+.chip3.qi img{width:20px;height:20px;vertical-align:-4px;margin-right:2px}
+.tabs button.off{opacity:.38;filter:grayscale(1)}
+.hm-sheet{padding-bottom:calc(100px + env(safe-area-inset-bottom));max-height:92%}
+.gr-t{text-align:left}
+.hm-me{max-width:200px}.hm-me b{white-space:normal;line-height:1.1}
+/* a hidden button stays hidden whatever its display style (the defeat screen showed Rise again with no rises left) */
+.btn[hidden],button[hidden]{display:none!important}
+
+/* Sanctuary review round: Sparks in gold, glass price buttons, glyphs, sheets above the tabs, toast above everything */
+#toast{z-index:60}
+.tabs.under{display:none!important}
+.hm-sheet{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
+#grDone{justify-self:center;min-width:220px}
+.hm-qi span{background:rgba(255,214,110,.22);color:#FFE6A3}
+.hm-qi.hint{animation:qiHint 1.4s ease-in-out infinite}
+@keyframes qiHint{50%{box-shadow:inset 0 0 0 2px #FFD66E,0 0 22px rgba(255,214,110,.75)}}
+.hm-gear{display:grid;place-items:center;padding:0}.hm-gear svg{width:26px;height:26px}
+.hm-me{max-width:none}.hm-me b{white-space:nowrap;font-size:15.5px}
+.gr-t span{display:flex;align-items:center;gap:5px}
+.gr-g{width:16px;height:16px;flex:none;fill:none;stroke:var(--c);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.gr-go{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);color:#FFE6A3}
+.gr-go:not(.off):not(:disabled){box-shadow:inset 0 0 0 2px #FFD66E,0 0 14px rgba(255,214,110,.35);color:#FFE6A3}
+.gr-go.off{color:rgba(255,255,255,.5)}.gr-go.off img{filter:grayscale(1) opacity(.6)}
+.set-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;justify-items:center}
+.set-t{display:grid;justify-items:center;gap:6px;font-weight:800;font-size:13.5px;cursor:pointer}
+.set-t .ibtn{position:relative}
+.set-t .ibtn.off::after{content:"";position:absolute;left:50%;top:50%;width:30px;height:3px;margin:-1.5px 0 0 -15px;border-radius:2px;background:#fff;transform:rotate(-45deg);box-shadow:0 0 0 2px rgba(18,22,60,.95)}
+.tabs button.off::before{content:"";position:absolute;top:8px;right:calc(50% - 24px);width:16px;height:16px;border-radius:50%;background:#1E2560 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='6' y='11' width='12' height='9' rx='2' fill='%23fff'/%3E%3Cpath d='M9 11V8.5a3 3 0 0 1 6 0V11' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E") 50% 50%/11px no-repeat;box-shadow:0 0 0 2px #0E1236}
+.gr-sub{text-align:center;font-size:13px;opacity:.7;margin-top:-8px}
 </style>
 
 <div id="stage">
@@ -1185,7 +1247,6 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <button id="mapBtn" aria-label="Shore map"><canvas id="mapCv"></canvas></button>
     <div id="combo"><b id="comboN">×0</b><span>combo</span></div>
     <div id="cue"></div>
-    <div id="toast"></div>
     <div id="joy"><i></i></div>
     <div id="seal" aria-hidden="true"><div class="sealrow" id="sealRow"></div></div>
     <div id="moveGhost"><i></i></div>
@@ -1197,7 +1258,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   <section class="scr" id="title">
     <div class="brand"><img class="logo" src="art4/logo-morqi.png?v=8" alt="MorQi"><span class="tag">Balance is your superpower</span></div>
     <div class="tsound">
-      <button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg></button>
+      <label class="set-t"><button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg></button>
       <button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
       <button class="ibtn voBtn" aria-label="Voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><circle cx="8.5" cy="11.5" r="1.3" fill="#fff"/><circle cx="12" cy="11.5" r="1.3" fill="#fff"/><circle cx="15.5" cy="11.5" r="1.3" fill="#fff"/></svg></button>
     </div>
@@ -1217,14 +1278,25 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   <section class="scr" id="home" hidden>
     <div class="hm-top">
       <button class="hm-me" id="hmMe" aria-label="Your Keeper"><img id="hmFace" alt=""><span><b id="hmName">Amara</b><i class="grow" id="hmGrow"><b></b></i></span></button>
-      <div class="hm-snd">
-        <button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.6" fill="#fff"/><circle cx="16.5" cy="16" r="2.6" fill="#fff"/></svg></button>
-        <button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
-        <button class="ibtn voBtn" aria-label="Voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg></button>
+      <div class="hm-right">
+        <button class="hm-qi" id="hmQi" aria-label="Sparks: grow your Sanctuary"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="hmQiN">0</b><span>Grow</span></button>
+        <button class="hm-gear" id="hmGear" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
     <div class="art hm-art"><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa"><img class="hm-a" id="hmPet" alt=""></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
     <button class="btn green hm-go" id="hmGo">Play</button>
+    <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
+      <h3>Grow your Sanctuary</h3><p class="gr-qi"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="grQi">0</b> Sparks</p><p class="gr-sub">Earn Sparks by freeing creatures</p>
+      <div class="gr-list" id="grList"></div><button class="btn green" id="grDone">Done</button></div></div>
+    <div class="hm-over" id="setSheet" hidden><div class="hm-sheet">
+      <h3>Settings</h3>
+      <div class="set-row">
+        <label class="set-t"><button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.6" fill="#fff"/><circle cx="16.5" cy="16" r="2.6" fill="#fff"/></svg></button><span>Music</span></label>
+        <label class="set-t"><button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button><span>Sounds</span></label>
+        <label class="set-t"><button class="ibtn voBtn" aria-label="Voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg></button><span>Voice</span></label>
+      </div>
+      <div class="set-grown"><b>For grown-ups</b><span>No ads interrupt play. Sparks are earned by playing.</span></div>
+      <button class="btn green" id="setDone">Done</button></div></div>
   </section>
   <section class="scr" id="map" hidden>
     <div class="mp-head"><span class="ribbon">The Five Realms</span></div>
@@ -1241,10 +1313,11 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <div class="ss-card"><img class="ss-icon" src="art4/tabs/tab-season.png?v=9" alt=""><span class="ribbon">Season 1 · The Thaw</span><p>A new adventure is coming!</p>
       <div class="ss-track" id="ssTrack"><button class="ss-r" aria-label="A surprise, still frozen"><img src="art4/season/path-story.jpg?v=9" alt=""></button><button class="ss-r" aria-label="A surprise, still frozen"><img src="art4/season/path-look.png?v=9" alt=""></button><button class="ss-r" aria-label="A surprise, still frozen"><img src="art4/season/path-animal.png?v=9" alt=""></button><button class="ss-r" aria-label="A surprise, still frozen"><img src="art4/season/path-gems.png?v=9" alt=""></button><button class="ss-r" aria-label="A surprise, still frozen"><img src="art4/season/k1-ascended.png?v=9" alt=""></button></div></div>
   </section>
+  <div id="toast" role="status"></div>
   <nav class="tabs" id="tabs" hidden aria-label="Menu">
     <button data-tab="home"><img src="art4/tabs/tab-sanctuary.png?v=9" alt=""><span>Sanctuary</span></button>
     <button data-tab="book"><img src="art4/tabs/tab-book.png?v=9" alt=""><span>Book</span></button>
-    <button data-tab="map"><img src="art4/tabs/tab-play.png?v=9" alt=""><span>Play</span></button>
+    <button data-tab="map"><img src="art4/tabs/tab-play.png?v=9" alt=""><span>Journey</span></button>
     <button data-tab="keepers"><img src="art4/tabs/tab-keepers.png?v=9" alt=""><span>Keepers</span></button>
     <button data-tab="season"><img src="art4/tabs/tab-season.png?v=9" alt=""><span>Season</span></button>
   </nav>
@@ -1409,6 +1482,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <div class="riseLives" id="riseLives" role="img"></div>
       <button class="btn quietb" id="retryBtn">Start over</button>
       <button class="btn green" id="riseBtn">Rise again</button>
+      <button class="btn green qiRise" id="qiRiseBtn" hidden><img src="art4/icons/icon-spark.png?v=9" alt=""><span>Rise for <b id="qiRiseP">100</b> Sparks</span></button>
     </div>
   </section>
 </div>
@@ -1716,7 +1790,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=11`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2525,8 +2599,10 @@ function startRun() {
     lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, qi:{}, qiStones:{}, stoneOut:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
-    rises:RISES[LVL - 1], lastLight:0, lightUsed:false, strongT:-9, taught:{}, shake:0, buffs:{ tiger:0, ward:0 }, freeze:0, flashT:0, swords:[], pearls:[]
+    rises:RISES[LVL - 1], lastLight:0, lightUsed:false, grow:grown(), qiRises:0, strongT:-9, taught:{}, shake:0, buffs:{ tiger:0, ward:0 }, freeze:0, flashT:0, swords:[], pearls:[]
   };
+  // the Sanctuary's growth carries into the run: Heart Spring raises health (the other plots act where they apply)
+  { const hp = Math.round(220 * (1 + .08 * (S.grow.water || 0))); S.p.hp = S.p.max = hp; }
   camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; S.cam = { x:camX, y:camY };
   paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
@@ -2701,7 +2777,7 @@ function spawnBoss() {
 // one place for every hit: element bonus, buffs, flash, squash, knockback, numbers and sparks
 function hurt(e, dmg, el, o = {}) {
   if (e.dead) return;
-  let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1);
+  let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0));
   const k = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), strong = k > 1, weak = k < 1;
   m *= k;
   // the words teach, so they show the first few times in a run; after that the coloured hit says it
@@ -2813,7 +2889,7 @@ function useItem(k) {
   if (GIFT_VO.includes(k) && !S.taught['g_' + k] && !hsOn()) { S.taught['g_' + k] = 1; const m = fewTimes('_g' + k); if (m && AU.vo('vo-gift-' + k, 0, .6, false)) markSeen(m); }
   if (k === 'magnet') { for (const q of S.gems) q.pull = true; pickupPop('Gem Wind!', '#A8F4FF'); SFX.sweep(); ring(P.x, P.y, 20, 900, '#A8F4FF', .7, 12, true); }
   else if (k === 'heart' || k === 'dumpling' || k === 'peach') {
-    const h = k === 'peach' ? P.max : P.max / 3; if (k !== 'peach') { pickupPop('+' + Math.round(h), '#FF7A8A'); SFX.heart(); S.hearts = (S.hearts || 0) + 1; } P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
+    const h = (k === 'peach' ? P.max : P.max / 3) * (1 + .12 * (S.grow.wood || 0)); if (k !== 'peach') { pickupPop('+' + Math.round(h), '#FF7A8A'); SFX.heart(); S.hearts = (S.hearts || 0) + 1; } P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
     if (k === 'peach') pickupPop('Peach!', '#FFB0C8'); SFX.heal();
     for (let i = 0; i < 14; i++) fx({ k:'plus', x:P.x + rnd(-40, 40), y:P.y + rnd(-30, 20), vx:0, vy:-rnd(60, 120), life:rnd(.5, .9), s:rnd(7, 11), c:'#8FF0A0' });
   } else if (k === 'ward') { S.buffs.ward = 15; pickupPop('Jade Ward!', '#7FF0C0'); SFX.bell(true); ring(P.x, P.y, 20, 240, '#5FE3B4', .6, 14, true); }
@@ -3510,7 +3586,7 @@ function shrines(dt) {
     sh.t += dt;
     const inside = Math.hypot(P.x - sh.x, P.y - sh.y) < sh.r;
     if (inside && sh.charge > 0 && P.hp < P.max) {
-      const h = Math.min(sh.charge, P.max / 9 * dt, P.max - P.hp); P.hp += h; sh.charge -= h;
+      const h = Math.min(sh.charge, P.max / 9 * dt * (1 + .12 * (S.grow.wood || 0)), P.max - P.hp); P.hp += h; sh.charge -= h;
       if (!sh.healing) { sh.healing = true; SFX.heal(); ring(S.p.x, S.p.y, 20, 170, '#8FF0A8', .55, 12, true); flash(S.p.x, S.p.y - 30, 200, '#B8FFC8', .35); }
       if (Math.random() < .35) fx({ k:'glow', x:P.x + rnd(-20, 20), y:P.y - rnd(10, 60), s:22, s1:4, c:'#FF8FA8', life:.6 });
     } else sh.healing = false;
@@ -3729,7 +3805,7 @@ function ouch(dmg, fx, fy, o = {}) {
   return true;
 }
 // your Keeper has your spirit animal's element: creatures whose element beats yours hit harder, the rest hit softer
-function armourVs(el) { let m = 1 - (S.gifts.rooted || 0) * .08; if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
+function armourVs(el) { let m = (1 - (S.gifts.rooted || 0) * .08) * (1 - .04 * (S.grow.earth || 0)); if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
 const SHOT_HIT = { bubble:'#7FC4FF', thorn:'#7FCF4A', ember:'#FFB050', pebble:'#C8A060', blade:'#E6EEF4' };
 function hazard(k, x, y, r, life, dmg) { if (S.hz.length < 60) S.hz.push({ k, x, y, r, life, t:0, dmg, tick:0, rot:rnd(0, TAU) }); }
 function brain(e, P, d, dt, s) {
@@ -4363,7 +4439,7 @@ function update(dt) {
   if (keys.a || keys.arrowleft) mx -= 1; if (keys.d || keys.arrowright) mx += 1;
   if (keys.w || keys.arrowup) my -= 1; if (keys.s || keys.arrowdown) my += 1;
   const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
-  P.slowT = Math.max(0, (P.slowT || 0) - dt); const spd = MOVE * (P.slowT > 0 ? .6 : 1);
+  P.slowT = Math.max(0, (P.slowT || 0) - dt); const spd = MOVE * (1 + .03 * (S.grow.metal || 0)) * (P.slowT > 0 ? .6 : 1);
   // the Keeper's speed eases toward where the thumb points: quick to get going, a short glide to stop, so a turn curves
   // instead of snapping (A, 2026-10-05: "movement is very slow … make it more flowy"); a hard turn kicks up a skid of dust
   const vx0 = P.vx || 0, vy0 = P.vy || 0, ease = 1 - Math.exp(-(m > .1 ? 18 : 9) * dt);
@@ -6409,12 +6485,14 @@ function lose(fell) {
   const left = S.rises, all = RISES[S.level - 1], face = `art4/k${keeper}-face.png?v=8`;
   $('#riseLives').innerHTML = Array.from({ length:all + (S.lightUsed ? 1 : 0) }, (_, i) => `<img src="${face}" alt="" class="${i < left ? '' : 'used'}">`).join('');
   $('#riseLives').setAttribute('aria-label', `${left} ${left === 1 ? 'rise' : 'rises'} left`);
-  $('#riseBtn').hidden = left <= 0; $('#retryBtn').className = left <= 0 ? 'btn green' : 'btn quietb'; $('#retryBtn').textContent = left <= 0 ? 'Try again' : 'Start over';
+  const qp = 100 * (1 + (S.qiRises || 0)), canQi = left <= 0 && (S.qiRises || 0) < 2 && qi() >= qp;
+  $('#qiRiseBtn').hidden = !canQi; $('#qiRiseP').textContent = qp;
+  $('#riseBtn').hidden = left <= 0; $('#retryBtn').className = left <= 0 && !canQi ? 'btn green' : 'btn quietb'; $('#retryBtn').textContent = left <= 0 ? 'Try again' : 'Start over';
   const bar = $('#riseBar'); bar.style.transition = 'none'; bar.style.width = '0'; void bar.offsetWidth; bar.style.transition = '';
   setTimeout(() => { if (!S.over) return; show('defeat'); SFX.fanfare(false); requestAnimationFrame(() => { bar.style.width = Math.round(frac * 100) + '%'; }); }, fell ? 60 : 420);
 }
 function payPet() {   // the companion keeps what it earned: kills, ultimates fired, and a win; the Freed Book keeps its pages
-  bookSave();
+  bookSave(); payQi();
   if (!S || S.petPaid) return null; S.petPaid = true;
   const before = petInfo(), gain = Math.round(S.thawed * .1 + S.ult.uses * 10 + (S.won ? 90 : 0));   // about 300 a cleared level: Lv 9 after two
   store.set('morqi.petxp.' + animal, before.xp + gain); return { before, after:petInfo(), gain };
@@ -6450,7 +6528,7 @@ function results() {
     renderLevels(); }
   [...$('#resStars').children].forEach((el, i) => { if (goals[i][0]) setTimeout(() => { el.classList.add('in'); SFX.ting(); }, reduce ? 0 : 700 + i * 380); });
   const clock = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
-  $('#resChips').innerHTML = `<span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span>`
+  payQi(); $('#resChips').innerHTML = `<span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span><span class="chip3 qi" style="--a:#FFD66E;--b:#E09A1E"><img src="art4/icons/icon-spark.png?v=9" alt="">+${S.qiGot}</span>`
     + `<span class="chip3" style="--a:#A99CFF;--b:#6F5CF0">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
     + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('');
   $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:18 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${8 + (i * 7) % 9}px;--c:${['#FFE08A', '#7FF0C0', '#FFFFFF', '#FFB8D0'][i % 4]};--t:${5 + (i * 3) % 5}s;--d:${(i * .43) % 4}s"></i>`).join('');
@@ -6567,27 +6645,29 @@ function applyProfile(p) { keeper = p.keeper; animal = p.animal; keeperEl = p.el
     [...$('#ldBar').children].forEach((s, i) => s.classList.toggle('on', i < (done ? 5 : lit))); $('#ldBar').setAttribute('aria-valuenow', Math.round((done ? 1 : p) * 100));
     if (done) { $('#ldT').textContent = 'The world is awake'; $('#ldGo').hidden = false; return; } setTimeout(tick, 120); };
   tick(); }
-$('#ldGo').onclick = () => { AU.init(); SFX.select(); AU.music(true); AU.song('rise', 1); const p = profile(); if (p) { applyProfile(p); goTab('home'); } else show('pickKeeper'); };
+$('#ldGo').onclick = () => { AU.init(); SFX.select(); AU.music(true); AU.song('rise', 1); let p = profile(); if (!p && PITCH) p = { keeper:1, animal:'goat', el:'wood' }; if (p) { applyProfile(p); goTab('home'); } else show('pickKeeper'); };
 function goTab(t) {
   if (t === 'keepers') { editingKeeper = true; $('#keeperNext').textContent = 'Done'; pickKeeper(keeper); show('pickKeeper'); return; }
   if (t === 'map' && !mapPicked) { const u = unlocked(); LVL = 1; for (let n = 1; n <= u; n++) { LVL = n; if (!starsOf(n)) break; } }
   if (t === 'home') renderHome(); if (t === 'map') renderMap(); if (t === 'book') { renderBook(); bookSeen(); } show(t);
 }
-document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { SFX.select(); goTab(b.dataset.tab); });
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { if (b.classList.contains('off')) { SFX.pop(); toast('Coming in the full app'); return; } SFX.select(); goTab(b.dataset.tab); });
 function renderHome() {
   const K = KEEPER_INFO[keeper - 1] || KEEPER_INFO[0];
   const I = petInfo(); $('#hmFace').src = `art4/k${keeper}-face.png?v=8`; $('#hmName').textContent = `${K.n} & ${ANIMAL[animal].y}`;
   $('#hmGrow b').style.width = Math.round(I.into / I.need * 100) + '%'; $('#hmMe').setAttribute('aria-label', `${K.n} and ${ANIMAL[animal].y}, level ${I.lv}`);
   // new pages in the Book: a dot on its tab, and Luma says so once
-  const nb = store.get('morqi.bookNew') === '1'; document.querySelector('#tabs [data-tab="book"]').classList.toggle('dot', nb);
+  const nb = !PITCH && store.get('morqi.bookNew') === '1'; document.querySelector('#tabs [data-tab="book"]').classList.toggle('dot', nb);
+  // the first time a run has paid Sparks, the Sparks pill glows until it is opened
+  $('#hmQi').classList.toggle('hint', qi() > 0 && store.get('morqi.sparksTaught') !== '1');
   if (nb && !homeSaid) { homeSaid = true; setTimeout(() => AU.vo('vo-booknew', 0, .5), 700); }
-  $('#hmKeeper').src = `art4/k${keeper}-hi.png?v=8`; $('#hmKeeper').alt = K.n; $('#hmPet').src = lookSrc(`art4/a-${animal}-y.png?v=8`); $('#hmPet').alt = ANIMAL[animal].y;
+  $('#hmQiN').textContent = qi().toLocaleString(); $('#hmKeeper').src = `art4/k${keeper}-hi.png?v=8`; $('#hmKeeper').alt = K.n; $('#hmPet').src = lookSrc(`art4/a-${animal}-y.png?v=8`); $('#hmPet').alt = ANIMAL[animal].y;
 }
 $('#hmGo').onclick = () => { SFX.select(); goTab('map'); };
 // the painted portal is the door to the realms, so it answers a tap like one
 $('#hmPortal').onclick = () => { SFX.sweep(); const p = $('#hmPortal'); p.classList.remove('go'); void p.offsetWidth; p.classList.add('go'); setTimeout(() => goTab('map'), 380); };
 document.querySelectorAll('.ss-r').forEach(b => b.onclick = () => { SFX.pop(); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); });
-$('#hmMe').onclick = () => { SFX.select(); goTab('keepers'); };
+$('#hmMe').onclick = () => { if (PITCH) { SFX.pop(); toast('Coming in the full app'); return; } SFX.select(); goTab('keepers'); };
 // the realm map: one island per level, from the shore at the bottom to the city at the top, where the painting puts them
 const ISLE = [{ x:31, y:80 }, { x:68, y:62 }, { x:46, y:44 }, { x:26, y:26 }, { x:72, y:15 }];
 function renderMap() {
@@ -6636,6 +6716,46 @@ function goHome() { mapPicked = false; if (S) { payPet(); bookSave(); S.over = t
 $('#homeBtn').onclick = e => confirmTwice(e.currentTarget, 'Home', goHome, 'Tap again to leave');
 $('#resHomeBtn').onclick = () => { SFX.select(); goHome(); };
 addEventListener('pagehide', () => bookSave());
+
+/* ================= the Sanctuary (A, 2026-10-05: "lets move on to the sanctuary") ================= */
+// Runs pay Sparks, about one for every eight creatures freed and forty for a win; Sparks grow the five plots of the
+// island, one per element, each up to five times, and the growth carries into every run. Sparks are earned only, never
+// bought (A, 2026-10-05), and they also pay for a rise past the free ones, twice a run at most. (Named Qi at first; the
+// design review renamed it, since Qi already names the Qi Stones and a blue drop reads as Water)
+const PLOTS = [
+  { el:'water', n:'Heart Spring', d:'More health', per:'8% more health', g:'<path d="M12 20s-7-4.4-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 15.6 12 20 12 20z"/>' },
+  { el:'metal', n:'Swift Wind', d:'Faster feet', per:'3% faster', g:'<path d="M3 9h11a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3M3 12h8"/>' },
+  { el:'wood', n:'Deep Roots', d:'More healing', per:'12% more healing', g:'<path d="M12 21V11M12 11c0-4 3-7 7-7 0 4-3 7-7 7zM12 14c0-3-2.5-5-6-5 0 3 2.5 5 6 5z"/>' },
+  { el:'fire', n:'Warm Hearth', d:'Stronger powers', per:'4% stronger', g:'<path d="M12 3l2.4 5.6 6 .5-4.6 4 1.4 5.9L12 16l-5.2 3 1.4-5.9-4.6-4 6-.5z"/>' },
+  { el:'earth', n:'Stone Shelter', d:'Tougher', per:'4% less harm', g:'<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/>' } ];
+const PLOT_MAX = 5, plotCost = lv => 60 * (lv + 1); let growLock = 0;
+function grown() { try { return JSON.parse(store.get('morqi.grow') || '{}') || {}; } catch (e) { return {}; } }
+function qi() { return Math.max(0, +(store.get('morqi.sparks') || 0)); }
+function addQi(n) { store.set('morqi.sparks', Math.max(0, qi() + n)); }
+function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; S.qiGot = Math.round(S.thawed / 8) + (S.won ? 40 : 0); addQi(S.qiGot);
+  if (S.won && S.qiGot && !SEEN.has('_sparks')) { markSeen('_sparks'); setTimeout(() => AU.vo('vo-sparks', 0, .5), 2600); } }
+function renderGrow() {
+  const g = grown(), q = qi(); $('#grQi').textContent = q.toLocaleString(); $('#hmQiN').textContent = q.toLocaleString();
+  $('#grList').innerHTML = PLOTS.map(p => { const lv = g[p.el] || 0, max = lv >= PLOT_MAX, cost = plotCost(lv), can = !max && q >= cost;
+    return `<div class="gr-row" style="--c:${EL[p.el]}"><img src="art4/icons/plot-${p.el}.png?v=9" alt=""><div class="gr-t"><b>${p.n}</b><span><svg class="gr-g" viewBox="0 0 24 24" aria-hidden="true">${p.g}</svg>${p.d}</span><i class="gr-lv">${[0, 1, 2, 3, 4].map(k => `<s class="${k < lv ? 'on' : ''}"></s>`).join('')}</i></div>
+      <button class="gr-go${can ? '' : ' off'}" data-el="${p.el}" ${max ? 'disabled' : ''} aria-label="${max ? p.n + ' is fully grown' : `Grow ${p.n} for ${cost} Sparks: ${p.per} each time`}">${max ? 'Grown' : `<img src="art4/icons/icon-spark.png?v=9" alt="">${cost}`}</button></div>`; }).join('');
+  $('#grList').querySelectorAll('.gr-go').forEach(b => b.onclick = () => { if (performance.now() < growLock) return; const el = b.dataset.el, g2 = grown(), lv = g2[el] || 0, cost = plotCost(lv);
+    if (lv >= PLOT_MAX) return; if (qi() < cost) { SFX.pop(); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); return; }
+    growLock = performance.now() + 600; addQi(-cost); g2[el] = lv + 1; store.set('morqi.grow', JSON.stringify(g2)); SFX.levelup(); renderGrow();
+    $('#grList').querySelector(`.gr-go[data-el="${el}"]`).closest('.gr-row').classList.add('grew'); });
+}
+const openSheet = id => { $(id).hidden = false; guardTaps(); $('#tabs').classList.add('under'); if (id === '#growSheet') { store.set('morqi.sparksTaught', '1'); $('#hmQi').classList.remove('hint'); } };
+const closeSheet = o => { o.hidden = true; if (![...document.querySelectorAll('.hm-over')].some(x => !x.hidden)) $('#tabs').classList.remove('under'); };
+$('#hmQi').onclick = () => { SFX.select(); renderGrow(); openSheet('#growSheet'); };
+$('#hmGear').onclick = () => { SFX.select(); openSheet('#setSheet'); };
+$('#setDone').onclick = () => { SFX.select(); closeSheet($('#setSheet')); };
+$('#grDone').onclick = () => { SFX.select(); closeSheet($('#growSheet')); };
+document.querySelectorAll('.hm-over').forEach(o => o.addEventListener('click', e => { if (e.target === o) closeSheet(o); }));
+$('#qiRiseBtn').onclick = () => { if (!S) return; const qp = 100 * (1 + (S.qiRises || 0)); if (qi() < qp) return; addQi(-qp); S.qiRises = (S.qiRises || 0) + 1; S.rises = 1; $('#riseBtn').click(); };
+// the pitch link opens the app as it will ship: the loading screen, then straight into a Sanctuary, with only the
+// Sanctuary, the Journey and Settings open for now (A, 2026-10-05); everything else waits, greyed
+const PITCH = /[?&]from=pitch/.test(location.search);
+if (PITCH) document.querySelectorAll('#tabs [data-tab="book"], #tabs [data-tab="keepers"], #tabs [data-tab="season"]').forEach(b => { b.classList.add('off'); b.setAttribute('aria-disabled', 'true'); });
 })();
 </script>
 </body></html>
