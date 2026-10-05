@@ -58,8 +58,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .scr p{margin:0;max-width:32ch;color:rgba(255,255,255,.82);font-size:16px;line-height:1.45;font-weight:700}
 .eb{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--jade-hi)}
 .small{font-size:12.5px;color:rgba(255,255,255,.62);font-weight:700}
-#title{background:#0C1420 url(art4/hero-tall.jpg?v=8) 50% 0/cover no-repeat;justify-content:flex-end;gap:18px;padding-bottom:calc(26px + env(safe-area-inset-bottom))}
-#title::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,20,32,0) 50%,rgba(12,20,32,.55) 68%,rgba(12,20,32,.92) 86%)}
+#title{background:#0C1420 url(art4/hero-tall.jpg?v=9) 50% 0/cover no-repeat;justify-content:flex-end;gap:18px;padding-bottom:calc(26px + env(safe-area-inset-bottom))}
+/* night at both ends: a soft shade at the top keeps the logo and tagline crisp over the five bosses on the key art, and the
+   bottom fades for the level and Play */
+#title::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,20,32,.62) 0%,rgba(12,20,32,.3) 14%,rgba(12,20,32,0) 26%,rgba(12,20,32,0) 50%,rgba(12,20,32,.55) 68%,rgba(12,20,32,.92) 86%)}
 #title > *{position:relative}
 #title h1{font-family:var(--round);font-weight:900;letter-spacing:-.02em}
 
@@ -73,7 +75,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 /* Keeper select */
 .keepers{display:flex;justify-content:center;gap:10px;flex-wrap:nowrap;width:100%;max-width:360px}
 #pickKeeper{justify-content:space-between;gap:10px;background:#0C1420}
-#pickKeeper::before{content:"";position:absolute;inset:0;background:url(art4/hero.jpg?v=8) 50% 100%/cover no-repeat;opacity:.5;filter:blur(6px) saturate(1.1)}
+#pickKeeper::before{content:"";position:absolute;inset:0;background:url(art4/hero.jpg?v=9) 50% 100%/cover no-repeat;opacity:.5;filter:blur(6px) saturate(1.1)}
 #pickKeeper::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 70% 42% at 50% 56%,rgba(111,242,207,.18),transparent 70%),linear-gradient(180deg,rgba(12,20,32,.7),rgba(12,20,32,.15) 30%,rgba(12,20,32,.3) 70%,rgba(12,20,32,.9))}
 #pickKeeper > *{position:relative;z-index:1}
 .ks-head{display:flex;flex-direction:column;align-items:center;gap:6px}
