@@ -756,6 +756,14 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 /* the Highest Self tip: the Keeper as the hooded master in gold light */
 .hsdemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 55%,rgba(255,224,138,.55),rgba(255,197,74,.12) 45%,transparent 70%),linear-gradient(180deg,#2A2F7A,#141A44)}
 .hsdemo img{height:92%!important;width:auto!important;max-width:none;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,224,138,.8));animation:float 3s ease-in-out infinite}
+/* tip pictures: made for each card */
+.snap .tipart{display:block;width:100%;height:100%;object-fit:cover}
+.ultdemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--c) 35%,transparent),transparent 65%),linear-gradient(180deg,#2A2F7A,#141A44)}
+.ultdemo .ur{position:absolute;width:150px;height:150px;border-radius:50%;background:conic-gradient(#FFE08A,var(--c),#FFFFFF,var(--c),#FFE08A);-webkit-mask:radial-gradient(circle,transparent 62px,#000 63px);mask:radial-gradient(circle,transparent 62px,#000 63px);animation:spin 3s linear infinite}
+.ultdemo img{position:relative;width:124px;height:124px;border-radius:50%;object-fit:contain;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--c) 45%,#fff),color-mix(in srgb,var(--c) 35%,#1B2257));box-shadow:0 0 30px color-mix(in srgb,var(--c) 70%,transparent)}
+.ultdemo .tap{position:absolute;left:58%;top:58%;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:tapPulse 1.2s ease-out infinite}
+@keyframes tapPulse{0%{transform:scale(.85);box-shadow:0 0 0 0 rgba(255,255,255,.7)}70%{transform:scale(1);box-shadow:0 0 0 22px rgba(255,255,255,0)}100%{transform:scale(.85)}}
+@media (prefers-reduced-motion:reduce){.ultdemo .ur,.ultdemo .tap{animation:none}}
 </style>
 
 <div id="stage">
@@ -4181,37 +4189,22 @@ function coachTick(dt) {
   if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel) return;
   showCoach(COACH.q.shift());
 }
+// the picture for each tip: drawn once, the same for every player, or built from the player's own Keeper and animal
+const TIP_ART = { enemy:'tip-rings', bloom:'tip-bloom' };
+function tipArt(id) {
+  if (id === 'move') return '<div class="dragdemo"><i></i></div>';
+  if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
+  if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
+  if (TIP_ART[id]) return `<img class="tipart" src="art4/tips/${TIP_ART[id]}.jpg?v=8" alt="">`;
+  return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
+}
 function showCoach(c) {
   COACH.cur = c; running = false;
   if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>'; show('beastCard'); SFX.alarm(); return; }
-  // a card with a live snapshot of the exact thing being explained, so the guide can never miss its target
+  // every tip card shows a picture made for it, never a live snapshot of play (A, 2026-10-04: snapshots caught
+  // flashes, empty ground or the wrong moment, and "I can't waste people's time with these inconsistencies")
   $('#tipT').textContent = c.title; $('#tipP').textContent = c.text; $('#tipOk').textContent = COACH.q.length ? 'Next' : 'OK';
-  const box = $('#tipSnap'); box.innerHTML = '';
-  if (c.id === 'move') box.innerHTML = '<div class="dragdemo"><i></i></div>';
-  // the Highest Self tip shows the Keeper's Highest Self art, not a snapshot (the stones burst in a white flash)
-  else if (c.id === 'highest') box.innerHTML = `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
-  else {
-    // the thing being explained stays in full colour; everything else goes grey and dim, and an arrow points at it
-    // draw the clean frame first (no floating numbers), then aim at the target in that same frame: drawing moves the
-    // camera, so aiming before drawing put the spotlight beside the subject whenever the player was on the move
-    const keep = [S.txt, S.nums]; S.txt = []; S.nums = []; draw();
-    const p = c.where(); let sx = p.sx, sy = p.sy, sr = p.sr || 34; if (sx == null) { sx = (p.x - camX) * Z; sy = (p.y - camY) * Z; sr = (p.r || 50) * Z; }
-    const k = cv.width / cv.clientWidth, cw = Math.min(W, Math.max(200, sr * 4.6)), ch = cw * .75, x0 = clamp(sx - cw / 2, 0, W - cw), y0 = clamp(sy - ch / 2, 0, H - ch);
-    const sc = document.createElement('canvas'); sc.width = 400; sc.height = 300; const g = sc.getContext('2d'); g.drawImage(cv, x0 * k, y0 * k, cw * k, ch * k, 0, 0, 400, 300);
-    S.txt = keep[0]; S.nums = keep[1]; draw();
-    const tx = (sx - x0) / cw * 400, ty = (sy - y0) / ch * 300, tr = sr / cw * 400;
-    if (p.paint) { const im = $(p.paint), rr = tr * .82; g.save(); g.beginPath(); g.arc(tx, ty, rr, 0, TAU); g.fillStyle = EL[ANIMAL[animal].e]; g.fill(); g.clip(); try { g.drawImage(im, tx - rr, ty - rr, rr * 2, rr * 2); } catch (e) {} g.restore(); g.lineWidth = 5; g.strokeStyle = '#FFE08A'; g.beginPath(); g.arc(tx, ty, rr, 0, TAU); g.stroke(); }
-    try {
-      const im = g.getImageData(0, 0, 400, 300), d = im.data, r0 = tr * .9, r1 = tr * 1.25;
-      for (let y = 0, i = 0; y < 300; y++) for (let x = 0; x < 400; x++, i += 4) {
-        const dd = Math.hypot(x - tx, y - ty), m = dd <= r0 ? 1 : dd >= r1 ? 0 : 1 - (dd - r0) / (r1 - r0), grey = (d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11) * .42 + 14;
-        d[i] = d[i] * 1.06 * m + grey * (1 - m); d[i + 1] = d[i + 1] * 1.06 * m + grey * (1 - m); d[i + 2] = d[i + 2] * 1.06 * m + (grey + 10) * (1 - m);
-      }
-      g.putImageData(im, 0, 0);
-    } catch (e) {}
-    const up = ty - tr < 70, ax = tx / 4, ay = (up ? ty + tr : ty - tr) / 3;
-    box.appendChild(sc); box.insertAdjacentHTML('beforeend', `<span class="arrow${up ? ' up' : ''}" style="left:${ax}%;top:${ay}%"><svg viewBox="0 0 40 46"><path d="M12 3h16v20h9L20 43 3 23h9z" fill="#FFE08A" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/></svg></span>`);
-  }
+  $('#tipSnap').innerHTML = tipArt(c.id);
   show('tipCard'); SFX.pop(); $('#tipOk').focus({ preventScroll:true });
 }
 function coachOk() {
@@ -4640,7 +4633,7 @@ function results() {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
