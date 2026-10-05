@@ -592,6 +592,10 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .tarr svg{width:20px;height:20px}
 .tarr:disabled{opacity:0;pointer-events:none}
 #title #playBtn{width:min(78%,300px)}
+/* a locked level: its name dimmed, a quiet line saying what opens it, and Play greyed out */
+.tname.locked h1{opacity:.55}
+.tlock{font:800 13px var(--round);color:rgba(255,255,255,.75);letter-spacing:.01em}
+#title #playBtn.locked{filter:grayscale(1) brightness(.75);opacity:.7;pointer-events:none}
 .tdots{display:flex;gap:10px;align-items:center}
 .tdots button{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:var(--c);opacity:.55;cursor:pointer;transition:all .25s var(--spring)}
 .tdots button.cur{width:22px;border-radius:4px;opacity:1;box-shadow:0 0 10px var(--c)}
@@ -1904,8 +1908,12 @@ addEventListener('resize', size); size();
 /* ================= the opening: Keeper, year, spirit animal ================= */
 let keeper = 1, animal = 'pig', keeperEl = 'water';
 let LVL = Math.min(4, Math.max(1, +new URLSearchParams(location.search).get('level') || 1));
-const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
-const unlocked = () => Math.max(LVL, +(store.get('morqi.unlocked') || 1));
+// progress lives in local storage; where a browser refuses it, a first-party cookie keeps it instead
+const jar = { get(k) { const m = document.cookie.match(new RegExp('(?:^|; )' + k.replace(/\./g, '\\.') + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : null; },
+  set(k, v) { try { document.cookie = `${k}=${encodeURIComponent(v)}; max-age=31536000; path=/; SameSite=Lax`; } catch (e) {} } };
+const store = { get(k) { try { const v = localStorage.getItem(k); return v ?? jar.get(k); } catch (e) { return jar.get(k); } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { jar.set(k, v); } } };
+// a level asked for in the link (?level=) counts as open; the level being looked at on the title does not
+const LVL0 = LVL, unlocked = () => Math.max(LVL0, +(store.get('morqi.unlocked') || 1));
 const SEEN = new Set((store.get('morqi.seen') || '').split(',').filter(Boolean));
 const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(',')); };
 function show(id) { document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); }
@@ -1950,7 +1958,7 @@ function ringPick() {
 }
 ['#year', '#bmonth', '#bday'].forEach(q => $(q).addEventListener('change', () => { ringPick(); SFX.pop(); }));
 ringPick();
-$('#playBtn').onclick = () => { AU.init(); SFX.select(); AU.music(true); AU.song('rise', 1); show('pickKeeper'); };   // the menu plays the main theme with its beat in
+$('#playBtn').onclick = () => { if (LVL > unlocked()) return; AU.init(); SFX.select(); AU.music(true); AU.song('rise', 1); show('pickKeeper'); };   // the menu plays the main theme with its beat in
 $('#keeperNext').onclick = () => { SFX.select(); show('pickYear'); };
 $('#yearNext').onclick = () => {
   // the Chinese year begins at Lunar New Year; its stem gives the element, its branch the animal (a 2014 birthday after
@@ -2926,7 +2934,7 @@ function shrines(dt) {
     const inside = Math.hypot(P.x - sh.x, P.y - sh.y) < sh.r;
     if (inside && sh.charge > 0 && P.hp < P.max) {
       const h = Math.min(sh.charge, P.max / 9 * dt, P.max - P.hp); P.hp += h; sh.charge -= h;
-      if (!sh.healing) { sh.healing = true; SFX.heal(); pickupPop(SHRINE.name[sh.el], EL[sh.el]); }
+      if (!sh.healing) { sh.healing = true; SFX.heal(); ring(S.p.x, S.p.y, 20, 170, '#8FF0A8', .55, 12, true); flash(S.p.x, S.p.y - 30, 200, '#B8FFC8', .35); }
       if (Math.random() < .35) fx({ k:'glow', x:P.x + rnd(-20, 20), y:P.y - rnd(10, 60), s:22, s1:4, c:'#FF8FA8', life:.6 });
     } else sh.healing = false;
     for (const e of S.en) if (!e.dead && !e.boss && e.el === sh.fed && Math.abs(e.x - sh.x) < 700 && Math.abs(e.y - sh.y) < 700) e.lure = sh;
@@ -2949,7 +2957,7 @@ const BOSSES = {
     glow:'#8FE060', mist:'150,200,110', edge:['#A8D070', '#5E8A3A'], bolt:'#D8FF9A',
     snd:{ roar:'wood-roar', sig:'wood-roots', slam:'wood-axe', charge:'wood-axe', cast:'wood-roots' },
     tip:'When a red line points at you, step sideways before the roots burst up.' },
-  fire:{ name:'The Ember Drummer', pats:['drums', 'mortar', 'charge', 'drums', 'spiral'], shot:'ember', skin:'mortar',
+  fire:{ name:'The Ember Drummer', pats:['drums', 'mortar', 'charge', 'spiral'], shot:'ember', skin:'mortar',
     glow:'#FF8A3A', mist:'255,150,90', edge:['#FFB866', '#E0603A'], bolt:'#FFD08A',
     snd:{ roar:'fire-roar', sig:'fire-drum', slam:'fire-drum', charge:'fire-dash', cast:'fire-mortar' },
     tip:'Each drum beat sends a ring of fire, so run to its bright gap.' },
@@ -3000,7 +3008,7 @@ function bossFight(b, ph, dt) {
     if (a.ph === 0 && a.t >= a.wind) { a.ph = 1; a.t = 0; SFX.charge(); SFX.bx(B.snd.charge, 1, 300); S.shake = Math.max(S.shake, .3); }
     else if (a.ph === 1) { b.x += a.dx * a.spd * dt; b.y += a.dy * a.spd * dt;
       if ((b.dustT = (b.dustT || 0) - dt) <= 0) { b.dustT = .04; smoke(b.x, b.y + 50, 2, 30, B.mist);
-        if (el === 'fire') { if ((b.trT = (b.trT || 0) - .04) <= 0) { b.trT = .1; hazard('cinder', b.x, b.y + 30, 34, 2.4, 6); } flames(b.x, b.y + 30, 2, 20, 30); }
+        if (el === 'fire') { if ((b.trT = (b.trT || 0) - .04) <= 0) { b.trT = .2; hazard('cinder', b.x, b.y + 30, 34, 1.6, 6); } flames(b.x, b.y + 30, 2, 20, 30); }
         else if (el === 'water') drops(b.x, b.y + 40, 4, 220);
         else if (el === 'wood') leaves(b.x, b.y, 2, 160);
         else if (el === 'earth') debris(b.x, b.y + 40, 2, 200);
@@ -3034,10 +3042,12 @@ function bossFight(b, ph, dt) {
       if (Math.hypot(x - A.x, y - A.y) > A.r - 30) break; S.bossFx.push({ k:'spike', skin:'root', line:1, x, y, r:58, t:0, wind:.8 + i * .085 }); }
     b.castAt = S.t; SFX.bx(B.snd.slam, 1, 300); }
   // the Ember Drummer: each beat sends a ring of fire out across the arena, with one gap to stand in
-  else if (pat === 'drums') { const n = 2 + ph; let gap = aim + Math.PI + (Math.random() < .5 ? -1 : 1) * rnd(.3, .6);
-    for (let i = 0; i < n; i++) { if (i) gap += (Math.random() < .5 ? -1 : 1) * rnd(.25, .5); const spd = 360 + ph * 30;
-      S.bossFx.push({ k:'drum', x:b.x, y:b.y, gap:Math.atan2(P.y - b.y, P.x - b.x) + (i ? gap - aim - Math.PI : (Math.random() < .5 ? -1 : 1) * rnd(.45, .75)), gw:1.15 - ph * .1, spd, t:-i * .9, wind:.62, end:.62 + (A.r * 2 + 120) / spd }); }
-    b.atk += n * .5; }
+  // (A's Level 3 run, 2026-10-05: three falls in 80 s, nearly all to drum rings, so a round is now two rings, three when
+  // enraged, a second apart, with wider gaps that sit near you and move only a little from one ring to the next)
+  else if (pat === 'drums') { const n = ph > 1 ? 3 : 2, spd = 340 + ph * 25; let gap = aim + (Math.random() < .5 ? -1 : 1) * rnd(.4, .7);
+    for (let i = 0; i < n; i++) { if (i) gap += (Math.random() < .5 ? -1 : 1) * rnd(.25, .45);
+      S.bossFx.push({ k:'drum', x:b.x, y:b.y, gap, gw:1.3 - ph * .05, spd, t:-i * 1, wind:.7, end:.7 + (A.r * 2 + 120) / spd }); }
+    b.atk += n * .6; }
   // the Stone Matron: boulders roll down lanes across the arena, one lane always on you, with room between them
   else if (pat === 'boulders') { const dir = rnd(0, TAU), dx = Math.cos(dir), dy = Math.sin(dir), nx = -dy, ny = dx, offs = ph === 0 ? [0, (Math.random() < .5 ? -1 : 1) * 280] : [-280, 0, 280], len = A.r * 2.4, spd = 700 + ph * 70;
     offs.forEach((o, i) => { const cx = P.x + nx * (o + rnd(-30, 30)), cy = P.y + ny * (o + rnd(-30, 30)), t = (cx - A.x) * dx + (cy - A.y) * dy, mx = cx - dx * t, my = cy - dy * t;
@@ -3045,7 +3055,7 @@ function bossFight(b, ph, dt) {
     b.castAt = S.t; SFX.bx(B.snd.cast, 1, 300); b.atk += .8; }
   // the Bell Sentinel: its bell tolls in a great ring that slows anyone caught inside, then it vanishes and steps behind you
   else if (pat === 'toll') S.bossFx.push({ k:'toll', x:b.x, y:b.y, r:250 + ph * 25, t:0, wind:1.6 });
-  else if (pat === 'fan') { b.fan = { n:2 + ph, t:.5 }; b.castAt = S.t; }
+  else if (pat === 'fan') { b.fan = { n:ph > 1 ? 3 : 2, t:.5 }; b.castAt = S.t; }
   else if (pat === 'blink') { b.blink = { ph:0, t:0 }; SFX.bx(B.snd.charge, 1, 200); smoke(b.x, b.y, 8, 36, B.mist); }
 }
 // each ground attack lands on its own: what it does, how it looks and how it sounds
@@ -3065,7 +3075,7 @@ function bossFxTick(b, B, f, ph, dt) {
   if (f.k === 'drum') {
     if (f.t >= f.wind && !f.fired) { f.fired = true; b.beatAt = S.t; SFX.bx(B.snd.sig, 1, 120); SFX.boom(false); S.shake = Math.max(S.shake, .3); ring(f.x, f.y, 40, 200, '#FFB050', .3, 22, true); flames(f.x, f.y + 30, 10, 60, 40); }
     if (f.fired && !f.hit) { const R = 60 + (f.t - f.wind) * f.spd, d = Math.hypot(P.x - f.x, P.y - f.y);
-      if (Math.abs(d - R) < 22 + P.r * .4 && angGap(Math.atan2(P.y - f.y, P.x - f.x), f.gap) > f.gw / 2) { f.hit = true; if (ouch(22, f.x, f.y, { push:70, el, src:'drums' })) flames(P.x, P.y, 6, 20, 30); } }
+      if (Math.abs(d - R) < 22 + P.r * .4 && angGap(Math.atan2(P.y - f.y, P.x - f.x), f.gap) > f.gw / 2) { f.hit = true; if (ouch(16, f.x, f.y, { push:70, el, src:'drums' })) flames(P.x, P.y, 6, 20, 30); } }
     return; }
   if (f.k === 'boulder') {
     if (f.t < f.wind) return;
@@ -3095,7 +3105,7 @@ function landSpike(b, B, f) {
   const sp = (c, n, s) => { for (let i = 0; i < n; i++) { const an = i / n * TAU; fx({ k:'spike', x:f.x + Math.cos(an) * f.r * .45, y:f.y + Math.sin(an) * f.r * .3, life:.7, s, c, rot:an }); } };
   if (f.skin === 'geyser') { sp('#9FDCFF', 6, 48); drops(f.x, f.y, 16, 380); smoke(f.x, f.y - 20, 5, 40, '200,235,255'); SFX.splash(); SFX.bx('water-wall', 2, 300); }
   else if (f.skin === 'root') { sp('#6FAE3A', 5, 46); sp('#4A2E1A', 3, 30); leaves(f.x, f.y, 5, 220); debris(f.x, f.y, 5, 220); SFX.bx('wood-roots', 2, 260); SFX.thud(false); }
-  else if (f.skin === 'mortar') { flash(f.x, f.y, 260, '#FFB050', .25); flames(f.x, f.y, 10, f.r * .6, 36); stars(f.x, f.y - 30, 18, '#FFE08A', 420); smoke(f.x, f.y, 5, 40, '90,60,50'); hazard('cinder', f.x, f.y, 40, 1.8, 5); SFX.boom(true); SFX.firework(); }
+  else if (f.skin === 'mortar') { flash(f.x, f.y, 260, '#FFB050', .25); flames(f.x, f.y, 10, f.r * .6, 36); stars(f.x, f.y - 30, 18, '#FFE08A', 420); smoke(f.x, f.y, 5, 40, '90,60,50'); SFX.boom(true); SFX.firework(); }
   else if (f.skin === 'sink') { decal({ k:'crack', x:f.x, y:f.y, r:f.r * 1.1, life:5 }); debris(f.x, f.y, 14, 320); smoke(f.x, f.y, 6, 44, '160,130,90'); SFX.bx('earth-quake', 2, 300); S.shake = Math.max(S.shake, .25); }
   else if (f.skin === 'sword') { sp('#E6EEF4', 4, 54); stars(f.x, f.y - 20, 12, '#FFFFFF', 300); ring(f.x, f.y, 10, f.r, '#FFFFFF', .3, 8, true); SFX.shing(); }
   else { sp('#BFE6FF', 6, 42); shards(f.x, f.y, '#DDF1FF', 8, 260); SFX.spikes(); }
@@ -3394,7 +3404,8 @@ function update(dt) {
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
     if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
     if (d < e.r + P.r && P.hurt <= 0 && !hsOn()) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
-      const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el); P.hp -= hit; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy }; floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
+      const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el); P.hp -= hit; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
+      if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? A.r - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
@@ -3676,12 +3687,15 @@ function drawBossFx(f) {
     const g0 = f.gap - f.gw / 2, g1 = f.gap + f.gw / 2, reach = A.r + 60;
     if (!f.fired) {
       add(() => { g.fillStyle = `rgba(255,226,140,${.2 + .12 * pulse})`; g.beginPath(); g.moveTo(f.x, f.y); g.arc(f.x, f.y, reach, g0, g1); g.closePath(); g.fill(); });
+      g.strokeStyle = '#FFF4D8'; g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round';
+      for (let r = 140; r < reach - 40; r += 110) { const q = (S.t * 1.4 + r / 110) % 1, rr = r + q * 40, cx = f.x + Math.cos(f.gap) * rr, cy = f.y + Math.sin(f.gap) * rr, nx = -Math.sin(f.gap), ny = Math.cos(f.gap), ux = Math.cos(f.gap), uy = Math.sin(f.gap);
+        g.globalAlpha = Math.sin(q * Math.PI) * .9 * p; g.beginPath(); g.moveTo(cx - ux * 10 + nx * 14, cy - uy * 10 + ny * 14); g.lineTo(cx + ux * 8, cy + uy * 8); g.lineTo(cx - ux * 10 - nx * 14, cy - uy * 10 - ny * 14); g.stroke(); }
+      g.globalAlpha = 1; g.lineCap = 'butt'; g.lineJoin = 'miter';
       g.strokeStyle = `rgba(255,236,170,${.6 * p})`; g.lineWidth = 3; g.setLineDash([14, 12]); g.lineDashOffset = -S.t * 60; g.beginPath(); g.moveTo(f.x + Math.cos(g0) * 60, f.y + Math.sin(g0) * 60); g.lineTo(f.x + Math.cos(g0) * reach, f.y + Math.sin(g0) * reach); g.moveTo(f.x + Math.cos(g1) * 60, f.y + Math.sin(g1) * 60); g.lineTo(f.x + Math.cos(g1) * reach, f.y + Math.sin(g1) * reach); g.stroke(); g.setLineDash([]);
       add(() => { g.strokeStyle = `rgba(255,70,40,${.35 + .25 * pulse})`; g.lineWidth = 14 * p + 4; g.beginPath(); g.arc(f.x, f.y, 60 + p * 30, g1, g0 + TAU); g.stroke(); g.strokeStyle = 'rgba(255,225,200,.9)'; g.lineWidth = 2.5; g.stroke(); });
       return; }
     const R = 60 + (f.t - f.wind) * f.spd, fade = Math.min(1, (reach - R) / 80 + .2);
     if (R > reach + 40) return;
-    g.fillStyle = 'rgba(255,236,170,.08)'; g.beginPath(); g.moveTo(f.x, f.y); g.arc(f.x, f.y, reach, g0, g1); g.closePath(); g.fill();
     g.lineCap = 'round'; g.globalAlpha = fade;
     g.strokeStyle = 'rgba(200,40,10,.9)'; g.lineWidth = 30; g.beginPath(); g.arc(f.x, f.y, R, g1, g0 + TAU); g.stroke();
     add(() => { g.strokeStyle = '#FF9A3A'; g.lineWidth = 18; g.beginPath(); g.arc(f.x, f.y, R, g1, g0 + TAU); g.stroke(); g.strokeStyle = '#FFF1C0'; g.lineWidth = 5; g.stroke(); });
@@ -3712,8 +3726,8 @@ function drawBossFx(f) {
     g.fillStyle = '#7A8794'; g.fillRect(-16, -52, 32, 7); g.strokeRect(-16, -52, 32, 7); g.fillStyle = '#4A3A2A'; g.fillRect(-4, -72, 8, 20); g.restore(); g.globalAlpha = 1; }
 }
 // each shot glows in its light colour around a deeper body of the same hue, so it reads on bright stone and sand too
-const SHOT_BODY = { '#6FC8FF':'#2F8FE8', '#8FE060':'#3F9A22', '#FF8A3A':'#F0501A', '#F0C060':'#C8861A', '#C9D3DB':'#5E6B78' };
-const SHOT_COL = { water:'#6FC8FF', wood:'#8FE060', fire:'#FF8A3A', earth:'#F0C060', metal:'#C9D3DB', bubble:'#6FC8FF', thorn:'#8FE060', ember:'#FF8A3A', pebble:'#F0C060', blade:'#C9D3DB' };
+const SHOT_BODY = { '#FFB347':'#FFE9A8', '#6FC8FF':'#2F8FE8', '#8FE060':'#3F9A22', '#FF8A3A':'#F0501A', '#F0C060':'#C8861A', '#C9D3DB':'#5E6B78' };
+const SHOT_COL = { water:'#6FC8FF', wood:'#8FE060', fire:'#FF8A3A', earth:'#F0C060', metal:'#C9D3DB', bubble:'#6FC8FF', thorn:'#8FE060', ember:'#FFB347', pebble:'#F0C060', blade:'#C9D3DB' };
 function energy(x, y, vx, vy, col, sz, foe, ring) {
   const v = Math.hypot(vx, vy) || 1, ux = vx / v, uy = vy / v, pulse = .5 + .5 * Math.sin(S.t * 14 + x * .05);
   // the halo and tail are painted, not added, so they keep their colour on sand and pale stone instead of washing white
@@ -3926,7 +3940,7 @@ function draw() {
       g.fillStyle = '#7FCF4A'; g.strokeStyle = '#1A2A10'; g.lineWidth = 2;
       for (let i = 0; i < 7; i++) { const an = h.rot + i * TAU / 7, rx = h.x + Math.cos(an) * h.r * .55, ry = h.y + Math.sin(an) * h.r * .32; g.beginPath(); g.moveTo(rx - 6, ry); g.lineTo(rx, ry - 16); g.lineTo(rx + 6, ry); g.closePath(); g.fill(); g.stroke(); }
       g.globalAlpha = 1; }
-    else { g.globalAlpha = k * .8; g.fillStyle = 'rgba(60,20,10,.4)'; g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r * .6, 0, 0, TAU); g.fill(); const w = h.r * 1.1 * (1 + Math.sin(S.t * 18 + h.rot) * .1); g.drawImage(flameSprite(1), h.x - w / 2, h.y - w * 1.1, w, w * 1.5); g.globalAlpha = 1; }
+    else { g.globalAlpha = k * .8; g.fillStyle = 'rgba(60,20,10,.4)'; g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r * .6, 0, 0, TAU); g.fill(); g.strokeStyle = `rgba(255,90,70,${.6 + .3 * Math.sin(S.t * 10 + h.rot)})`; g.lineWidth = 2.5; g.stroke(); const w = h.r * 1.1 * (1 + Math.sin(S.t * 18 + h.rot) * .1); g.drawImage(flameSprite(1), h.x - w / 2, h.y - w * 1.1, w, w * 1.5); g.globalAlpha = 1; }
   }
   // the boss's ground attacks fill up in red first
   if (S.bossFx) for (const f of S.bossFx) if (f.t >= 0) drawBossFx(f);
@@ -3968,11 +3982,11 @@ function draw() {
       g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, e.x, y); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, e.x, y); g.globalAlpha = 1; g.lineWidth = 1; }
     if (e.type === 'golem') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(e.x - 42, e.y - s * .62 - 14, 84, 10); g.fillStyle = EL[e.el]; g.fillRect(e.x - 40, e.y - s * .62 - 12, 80 * Math.max(0, e.hp / e.max), 6); }
   }
-  // burning pools: fixed flame tongues flickering in place
+  // burning pools (the player's own): low warm flames with no red rim, so they never read as a hazard to avoid
   for (const z of S.zones) if (z.k === 'fire' && inView(z.x, z.y, z.r)) {
     const a = Math.min(1, z.t * 5, (z.life - z.t) * 2.5);
     g.globalAlpha = a;
-    for (const f of z.tongues) { const fl = 1 + Math.sin(S.t * f.sp + f.ph) * .16, w = f.s * fl * .9, h = w * 1.55; g.drawImage(flameSprite(Math.sin(S.t * f.sp * .7 + f.ph) > .4 ? 1 : 0), z.x + f.dx - w / 2, z.y + f.dy - h * .73, w, h); }
+    for (const f of z.tongues) { const fl = 1 + Math.sin(S.t * f.sp + f.ph) * .16, w = f.s * fl * .75, h = w * 1.1; g.drawImage(flameSprite(Math.sin(S.t * f.sp * .7 + f.ph) > .4 ? 1 : 0), z.x + f.dx - w / 2, z.y + f.dy - h * .73, w, h); }
     g.globalAlpha = 1;
   }
   // sacred trees (Rising Grove)
@@ -4132,7 +4146,7 @@ function draw() {
   // core, a halo in the element's colour and a short comet tail. Enemy and boss shots are larger and carry a pulsing
   // coral-red rim, so they read as danger beside your own; a bubble that slows you keeps an inner ring.
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.el] || '#C9D3DB', 9, false); }
-  for (const s of S.eshots) { if (!inView(s.x, s.y, 40)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.k] || SHOT_COL[s.el] || '#7FC4FF', s.boss ? 16 : 14, true, s.k === 'bubble'); }
+  for (const s of S.eshots) { if (!inView(s.x, s.y, 40)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.k] || SHOT_COL[s.el] || '#7FC4FF', s.boss ? 18 : 14, true, s.k === 'bubble'); }
   g.lineWidth = 1;
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
@@ -5030,16 +5044,21 @@ $('#chartOk').onclick = () => { SFX.select(); show(chartFrom); };
 // the title shows one level at a time, like pages: its name, its stars, and five dots in the element colours of the
 // five realms underneath (filled when open, hollow when still locked)
 const REALM = ['water', 'wood', 'fire', 'earth', 'metal'];
+// every level can be looked at, locked or not (Gene, playtest 2026-10-04: with the next arrow hidden until a level was
+// beaten, she thought the arrows were broken and could not see that more levels exist). A locked level shows its name,
+// a lock and what opens it, and Play waits greyed out.
 function renderLevels() {
-  const u = unlocked(), st = starsOf(LVL);
+  const u = unlocked(), st = starsOf(LVL), locked = LVL > u;
   $('#lvNum').textContent = `Level ${LVL}`; $('#lvName').textContent = LEVELS[LVL - 1].name; $('.tname').style.setProperty('--c', EL[REALM[LVL - 1]]);
-  $('#lvStars').innerHTML = [0, 1, 2].map(i => `<i class="${i < st ? 'on' : ''}">\u2605</i>`).join('');
-  $('#lvStars').setAttribute('aria-label', `${st} of 3 stars`);
-  $('#lvPrev').disabled = LVL <= 1; $('#lvNext').disabled = LVL >= Math.min(u, LEVELS.length);
+  $('.tname').classList.toggle('locked', locked);
+  if (locked) { $('#lvStars').innerHTML = `<b class="tlock">Free ${LEVELS[u - 1].name.replace(/^The /, 'the ')} to open it</b>`; $('#lvStars').setAttribute('aria-label', 'Locked'); }
+  else { $('#lvStars').innerHTML = [0, 1, 2].map(i => `<i class="${i < st ? 'on' : ''}">\u2605</i>`).join(''); $('#lvStars').setAttribute('aria-label', `${st} of 3 stars`); }
+  const pb = $('#playBtn'); pb.disabled = locked; pb.classList.toggle('locked', locked); pb.textContent = locked ? 'Locked' : 'Play';
+  $('#lvPrev').disabled = LVL <= 1; $('#lvNext').disabled = LVL >= LEVELS.length;
   $('#lvls').innerHTML = LEVELS.map((L, i) => `<button role="tab" style="--c:${EL[REALM[i]]}" class="${i + 1 === LVL ? 'cur' : ''}${i + 1 > u ? ' lock' : ''}" data-n="${i + 1}" aria-label="Level ${i + 1}: ${L.name}${i + 1 > u ? ' (locked)' : ''}" aria-selected="${i + 1 === LVL}" ${i + 1 > u ? 'disabled' : ''}></button>`).join('');
   $('#lvls').querySelectorAll('button').forEach(b => b.onclick = () => pickLevel(+b.dataset.n));
 }
-function pickLevel(n) { if (n < 1 || n > Math.min(unlocked(), LEVELS.length) || n === LVL) return; LVL = n; SFX.select(); renderLevels(); }
+function pickLevel(n) { if (n < 1 || n > LEVELS.length || n === LVL) return; LVL = n; SFX.select(); renderLevels(); }
 $('#lvPrev').onclick = () => pickLevel(LVL - 1); $('#lvNext').onclick = () => pickLevel(LVL + 1);
 renderLevels();
 $('#nextLvBtn').onclick = () => { SFX.select(); LVL++; renderLevels(); intro(LVL); };
