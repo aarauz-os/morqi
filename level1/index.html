@@ -1813,7 +1813,7 @@ const AU = (() => {
   }
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
-    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=11`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
+    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=12`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
   const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
@@ -3723,10 +3723,13 @@ function bossFight(b, ph, dt) {
   // the Ember Drummer: each beat sends a ring of fire out across the arena, with one gap to stand in
   // (A's Level 3 run, 2026-10-05: three falls in 80 s, nearly all to drum rings, so a round is now two rings, three when
   // enraged, a second apart, with wider gaps that sit near you and move only a little from one ring to the next)
-  else if (pat === 'drums') { const n = ph > 1 ? 3 : 2, spd = 295 + ph * 20; let gap = aim + (Math.random() < .5 ? -1 : 1) * rnd(.4, .7);
+  // (A, 2026-10-05: "i dont need the fire gaps to be wider just more of them"): each ring now breaks in two places, three
+  // when the drummer is calm, one gap always near you, the others spread round the ring, all of them the old width
+  else if (pat === 'drums') { const n = ph > 1 ? 3 : 2, spd = 315 + ph * 20, holes = ph > 1 ? 2 : 3; let gap = aim + (Math.random() < .5 ? -1 : 1) * rnd(.4, .7);
     for (let i = 0; i < n; i++) { if (i) gap += (Math.random() < .5 ? -1 : 1) * rnd(.25, .45);
-      S.bossFx.push({ k:'drum', x:b.x, y:b.y, gap, gw:1.7 - ph * .05, spd, t:-i * 1.35, wind:.8, end:.8 + (A.r * 2 + 120) / spd }); }
-    b.atk += n * .8; }
+      const gaps = Array.from({ length:holes }, (_, k) => gap + k * TAU / holes + (k ? rnd(-.35, .35) : 0));
+      S.bossFx.push({ k:'drum', x:b.x, y:b.y, gap, gaps, gw:1.3 - ph * .05, spd, t:-i * 1.2, wind:.8, end:.8 + (A.r * 2 + 120) / spd }); }
+    b.atk += n * .7; }
   // the Stone Matron: boulders roll down lanes across the arena, one lane always on you, with room between them
   else if (pat === 'boulders') { const dir = rnd(0, TAU), dx = Math.cos(dir), dy = Math.sin(dir), nx = -dy, ny = dx, offs = ph === 0 ? [0, (Math.random() < .5 ? -1 : 1) * 280] : [-280, 0, 280], len = A.r * 2.4, spd = 620 + ph * 60;
     offs.forEach((o, i) => { const cx = P.x + nx * (o + rnd(-30, 30)), cy = P.y + ny * (o + rnd(-30, 30)), t = (cx - A.x) * dx + (cy - A.y) * dy, mx = cx - dx * t, my = cy - dy * t;
@@ -3754,7 +3757,7 @@ function bossFxTick(b, B, f, ph, dt) {
   if (f.k === 'drum') {
     if (f.t >= f.wind && !f.fired) { f.fired = true; b.beatAt = S.t; SFX.bx(B.snd.sig, 1, 120); SFX.boom(false); S.shake = Math.max(S.shake, .3); ring(f.x, f.y, 40, 200, '#FFB050', .3, 22, true); flames(f.x, f.y + 30, 10, 60, 40); }
     if (f.fired && !f.hit) { const R = 60 + (f.t - f.wind) * f.spd, d = Math.hypot(P.x - f.x, P.y - f.y);
-      if (Math.abs(d - R) < 22 + P.r * .4 && angGap(Math.atan2(P.y - f.y, P.x - f.x), f.gap) > f.gw / 2) { f.hit = true; if (ouch(16, f.x, f.y, { push:70, el, src:'drums' })) flames(P.x, P.y, 6, 20, 30); } }
+      if (Math.abs(d - R) < 22 + P.r * .4 && (f.gaps || [f.gap]).every(gp => angGap(Math.atan2(P.y - f.y, P.x - f.x), gp) > f.gw / 2)) { f.hit = true; if (ouch(16, f.x, f.y, { push:70, el, src:'drums' })) flames(P.x, P.y, 6, 20, 30); } }
     return; }
   if (f.k === 'boulder') {
     if (f.t < f.wind) return;
@@ -3974,11 +3977,11 @@ function bloomCreature(e, d, dt) {
   if (d < e.r + S.p.r + 16) { stars(e.x, e.y - 30, 5, '#FFE58A', 200); kill(e); }
 }
 /* ================= Ascended (S.hs in the code) ================= */
-// MorQi's point is becoming your best self, and for six seconds you are it. Gathering every Qi Stone of a level makes
+// MorQi's point is becoming your best self, and for twelve seconds you are it (A, 2026-10-05: twelve, like the Bloom). Gathering every Qi Stone of a level makes
 // you whole: you rise in the master's robes with the five elements circling you, nothing can touch you, every half second
 // a wave of all five elements breaks over everything near you (cycling, so the strong one always lands), every gem flies
 // to you, and it ends in the Five-Stone Burst before the Warden arrives. The first time ever, a card names it.
-const HIGHEST = { life:6, pulse:.45, R:470 };
+const HIGHEST = { life:12, pulse:.45, R:470 };
 const hsOn = () => !!(S && S.hs && S.hs.on);
 function hsTick(dt) {
   const H = S.hs, P = S.p;
@@ -4786,24 +4789,26 @@ function drawBossFx(f) {
     add(() => glowAt(f.x, f.y, 520, '#3F8FD8', .45 * fade));
     g.globalAlpha = fade; warnCircle(f.x, f.y, f.core, on ? 1 : p, 1); g.globalAlpha = 1;
     return; }
-  if (f.k === 'drum') {   // the Ember Drummer's ring of fire, with its one bright gap
-    const g0 = f.gap - f.gw / 2, g1 = f.gap + f.gw / 2, reach = A.r + 60;
+  if (f.k === 'drum') {   // the Ember Drummer's ring of fire, broken by bright gaps to stand in
+    const reach = A.r + 60, gw = f.gw, gaps = (f.gaps || [f.gap]).map(x => ((x % TAU) + TAU) % TAU).sort((x, y) => x - y);
+    // the burning arcs run from the far edge of one gap to the near edge of the next
+    const arcs = gaps.map((gp, i) => { const nx = i + 1 < gaps.length ? gaps[i + 1] : gaps[0] + TAU; return [gp + gw / 2, nx - gw / 2]; });
     if (!f.fired) {
-      add(() => { g.fillStyle = `rgba(255,226,140,${.2 + .12 * pulse})`; g.beginPath(); g.moveTo(f.x, f.y); g.arc(f.x, f.y, reach, g0, g1); g.closePath(); g.fill(); });
-      g.strokeStyle = '#FFF4D8'; g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round';
-      for (let r = 140; r < reach - 40; r += 110) { const q = (S.t * 1.4 + r / 110) % 1, rr = r + q * 40, cx = f.x + Math.cos(f.gap) * rr, cy = f.y + Math.sin(f.gap) * rr, nx = -Math.sin(f.gap), ny = Math.cos(f.gap), ux = Math.cos(f.gap), uy = Math.sin(f.gap);
-        g.globalAlpha = Math.sin(q * Math.PI) * .9 * p; g.beginPath(); g.moveTo(cx - ux * 10 + nx * 14, cy - uy * 10 + ny * 14); g.lineTo(cx + ux * 8, cy + uy * 8); g.lineTo(cx - ux * 10 - nx * 14, cy - uy * 10 - ny * 14); g.stroke(); }
-      g.globalAlpha = 1; g.lineCap = 'butt'; g.lineJoin = 'miter';
-      g.strokeStyle = `rgba(255,236,170,${.6 * p})`; g.lineWidth = 3; g.setLineDash([14, 12]); g.lineDashOffset = -S.t * 60; g.beginPath(); g.moveTo(f.x + Math.cos(g0) * 60, f.y + Math.sin(g0) * 60); g.lineTo(f.x + Math.cos(g0) * reach, f.y + Math.sin(g0) * reach); g.moveTo(f.x + Math.cos(g1) * 60, f.y + Math.sin(g1) * 60); g.lineTo(f.x + Math.cos(g1) * reach, f.y + Math.sin(g1) * reach); g.stroke(); g.setLineDash([]);
-      add(() => { g.strokeStyle = `rgba(255,70,40,${.35 + .25 * pulse})`; g.lineWidth = 14 * p + 4; g.beginPath(); g.arc(f.x, f.y, 60 + p * 30, g1, g0 + TAU); g.stroke(); g.strokeStyle = 'rgba(255,225,200,.9)'; g.lineWidth = 2.5; g.stroke(); });
+      for (const gp of gaps) { const g0 = gp - gw / 2, g1 = gp + gw / 2;
+        add(() => { g.fillStyle = `rgba(255,226,140,${.2 + .12 * pulse})`; g.beginPath(); g.moveTo(f.x, f.y); g.arc(f.x, f.y, reach, g0, g1); g.closePath(); g.fill(); });
+        g.strokeStyle = '#FFF4D8'; g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round';
+        for (let r = 140; r < reach - 40; r += 110) { const q = (S.t * 1.4 + r / 110) % 1, rr = r + q * 40, cx = f.x + Math.cos(gp) * rr, cy = f.y + Math.sin(gp) * rr, nx = -Math.sin(gp), ny = Math.cos(gp), ux = Math.cos(gp), uy = Math.sin(gp);
+          g.globalAlpha = Math.sin(q * Math.PI) * .9 * p; g.beginPath(); g.moveTo(cx - ux * 10 + nx * 14, cy - uy * 10 + ny * 14); g.lineTo(cx + ux * 8, cy + uy * 8); g.lineTo(cx - ux * 10 - nx * 14, cy - uy * 10 - ny * 14); g.stroke(); }
+        g.globalAlpha = 1; g.lineCap = 'butt'; g.lineJoin = 'miter';
+        g.strokeStyle = `rgba(255,236,170,${.6 * p})`; g.lineWidth = 3; g.setLineDash([14, 12]); g.lineDashOffset = -S.t * 60; g.beginPath(); g.moveTo(f.x + Math.cos(g0) * 60, f.y + Math.sin(g0) * 60); g.lineTo(f.x + Math.cos(g0) * reach, f.y + Math.sin(g0) * reach); g.moveTo(f.x + Math.cos(g1) * 60, f.y + Math.sin(g1) * 60); g.lineTo(f.x + Math.cos(g1) * reach, f.y + Math.sin(g1) * reach); g.stroke(); g.setLineDash([]); }
+      add(() => { for (const [a0, a1] of arcs) { g.strokeStyle = `rgba(255,70,40,${.35 + .25 * pulse})`; g.lineWidth = 14 * p + 4; g.beginPath(); g.arc(f.x, f.y, 60 + p * 30, a0, a1); g.stroke(); g.strokeStyle = 'rgba(255,225,200,.9)'; g.lineWidth = 2.5; g.stroke(); } });
       return; }
     const R = 60 + (f.t - f.wind) * f.spd, fade = Math.min(1, (reach - R) / 80 + .2);
     if (R > reach + 40) return;
     g.lineCap = 'round'; g.globalAlpha = fade;
-    g.strokeStyle = 'rgba(200,40,10,.9)'; g.lineWidth = 30; g.beginPath(); g.arc(f.x, f.y, R, g1, g0 + TAU); g.stroke();
-    add(() => { g.strokeStyle = '#FF9A3A'; g.lineWidth = 18; g.beginPath(); g.arc(f.x, f.y, R, g1, g0 + TAU); g.stroke(); g.strokeStyle = '#FFF1C0'; g.lineWidth = 5; g.stroke(); });
-    const n = Math.max(8, R / 45 | 0), span = TAU - f.gw;
-    for (let i = 0; i <= n; i++) { const an = g1 + span * i / n, x = f.x + Math.cos(an) * R, y = f.y + Math.sin(an) * R; flameAt(x, y + 8, 30, .15, i * 1.7 + f.gap, fade * .9); }
+    for (const [a0, a1] of arcs) { g.strokeStyle = 'rgba(200,40,10,.9)'; g.lineWidth = 30; g.beginPath(); g.arc(f.x, f.y, R, a0, a1); g.stroke(); }
+    add(() => { for (const [a0, a1] of arcs) { g.strokeStyle = '#FF9A3A'; g.lineWidth = 18; g.beginPath(); g.arc(f.x, f.y, R, a0, a1); g.stroke(); g.strokeStyle = '#FFF1C0'; g.lineWidth = 5; g.stroke(); } });
+    for (const [a0, a1] of arcs) { const n = Math.max(3, (R * (a1 - a0)) / 45 | 0); for (let i = 0; i <= n; i++) { const an = a0 + (a1 - a0) * i / n, x = f.x + Math.cos(an) * R, y = f.y + Math.sin(an) * R; flameAt(x, y + 8, 30, .15, i * 1.7 + a0, fade * .9); } }
     g.globalAlpha = 1; return; }
   if (f.k === 'boulder') {   // the Stone Matron's boulders: a lane first, then the boulder thunders down it
     g.save(); g.translate(f.x, f.y); g.rotate(Math.atan2(f.dy, f.dx)); const L = f.len, W = f.w, R = W / 2;
