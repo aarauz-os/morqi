@@ -787,7 +787,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .gemdemo i{position:absolute;width:16px;height:16px;transform:rotate(45deg);background:linear-gradient(135deg,#E6FDFF,#5FE0F5 60%,#1C9CC0);box-shadow:0 0 12px #7FE8FF;left:calc(12% + var(--i) * 15%);top:calc(14% + (var(--i) * 37 % 4) * 14%);animation:gemIn 1.6s calc(var(--i) * .22s) ease-in infinite}
 @keyframes gemIn{0%{opacity:0}20%{opacity:1}100%{opacity:0;left:48%;top:66%;transform:rotate(45deg) scale(.4)}}
 .stonedemo{background:radial-gradient(circle at 50% 50%,rgba(255,228,150,.3),transparent 62%),linear-gradient(180deg,#2A2F7A,#141A44)}
-.stonedemo img{position:absolute;width:21%!important;height:auto!important;left:calc(50% + cos(calc(var(--i) * 72deg - 90deg)) * 30% - 10.5%);top:calc(50% + sin(calc(var(--i) * 72deg - 90deg)) * 34% - 13%);filter:drop-shadow(0 0 10px rgba(255,255,255,.55));animation:float 3s calc(var(--i) * -.6s) ease-in-out infinite}
+.stonedemo img{position:absolute;width:21%!important;height:auto!important;left:calc(50% + cos(calc(var(--i) * 360deg / var(--n,5) + var(--a0,-90deg))) * var(--r,30%) - 10.5%);top:calc(50% + sin(calc(var(--i) * 360deg / var(--n,5) + var(--a0,-90deg))) * 34% - 13%);filter:drop-shadow(0 0 10px rgba(255,255,255,.55));animation:float 3s calc(var(--i) * -.6s) ease-in-out infinite}
 .hsdemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 55%,rgba(255,224,138,.55),rgba(255,197,74,.12) 45%,transparent 70%),linear-gradient(180deg,#2A2F7A,#141A44)}
 .hsdemo img{height:92%!important;width:auto!important;max-width:none;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,224,138,.8));animation:float 3s ease-in-out infinite}
 /* a realm boss's first-meeting card: the boss in its own glow, its minion at its side */
@@ -1180,7 +1180,7 @@ const AU = (() => {
   const save = (k, v) => { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
   let c = null, comp, sfx, mus, musLP, noiseBuf, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music2', true);
   // voices (A, 2026-10-05): Luma's short reminders and the spirit voice's "Ascended!", on their own bus and switch
-  let vox, voOn = pref('morqi.voice', true), voEnd = 0;
+  let vox, voSrc, voOn = pref('morqi.voice', true), voEnd = 0;
   const last = {};
   const MUSVOL = .15;   // music at about 5 out of 10 (A, 2026-10-04; it was 4)
   function init() {
@@ -1306,9 +1306,11 @@ const AU = (() => {
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=8`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
   const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'ascended', 'beast'].map(k => 'vo-card-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
-  function vo(name, delay = 0, dip = .5) {
-    if (!c || !voOn || !SMP[name]) return false; const t = c.currentTime + delay; if (t < voEnd) return false;
-    const src = c.createBufferSource(); src.buffer = SMP[name]; src.connect(vox); src.start(t); voEnd = t + src.buffer.duration;
+  // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
+  function vo(name, delay = 0, dip = .5, cut = true) {
+    if (!c || !voOn || !SMP[name]) return false; const t = c.currentTime + delay;
+    if (t < voEnd) { if (!cut) return false; try { voSrc.stop(t); } catch (e) {} }
+    const src = voSrc = c.createBufferSource(); src.buffer = SMP[name]; src.connect(vox); src.start(t); voEnd = t + src.buffer.duration;
     if (mus) { mus.gain.cancelScheduledValues(t); mus.gain.setTargetAtTime(MUSVOL * dip, t, .06); mus.gain.setTargetAtTime(MUSVOL, voEnd, .35); }
     return true;
   }
@@ -2037,7 +2039,7 @@ function renderStory() {
     { img:'story-frost', t:`The ${w} ${realm === 'earth' ? 'have' : 'has'} gone still`, p:`The Stillmaker's frost froze ${place}. Everyone stopped, right where they stood.`, alt:'A storm of frost sweeps over a lantern-lit village and freezes its people mid-moment.' },
     { img:'luma', t:'Luma sends you out', p:`Luma, the fox spirit of your hearth, sends you and your ${A.y} to bring ${place} back to life.`, alt:'Luma, the little fox spirit of the hearth, beside the fire.',
       over:`<img class="st-k" src="art4/run/k${keeper}-r2.png?v=8" alt=""><img class="st-a" src="art4/a-${animal}-y.png?v=8" alt="">` },
-    { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn the five Qi Stones. Gather them all, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
+    { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn ${LVL === 1 ? 'two' : 'the five'} Qi Stones. Gather ${LVL === 1 ? 'both' : 'them all'}, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
       over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } ];
   const pg = pages[storyPg], src = pg.img === 'luma' ? 'art4/luma.jpg?v=8' : `art4/story/${pg.img}.jpg?v=8`;
   art.innerHTML = `<img class="sbg" src="${src}" alt="${pg.alt}">${pg.over || ''}`; art.className = 'story pg' + storyPg;
@@ -2822,7 +2824,7 @@ function ultTick(dt) {
 const live = (o, pool) => (o && !o.dead && !o.pull && (S.en.includes(o) || S.gems.includes(o))) ? o : pool.sort((a, b) => Math.hypot(a.x - S.p.x, a.y - S.p.y) - Math.hypot(b.x - S.p.x, b.y - S.p.y))[0] || o;
 // Luma speaks (A, 2026-10-05): rare, short and helpful, never scolding. One line every 12 s at most, never during
 // Ascended; the boss's arrival and a freed realm always speak.
-function luma(name, force) { if (!S || hsOn() || (S.over && !force)) return; if (!force && S.t - (S.voT ?? -99) < 12) return; if (AU.vo(name)) S.voT = S.t; }
+function luma(name, force) { if (!S || hsOn() || (S.over && !force)) return; if (!force && S.t - (S.voT ?? -99) < 12) return; if (AU.vo(name, 0, .5, false)) S.voT = S.t; }
 function teach() {
   const P = S.p, A = ANIMAL[animal], tg = S.taught;
   if (P.hp < P.max * .3 && S.items.some(it => it.kind === 'heart') && S.t - (S.heartVoT ?? -99) > 25) { S.heartVoT = S.t; luma('vo-heart-' + (Math.random() < .5 ? 1 : 2)); }
@@ -3454,7 +3456,7 @@ function qiKill(e) {
     S.stoneOut[el] = true; S.items.push({ x:e.x, y:e.y, kind:'stone', el, t:0, z:30, vz:320 });
     // the first stone ever gets its card (which Luma reads); after that she just names the stone
     if (SEEN.has('_stone')) luma('vo-stone-' + el);
-    if (!SEEN.has('_stone')) { markSeen('_stone'); coach('stone', 'A Qi Stone!', 'Walk to it to collect it. Gather all five to free the land and wake the boss.', () => ({ sx:W / 2, sy:H * .45 })); }
+    if (!SEEN.has('_stone')) { markSeen('_stone'); coach('stone', 'A Qi Stone!', `Walk to it to collect it. Gather ${stoneEls().length === 5 ? 'all five' : 'both'} to free the land and wake the boss.`, () => ({ sx:W / 2, sy:H * .45 })); }
     ring(e.x, e.y, 10, 280, EL[el], .7, 14, true); stars(e.x, e.y - 30, 20, EL[el], 340); SFX.chestDrop();
   }
 }
@@ -4655,7 +4657,7 @@ function tipArt(id) {
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
   if (id === 'shrine') return `<div class="shrinedemo"><img src="art4/props/x-shrine-${(S && S.lastShrineEl) || 'water'}.png?v=8" alt=""></div>`;
   if (id === 'gem') return `<div class="gemdemo"><img src="art4/k${keeper}.png?v=8" alt="">${[0, 1, 2, 3, 4, 5].map(i => `<i style="--i:${i}"></i>`).join('')}</div>`;
-  if (id === 'stone') return `<div class="stonedemo">${['wood', 'fire', 'earth', 'metal', 'water'].map((el, i) => `<img src="art4/props/x-stone-${el}.png?v=8" alt="" style="--i:${i}">`).join('')}</div>`;
+  if (id === 'stone') { const els = S ? stoneEls() : ['wood', 'fire', 'earth', 'metal', 'water']; return `<div class="stonedemo" style="--n:${els.length};--a0:${els.length === 5 ? -90 : 180}deg;--r:${els.length === 5 ? 30 : 17}%">${els.map((el, i) => `<img src="art4/props/x-stone-${el}.png?v=8" alt="" style="--i:${i}">`).join('')}</div>`; }
   if (id.startsWith('boss-')) { const b = id.slice(5); return `<div class="bossart" style="--c:${BOSSES[b].glow}"><img src="art4/bosses/${b}.png?v=9" alt=""><img class="mn" src="art4/e-${b}-m.png?v=8" alt=""></div>`; }
   if (TIP_ART[id]) return `<img class="tipart" src="art4/tips/${TIP_ART[id]}.jpg?v=8" alt="">`;
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
