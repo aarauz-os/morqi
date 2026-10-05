@@ -2366,8 +2366,8 @@ const AU = (() => {
   /* "Haven": the home screen's own song (A, 2026-10-05: "more chill vibe with a slow bop", the moody late-night R&B
      feel; the artist reference stays in the wiki). Named for A's playlist and the Sanctuary it plays in. Lush electric
      piano chords (D minor 9, B flat major 7, G minor 9, A suspended), a smooth sub that glides, sparse swung drums
-     with a soft rim and snap on three and lazy hats sitting behind the beat, a little tape hiss, and an airy vocal-chop
-     hook in the middle register, doubled by the piano an octave down. The last part switches the beat. House rules
+     with a soft rim and snap on three and lazy hats sitting behind the beat, a little tape hiss, and an low crooned "ooh"
+     hook that glides from note to note. The last part switches the beat. House rules
      kept: the hook rests 5 bars in 13, peaks 62% through with one leap and one repeated note, a quiet E flat major 7 at
      the golden point (the same E flat the Warden and Ascend lean on, so home still sounds like MorQi), every pitched
      voice at or below about 700 Hz. */
@@ -2381,9 +2381,13 @@ const AU = (() => {
   const swing = (i, t) => t + (i & 1 ? SIX * .28 : 0);   // every other sixteenth leans back
   const soft = (t, f, dur, from) => mv({ t, f, f0:from, gl:.2, dur, vol:.32, att:.02, hold:Math.max(.01, dur * .6) });   // a round sub, no grit
   const snap = (t, v) => { mn({ t, f:1800, ft:'bandpass', q:2, dur:.06, vol:v, rev:.5 }); mn({ t:t + .008, f:3200, ft:'bandpass', q:2.5, dur:.03, vol:v * .5 }); };
-  const falsetto = (t, f, len, v) => { chop(t, f, v, len); mv({ t, f, dur:len * 1.3, vol:v * .3, att:.06, hold:len * .5, vib:5, vibD:16, rev:.7, dly:.3 }); };
+  // a crooned "ooh": round and breathy, sliding up into each note and holding into the next (A, 2026-10-05: the first
+  // voice, a buzzy vocal chop up high, sounded like "trumpets … too high pitched … choppy")
+  const croon = (t, f, len, v) => { for (const [ty, g, d] of [['sine', 1, 0], ['triangle', .45, 6]]) mv({ t, f, f0:f * .94, gl:.12, type:ty, det:d, dur:len, vol:v * g, att:.09, hold:len * .55, lp:850, vib:4.6, vibD:9, rev:.6, dly:.22 });
+    mn({ t, f:700, ft:'bandpass', q:3, dur:len * .7, att:len * .3, vol:v * .12, rev:.5 }); };
   function havenStep(s, t) {
-    const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HAVEN, gold = golden(bar), p = part(bar), C = R.ch[ch], tt = swing(i, t);
+    // the hook's cycle runs five bars behind the song, so it opens on five bars of piano, sub and drums alone
+    const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HAVEN, hb = bar + 8, gold = bar > 0 && golden(hb), p = part(bar), C = R.ch[ch], tt = swing(i, t);
     if (s === 0) filt(1400, t);
     if (i === 0 && bar % 4 === 0) mn({ t, f:2600, ft:'lowpass', dur:SIX * 64, att:2, vol:.012 });   // tape hiss under it all
     if (k === 0) keys(t, gold ? R.surp : C, SIX * 31, gold ? .03 : .024, p === 3 ? 2200 : 1500);
@@ -2395,8 +2399,8 @@ const AU = (() => {
     if (p !== 2 && i % 2 === 0) hat(tt, i % 4 ? .012 : .02);
     if (p === 3 && (i === 6 || i === 14)) hat(tt, .016, true);
     if ((bar & 3) === 3 && i >= 13) hat(t + (i - 13) * SIX * 2 / 3, .012);   // a lazy triplet into every fourth bar
-    if (p === 2) { if (i === 0 && bar & 1) falsetto(t, C[3] || C[2], SIX * 12, .03); return; }   // the breakdown: piano, sub, one long "ooh"
-    if (hookOn(bar)) sing(R.hook[(bar >> 1) & 1], bar, k, (f, d, g, l) => { falsetto(swing(k, t) + d, f, SIX * 3 * l, .06 * g); keys(swing(k, t) + d, [f / 2], SIX * 3 * l, .012 * g, 1200); });
+    if (p === 2) { if (i === 0 && bar & 1) croon(t, C[2], SIX * 14, .045); return; }   // the breakdown: piano, sub, one long "ooh"
+    if (hookOn(hb)) sing(R.hook[(hb >> 1) & 1].map(([st, f]) => [st, f / 2]), bar, k, (f, d, g, l) => croon(swing(k, t) + d, f, SIX * 5 * l, .085 * g));
   }
   function music(play) {
     if (!c) return;
