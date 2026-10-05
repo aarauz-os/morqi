@@ -259,3 +259,14 @@ html.paged .rogue .was{box-shadow:none}
 .rogue .gift{display:inline-flex;align-items:center;gap:6px;justify-self:center;margin-top:6px;padding:3px 10px 3px 4px;border-radius:999px;border:1px solid color-mix(in srgb,var(--star) 40%,transparent);background:color-mix(in srgb,var(--star) 10%,var(--glass));font-style:normal;font-size:12px;font-weight:800;color:var(--star);white-space:nowrap}
 .rogue .gift img{width:22px;height:22px;object-fit:contain}
 .rogue .gift.next{padding-left:10px;border-style:dashed;color:var(--faint);background:none}
+
+/* the long game: the frozen world beyond the five realms, and Luma's nine tails as the years-long spine */
+.world{margin:0;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.4)}
+.world img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+.tails{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.tails i{width:16px;height:30px;border-radius:50% 50% 50% 50%/70% 70% 30% 30%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1.5px rgba(207,230,255,.35)}
+.tails i.on{background:linear-gradient(180deg,#F4FBFF,#9ED4FF);box-shadow:0 0 12px rgba(158,212,255,.7)}
+.tails .lbl{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+html.paged #long .beats{gap:9px}html.paged #long .lede{margin-bottom:0}
+html.paged #long h2.h{font-size:clamp(28px,3.4vw,40px)}
+html.paged #long .beats li span{font-size:13px;line-height:1.38}html.paged #long .lede{font-size:16px}
