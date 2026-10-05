@@ -1715,7 +1715,7 @@ const AU = (() => {
   }
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
-    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=10`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
+    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=11`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
   const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
@@ -2705,7 +2705,7 @@ function hurt(e, dmg, el, o = {}) {
   const k = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), strong = k > 1, weak = k < 1;
   m *= k;
   // the words teach, so they show the first few times in a run; after that the coloured hit says it
-  if (strong && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
+  if (strong && S.level < 3 && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
   if (weak && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
   const dealt = dmg * m;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
@@ -3287,7 +3287,10 @@ function ultTick(dt) {
 const live = (o, pool) => (o && !o.dead && !o.pull && (S.en.includes(o) || S.gems.includes(o))) ? o : pool.sort((a, b) => Math.hypot(a.x - S.p.x, a.y - S.p.y) - Math.hypot(b.x - S.p.x, b.y - S.p.y))[0] || o;
 // Luma speaks (A, 2026-10-05): rare, short and helpful, never scolding. One line every 12 s at most, never during
 // Ascended; the boss's arrival and a freed realm always speak.
-function luma(name, force) { if (!S || hsOn() || (S.over && !force)) return false; if (!force && S.t - (S.voT ?? -99) < 12) return false; if (!AU.vo(name, 0, .5, false)) return false; S.voT = S.t; return true; }
+// (A, 2026-10-05: "after the first 2 levels i would tone down the hand holding prompts unless its a new mechanic"):
+// from Level 3 Luma no longer reminds about stones, hearts or the arrow; she still names each boss and how to beat it
+const veteran = () => S && S.level >= 3;
+function luma(name, force) { if (!S || hsOn() || (S.over && !force)) return false; if (veteran() && /^vo-(wait|heart|stone)-/.test(name)) return false; if (!force && S.t - (S.voT ?? -99) < 12) return false; if (!AU.vo(name, 0, .5, false)) return false; S.voT = S.t; return true; }
 // a spoken hint for a player's first few runs: the next unused mark ('_crate1', '_crate2', …), or null once it's been said enough
 const fewTimes = (k, n = 3) => { for (let i = 1; i <= n; i++) if (!SEEN.has(k + i)) return k + i; return null; };
 function teach() {
@@ -5906,8 +5909,11 @@ const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'b
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
-  if (c.card) AU.vo('vo-card-beast'); else if (CARD_VO[c.id]) AU.vo('vo-card-' + CARD_VO[c.id]);
-  if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>'; show('beastCard'); SFX.alarm(); return; }
+  // (A, 2026-10-05, after playing: "chill out on adding the 'move away from the red line' line everytime theres a new
+  // enemy type"): the red-shapes warning is spoken and shown the first time only
+  const redOnce = c.card && !SEEN.has('_redtip'); if (redOnce) markSeen('_redtip');
+  if (c.card) { if (redOnce) AU.vo('vo-card-beast'); } else if (CARD_VO[c.id]) AU.vo('vo-card-' + CARD_VO[c.id]);
+  if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + (redOnce ? '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>' : ''); show('beastCard'); SFX.alarm(); return; }
   // every tip card shows a picture made for it, never a live snapshot of play (A, 2026-10-04: snapshots caught
   // flashes, empty ground or the wrong moment, and "I can't waste people's time with these inconsistencies")
   $('#tipT').textContent = c.title; $('#tipP').textContent = c.text; $('#tipOk').textContent = COACH.q.length ? 'Next' : 'OK';
