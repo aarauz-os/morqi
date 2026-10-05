@@ -2205,7 +2205,7 @@ function spawnBoss() {
   e.pat = 0; e.atk = 2.6; S.bossFx = []; S.heartT = 3;
   for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.arena.x, m.y - S.arena.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
-  SFX.bx(B.snd.roar, 0); SFX.stomp(); S.shake = .6; AU.song('boss'); S.flashT = .45; S.flashC = '110,96,255'; ring(e.x, e.y, 30, 900, B.glow, .9, 24, true);
+  SFX.bx(B.snd.roar, 0); SFX.stomp(); S.shake = .6; AU.song('boss'); S.flashT = .2; S.flashC = [1, 3, 5].map(i => parseInt(B.glow.slice(i, i + 2), 16)).join(','); ring(e.x, e.y, 30, 900, B.glow, .9, 24, true);
   ring(e.x, e.y, 20, 400, '#FFFFFF', .8, 16, true); smoke(e.x, e.y + 60, 14, 50, B.mist);
   // the first time a player meets each boss, one card names it and how to beat its signature attack
   // (the spirit animal's awakening follows that card; without a card it comes 1.4 s in, and never later than 12 s)
@@ -2213,6 +2213,7 @@ function spawnBoss() {
   if (card) setTimeout(() => { if (!S || S.over) return; coach('boss-' + realm, B.name, B.tip, () => ({ sx:W / 2, sy:H * .4 })); COACH.gap = 0; }, 1100);
   const wake = () => { if (S && !S.over && !S.bossWoke) { S.bossWoke = true; awaken(); } };
   setTimeout(wake, card ? 12000 : 1400);
+  if (!card) setTimeout(() => { if (S && !S.over) releaseLevels(); }, 2400); else setTimeout(() => { if (S && !S.over && !COACH.cur) releaseLevels(); }, 15000);
 }
 
 // one place for every hit: element bonus, buffs, flash, squash, knockback, numbers and sparks
@@ -2319,7 +2320,7 @@ function crates(dt) {
     if (Math.hypot(it.x - P.x, it.y - P.y) < 60) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
   S.items = S.items.filter(it => !it.got && (it.kind === 'stone' || it.t < 40));
-  for (const ch of S.chests) { ch.t += dt; if (!ch.got && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
+  for (const ch of S.chests) { ch.t += dt; if (!ch.got && !hsOn() && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
   S.chests = S.chests.filter(c => !c.got);
 }
 function useItem(k) {
@@ -3347,6 +3348,7 @@ function startBloom() {
 }
 function endBloom() { const P = S.p; S.bloom = null; AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]); SFX.sweep(); ring(P.x, P.y, 20, 900, '#FFFFFF', .9, 18, true); paintThaw(P.x, P.y, 700); flushLevels(); }
 // level-ups that waited for a Bloom or a Highest Self
+function releaseLevels() { if (!S.holdLevels) return; S.holdLevels = false; flushLevels(); }
 function flushLevels() { if (!S.lvlDefer) return; S.queued += S.lvlDefer - 1; S.lvlDefer = 0; levelUp(); }
 function bloomFlourish(B) {
   const P = S.p, x = P.x + rnd(-VW * .45, VW * .45), y = P.y + rnd(-VH * .4, VH * .4), w = B.w;
@@ -3361,7 +3363,7 @@ function bloomCreature(e, d, dt) {
   e.x += Math.sin(S.t * 2 + e.ph) * 18 * dt;
   if (d < e.r + S.p.r + 16) { stars(e.x, e.y - 30, 5, '#FFE58A', 200); kill(e); }
 }
-/* ================= Highest Self ================= */
+/* ================= Ascended (called Highest Self in the code; A renamed it, 2026-10-05) ================= */
 // MorQi's point is becoming your highest self, and for six seconds you are it. Gathering every Qi Stone of a level makes
 // you whole: you rise in the master's robes with the five elements circling you, nothing can touch you, every half second
 // a wave of all five elements breaks over everything near you (cycling, so the strong one always lands), every gem flies
@@ -3375,10 +3377,10 @@ function hsTick(dt) {
   if (H.on.p <= 0) { H.on.p = HIGHEST.pulse; hsPulse(); }
   if (H.on.t >= HIGHEST.life) {
     // after the final one "Ascend" plays on until the Warden's theme lands on the next bar; otherwise the world's own song returns
-    const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); flushLevels(); if (!final) AU.song(SONG_OF[worldOf()]);
+    const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
     if (!SEEN.has('_highest')) { markSeen('_highest'); S.taught.c_highest = 0;
-      coach('highest', 'Your Highest Self', 'Your Qi Stones made you whole: that is who you are becoming. Gather them on every shore to become your Highest Self again.',
+      coach('highest', 'You Ascended!', 'Your Qi Stones made you whole: that is who you are becoming. Gather them on every shore to Ascend again.',
         () => { const cam = S.cam || { x:0, y:0 }; return { sx:(P.x - cam.x) * Z, sy:(P.y - 30 - cam.y) * Z, sr:70 }; }); }
   }
 }
@@ -3426,7 +3428,7 @@ function collectStone(el) {
 }
 // the end of Highest Self after the stones: every element at once, a held breath, and the shore cleared
 function stoneBurst() {
-  const P = S.p; S.hitstop = .35; S.flashT = .55; S.flashC = '255,255,255'; S.shake = 1.2; SFX.boom(true); SFX.bossdown(); SFX.jackpot(true);
+  const P = S.p; S.hitstop = .35; S.flashT = .22; S.flashC = '255,248,230'; S.shake = 1.2; SFX.boom(true); SFX.bossdown(); SFX.jackpot(true);
   ELS.forEach((el, i) => ring(P.x, P.y, 20 + i * 40, 1600, EL[el], 1.1 + i * .12, 34, true));
   stars(P.x, P.y - 40, 90, '#FFE58A', 900); paintThaw(P.x, P.y, 1100);
   for (const e of S.en) if (!e.dead && !e.boss) { stars(e.x, e.y - 20, 3, EL[e.el], 200); kill(e); }
@@ -4414,8 +4416,8 @@ function options() {
   return opts.slice(0, 3);
 }
 function levelUp() {
-  // never break a Bloom or a Highest Self: level-ups wait for it to end, then come one after another
-  if (S.bloom || hsOn()) { S.lvlDefer = (S.lvlDefer || 0) + 1; return; }
+  // never break a Bloom or Ascended, nor the boss's entrance: level-ups wait, then come one after another
+  if (S.bloom || hsOn() || S.holdLevels) { S.lvlDefer = (S.lvlDefer || 0) + 1; return; }
   running = false; S.pendingLevel = true;
   const P = S.p;
   ring(P.x, P.y, 20, 260, '#FFE58A', .5, 14, true); stars(P.x, P.y - 40, 26, '#FFE58A', 380); flash(P.x, P.y - 40, 260, '#FFF1C0', .3);
@@ -4505,6 +4507,7 @@ function chestPool() {
   for (const id in S.skills) if (!S.evo[id] && S.skills[id] < maxStars(id)) list.push({ kind:'active', id });
   for (const id in S.gifts) if (S.gifts[id] < 5) list.push({ kind:'gift', id });
   if (Object.keys(S.gifts).length < SLOTS.gift) for (const id in S.skills) { const g = evoGift(id); if (!S.evo[id] && !S.gifts[g] && POW[id].e !== S.apprentice && !list.some(o => o.kind === 'gift' && o.id === g)) list.push({ kind:'gift', id:g }); }
+  if (Object.keys(S.skills).length < SLOTS.active) for (const id in POW) if (!S.skills[id] && S.learned.includes(POW[id].e) && list.filter(o => o.kind === 'active' && !S.skills[o.id]).length < 3) list.push({ kind:'active', id });
   return list.length ? list : [{ kind:'heal' }];
 }
 const iconOf = o => icon(o.kind === 'evo' ? POW[o.id].evoIcon : o.kind === 'active' ? POW[o.id].icon : o.kind === 'gift' ? GIFT[o.id].icon : 'g-spring');
@@ -4514,7 +4517,7 @@ function openChest() {
   // the rewards: an evolution first if one is ready, then upgrades to what you carry (never past five stars)
   const lv = {}, rewards = [];
   for (let i = 0; i < mult; i++) {
-    const avail = pool.filter(o => o.kind === 'heal' || (o.kind === 'evo' ? !rewards.some(x => x.kind === 'evo' && x.id === o.id) : ((o.kind === 'active' ? S.skills[o.id] : S.gifts[o.id]) + (lv[o.id] || 0)) < (o.kind === 'active' ? maxStars(o.id) : 5)));
+    const avail = pool.filter(o => o.kind === 'heal' || (o.kind === 'evo' ? !rewards.some(x => x.kind === 'evo' && x.id === o.id) : (((o.kind === 'active' ? S.skills[o.id] : S.gifts[o.id]) || 0) + (lv[o.id] || 0)) < (o.kind === 'active' ? maxStars(o.id) : 5)));
     if (!avail.length) break;
     const o = (i === 0 && avail.find(x => x.kind === 'evo')) || avail[(Math.random() * avail.length) | 0];
     rewards.push(o); if (o.kind !== 'evo') lv[o.id] = (lv[o.id] || 0) + 1;
@@ -4530,7 +4533,7 @@ function openChest() {
   slots.forEach((pos, i) => { ringEl.children[pos].innerHTML = `<img src="${iconOf(tiles[i])}" alt="">`; });
   $('#chestWrap').classList.remove('open'); $('#chestMult').textContent = ''; $('#chestGains').innerHTML = '';
   $('#chestBtn').textContent = 'Open!'; $('#chestBtn').disabled = false;
-  const ct = $('#chestTip'); if (!S.taught.chest) { S.taught.chest = 1; ct.innerHTML = 'The wheel picks <b>free upgrades</b> from your powers: one, three or, if you\'re lucky, five. Tap <b>Open!</b>'; ct.hidden = false; } else ct.hidden = true;
+  const ct = $('#chestTip'); if (!S.taught.chest) { S.taught.chest = 1; ct.innerHTML = 'The wheel picks <b>free upgrades</b> and new powers: one, three or, if you\'re lucky, five. Tap <b>Open!</b>'; ct.hidden = false; } else ct.hidden = true;
   show('chest'); SFX.chestDrop();
 }
 $('#chestBtn').onclick = () => {
@@ -4559,8 +4562,8 @@ function landChest() {
   CH.rewards.forEach((o, k) => setTimeout(() => {
     if (k) { ringEl.children[CH.slots[k]].classList.add('won'); SFX.tick(8 + k * 3); }
     const nm = o.kind === 'evo' ? POW[o.id].evo : o.kind === 'active' ? POW[o.id].n : o.kind === 'gift' ? GIFT[o.id].n : 'Warm Tea';
-    const cur = o.kind === 'active' ? S.skills[o.id] : o.kind === 'gift' ? S.gifts[o.id] : 0, plus = CH.rewards.slice(0, k).filter(x => x.kind === o.kind && x.id === o.id).length;
-    const sub = o.kind === 'evo' ? 'Evolution!' : o.kind === 'heal' ? 'Heal fully' : `Lv ${cur + plus} → ${cur + plus + 1}`;
+    const cur = (o.kind === 'active' ? S.skills[o.id] : o.kind === 'gift' ? S.gifts[o.id] : 0) || 0, plus = CH.rewards.slice(0, k).filter(x => x.kind === o.kind && x.id === o.id).length;
+    const sub = o.kind === 'evo' ? 'Evolution!' : o.kind === 'heal' ? 'Heal fully' : cur + plus === 0 ? 'New power!' : `Lv ${cur + plus} → ${cur + plus + 1}`;
     const row = document.createElement('div'); row.className = 'gain'; row.innerHTML = `<img src="${iconOf(o)}" alt=""><div><b>${nm}</b><span>${sub}</span></div>`; $('#chestGains').appendChild(row);
   }, reduce ? 0 : 250 + k * 380));
   setTimeout(() => { CH.phase = 'done'; $('#chestBtn').textContent = 'Collect'; $('#chestBtn').disabled = false; }, reduce ? 0 : 400 + CH.rewards.length * 380);
@@ -4591,7 +4594,7 @@ function coachTick(dt) {
   NOTES.t -= dt; if (NOTES.t <= 0 && NOTES.q.length && !COACH.cur && !popupOpen()) { toast(NOTES.q.shift(), 4200); NOTES.t = 5.5; }
   if (COACH.cur) return;
   COACH.gap -= dt;
-  if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel) return;
+  if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel || hsOn()) return;
   showCoach(COACH.q.shift());
 }
 // the picture for each tip: drawn once, the same for every player, or built from the player's own Keeper and animal
@@ -4619,7 +4622,7 @@ function coachOk() {
   show(null);
   const was = COACH.cur.id; hideCoach(); COACH.cur = null; SFX.select();
   // the spirit animal's awakening waits until the boss's card is closed, so the boss has the screen to itself first
-  if (was && was.startsWith('boss-') && S && !S.over && !S.bossWoke) { S.bossWoke = true; setTimeout(() => { if (S && !S.over) awaken(); }, 900); }
+  if (was && was.startsWith('boss-') && S && !S.over) { releaseLevels(); if (!S.bossWoke) { S.bossWoke = true; setTimeout(() => { if (S && !S.over) awaken(); }, 900); } }
   if (COACH.q.length && !popupOpen()) { showCoach(COACH.q.shift()); return; }
   COACH.gap = 6;
   if (S && !S.over && !popupOpen()) startLoop();
