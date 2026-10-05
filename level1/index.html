@@ -1194,6 +1194,10 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 @keyframes grew{30%{box-shadow:inset 0 0 0 2px var(--c),0 0 26px var(--c)}}
 .set-row{display:grid;grid-template-columns:repeat(3,auto 1fr);align-items:center;gap:8px 8px;justify-content:center;font-weight:800}
 .set-row .ibtn{width:48px;height:48px}
+/* the new-season theme sheet (A, 2026-10-05) */
+.th-sheet{display:grid;gap:14px;justify-items:center;text-align:center}
+#themeSheet .th-name{display:flex;align-items:center;gap:8px;font-family:var(--round);font-weight:900;font-size:26px;color:#FFD66E}#themeSheet .th-name svg{width:26px;height:26px}
+.th-t{max-width:30ch;font-size:15px;line-height:1.45;color:rgba(255,255,255,.88)}.th-t b{color:#FFD66E}
 .set-grown{display:grid;gap:4px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.06);font-size:13.5px;line-height:1.4}.set-grown b{font-size:14px}
 #setDone{justify-self:center;min-width:220px}
 .qiRise{display:inline-flex!important;align-items:center;justify-content:center;gap:8px}.qiRise img{width:28px;height:28px}
@@ -1325,8 +1329,14 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <label class="set-t"><button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button><span>Sounds</span></label>
         <label class="set-t"><button class="ibtn voBtn" aria-label="Voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg></button><span>Voice</span></label>
       </div>
-      <div class="set-grown"><b>For grown-ups</b><span>No ads interrupt play. Sparks are earned by playing.</span></div>
+      <div class="set-grown"><b>For grown-ups</b><span>No ads interrupt play. Sparks are earned by playing, and a few more for playing with the music on.</span></div>
       <button class="btn green" id="setDone">Done</button></div></div>
+    <div class="hm-over" id="themeSheet" hidden><div class="hm-sheet th-sheet">
+      <h3>A new theme song</h3>
+      <p class="th-name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/></svg><span id="thName"></span></p>
+      <p class="th-t">Turn the music on and keep it on for a whole level: <b>+300 Sparks</b>. After that, every level with music on earns <b>+10</b>.</p>
+      <button class="btn green" id="thOn">Turn music on</button>
+      <button class="btn blue small" id="thNo">Not now</button></div></div>
   </section>
   <section class="scr" id="map" hidden>
     <div class="mp-head"><span class="ribbon">The Five Realms</span></div>
@@ -2366,8 +2376,8 @@ const AU = (() => {
   /* "Haven": the home screen's own song (A, 2026-10-05: "more chill vibe with a slow bop", the moody late-night R&B
      feel; the artist reference stays in the wiki). Named for A's playlist and the Sanctuary it plays in. Lush electric
      piano chords (D minor 9, B flat major 7, G minor 9, A suspended), a smooth sub that glides, sparse swung drums
-     with a soft rim and snap on three and lazy hats sitting behind the beat, a little tape hiss, and an low crooned "ooh"
-     hook that glides from note to note. The last part switches the beat. House rules
+     with a soft rim and snap on three and lazy hats sitting behind the beat, a little tape hiss, and an electric-piano
+     hook in the middle register (no sung or horn-like voice: A heard both as trumpets). The last part switches the beat. House rules
      kept: the hook rests 5 bars in 13, peaks 62% through with one leap and one repeated note, a quiet E flat major 7 at
      the golden point (the same E flat the Warden and Ascend lean on, so home still sounds like MorQi), every pitched
      voice at or below about 700 Hz. */
@@ -2378,13 +2388,13 @@ const AU = (() => {
           [[0, 440], [3, 392], [6, 349.23], [10, 293.66], [12, 349.23], [20, 523.25], [22, 466.16], [24, 440], [26, 392], [29, 329.63]]],
     surp:[155.56, 196, 233.08, 293.66],
     kicks:[[0, 7, 10], [0, 3, 10]], flip:[[0, 6, 11], [0, 2, 8, 11]] };
+  const THIRD = { 440:349.23, 392:329.63, 349.23:293.66, 293.66:233.08, 523.25:440, 466.16:392, 329.63:261.63 };   // a third below, in D minor
   const swing = (i, t) => t + (i & 1 ? SIX * .28 : 0);   // every other sixteenth leans back
   const soft = (t, f, dur, from) => mv({ t, f, f0:from, gl:.2, dur, vol:.32, att:.02, hold:Math.max(.01, dur * .6) });   // a round sub, no grit
   const snap = (t, v) => { mn({ t, f:1800, ft:'bandpass', q:2, dur:.06, vol:v, rev:.5 }); mn({ t:t + .008, f:3200, ft:'bandpass', q:2.5, dur:.03, vol:v * .5 }); };
-  // a crooned "ooh": round and breathy, sliding up into each note and holding into the next (A, 2026-10-05: the first
-  // voice, a buzzy vocal chop up high, sounded like "trumpets … too high pitched … choppy")
-  const croon = (t, f, len, v) => { for (const [ty, g, d] of [['sine', 1, 0], ['triangle', .45, 6]]) mv({ t, f, f0:f * .94, gl:.12, type:ty, det:d, dur:len, vol:v * g, att:.09, hold:len * .55, lp:850, vib:4.6, vibD:9, rev:.6, dly:.22 });
-    mn({ t, f:700, ft:'bandpass', q:3, dur:len * .7, att:len * .3, vol:v * .12, rev:.5 }); };
+  // the hook's voice: an electric piano played as a lead, a soft bell-like strike that blooms and fades (A, 2026-10-05:
+  // the sung voices before it, a buzzy chop and then a gliding croon, both sounded like "horns or trumpets")
+  const lead = (t, f, len, v) => { mv({ t, f, dur:len * 1.6, vol:v, att:.006, hold:len * .3, lp:1400, rev:.45, dly:.25 }); mv({ t, f:f * 2, dur:.4, vol:v * .22, att:.004, lp:1800 }); mv({ t, f:f * 3.01, dur:.12, vol:v * .05 }); };
   function havenStep(s, t) {
     // the hook's cycle runs five bars behind the song, so it opens on five bars of piano, sub and drums alone
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HAVEN, hb = bar + 8, gold = bar > 0 && golden(hb), p = part(bar), C = R.ch[ch], tt = swing(i, t);
@@ -2399,8 +2409,15 @@ const AU = (() => {
     if (p !== 2 && i % 2 === 0) hat(tt, i % 4 ? .012 : .02);
     if (p === 3 && (i === 6 || i === 14)) hat(tt, .016, true);
     if ((bar & 3) === 3 && i >= 13) hat(t + (i - 13) * SIX * 2 / 3, .012);   // a lazy triplet into every fourth bar
-    if (p === 2) { if (i === 0 && bar & 1) croon(t, C[2], SIX * 14, .045); return; }   // the breakdown: piano, sub, one long "ooh"
-    if (hookOn(hb)) sing(R.hook[(hb >> 1) & 1].map(([st, f]) => [st, f / 2]), bar, k, (f, d, g, l) => croon(swing(k, t) + d, f, SIX * 5 * l, .085 * g));
+    if (p === 2) return;   // the breakdown: piano, sub and a lighter beat   // the breakdown: piano, sub, one long "ooh"
+    // the hook, always played tight: the second part adds a harmony a third below, the last part doubles it an octave
+    // down (A, 2026-10-05: the shared variation, notes pushed late plus random grace notes, sounded "like an amateur
+    // playing the instruments")
+    if (hookOn(hb)) for (const [st, f] of R.hook[(hb >> 1) & 1]) if (st === k) {
+      lead(swing(k, t), f, SIX * 4, .05);
+      if (p === 1) lead(swing(k, t), THIRD[f], SIX * 4, .026);
+      if (p === 3) lead(swing(k, t), f / 2, SIX * 4, .024);
+    }
   }
   function music(play) {
     if (!c) return;
@@ -2685,7 +2702,7 @@ function startRun() {
     ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null, call:callPick && callOwned(callPick) ? newCall(callPick) : null,
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
     lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, qi:{}, qiStones:{}, stoneOut:{}, evo:{}, cds:{}, ang:{},
-    thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
+    thawed:0, musAll:AU.musicOn, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
     rises:RISES[LVL - 1], lastLight:0, lightUsed:false, grow:grown(), qiRises:0, strongT:-9, taught:{}, shake:0, buffs:{ tiger:0, ward:0 }, freeze:0, flashT:0, swords:[], pearls:[]
   };
@@ -2765,7 +2782,7 @@ function renderSound() {
   document.querySelectorAll('.sfxBtn').forEach(b => { b.classList.toggle('off', !AU.on); b.setAttribute('aria-pressed', AU.on); });
   document.querySelectorAll('.voBtn').forEach(b => { b.classList.toggle('off', !AU.voiceOn); b.setAttribute('aria-pressed', AU.voiceOn); });
 }
-document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleMusic(); if (AU.musicOn && S && !S.over) AU.music(true); renderSound(); SFX.select(); });
+document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleMusic(); if (S && !S.over && !AU.musicOn) S.musAll = false; if (AU.musicOn && S && !S.over) AU.music(true); renderSound(); SFX.select(); });
 document.querySelectorAll('.sfxBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleSfx(); renderSound(); SFX.select(); });
 document.querySelectorAll('.voBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleVoice(); renderSound(); SFX.select(); });
 renderSound();
@@ -5921,6 +5938,8 @@ function drawItem(it) {
   }
   g.lineWidth = 1;
 }
+// the season's home theme: it changes every season, so there is always something new to hear (A, 2026-10-05)
+const THEME = { id:'haven', n:'Haven' };
 
 /* ================= levelling ================= */
 function gainXp(v) {
@@ -6725,7 +6744,7 @@ function results() {
     renderLevels(); }
   [...$('#resStars').children].forEach((el, i) => { if (goals[i][0]) setTimeout(() => { el.classList.add('in'); SFX.ting(); }, reduce ? 0 : 700 + i * 380); });
   const clock = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
-  payQi(); $('#resChips').innerHTML = `<span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span><span class="chip3 qi" style="--a:#FFD66E;--b:#E09A1E"><img src="art4/icons/icon-spark.png?v=9" alt="">+${S.qiGot}</span>`
+  payQi(); $('#resChips').innerHTML = `<span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span><span class="chip3 qi" style="--a:#FFD66E;--b:#E09A1E"><img src="art4/icons/icon-spark.png?v=9" alt="">+${S.qiGot}</span>${S.qiMus ? `<span class="chip3" style="--a:#FFD66E;--b:#E09A1E">${S.qiMus > 10 ? 'New theme' : 'Music on'} +${S.qiMus}</span>` : ''}`
     + `<span class="chip3" style="--a:#A99CFF;--b:#6F5CF0">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
     + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('');
   $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:18 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${8 + (i * 7) % 9}px;--c:${['#FFE08A', '#7FF0C0', '#FFFFFF', '#FFB8D0'][i % 4]};--t:${5 + (i * 3) % 5}s;--d:${(i * .43) % 4}s"></i>`).join('');
@@ -6858,6 +6877,8 @@ function renderHome() {
   // the first time a run has paid Sparks, the Sparks pill glows until it is opened
   $('#hmQi').classList.toggle('hint', qi() > 0 && store.get('morqi.sparksTaught') !== '1');
   if (nb && !homeSaid) { homeSaid = true; setTimeout(() => AU.vo('vo-booknew', 0, .5), 700); }
+  // a new season's theme, offered once to players who keep the music off
+  if (!PITCH && !AU.musicOn && store.get('morqi.themeAsked') !== THEME.id) { store.set('morqi.themeAsked', THEME.id); store.set('morqi.themeBonus', 'want:' + THEME.id); $('#thName').textContent = THEME.n; setTimeout(() => openSheet('#themeSheet'), 900); }
   $('#hmQiN').textContent = qi().toLocaleString(); $('#hmKeeper').src = `art4/k${keeper}-hi.png?v=8`; $('#hmKeeper').alt = K.n; $('#hmPet').src = lookSrc(`art4/a-${animal}-y.png?v=8`); $('#hmPet').alt = ANIMAL[animal].y;
 }
 $('#hmGo').onclick = () => { SFX.select(); goTab('map'); };
@@ -6930,7 +6951,16 @@ const CALL_UP = [150, 300, 450, 600], callLv = id => +(store.get('morqi.callTier
 function grown() { try { return JSON.parse(store.get('morqi.grow') || '{}') || {}; } catch (e) { return {}; } }
 function qi() { return Math.max(0, +(store.get('morqi.sparks') || 0)); }
 function addQi(n) { store.set('morqi.sparks', Math.max(0, qi() + n)); }
-function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; S.qiGot = Math.round(S.thawed / 8) + (S.won ? 40 : 0); addQi(S.qiGot);
+// The home theme changes every season, and music is rewarded (A, 2026-10-05: "keeping it on for a level will give them
+// a 300 … and leaving it on gives them 10 per level. easy way to keep the music on and get them hooked"). A level counts
+// when the music stayed on the whole way and it lasted a minute; the 300 is for players who had the music off when the
+// season's theme arrived, once per theme. THEME, the season's home theme, is at the top of this file.
+function musicSparks() {
+  if (!S.musAll || !AU.musicOn || S.t < 60) return 0;
+  if (store.get('morqi.themeBonus') === 'want:' + THEME.id) { store.set('morqi.themeBonus', 'paid:' + THEME.id); return 310; }
+  return 10;
+}
+function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; S.qiMus = musicSparks(); S.qiGot = Math.round(S.thawed / 8) + (S.won ? 40 : 0) + S.qiMus; addQi(S.qiGot);
   if (S.won && S.qiGot && !SEEN.has('_sparks')) { markSeen('_sparks'); setTimeout(() => AU.vo('vo-sparks', 0, .5), 2600); } }
 function renderGrow() {
   const g = grown(), q = qi(); $('#grQi').textContent = q.toLocaleString(); $('#hmQiN').textContent = q.toLocaleString();
@@ -6955,6 +6985,8 @@ const openSheet = id => { $(id).hidden = false; guardTaps(); $('#tabs').classLis
 const closeSheet = o => { o.hidden = true; if (![...document.querySelectorAll('.hm-over')].some(x => !x.hidden)) $('#tabs').classList.remove('under'); };
 $('#hmQi').onclick = () => { SFX.select(); renderGrow(); openSheet('#growSheet'); };
 $('#hmGear').onclick = () => { SFX.select(); openSheet('#setSheet'); };
+$('#thOn').onclick = () => { AU.init(); if (!AU.musicOn) AU.toggleMusic(); AU.music(true); AU.song('home'); renderSound(); SFX.select(); closeSheet($('#themeSheet')); };
+$('#thNo').onclick = () => { SFX.select(); closeSheet($('#themeSheet')); };
 $('#setDone').onclick = () => { SFX.select(); closeSheet($('#setSheet')); };
 $('#grDone').onclick = () => { SFX.select(); closeSheet($('#growSheet')); };
 document.querySelectorAll('.hm-over').forEach(o => o.addEventListener('click', e => { if (e.target === o) closeSheet(o); }));
