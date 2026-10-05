@@ -4400,8 +4400,9 @@ function options() {
   const nG0 = Object.keys(S.gifts).length;
   if (nG0 < SLOTS.gift) { const key = Object.keys(S.skills).filter(id => !S.evo[id] && S.skills[id] >= 2 && !S.gifts[evoGift(id)] && POW[id].e !== S.apprentice).sort((a, b) => S.skills[b] - S.skills[a])[0];
     if (key && !has('gift', evoGift(key))) opts.push({ kind:'gift', id:evoGift(key) }); }
-  // the Lodestone shows up once per rank; pass it by and it is gone for this run
-  if (lodeDue() && opts.length < 3) { S.lodeOff[S.lode + 1] = 1; opts.push({ kind:'lode', id:'lode' }); }
+  // the Lodestone's reach now grows on its own as your spirit animal grows, never as a card (A, 2026-10-05: a pick spent on
+  // pulling in gems felt like a waste when the game pulls them in anyway)
+  while (lodeDue()) S.lode++;
   const pool = [], nA = Object.keys(S.skills).length, nG = Object.keys(S.gifts).length;
   for (const id in POW) if (S.learned.includes(POW[id].e) && !S.evo[id] && (S.skills[id] ? S.skills[id] < maxStars(id) : nA < SLOTS.active)) pool.push({ kind:'active', id });
   // a new gift is always one that evolves a power you hold (playtest sims: random picks filled the gift slots with gifts
@@ -4640,7 +4641,6 @@ function renderSkills() {
   $('#ultLv').textContent = 'Lv ' + I.lv; $('#ultName').textContent = I.name; ub.setAttribute('aria-label', `${A.y} ultimate: ${I.name}`);
   for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" data-k="p" data-id="${id}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
   for (const id in S.gifts) h += `<span class="slot gift" data-k="g" data-id="${id}" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
-  if (S.lode) h += `<span class="slot gift" data-k="l" style="--c:${EL.metal}"><img src="${icon('g-lodestone')}" alt="Lodestone"><em>${S.lode}</em></span>`;
   box.innerHTML = h;
 }
 // the row at the bottom is what you have, and it all works on its own; tapping one says so in a small bubble that
