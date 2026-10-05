@@ -836,6 +836,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <div class="tsound">
       <button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg></button>
       <button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+      <button class="ibtn voBtn" aria-label="Voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><circle cx="8.5" cy="11.5" r="1.3" fill="#fff"/><circle cx="12" cy="11.5" r="1.3" fill="#fff"/><circle cx="15.5" cy="11.5" r="1.3" fill="#fff"/></svg></button>
     </div>
     <div class="tlvl">
       <button class="tarr" id="lvPrev" aria-label="Previous level"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -929,6 +930,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <div class="iconrow">
         <button class="rbtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg><span>Music</span></button>
         <button class="rbtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg><span>Sound</span></button>
+        <button class="rbtn voBtn" aria-label="Voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><circle cx="8.5" cy="11.5" r="1.3" fill="#fff"/><circle cx="12" cy="11.5" r="1.3" fill="#fff"/><circle cx="15.5" cy="11.5" r="1.3" fill="#fff"/></svg></button>
         <button class="rbtn" id="howBtn" aria-label="How to play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 9a3.5 3.5 0 1 1 5 3.2c-1 .5-1.5 1.2-1.5 2.3" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="18.6" r="1.6" fill="#fff"/></svg><span>Help</span></button>
         <button class="rbtn" id="chartBtn2" aria-label="Element chart"><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="#fff" stroke-width="1.6"><circle cx="12" cy="4" r="2.6" fill="#6FBF4A"/><circle cx="20" cy="10" r="2.6" fill="#E8553F"/><circle cx="17" cy="19.5" r="2.6" fill="#E6B23A"/><circle cx="7" cy="19.5" r="2.6" fill="#C9D3DB"/><circle cx="4" cy="10" r="2.6" fill="#4E9BE0"/></g></svg><span>Chart</span></button>
       </div>
@@ -1175,6 +1177,8 @@ const AU = (() => {
   const pref = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v === '1'; } catch (e) { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
   let c = null, comp, sfx, mus, musLP, noiseBuf, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music2', true);
+  // voices (A, 2026-10-05): Luma's short reminders and the spirit voice's "Ascended!", on their own bus and switch
+  let vox, voOn = pref('morqi.voice', true), voEnd = 0;
   const last = {};
   const MUSVOL = .15;   // music at about 5 out of 10 (A, 2026-10-04; it was 4)
   function init() {
@@ -1183,7 +1187,8 @@ const AU = (() => {
     setTimeout(loadSamples, 0);
     comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 14; comp.ratio.value = 5; comp.attack.value = .002; comp.release.value = .18;
     const master = c.createGain(); master.gain.value = .95; comp.connect(master).connect(c.destination);
-    sfx = c.createGain(); sfx.gain.value = .47; sfx.connect(comp);   // effects sit under the music: measured in play, about 4 dB below it on average, and even their peaks stay below the music's (A, 2026-10-04)
+    sfx = c.createGain(); sfx.gain.value = .47; sfx.connect(comp);
+    vox = c.createGain(); vox.gain.value = .9; vox.connect(comp);   // effects sit under the music: measured in play, about 4 dB below it on average, and even their peaks stay below the music's (A, 2026-10-04)
     mus = c.createGain(); mus.gain.value = MUSVOL; musLP = c.createBiquadFilter(); musLP.type = 'lowpass'; musLP.frequency.value = 20000; mus.connect(musLP).connect(comp);
     noiseBuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     return c;
@@ -1295,7 +1300,16 @@ const AU = (() => {
     if (!mus) return; const t = c.currentTime, v = MUSVOL; mus.gain.cancelScheduledValues(t); mus.gain.setTargetAtTime(v / PHI, t, .03); mus.gain.setTargetAtTime(v, t + .618, .25);
   }
   let voices = 0;
-  function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=8`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
+  function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=8`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
+    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=8`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
+  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-free-' + e])];
+  // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
+  function vo(name, delay = 0, dip = .5) {
+    if (!c || !voOn || !SMP[name]) return false; const t = c.currentTime + delay; if (t < voEnd) return false;
+    const src = c.createBufferSource(); src.buffer = SMP[name]; src.connect(vox); src.start(t); voEnd = t + src.buffer.duration;
+    if (mus) { mus.gain.cancelScheduledValues(t); mus.gain.setTargetAtTime(MUSVOL * dip, t, .06); mus.gain.setTargetAtTime(MUSVOL, voEnd, .35); }
+    return true;
+  }
   function smp(name, rung, rate) {
     const list = (SVAR[name] || [name]).filter(n => SMP[n]); if (!list.length) return false;
     if (voices >= 22) return true;
@@ -1880,7 +1894,7 @@ const AU = (() => {
     // slow motion: the score sinks under water and fades while the last notes ring out
     slowmo() { if (!musLP) return; const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(musLP.frequency.value, t); musLP.frequency.exponentialRampToValueAtTime(160, t + 1.1);
       mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(0, t + 1.4); }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
-    get on() { return sfxOn; }, get musicOn() { return musOn; } };
+    get on() { return sfxOn; }, get musicOn() { return musOn; }, vo, toggleVoice() { voOn = !voOn; save('morqi.voice', voOn); return voOn; }, get voiceOn() { return voOn; } };
 })();
 const SFX = AU.S;
 
@@ -2133,9 +2147,11 @@ function renderSound() {
   // the round icon buttons, in the pause menu and on the title, grey out when off
   document.querySelectorAll('.musBtn').forEach(b => { b.classList.toggle('off', !AU.musicOn); b.setAttribute('aria-pressed', AU.musicOn); });
   document.querySelectorAll('.sfxBtn').forEach(b => { b.classList.toggle('off', !AU.on); b.setAttribute('aria-pressed', AU.on); });
+  document.querySelectorAll('.voBtn').forEach(b => { b.classList.toggle('off', !AU.voiceOn); b.setAttribute('aria-pressed', AU.voiceOn); });
 }
 document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleMusic(); if (AU.musicOn && S && !S.over) AU.music(true); renderSound(); SFX.select(); });
 document.querySelectorAll('.sfxBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleSfx(); renderSound(); SFX.select(); });
+document.querySelectorAll('.voBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleVoice(); renderSound(); SFX.select(); });
 renderSound();
 $('#againBtn').onclick = () => { show(null); AU.music(true); startRun(); };
 $('#retryBtn').onclick = () => { payPet(); show(null); startRun(); };
@@ -2220,6 +2236,7 @@ function spawnBoss() {
   if (card) setTimeout(() => { if (!S || S.over) return; coach('boss-' + realm, B.name, B.tip, () => ({ sx:W / 2, sy:H * .4 })); COACH.gap = 0; }, 1100);
   const wake = () => { if (S && !S.over && !S.bossWoke) { S.bossWoke = true; awaken(); } };
   setTimeout(wake, card ? 12000 : 1400);
+  setTimeout(() => luma('vo-boss-' + realm, true), 1500);
   if (!card) setTimeout(() => { if (S && !S.over) releaseLevels(); }, 2400); else setTimeout(() => { if (S && !S.over && !COACH.cur) releaseLevels(); }, 15000);
 }
 
@@ -2322,6 +2339,7 @@ function crates(dt) {
     it.t += dt; if (it.vz) { it.vz -= 900 * dt; it.z = Math.max(0, it.z + it.vz * dt); if (it.z === 0) it.vz = 0; }
     // a Qi Stone waits for you to collect it, with a glowing arrow at your side that grows the longer it waits (A,
     // 2026-10-05); after 20 s it flies to you, so a level can never stall on one (Gene's ran ten minutes on a lost stone)
+    if (it.kind === 'stone' && it.t > 8 && !it.told) { it.told = true; luma('vo-wait-' + (Math.random() < .5 ? 1 : 2)); }
     if (it.kind === 'stone' && it.t > 20) { const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1100, 160 + (it.t - 20) * 520) * dt;
       it.x += (P.x - it.x) / d * Math.min(d, v); it.y += (P.y - it.y) / d * Math.min(d, v); if (Math.random() < .6) fx({ k:'glow', x:it.x, y:it.y - 20, s:40, s1:6, c:EL[it.el], life:.35 }); }
     if (Math.hypot(it.x - P.x, it.y - P.y) < 60) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
@@ -2799,8 +2817,12 @@ function ultTick(dt) {
 // a tip opens a moment after it is queued; by then its creature may be gone or its gem collected, so it shows the
 // nearest live one instead of an empty patch of ground
 const live = (o, pool) => (o && !o.dead && !o.pull && (S.en.includes(o) || S.gems.includes(o))) ? o : pool.sort((a, b) => Math.hypot(a.x - S.p.x, a.y - S.p.y) - Math.hypot(b.x - S.p.x, b.y - S.p.y))[0] || o;
+// Luma speaks (A, 2026-10-05): rare, short and helpful, never scolding. One line every 12 s at most, never during
+// Ascended; the boss's arrival and a freed realm always speak.
+function luma(name, force) { if (!S || hsOn() || (S.over && !force)) return; if (!force && S.t - (S.voT ?? -99) < 12) return; if (AU.vo(name)) S.voT = S.t; }
 function teach() {
   const P = S.p, A = ANIMAL[animal], tg = S.taught;
+  if (P.hp < P.max * .3 && S.items.some(it => it.kind === 'heart') && S.t - (S.heartVoT ?? -99) > 25) { S.heartVoT = S.t; luma('vo-heart-' + (Math.random() < .5 ? 1 : 2)); }
   if (!tg.c_pet && S.t > 6) note('pet', `Your ${A.y} fights beside you, firing ${ELNAME[A.e]} at the creatures ${ELNAME[A.e]} beats.`);
   if (!tg.c_gem && S.t > 7 && S.gems.length >= 3) coach('gem', 'Gems!', 'Walk over gems to collect them. They make you stronger.', () => ({ sx:W / 2, sy:H * .45 }));
   if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. The right element hits twice as hard.', () => { const t = live(e, S.en.filter(o => !o.dead && !o.boss)); return { x:t.x, y:t.y - t.size * .16, r:t.size * .62 }; }, 5.5); }
@@ -3396,7 +3418,7 @@ function hsStart(final) {
   const H = S.hs, P = S.p; H.used = true; H.on = { t:0, p:.35, final };
   S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); AU.song('highest', 2);
   // the world stops for half a second while the camera pushes in on the anthem's first hit
-  S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true);
+  S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true); AU.vo('vo-ascended', .35, .8);
   ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true); stars(P.x, P.y - 60, 50, '#FFE58A', 600);
   for (const q of S.gems) q.pull = true;
 }
@@ -3426,6 +3448,7 @@ function qiKill(e) {
   const el = e.el; S.qi[el] = (S.qi[el] || 0) + 1;
   if (stoneEls().includes(el) && !S.qiStones[el] && !S.stoneOut[el] && S.qi[el] >= stoneNeed()) {
     S.stoneOut[el] = true; S.items.push({ x:e.x, y:e.y, kind:'stone', el, t:0, z:30, vz:320 });
+    luma('vo-stone-' + el);
     if (!SEEN.has('_stone')) { markSeen('_stone'); coach('stone', 'A Qi Stone!', 'Walk to it to collect it. Gather all five to free the land and wake the boss.', () => ({ sx:W / 2, sy:H * .45 })); }
     ring(e.x, e.y, 10, 280, EL[el], .7, 14, true); stars(e.x, e.y - 30, 20, EL[el], 340); SFX.chestDrop();
   }
@@ -4860,6 +4883,7 @@ function win() {
     });
     at(9, 3.75, () => { SFX.heal(); stars(T.x, T.y - 120, 40, '#FFE58A', 420); });
     at(10, 4.3, () => { floatText(T.x, T.y - T.s * .95, 'Victory!', '#FFE08A', 46); SFX.fanfare(true); });
+    at(11, 5.0, () => AU.vo('vo-free-' + (B.realm || worldOf())));
     if (T.t > 3.3 && T.r < 2600) { T.r += 70; paintThaw(T.x, T.y, T.r); for (let i = 0; i < 6; i++) paintThaw(rnd(0, WORLD), rnd(0, WORLD), 180); }
     // night lifts into dawn
     if (T.t > 3.3) S.night = Math.max(0, (S.night || 0) - dt / 1.8);
