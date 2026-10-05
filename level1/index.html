@@ -320,6 +320,10 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .card .txt small{display:none}
 .card .txt small[style]{display:block;font-size:10px;line-height:1.2;color:#FFF3C4!important}
 .card .chips{justify-content:center;gap:3px;font-size:10px;color:rgba(255,255,255,.8)}
+/* a new power's strength and weakness, so every element is a choice of taste (A, 2026-10-05) */
+.card .trait{display:flex;flex-direction:column;gap:2px;margin:2px 0 4px;font-size:10.5px;line-height:1.2;font-weight:800;color:rgba(255,255,255,.92)}
+.card .trait i{font-style:normal}
+.card .trait b{font-weight:900;color:#fff}
 .card .chips .ec{font-size:10px;padding:1px 6px 2px;background:rgba(255,255,255,.22);color:#fff;box-shadow:none}
 .stars{gap:3px}.stars s{width:11px;height:5px;background:rgba(255,255,255,.3)}
 .card .stars s.f{background:#fff}.card .stars s.n{background:rgba(255,255,255,.7)}
@@ -1587,6 +1591,14 @@ const POW = {
   bell:   { n:'Golden Bell',   e:'metal', icon:'p-bell',    evo:'Mountain Bell',       evoIcon:'e-mountain',    role:'Guard' },
   swords: { n:'Flying Swords', e:'metal', icon:'p-swords',  evo:'Ten Thousand Swords', evoIcon:'e-swords',      role:'Shooter' }
 };
+// what each power is good and weak at, measured with every power alone (tools/qa/balance.mjs, 2026-10-05). A: "no one
+// should feel like their element has no real advantage ... all elements have their weaknesses AND strengths"
+const TRAIT = {
+  tide:['Bosses up close', 'Big crowds'], pearl:['Hits all over', 'Slow start'], vine:['Hits all around you', 'Short reach'],
+  bamboo:['Clears the way ahead', 'Bosses'], ember:['Crowds', 'Bosses'], lantern:['Bosses', 'Leaves you open'],
+  stone:['Keeps you safe', 'Big crowds'], boulder:['Huge hits', 'Leaves you open'], skip:['Chains through crowds', 'Bosses'],
+  bell:['Slows creatures', 'Big crowds'], swords:['Bosses', 'Big crowds']
+};
 const GIFT = {
   spring:  { n:'Deep Spring', e:'water', icon:'g-spring' },
   shoot:   { n:'Green Shoot', e:'wood',  icon:'g-shoot' },
@@ -1602,34 +1614,34 @@ const AWAKEN_AT = [4, 8, 12, 16, 20];
 
 // every number each power has at each level, shared by the game and the cards
 const ST = {
-  tide:    (l, v) => v ? { n:8, dmg:34, size:22, r:86, surge:2.4 } : { n:2 + l, dmg:17 + 5 * l, size:13 + 2 * l, r:74 + 4 * l },
-  pearl:   (l, v) => v ? { n:4, dmg:40, size:26, spd:420, life:99, cd:1 } : { n:[0,1,2,3,3,4][l], dmg:16 + 5 * l, size:14 + 1.6 * l, spd:380 + 20 * l, life:3.6 + .3 * l, cd:1.8 },
-  vine:    (l, v) => v ? { n:12, dmg:48, R:210, w:15, cd:.9 } : { n:5 + l, dmg:16 + 6 * l, R:118 + 16 * l, w:7 + l, cd:1.1 },
+  tide:    (l, v) => v ? { n:8, dmg:66, size:22, r:100, surge:2 } : { n:2 + l, dmg:20 + 6 * l, size:13 + 2 * l, r:74 + 4 * l },
+  pearl:   (l, v) => v ? { n:8, dmg:58, size:26, spd:420, life:99, cd:1 } : { n:[0,1,3,4,5,6][l], dmg:20 + 6 * l, size:14 + 1.6 * l, spd:380 + 20 * l, life:3.6 + .3 * l, cd:1.8 },
+  vine:    (l, v) => v ? { n:12, dmg:70, R:210, w:15, cd:.8 } : { n:5 + l, dmg:24 + 9 * l, R:118 + 16 * l, w:7 + l, cd:.95 },
   bamboo:  (l, v) => v ? { n:8, dmg:34, pierce:5, cd:.24, split:3, sz:1.2 } : { n:l, dmg:14 + 4 * l, pierce:l >= 3 ? 3 : 2, cd:.75, split:l >= 5 ? 2 : 0, sz:l >= 4 ? 1.2 : 1 },
-  ember:   (l, v) => v ? { n:6, dmg:40, r:82, cd:.7 } : { n:l, dmg:18 + 5 * l, r:40 + 5 * l, cd:1.0 },
-  lantern: (l, v) => v ? { n:6, dmg:22, r:96, dur:4, cd:2.4 } : { n:[0,1,2,2,3,3][l], dmg:8 + 3 * l, r:48 + 7 * l, dur:2.4 + .2 * l, cd:2.6 },
-  stone:   (l, v) => v ? { n:6, dmg:52, size:30, r:108 } : { n:3 + (l >> 1), dmg:20 + 5 * l, size:16 + 2.5 * l, r:76 + 5 * l },
-  boulder: (l, v) => v ? { n:5, dmg:90, r:112, cd:1.5 } : { n:[0,1,2,2,3,3][l], dmg:30 + 8 * l, r:52 + 6 * l, cd:1.8 },
-  skip:    (l, v) => v ? { n:2, dmg:46, hops:6, r:300, cd:.9, quake:80 } : { n:[0,1,1,2,2,2][l], dmg:18 + 5 * l, hops:1 + l, r:240 + 10 * l, cd:1.15 },
-  bell:    (l, v) => v ? { R:150, dmg:26, pulse:2 } : { R:70 + 12 * l, dmg:9 + 4 * l },
-  swords:  (l, v) => v ? { n:6, dmg:44, range:420, rain:1.3 } : { n:l, dmg:20 + 5 * l, range:300 + 20 * l }
+  ember:   (l, v) => v ? { n:5, dmg:40, r:82, cd:.8 } : { n:l, dmg:16 + 5 * l, r:40 + 5 * l, cd:1.0 },
+  lantern: (l, v) => v ? { n:6, dmg:22, r:96, dur:4, cd:2.4 } : { n:[0,1,2,2,3,3][l], dmg:9 + 4 * l, r:48 + 7 * l, dur:2.4 + .2 * l, cd:2.6 },
+  stone:   (l, v) => v ? { n:7, dmg:64, size:30, r:118 } : { n:3 + (l >> 1), dmg:20 + 5 * l, size:16 + 2.5 * l, r:76 + 5 * l },
+  boulder: (l, v) => v ? { n:5, dmg:70, r:112, cd:1.5 } : { n:[0,1,2,2,3,3][l], dmg:34 + 9 * l, r:52 + 6 * l, cd:1.8 },
+  skip:    (l, v) => v ? { n:2, dmg:52, hops:6, r:300, cd:.9, quake:80 } : { n:[0,1,1,2,2,2][l], dmg:18 + 5 * l, hops:1 + l, r:240 + 10 * l, cd:1.15 },
+  bell:    (l, v) => v ? { R:150, dmg:48, pulse:2 } : { R:70 + 12 * l, dmg:14 + 6 * l },
+  swords:  (l, v) => v ? { n:6, dmg:58, range:420, rain:1.3 } : { n:l, dmg:22 + 6 * l, range:300 + 20 * l }
 };
 // what the next level changes, in words a child uses (design review, 2026-10-04: no spreadsheet numbers on the cards)
 const more = (d, one, many) => d > 1 ? `${d} more ${many}` : `one more ${one}`;
 const say = (a, b, parts, tail) => { const w = parts.filter(([k]) => b[k] > a[k]).map(([k, f]) => typeof f === 'function' ? f(b[k] - a[k]) : f);
   if (tail) w.push(tail); const t = w.length > 1 ? w.slice(0, -1).join(', ') + ' and ' + w[w.length - 1] : w[0] || 'stronger'; return t[0].toUpperCase() + t.slice(1); };
 const NEXT = {
-  tide:    l => { const a = ST.tide(l), b = ST.tide(l + 1); return l ? say(a, b, [['n', d => more(d, 'orb', 'orbs')], ['dmg', 'harder splashes']], 'bigger orbs') : `${b.n} orbs of water circle you and splash anything they touch`; },
-  pearl:   l => { const a = ST.pearl(l), b = ST.pearl(l + 1); return l ? say(a, b, [['n', d => more(d, 'pearl', 'pearls')], ['dmg', 'harder hits']], 'faster and bigger') : 'A dragon pearl ricochets off every edge of the screen'; },
-  vine:    l => { const a = ST.vine(l), b = ST.vine(l + 1); return l ? say(a, b, [['n', d => more(d, 'vine', 'vines')], ['R', 'longer reach'], ['dmg', 'harder hits']]) : `${b.n} thorned vines whip out around you`; },
+  tide:     l => ['Water orbs circle you', 'The ring breathes in and out', 'A second ring of orbs', 'Orbs splash and slow creatures', 'Small waves roll out from you'][l] || 'Harder hits',
+  pearl:    l => ['A pearl ricochets around the screen', 'A bounce sends out a little pearl', 'Pearls grow each time they bounce', 'Pearl hits splash nearby creatures', 'Pearls seek out creatures'][l] || 'Harder hits',
+  vine:     l => ['Thorned vines whip all around you', 'Vines hold creatures still for a moment', 'A double lash', 'Vine hits heal you a little', 'A sapling sprouts and fights beside you'][l] || 'Harder hits',
   bamboo:  l => ['A bamboo spear flies the way you run', 'Spears fan out three wide', 'A spear guards your back, and spears fly through three creatures', 'A wide fan of five bigger spears', 'Spears split in two when they stop, and three guard your back'][l] || 'Harder hits',
-  ember:   l => { const a = ST.ember(l), b = ST.ember(l + 1); return l ? say(a, b, [['n', d => more(d, 'fireball', 'fireballs')], ['dmg', 'harder hits']], 'bigger blasts') : 'A homing fireball that explodes on impact'; },
-  lantern: l => { const a = ST.lantern(l), b = ST.lantern(l + 1); return l ? say(a, b, [['n', d => more(d, 'lantern', 'lanterns')], ['r', 'wider fire'], ['dmg', 'hotter burn']]) : 'Thrown lanterns burst into pools of fire'; },
-  stone:   l => { const a = ST.stone(l), b = ST.stone(l + 1); return l ? say(a, b, [['n', d => more(d, 'boulder', 'boulders')], ['dmg', 'harder hits']], 'bigger boulders') : `${b.n} boulders circle you and smash foes back`; },
-  skip:    l => { const a = ST.skip(l), b = ST.skip(l + 1); return l ? say(a, b, [['n', d => more(d, 'stone', 'stones')], ['hops', d => more(d, 'bounce', 'bounces')], ['dmg', 'harder hits']]) : 'A stone skips from creature to creature'; },
-  boulder: l => { const a = ST.boulder(l), b = ST.boulder(l + 1); return l ? say(a, b, [['n', d => more(d, 'boulder', 'boulders')], ['dmg', 'harder hits']], 'a wider quake') : 'A boulder falls from the sky onto the crowd'; },
-  bell:    l => { const a = ST.bell(l), b = ST.bell(l + 1); return l ? say(a, b, [['R', 'a wider field'], ['dmg', 'harder hits']]) : 'A golden bagua field hurts and slows all inside it'; },
-  swords:  l => { const a = ST.swords(l), b = ST.swords(l + 1); return l ? say(a, b, [['n', d => more(d, 'sword', 'swords')], ['dmg', 'harder hits']], 'longer flight') : 'A flying sword slices out and returns to you'; },
+  ember:    l => ['A homing fireball that explodes on impact', 'Blasts leave fire on the ground', 'Blasts throw sparks at the next creatures', 'Bigger blasts', 'Every fourth volley is a great comet'][l] || 'Harder hits',
+  lantern:  l => ['Thrown lanterns burst into pools of fire', 'Lanterns bounce once and burst again', 'Bursts scatter sparks of fire', 'Fireworks pop above the fire', 'Lanterns land in threes'][l] || 'Harder hits',
+  stone:    l => ['Boulders circle you and smash creatures back', 'The ring of boulders breathes in and out', 'A second ring of boulders', 'The boulders fling out and come back', 'Boulder hits crack the ground'][l] || 'Harder hits',
+  skip:     l => ['A stone skips from creature to creature', 'Every skip splashes nearby creatures', 'The last skip splits in two', 'Creatures it hits are dazed', 'Bigger, faster stones'][l] || 'Harder hits',
+  boulder:  l => ['A boulder falls from the sky onto the crowd', 'The ground cracks and slows creatures', 'Boulders bounce once more', 'Each landing sends out a shockwave', 'Every fourth boulder is a giant'][l] || 'Harder hits',
+  bell:     l => ['A golden bagua field hurts and slows all inside it', 'The field draws creatures in', 'Chimes ring out with every tick', 'A ring wave rolls out every few seconds', 'The field grows while you stand still'][l] || 'Harder hits',
+  swords:   l => ['A flying sword slices out and returns to you', 'Slashes linger and strike again', 'A guard blade cuts whatever comes close', 'Swords burst into blade fans', 'Bigger, faster, longer-flying swords'][l] || 'Harder hits',
   spring:  l => l ? 'You heal faster' : 'You slowly heal over time',
   shoot:   l => l ? 'More qi, and you pick things up from farther away' : 'More qi from every creature, and a wider pickup',
   kindling:l => l ? 'Every power hits even harder' : 'Every power hits harder',
@@ -2947,7 +2959,9 @@ function dropChest(x, y) { S.chests.push({ x, y, t:0 }); SFX.chestDrop(); stars(
 const cdMul = () => Math.pow(.91, S.gifts.lungs || 0);
 function nearest(x, y, n, maxD = 560, skip) {
   const out = [];
-  for (const e of S.en) { if (e.dead || (skip && skip.has(e))) continue; const d = Math.hypot(e.x - x, e.y - y); if (d < maxD) out.push([e, d]); }
+  // a boss is measured to the edge of its body, so aimed powers turn to it when it is close instead of to its small helpers
+  // (balance run, 2026-10-05: Ember Darts and Skipping Stones spent a boss fight on the helpers and took a sixth of its health)
+  for (const e of S.en) { if (e.dead || (skip && skip.has(e))) continue; const d = Math.hypot(e.x - x, e.y - y) - (e.boss ? e.r : 0); if (d < maxD) out.push([e, d]); }
   return out.sort((a, b) => a[1] - b[1]).slice(0, n).map(a => a[0]);
 }
 function inArea(x, y, r, fn) { for (const e of S.en) if (!e.dead && Math.abs(e.x - x) < r + e.r && Math.hypot(e.x - x, e.y - y) < r + e.r) fn(e); }
@@ -2970,24 +2984,35 @@ function firePatch(x, y, r, dur, dmg, festival) {
 
 function powers(dt) {
   const P = S.p, sk = S.skills, ev = S.evo;
+  // a power's level as its shape follows it: 1-5, and 6 once evolved (A, 2026-10-05: "they need to feel and see the
+  // rewards for upgrading one power"); every level from 2 adds something you can see, and the evolution keeps them all
+  const LV = id => ev[id] ? 6 : (sk[id] || 0);
 
   /* Tide Ring: orbs of water rebuilt around you every frame, so you are always the centre */
   if (sk.tide) {
-    const st = ST.tide(sk.tide, ev.tide), r0 = st.r;
+    const st = ST.tide(sk.tide, ev.tide), L = LV('tide'), r0 = st.r * (L >= 2 ? 1 + .3 * Math.sin(S.t * 2.2) : 1);
     S.ang.tide = (S.ang.tide || 0) + dt * (ev.tide ? 3.1 : 2.8); S.orbs = [];
     for (let i = 0; i < st.n; i++) { const a = S.ang.tide + i * TAU / st.n; S.orbs.push({ x:P.x + Math.cos(a) * r0, y:P.y + Math.sin(a) * r0, s:st.size, a, r:r0 }); }
+    // Level 2 the ring breathes in and out; Level 3 a second ring turns the other way inside it
+    if (L >= 3) { const n2 = Math.max(2, st.n >> 1), r2 = r0 * .55; for (let i = 0; i < n2; i++) { const a = -S.ang.tide * 1.3 + i * TAU / n2; S.orbs.push({ x:P.x + Math.cos(a) * r2, y:P.y + Math.sin(a) * r2, s:st.size * .8, a, r:r2 }); } }
+    // a boss is big enough to meet several orbs at once, so it is struck more often; from Level 4 slowed creatures are only
+    // nudged, so they stay in the ring (balance run, 2026-10-05: Level 5 freed fewer than Level 3)
     for (const o of S.orbs) {
       if (Math.random() < .25) fx({ k:'drop', x:o.x, y:o.y, z:8, vx:rnd(-40, 40), vy:rnd(-40, 40), vz:rnd(40, 120), life:.4, s:rnd(2, 4) });
-      inArea(o.x, o.y, st.size + 8, e => { if ((e.hitCd.tide || 0) <= S.t) { e.hitCd.tide = S.t + .3; hurt(e, st.dmg, 'water', { kb:120, fx:P.x, fy:P.y }); drops(e.x, e.y - 10, 6, 180); SFX.splash(); } });
+      inArea(o.x, o.y, st.size + 8, e => { if ((e.hitCd.tide || 0) <= S.t) { e.hitCd.tide = S.t + (e.boss ? .12 : .3); hurt(e, st.dmg, 'water', { kb:L >= 4 ? 70 : 120, fx:P.x, fy:P.y }); drops(e.x, e.y - 10, 6, 180); SFX.splash();
+        if (L >= 4) { e.slow = Math.max(e.slow, 1); ring(e.x, e.y, 6, 46, '#9CD2FF', .25, 4, true); } } });
     }
     if (ev.tide && cool('surge', st.surge, dt)) { S.waves.push({ k:'tide', r:40, max:300, dmg:44, w:26, hit:new Set() }); SFX.wave(); }
+    else if (L === 5 && cool('tidewave', 3, dt)) { S.waves.push({ k:'tide', r:40, max:200, dmg:24, w:18, hit:new Set() }); SFX.wave(); }
   } else S.orbs = null;
 
   /* Dragon Pearls: ricochet off every edge of the screen */
   if (sk.pearl) {
-    const st = ST.pearl(sk.pearl, ev.pearl);
-    if (S.pearls.length < st.n && cool('pearl', ev.pearl ? .4 : .7, dt)) {
-      const a = rnd(0, TAU); S.pearls.push({ x:P.x, y:P.y - 20, vx:Math.cos(a) * st.spd, vy:Math.sin(a) * st.spd, life:st.life, s:st.size, rot:0 }); SFX.bloop();
+    const st = ST.pearl(sk.pearl, ev.pearl), L = LV('pearl');
+    if (S.pearls.filter(p => !p.kid).length < st.n && cool('pearl', ev.pearl ? .4 : .5, dt)) {
+      // launched toward the nearest creature, so pearls meet what is coming (balance run, 2026-10-05: thrown at random they
+      // let creatures through and got weaker with each level)
+      const t = nearest(P.x, P.y, 1, 420)[0], a = t ? Math.atan2(t.y - P.y, t.x - P.x) + rnd(-.35, .35) : rnd(0, TAU); S.pearls.push({ x:P.x, y:P.y - 20, vx:Math.cos(a) * st.spd, vy:Math.sin(a) * st.spd, life:st.life, s:st.size, s0:st.size, rot:0 }); SFX.bloop();
     }
     const vx0 = S.cam.x, vy0 = S.cam.y;
     for (const p of S.pearls) {
@@ -2995,25 +3020,43 @@ function powers(dt) {
       let b = false;
       if (p.x < vx0 + p.s) { p.x = vx0 + p.s; p.vx = Math.abs(p.vx); b = true; } if (p.x > vx0 + VW - p.s) { p.x = vx0 + VW - p.s; p.vx = -Math.abs(p.vx); b = true; }
       if (p.y < vy0 + p.s + 60) { p.y = vy0 + p.s + 60; p.vy = Math.abs(p.vy); b = true; } if (p.y > vy0 + VH - p.s) { p.y = vy0 + VH - p.s; p.vy = -Math.abs(p.vy); b = true; }
-      if (b) { drops(p.x, p.y, 8, 200); ring(p.x, p.y, 4, 40, '#9CD2FF', .25, 4, true); SFX.bloop(); }
+      if (b) { drops(p.x, p.y, 8, 200); ring(p.x, p.y, 4, 40, '#9CD2FF', .25, 4, true); SFX.bloop();
+        // Level 2 a bounce sends out a little pearl; Level 3 pearls grow each time they bounce
+        if (L >= 2 && !p.kid && !p.spawned) { p.spawned = 1; S.pearls.push({ x:p.x, y:p.y, vx:-p.vy * .8, vy:p.vx * .8, life:1.6, s:p.s * .6, s0:p.s * .6, rot:0, kid:1 }); }
+        if (L >= 3) p.s = Math.min((p.s0 || p.s) * 1.6, p.s * 1.12); }
+      // Level 5 pearls bend toward the nearest creature
+      if (L >= 5) { const t = nearest(p.x, p.y, 1, 320)[0]; if (t) { const a = Math.atan2(t.y - p.y, t.x - p.x), sp = Math.hypot(p.vx, p.vy); p.vx += (Math.cos(a) * sp - p.vx) * Math.min(1, dt * 2.2); p.vy += (Math.sin(a) * sp - p.vy) * Math.min(1, dt * 2.2); }
+        // turning keeps the pearl's full speed (balance run, 2026-10-05: each turn bled a little away, and the Pearl Storm's
+        // everlasting pearls slowed to a stop)
+        const v = Math.hypot(p.vx, p.vy) || 1; p.vx *= st.spd / v; p.vy *= st.spd / v; }
       if (Math.random() < .5) fx({ k:'glow', x:p.x + rnd(-4, 4), y:p.y + rnd(-4, 4), s:p.s * 1.3, s1:2, c:'#4E9BE0', life:.3 });
-      inArea(p.x, p.y, p.s, e => { if ((e.hitCd.pearl || 0) <= S.t) { e.hitCd.pearl = S.t + .35; hurt(e, st.dmg, 'water', { kb:160, fx:p.x, fy:p.y }); drops(e.x, e.y - 10, 5, 160); SFX.splash();
-        if (ev.pearl) { inArea(e.x, e.y, 70, o => { if (o !== e) hurt(o, st.dmg * .5, 'water', { spark:false }); }); ring(e.x, e.y, 10, 80, '#7FC4FF', .3, 8, true); } } });
+      // a pearl rolls on through a crowd instead of knocking it away (balance run, 2026-10-05: knocked away, creatures
+      // came back around and reached you)
+      inArea(p.x, p.y, p.s, e => { if ((e.hitCd.pearl || 0) <= S.t) { e.hitCd.pearl = S.t + (e.boss ? .15 : .35); hurt(e, st.dmg, 'water', { kb:40, fx:p.x, fy:p.y }); drops(e.x, e.y - 10, 5, 160); SFX.splash();
+        if (ev.pearl) { inArea(e.x, e.y, 70, o => { if (o !== e) hurt(o, st.dmg * .5, 'water', { spark:false }); }); ring(e.x, e.y, 10, 80, '#7FC4FF', .3, 8, true); }
+        else if (L >= 4) { inArea(e.x, e.y, 50, o => { if (o !== e) hurt(o, st.dmg * .4, 'water', { spark:false }); }); ring(e.x, e.y, 8, 56, '#7FC4FF', .25, 6, true); } } });
     }
     S.pearls = S.pearls.filter(p => p.life > 0);
   }
 
   /* Vine Lash: thorned vines whip out to full reach and crack */
   if (sk.vine && cool('vine', ST.vine(sk.vine, ev.vine).cd, dt)) {
-    const st = ST.vine(sk.vine, ev.vine), a0 = rnd(0, TAU);
+    const st = ST.vine(sk.vine, ev.vine), a0 = rnd(0, TAU), L = LV('vine'); let held = 0;
     fx({ k:'vine', follow:true, R:st.R, w:st.w, n:st.n, a:a0, life:.42, seed:Math.random() * 100 });
-    inArea(P.x, P.y, st.R, e => hurt(e, st.dmg, 'wood', { kb:150 }));
+    // Level 2 the vines hold what they hit for a moment; Level 4 every hit heals you a little
+    // a boss is caught by several vines at once (balance run, 2026-10-05: wood barely touched bosses)
+    inArea(P.x, P.y, st.R, e => { hurt(e, st.dmg * (e.boss ? 2.5 : 1), 'wood', { kb:150 }); if (L >= 2 && !e.boss) e.rooted = Math.max(e.rooted || 0, .5); held++; });
+    if (L >= 4 && held) { P.hp = Math.min(P.max, P.hp + Math.min(6, held * .6)); fx({ k:'plus', x:P.x + rnd(-16, 16), y:P.y - 10, vx:0, vy:-60, life:.6, s:8, c:'#8FF0A0' }); }
+    // Level 3 a second lash cracks a moment later between the first one's vines
+    if (L >= 3) setTimeout(() => { if (!S || S.over || !running) return; const a1 = a0 + Math.PI / st.n; fx({ k:'vine', follow:true, R:st.R * .9, w:st.w, n:st.n, a:a1, life:.4, seed:Math.random() * 100 }); inArea(S.p.x, S.p.y, st.R * .9, e => hurt(e, st.dmg * .7 * (e.boss ? 2.5 : 1), 'wood', { kb:120 })); SFX.whip(); }, 300);
+    // Level 5 a sapling sometimes sprouts and fights beside you (the Grove grows three)
+    if (!ev.vine && L >= 5 && S.trees.length < 1 && Math.random() < .5) { const a = rnd(0, TAU); S.trees.push({ x:P.x + Math.cos(a) * rnd(120, 200), y:P.y + Math.sin(a) * rnd(120, 200), t:0, life:4, cd:.6 }); leaves(P.x, P.y, 6, 160); }
     setTimeout(() => { if (!S || S.over) return; SFX.whip(); for (let i = 0; i < st.n; i++) { const a = a0 + i * TAU / st.n; leaves(S.p.x + Math.cos(a) * st.R, S.p.y + Math.sin(a) * st.R, 3, 160); } }, 110);
     if (ev.vine && S.trees.length < 3) { const a = rnd(0, TAU); S.trees.push({ x:P.x + Math.cos(a) * rnd(120, 220), y:P.y + Math.sin(a) * rnd(120, 220), t:0, life:5, cd:.6 }); leaves(P.x, P.y, 10, 200); }
   }
   for (const tr of S.trees) {
     tr.t += dt; tr.cd -= dt;
-    if (tr.cd <= 0 && tr.t > .4) { tr.cd = .7; fx({ k:'vine', x:tr.x, y:tr.y - 30, R:140, w:9, n:7, a:rnd(0, TAU), life:.4, seed:Math.random() * 100 }); inArea(tr.x, tr.y, 140, e => hurt(e, 30, 'wood', { kb:120, fx:tr.x, fy:tr.y })); paintThaw(tr.x, tr.y, 120); }
+    if (tr.cd <= 0 && tr.t > .4) { tr.cd = .7; fx({ k:'vine', x:tr.x, y:tr.y - 30, R:140, w:9, n:7, a:rnd(0, TAU), life:.4, seed:Math.random() * 100 }); inArea(tr.x, tr.y, 140, e => hurt(e, S.evo.vine ? 46 : 30, 'wood', { kb:120, fx:tr.x, fy:tr.y })); paintThaw(tr.x, tr.y, 120); }
   }
   S.trees = S.trees.filter(t => t.t < t.life);
 
@@ -3037,8 +3080,10 @@ function powers(dt) {
 
   /* Ember Darts: homing fireballs that explode */
   if (sk.ember) {
-    const st = ST.ember(sk.ember, ev.ember);
-    if (cool('ember', st.cd, dt)) { const tg = nearest(P.x, P.y, st.n); tg.forEach((e, i) => { const a = Math.atan2(e.y - P.y, e.x - P.x) + rnd(-.5, .5); S.shots.push({ k:'ember', x:P.x, y:P.y - 30, vx:Math.cos(a) * 420, vy:Math.sin(a) * 420, tgt:e, life:2, st }); }); if (tg.length) SFX.dart(); }
+    const st = ST.ember(sk.ember, ev.ember), L = LV('ember');
+    // Level 5 every fourth volley leads with a great comet
+    if (cool('ember', st.cd, dt)) { S.emberVol = (S.emberVol || 0) + 1; const comet = L >= 5 && S.emberVol % 4 === 0;
+      const tg = nearest(P.x, P.y, st.n); tg.forEach((e, i) => { const a = Math.atan2(e.y - P.y, e.x - P.x) + rnd(-.5, .5), big = comet && !i; S.shots.push({ k:'ember', x:P.x, y:P.y - 30, vx:Math.cos(a) * 420, vy:Math.sin(a) * 420, tgt:e, life:2, st:big ? { ...st, r:st.r * 2, dmg:st.dmg * 2 } : st, big }); }); if (tg.length) SFX.dart(); }
   }
 
   /* Lantern Bombs: lobbed lanterns that burst into pools of fire */
@@ -3046,71 +3091,98 @@ function powers(dt) {
     const st = ST.lantern(sk.lantern, ev.lantern);
     if (cool('lantern', st.cd, dt)) {
       const tg = nearest(P.x, P.y, 12, 380);
-      for (let i = 0; i < st.n; i++) { const e = tg.length ? tg[(Math.random() * tg.length) | 0] : null, a = rnd(0, TAU), d = rnd(120, 260);
-        S.lobs.push({ k:'lantern', x0:P.x, y0:P.y - 30, x1:e ? e.x + rnd(-30, 30) : P.x + Math.cos(a) * d, y1:e ? e.y + rnd(-30, 30) : P.y + Math.sin(a) * d, t:0, dur:rnd(.5, .7), h:rnd(110, 170), st }); }
+      const L = LV('lantern');
+      for (let i = 0; i < st.n; i++) { const e = tg.length ? tg[(Math.random() * tg.length) | 0] : null, a = rnd(0, TAU), d = rnd(120, 260), x1 = e ? e.x + rnd(-30, 30) : P.x + Math.cos(a) * d, y1 = e ? e.y + rnd(-30, 30) : P.y + Math.sin(a) * d;
+        S.lobs.push({ k:'lantern', x0:P.x, y0:P.y - 30, x1, y1, t:0, dur:rnd(.5, .7), h:rnd(110, 170), st, L });
+        // Level 5 lanterns land in threes
+        if (L >= 5) for (const o of [-1, 1]) S.lobs.push({ k:'lantern', x0:P.x, y0:P.y - 30, x1:x1 + o * 70, y1:y1 + rnd(-30, 30), t:0, dur:rnd(.55, .75), h:rnd(110, 170), st:{ ...st, r:st.r * .7, dmg:st.dmg * .7 }, L, small:1 }); }
       SFX.thwip();
     }
   }
 
   /* Stone Ward: boulders circling you */
   if (sk.stone) {
-    const st = ST.stone(sk.stone, ev.stone);
+    const st = ST.stone(sk.stone, ev.stone), L = LV('stone');
+    // Level 2 the ring breathes; Level 3 a second ring turns inside it; Level 4 every few seconds the stones fling out
+    // and come back
+    S.stoneT = (S.stoneT || 0) + dt; const fl = L >= 4 ? Math.max(0, Math.sin(Math.PI * Math.min(1, (S.stoneT % 4) / .7))) * ((S.stoneT % 4) < .7 ? 1 : 0) : 0;
+    const R = st.r * (L >= 2 ? 1 + .22 * Math.sin(S.t * 2.4) : 1) * (1 + 1.3 * fl);
     S.ang.stone = (S.ang.stone || 0) + dt * 2.7; S.stones = [];
-    for (let i = 0; i < st.n; i++) { const a = S.ang.stone + i * TAU / st.n; S.stones.push({ x:P.x + Math.cos(a) * st.r, y:P.y + Math.sin(a) * st.r, s:st.size, a, molten:ev.stone }); }
+    for (let i = 0; i < st.n; i++) { const a = S.ang.stone + i * TAU / st.n; S.stones.push({ x:P.x + Math.cos(a) * R, y:P.y + Math.sin(a) * R, s:st.size, a, molten:ev.stone }); }
+    if (L >= 3) for (let i = 0; i < 2; i++) { const a = -S.ang.stone * 1.4 + i * Math.PI, r2 = st.r * .5; S.stones.push({ x:P.x + Math.cos(a) * r2, y:P.y + Math.sin(a) * r2, s:st.size * .75, a, molten:ev.stone }); }
     for (const o of S.stones) {
       if (Math.random() < (o.molten ? .5 : .18)) { if (o.molten) flames(o.x, o.y, 1, 6, o.s * .9, 60); else fx({ k:'smoke', x:o.x, y:o.y + o.s * .5, vx:0, vy:-10, drag:2, life:.5, s:o.s * .5, c:'170,140,90' }); }
-      inArea(o.x, o.y, st.size + 4, e => { if ((e.hitCd.stone || 0) <= S.t) { e.hitCd.stone = S.t + .3; hurt(e, st.dmg, 'earth', { kb:360 }); debris(e.x, e.y - 10, 4, 220); SFX.thud(false); if (o.molten) flames(e.x, e.y, 4, 10, 22); } });
+      inArea(o.x, o.y, st.size + 4, e => { if ((e.hitCd.stone || 0) <= S.t) { e.hitCd.stone = S.t + (e.boss ? .12 : .3); hurt(e, st.dmg, 'earth', { kb:360 }); debris(e.x, e.y - 10, 4, 220); SFX.thud(false); if (o.molten) flames(e.x, e.y, 4, 10, 22);
+        if (L >= 5) { e.slow = Math.max(e.slow, .8); decal({ k:'crack', x:e.x, y:e.y, r:30, life:1.4, a:rnd(0, TAU) }); } } });
     }
   } else S.stones = null;
 
   /* Mountain Fist: boulders fall from the sky */
   if (sk.boulder) {
-    const st = ST.boulder(sk.boulder, ev.boulder);
+    const st = ST.boulder(sk.boulder, ev.boulder), L = LV('boulder');
     if (cool('boulder', st.cd, dt)) {
-      const tg = nearest(P.x, P.y, 20, 420);
-      for (let i = 0; i < st.n; i++) { const e = tg.length ? tg[(Math.random() * tg.length) | 0] : null, a = rnd(0, TAU);
-        S.drops.push({ k:ev.boulder ? 'meteor' : 'boulder', x:e ? e.x : P.x + Math.cos(a) * 160, y:e ? e.y : P.y + Math.sin(a) * 160, t:-i * .12, dur:ev.boulder ? .6 : .5, st }); }
+      const tg = nearest(P.x, P.y, 20, 420); S.bVol = (S.bVol || 0) + 1;
+      // Level 5 every fourth throw starts with a giant
+      // the first boulder of each throw falls on the nearest creature, which is the boss when one is close
+      for (let i = 0; i < st.n; i++) { const e = tg.length ? tg[i ? (Math.random() * tg.length) | 0 : 0] : null, a = rnd(0, TAU), giant = L >= 5 && !i && S.bVol % 4 === 0;
+        S.drops.push({ k:ev.boulder ? 'meteor' : 'boulder', x:e ? e.x : P.x + Math.cos(a) * 160, y:e ? e.y : P.y + Math.sin(a) * 160, t:-i * .12, dur:ev.boulder ? .6 : .5, st:giant ? { ...st, r:st.r * 1.6, dmg:st.dmg * 1.8 } : st, L }); }
     }
   }
 
   /* Skipping Stones: a stone flies at the nearest creature and skips on to the next one, and the next */
   if (sk.skip) {
-    const st = ST.skip(sk.skip, ev.skip);
+    const st = ST.skip(sk.skip, ev.skip), L = LV('skip');
     if (cool('skip', st.cd, dt)) { const tg = nearest(P.x, P.y, st.n, 520);
-      tg.forEach(e => { const a = Math.atan2(e.y - P.y, e.x - P.x); S.shots.push({ k:'skip', x:P.x, y:P.y - 24, vx:Math.cos(a) * 640, vy:Math.sin(a) * 640, tgt:e, hops:st.hops, life:1.4, st, hit:new Set() }); });
+      tg.forEach(e => { const a = Math.atan2(e.y - P.y, e.x - P.x); S.shots.push({ k:'skip', x:P.x, y:P.y - 24, vx:Math.cos(a) * 640, vy:Math.sin(a) * 640, tgt:e, hops:st.hops, life:1.4, st, hit:new Set(), L, big:L >= 5 }); });
       if (tg.length) SFX.thwip(); }
   }
 
   /* Golden Bell: a rotating bagua field that hurts and slows everything inside */
   if (sk.bell) {
-    const st = ST.bell(sk.bell, ev.bell);
-    S.ang.bell = (S.ang.bell || 0) + dt * .7; S.bellR = st.R;
+    const st = ST.bell(sk.bell, ev.bell), L = LV('bell');
+    // Level 5 the field grows while you stand still
+    S.bellGrow = Math.max(0, Math.min(1, (S.bellGrow || 0) + (P.moving ? -2 : 1) * dt * (L >= 5 ? 1 : 0)));
+    const R = st.R * (1 + .25 * S.bellGrow);
+    S.ang.bell = (S.ang.bell || 0) + dt * .7; S.bellR = R;
     S.cds.bellTick = (S.cds.bellTick || 0) - dt;
     if (S.cds.bellTick <= 0) {
-      S.cds.bellTick = .4; let n = 0;
-      inArea(P.x, P.y, st.R, e => { hurt(e, st.dmg, 'metal', { kb:60 }); e.slow = .5; n++; if (n < 8) fx({ k:'spark', x:e.x, y:e.y - 20, vx:rnd(-80, 80), vy:-rnd(60, 160), drag:4, life:.3, s:3, c:'#FFE58A' }); });
+      S.cds.bellTick = .33; let n = 0;
+      // a boss shakes to the bell twice as hard, as it does to the bell's waves (balance run, 2026-10-05: metal's guard
+      // barely touched bosses)
+      // Level 2 the field draws creatures in toward you
+      inArea(P.x, P.y, R, e => { hurt(e, st.dmg * (e.boss ? 2 : 1), 'metal', { kb:60 }); e.slow = .5; n++; if (n < 8) fx({ k:'spark', x:e.x, y:e.y - 20, vx:rnd(-80, 80), vy:-rnd(60, 160), drag:4, life:.3, s:3, c:'#FFE58A' });
+        if (L >= 2 && !e.boss && !e.heavy) { const d = Math.hypot(P.x - e.x, P.y - e.y) || 1; if (d > 60) { e.x += (P.x - e.x) / d * 16; e.y += (P.y - e.y) / d * 16; } } });
       if (n) SFX.ting();
+      // Level 3 each tick rings out as a chime you can see
+      if (L >= 3) ring(P.x, P.y, R * .85, R, '#FFE58A', .3, 4, true);
     }
+    // Level 4 a ring wave rolls out every few seconds (the Mountain Bell's great waves replace it)
+    if (!ev.bell && L >= 4 && cool('bellwave', 3, dt)) { S.waves.push({ k:'bell', r:R * .8, max:R * 1.7, dmg:30, w:14, hit:new Set() }); SFX.bell(false); }
     if (ev.bell && cool('dong', st.pulse, dt)) { S.waves.push({ k:'bell', r:st.R * .8, max:340, dmg:60, w:22, hit:new Set() }); SFX.bell(true); S.shake = Math.max(S.shake, .18); }
   } else S.bellR = 0;
 
   /* Flying Swords: orbit you, slice out through the crowd, fly home */
   if (sk.swords) {
-    const st = ST.swords(sk.swords, ev.swords);
+    const st = ST.swords(sk.swords, ev.swords), Lw = LV('swords');
     while (S.swords.length < st.n) S.swords.push({ st:'orbit', x:P.x, y:P.y, a:rnd(0, TAU), hit:new Set(), trail:[] });
     S.ang.sw = (S.ang.sw || 0) + dt * 3;
-    if (cool('swords', 1.2, dt)) { const tg = nearest(P.x, P.y, st.n, 500); S.swords.forEach((s, i) => { const e = tg[i % Math.max(1, tg.length)]; if (e && s.st === 'orbit') { const a = Math.atan2(e.y - s.y, e.x - s.x); s.st = 'out'; s.vx = Math.cos(a) * 700; s.vy = Math.sin(a) * 700; s.dist = 0; s.hit.clear(); } }); if (tg.length) SFX.shing(); }
+    if (cool('swords', 1.2, dt)) { const tg = nearest(P.x, P.y, st.n, 500); S.swords.forEach((s, i) => { const e = tg[i % Math.max(1, tg.length)]; if (e && s.st === 'orbit') { const a = Math.atan2(e.y - s.y, e.x - s.x); s.st = 'out'; s.vx = Math.cos(a) * (Lw >= 5 ? 880 : 700); s.vy = Math.sin(a) * (Lw >= 5 ? 880 : 700); s.dist = 0; s.hit.clear(); } }); if (tg.length) SFX.shing(); }
     S.swords.forEach((s, i) => {
       s.trail.push([s.x, s.y]); if (s.trail.length > 6) s.trail.shift();
-      if (s.st === 'orbit') { const a = S.ang.sw + i * TAU / S.swords.length; s.x += (P.x + Math.cos(a) * 54 - s.x) * Math.min(1, dt * 10); s.y += (P.y - 20 + Math.sin(a) * 54 - s.y) * Math.min(1, dt * 10); s.rot = a + Math.PI / 2; }
+      if (s.st === 'orbit') { const a = S.ang.sw + i * TAU / S.swords.length; s.x += (P.x + Math.cos(a) * 54 - s.x) * Math.min(1, dt * 10); s.y += (P.y - 20 + Math.sin(a) * 54 - s.y) * Math.min(1, dt * 10); s.rot = a + Math.PI / 2;
+        // Level 3 a sword at rest guards you, cutting whatever comes close
+        if (Lw >= 3) inArea(s.x, s.y, 24, e => { if ((e.hitCd.guard || 0) <= S.t) { e.hitCd.guard = S.t + .4; hurt(e, st.dmg * .5, 'metal', { kb:160, fx:P.x, fy:P.y }); } }); }
       else {
         if (s.st === 'back') { const d = Math.hypot(P.x - s.x, P.y - s.y) || 1; s.vx += ((P.x - s.x) / d * 900 - s.vx) * Math.min(1, dt * 6); s.vy += ((P.y - s.y) / d * 900 - s.vy) * Math.min(1, dt * 6); if (d < 40) s.st = 'orbit'; }
         s.x += s.vx * dt; s.y += s.vy * dt; s.dist += Math.hypot(s.vx, s.vy) * dt; s.rot = Math.atan2(s.vy, s.vx);
-        if (s.st === 'out' && s.dist > st.range) { s.st = 'back'; s.hit.clear(); }
-        inArea(s.x, s.y, 22, e => { if (!s.hit.has(e)) { s.hit.add(e); hurt(e, st.dmg, 'metal', { kb:140, fx:s.x, fy:s.y }); fx({ k:'slash', x:e.x, y:e.y - 20, rot:s.rot, life:.18, s:46 }); SFX.shing(); } });
+        // Level 4 at the end of its flight a sword bursts into a fan of three blades
+        if (s.st === 'out' && s.dist > st.range * (Lw >= 5 ? 1.2 : 1)) { s.st = 'back'; s.hit.clear(); if (Lw >= 4) for (const o of [-.6, 0, .6]) { const a = s.rot + o; S.drops.push({ k:'sword', x:s.x + Math.cos(a) * 60, y:s.y + Math.sin(a) * 60, t:0, dur:.15, st:{ dmg:st.dmg * .6, r:40 } }); } }
+        // Level 2 each slash lingers and strikes again a moment later
+        inArea(s.x, s.y, 22, e => { if (!s.hit.has(e)) { s.hit.add(e); hurt(e, st.dmg, 'metal', { kb:140, fx:s.x, fy:s.y }); fx({ k:'slash', x:e.x, y:e.y - 20, rot:s.rot, life:.18, s:46 }); SFX.shing();
+          if (Lw >= 2) { const x = e.x, y = e.y, r = s.rot; setTimeout(() => { if (!S || S.over) return; fx({ k:'slash', x, y:y - 20, rot:r + 1.2, life:.18, s:40 }); inArea(x, y, 30, o => hurt(o, st.dmg * .4, 'metal', { spark:false })); }, 300); } } });
       }
     });
-    if (ev.swords && cool('rain', st.rain, dt)) for (let i = 0; i < 8; i++) { const a = rnd(0, TAU), d = rnd(40, 230); S.drops.push({ k:'sword', x:P.x + Math.cos(a) * d, y:P.y + Math.sin(a) * d, t:-i * .06, dur:.32, st:{ dmg:62, r:56 } }); }
+    if (ev.swords && cool('rain', st.rain, dt)) for (let i = 0; i < 10; i++) { const a = rnd(0, TAU), d = rnd(40, 230); S.drops.push({ k:'sword', x:P.x + Math.cos(a) * d, y:P.y + Math.sin(a) * d, t:-i * .06, dur:.32, st:{ dmg:62, r:56 } }); }
   } else S.swords.length = 0;
 
   /* everything in flight */
@@ -3121,16 +3193,25 @@ function powers(dt) {
     } else if (s.k === 'bamboo' && Math.random() < .12) leaves(s.x, s.y, 1, 40);
     else if (s.k === 'skip') {
       if (!s.tgt || s.tgt.dead) { s.tgt = nearest(s.x, s.y, 1, s.st.r, s.hit)[0]; if (!s.tgt) { s.life = 0; continue; } }
-      const a = Math.atan2(s.tgt.y - s.y, s.tgt.x - s.x), sp = 700; s.vx += (Math.cos(a) * sp - s.vx) * Math.min(1, dt * 12); s.vy += (Math.sin(a) * sp - s.vy) * Math.min(1, dt * 12);
+      const a = Math.atan2(s.tgt.y - s.y, s.tgt.x - s.x), sp = s.big ? 900 : 700; s.vx += (Math.cos(a) * sp - s.vx) * Math.min(1, dt * 12); s.vy += (Math.sin(a) * sp - s.vy) * Math.min(1, dt * 12);
       if (Math.random() < .3) fx({ k:'smoke', x:s.x, y:s.y, vx:0, vy:0, drag:2, life:.3, s:6, c:'210,180,120' });
     }
     s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt;
-    if (s.k === 'ember') { const hitE = S.en.find(e => !e.dead && Math.abs(e.x - s.x) < e.r + 12 && Math.hypot(e.x - s.x, e.y - s.y) < e.r + 12); if (hitE || s.life <= 0) { s.life = 0; explode(s.x, s.y, s.st.r, s.st.dmg, 'fire', !!S.evo.ember); if (S.evo.ember) firePatch(s.x, s.y, 60, 1.6, 14); } }
+    if (s.k === 'ember') { const hitE = S.en.find(e => !e.dead && Math.abs(e.x - s.x) < e.r + 12 && Math.hypot(e.x - s.x, e.y - s.y) < e.r + 12); if (hitE || s.life <= 0) { s.life = 0;
+        // Level 2 blasts leave fire; Level 3 they throw sparks on to the next creatures; Level 4 they grow
+        const Le = S.evo.ember ? 6 : (S.skills.ember || 0); explode(s.x, s.y, s.st.r * (Le >= 4 ? 1.3 : 1), s.st.dmg, 'fire', !!S.evo.ember || s.big); if (S.evo.ember) firePatch(s.x, s.y, 60, 1.6, 14); else if (Le >= 2) firePatch(s.x, s.y, 40, 1, 8);
+        if (Le >= 3 && !s.spark) nearest(s.x, s.y, 2, 260).forEach(e => { const a = Math.atan2(e.y - s.y, e.x - s.x); S.shots.push({ k:'ember', x:s.x, y:s.y, vx:Math.cos(a) * 380, vy:Math.sin(a) * 380, tgt:e, life:1, st:{ ...s.st, r:s.st.r * .6, dmg:s.st.dmg * .5 }, spark:1 }); }); } }
     else if (s.k === 'skip') { const e = s.tgt; if (e && !e.dead && Math.hypot(e.x - s.x, e.y - s.y) < e.r + 14) {
         // a hit, then a skip on to the nearest creature it has not hit yet
-        s.hit.add(e); hurt(e, s.st.dmg, 'earth', { kb:200, fx:s.x, fy:s.y }); debris(e.x, e.y - 10, 5, 220, '#C8A060'); SFX.thud(false);
+        // a skipping stone hits a boss twice as hard: it has nowhere to skip off
+        s.hit.add(e); hurt(e, s.st.dmg * (s.big ? 1.25 : 1) * (e.boss ? 2 : 1), 'earth', { kb:200, fx:s.x, fy:s.y }); debris(e.x, e.y - 10, 5, 220, '#C8A060'); SFX.thud(false);
+        // Level 2 every skip splashes the creatures beside it; Level 4 what it hits is dazed
+        if ((s.L || 0) >= 2) { ring(e.x, e.y, 6, 50, '#C8A060', .25, 5, true); inArea(e.x, e.y, 44, o => { if (o !== e) hurt(o, s.st.dmg * .4, 'earth', { spark:false }); }); }
+        if ((s.L || 0) >= 4) { e.slow = Math.max(e.slow, 1); fx({ k:'spark', x:e.x, y:e.y - 30, vx:0, vy:-40, drag:3, life:.5, s:3, c:'#E6C27A' }); }
         if (S.evo.skip) { inArea(e.x, e.y, s.st.quake, o => { if (o !== e) hurt(o, s.st.dmg * .5, 'earth', { spark:false, kb:120, fx:e.x, fy:e.y }); }); decal({ k:'crack', x:e.x, y:e.y, r:s.st.quake * .7, life:2.5 }); ring(e.x, e.y, 10, s.st.quake, '#E6B23A', .3, 8, true); }
-        if (--s.hops <= 0) s.life = 0; else { s.tgt = nearest(e.x, e.y, 1, s.st.r, s.hit)[0]; s.life = s.tgt ? 1.2 : 0; } } }
+        // Level 3 the last skip splits in two and each skips once more
+        if (--s.hops <= 0) { s.life = 0; if ((s.L || 0) >= 3 && !s.child) nearest(e.x, e.y, 2, s.st.r, s.hit).forEach(o => { const a = Math.atan2(o.y - e.y, o.x - e.x); S.shots.push({ k:'skip', x:e.x, y:e.y, vx:Math.cos(a) * 600, vy:Math.sin(a) * 600, tgt:o, hops:1, life:1, st:{ ...s.st, dmg:s.st.dmg * .6 }, hit:new Set(s.hit), L:s.L, child:1 }); }); }
+        else { s.tgt = nearest(e.x, e.y, 1, s.st.r, s.hit)[0]; s.life = s.tgt ? 1.2 : 0; } } }
     else if (s.k === 'bamboo') { inArea(s.x, s.y, 10 * s.sz, e => { if (!s.hit.has(e) && s.pierce > 0) { s.hit.add(e); s.pierce--; hurt(e, s.dmg, 'wood', { kb:90 }); burst(e.x, e.y - 14, '#B6F07A', 4, 260);
       if (s.pierce <= 0) { s.life = 0;
         // a spear that stops splits into smaller ones that fly on (Level 5 in two, the Storm in three)
@@ -3139,7 +3220,12 @@ function powers(dt) {
   S.shots = S.shots.filter(s => s.life > 0);
   for (const l of S.lobs) {
     l.t += dt; const k = l.t / l.dur; l.x = l.x0 + (l.x1 - l.x0) * k; l.y = l.y0 + (l.y1 - l.y0) * k; l.z = Math.sin(Math.PI * Math.min(1, k)) * l.h;
-    if (k >= 1) { l.done = true; const st = l.st; flash(l.x1, l.y1, st.r * 2.2, '#FFE6A3', .15); flames(l.x1, l.y1, 14, st.r * .5, 34, 160); confetti(l.x1, l.y1, 8, 200); burst(l.x1, l.y1, '#FFB347', 8, 320); SFX.boom(false); firePatch(l.x1, l.y1, st.r, st.dur, st.dmg, !!S.evo.lantern); paintThaw(l.x1, l.y1, st.r); }
+    if (k >= 1) { l.done = true; const st = l.st; flash(l.x1, l.y1, st.r * 2.2, '#FFE6A3', .15); flames(l.x1, l.y1, 14, st.r * .5, 34, 160); confetti(l.x1, l.y1, 8, 200); burst(l.x1, l.y1, '#FFB347', 8, 320); SFX.boom(false); firePatch(l.x1, l.y1, st.r, st.dur, st.dmg, !!S.evo.lantern); paintThaw(l.x1, l.y1, st.r);
+      const L = l.L || 0, x = l.x1, y = l.y1;
+      // Level 2 a lantern bounces once and bursts again; Level 3 its burst scatters sparks of fire; Level 4 fireworks pop above it
+      if (L >= 2 && !l.bounced && !l.small) { const a = rnd(0, TAU); S.lobs.push({ k:'lantern', x0:x, y0:y, x1:x + Math.cos(a) * 90, y1:y + Math.sin(a) * 90, t:0, dur:.35, h:60, st:{ ...st, r:st.r * .7, dmg:st.dmg * .7 }, L, bounced:1 }); }
+      if (L >= 3) for (let i = 0; i < 3; i++) { const a = i * TAU / 3 + rnd(-.4, .4); firePatch(x + Math.cos(a) * st.r, y + Math.sin(a) * st.r * .7, st.r * .35, st.dur * .6, st.dmg * .6); }
+      if (L >= 4 && !l.small) setTimeout(() => { if (!S || S.over) return; confetti(x, y - 60, 14, 260); burst(x, y - 60, '#FFD24A', 10, 300); ring(x, y, 10, st.r * 1.3, '#FFB347', .35, 8, true); inArea(x, y, st.r * 1.2, e => hurt(e, st.dmg * 1.2, 'fire', { kb:180, fx:x, fy:y })); SFX.boom(false); }, 400); }
   }
   S.lobs = S.lobs.filter(l => !l.done);
   for (const d of S.drops) {
@@ -3148,7 +3234,10 @@ function powers(dt) {
       d.done = true; const st = d.st;
       if (d.k === 'sword') { inArea(d.x, d.y, st.r, e => hurt(e, st.dmg, 'metal', { kb:200, fx:d.x, fy:d.y })); fx({ k:'slash', x:d.x, y:d.y - 10, rot:rnd(0, TAU), life:.2, s:70 }); burst(d.x, d.y, '#E6F2FF', 10, 380); ring(d.x, d.y, 6, 70, '#E6F2FF', .25, 5, true); SFX.shing(); }
       else {
-        inArea(d.x, d.y, st.r, e => hurt(e, st.dmg, 'earth', { kb:420, fx:d.x, fy:d.y }));
+        const L = d.L || 0; inArea(d.x, d.y, st.r, e => { hurt(e, st.dmg, 'earth', { kb:420, fx:d.x, fy:d.y }); if (L >= 2) e.slow = Math.max(e.slow, 1.2); });
+        // Level 3 a boulder bounces on once more; Level 4 each landing sends out a shockwave
+        if (L >= 3 && !d.bounce) { const a = rnd(0, TAU); S.drops.push({ k:d.k, x:d.x + Math.cos(a) * 90, y:d.y + Math.sin(a) * 70, t:-.1, dur:.35, st:{ ...st, r:st.r * .7, dmg:st.dmg * .6 }, L, bounce:1 }); }
+        if (L >= 4 && !d.bounce) { ring(d.x, d.y, st.r, st.r * 1.9, '#E6C27A', .4, 10, true); inArea(d.x, d.y, st.r * 1.8, e => hurt(e, st.dmg * .35, 'earth', { kb:260, fx:d.x, fy:d.y, spark:false })); }
         const meteor = d.k === 'meteor';
         ring(d.x, d.y, 10, st.r * 1.5, meteor ? '#FF9A3A' : '#E6C27A', .45, 12, true); debris(d.x, d.y, meteor ? 14 : 10, 360, meteor ? '#5A2A10' : '#8A6A3A');
         smoke(d.x, d.y, 8, st.r * .8, '190,160,110'); decal({ k:'crack', x:d.x, y:d.y, r:st.r, life:2.2, a:rnd(0, TAU) });
@@ -3170,7 +3259,7 @@ function powers(dt) {
   // waves that belong to you stay centred on you for their whole life
   for (const w of S.waves) {
     w.x = P.x; w.y = P.y; w.r += dt * (w.k === 'bell' ? 600 : 460);
-    for (const e of S.en) if (!e.dead && !w.hit.has(e) && Math.abs(Math.hypot(e.x - w.x, e.y - w.y) - w.r) < e.r + w.w * .6) { w.hit.add(e); hurt(e, w.dmg * (e.boss && w.k === 'bell' ? 2 : 1), w.k === 'bell' ? 'metal' : 'water', { kb:260 }); }
+    for (const e of S.en) if (!e.dead && !w.hit.has(e) && Math.abs(Math.hypot(e.x - w.x, e.y - w.y) - w.r) < e.r + w.w * .6) { w.hit.add(e); hurt(e, w.dmg * (e.boss && w.k === 'bell' ? 2 : 1), w.k === 'bell' ? 'metal' : 'water', { kb:w.k === 'tide' ? 140 : 260 }); }
     if (w.k === 'tide' && Math.random() < .9) for (let i = 0; i < 3; i++) { const a = rnd(0, TAU); fx({ k:'drop', x:w.x + Math.cos(a) * w.r, y:w.y + Math.sin(a) * w.r, z:5, vx:Math.cos(a) * 80, vy:Math.sin(a) * 80, vz:rnd(80, 200), life:.4, s:rnd(3, 5) }); }
   }
   S.waves = S.waves.filter(w => w.r < w.max);
@@ -5154,7 +5243,7 @@ function draw() {
   g.lineWidth = 1;
   // projectiles
   for (const s of S.shots) {
-    if (s.k === 'ember') { const a = Math.atan2(s.vy, s.vx); g.save(); g.translate(s.x, s.y); g.rotate(a - Math.PI / 2); flameAt(0, 0, 26, .1, s.x); g.restore(); g.fillStyle = '#FFF6D0'; g.beginPath(); g.arc(s.x, s.y, 8, 0, TAU); g.fill(); add(() => glowAt(s.x, s.y, 60, '#FF7A2A', .6)); }
+    if (s.k === 'ember') { const a = Math.atan2(s.vy, s.vx); g.save(); g.translate(s.x, s.y); g.rotate(a - Math.PI / 2); flameAt(0, 0, s.big ? 52 : s.spark ? 16 : 26, .1, s.x); g.restore(); g.fillStyle = '#FFF6D0'; g.beginPath(); g.arc(s.x, s.y, 8, 0, TAU); g.fill(); add(() => glowAt(s.x, s.y, 60, '#FF7A2A', .6)); }
     else if (s.k === 'skip') energy(s.x, s.y, s.vx, s.vy, '#F0C060', S.evo.skip ? 16 : 13, false);
     else if (s.k === 'bamboo') {
       const a = Math.atan2(s.vy, s.vx);
@@ -5886,7 +5975,7 @@ function renderCards(opts) {
     } else if (o.kind === 'active') {
       const p = POW[o.id], lv = S.skills[o.id] || 0; b.className = 'card';
       html = `<span class="tile"><img src="${icon(p.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${p.n}</b>${lv ? '' : '<span class="flag">NEW!</span>'}</span>
-        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 2 ? `3 stars + ${GIFT[evoGift(o.id)].n} evolve it` : `evolves into ${p.evo}`}</small>${(() => { const fe = FED_BY[el]; return Object.keys(S.skills).some(id => S.evo[id] && POW[id].e === fe) && !(S.fuse && S.fuse[fe]) ? `<small style="color:#E4EAFF">3 stars fuse it into ${FUSE[fe].n}</small>` : ''; })()}${POW[o.id].e === S.apprentice ? '<small style="color:var(--sun)">Apprentice · up to 3 stars this level</small>' : ''}<span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
+        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p>${lv ? '' : `<span class="trait"><i><b>Strong:</b> ${TRAIT[o.id][0]}</i><i><b>Weak:</b> ${TRAIT[o.id][1]}</i></span>`}<small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 2 ? `3 stars + ${GIFT[evoGift(o.id)].n} evolve it` : `evolves into ${p.evo}`}</small>${(() => { const fe = FED_BY[el]; return Object.keys(S.skills).some(id => S.evo[id] && POW[id].e === fe) && !(S.fuse && S.fuse[fe]) ? `<small style="color:#E4EAFF">3 stars fuse it into ${FUSE[fe].n}</small>` : ''; })()}${POW[o.id].e === S.apprentice ? '<small style="color:var(--sun)">Apprentice · up to 3 stars this level</small>' : ''}<span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
     } else if (o.kind === 'gift') {
       const gi = GIFT[o.id], lv = S.gifts[o.id] || 0, feeds = Object.keys(POW).filter(k => evoGift(k) === o.id), mine = feeds.filter(k => S.skills[k] && !S.evo[k]);
       b.className = 'card gift';
@@ -6169,7 +6258,7 @@ let slotTipT = 0;
 $('#skills').addEventListener('pointerdown', e => {
   const sl = e.target.closest('.slot'); if (!sl || !S) return; e.preventDefault(); e.stopPropagation();
   const k = sl.dataset.k, id = sl.dataset.id; let name, line;
-  if (k === 'p') { name = S.evo[id] ? POW[id].evo : `${POW[id].n} \u00b7 Level ${S.skills[id]}`; line = S.evo[id] ? EVO_DESC[id] : ROLE_LINE[POW[id].role]; }
+  if (k === 'p') { name = S.evo[id] ? POW[id].evo : `${POW[id].n} \u00b7 Level ${S.skills[id]}`; line = S.evo[id] ? EVO_DESC[id] : `${ROLE_LINE[POW[id].role]}. Strong: ${TRAIT[id][0]}. Weak: ${TRAIT[id][1]}.`; }
   else if (k === 'g') { name = `${GIFT[id].n} \u00b7 Level ${S.gifts[id]}`; line = NEXT[id](0); }
   else { name = 'Lodestone'; line = 'Pulls nearby gems to you'; }
   const tip = $('#slotTip'), hud = $('#hud').getBoundingClientRect(), r = sl.getBoundingClientRect();
@@ -6610,7 +6699,7 @@ function results() {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
