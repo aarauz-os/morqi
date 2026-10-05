@@ -802,6 +802,72 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .ultdemo .tap{position:absolute;left:58%;top:58%;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 0 0 rgba(255,255,255,.7);animation:tapPulse 1.2s ease-out infinite}
 @keyframes tapPulse{0%{transform:scale(.85);box-shadow:0 0 0 0 rgba(255,255,255,.7)}70%{transform:scale(1);box-shadow:0 0 0 22px rgba(255,255,255,0)}100%{transform:scale(.85)}}
 @media (prefers-reduced-motion:reduce){.ultdemo .ur,.ultdemo .tap{animation:none}}
+
+/* Star Call (A, 2026-10-05): the bell sits under the spirit animal, so your own powers share one column. Tapping it
+   hushes the world under starlight while the seal is swiped; the marks along the bottom say which stroke comes next */
+#callBtn{position:absolute;left:14px;top:calc(var(--ultTop, 168px) + 90px);width:66px;height:66px;border-radius:50%;border:0;padding:0;background:none;pointer-events:auto;z-index:8;--p:0;-webkit-tap-highlight-color:transparent;touch-action:none}
+#callBtn[hidden]{display:none}
+#callBtn .ur{position:absolute;inset:0;border-radius:50%;background:conic-gradient(#C9D3DB calc(var(--p) * 360deg),rgba(16,22,52,.55) 0);-webkit-mask:radial-gradient(circle,transparent 27px,#000 28px);mask:radial-gradient(circle,transparent 27px,#000 28px)}
+#callBtn img{position:absolute;left:7px;top:7px;width:52px;height:52px;border-radius:50%;object-fit:contain;padding:4px;box-sizing:border-box;background:radial-gradient(circle at 50% 35%,#4A58B0,#161C4A);filter:grayscale(.85) brightness(.72);transition:filter .3s}
+#callBtn em{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);display:flex;gap:3px;padding:3px 6px;border-radius:99px;background:#1B2257;box-shadow:0 0 0 1.5px rgba(255,255,255,.55)}
+#callBtn em i{width:5px;height:5px;border-radius:50%;background:#F4F8FF}
+#callBtn.ready img{filter:none}
+#callBtn.ready .ur{background:conic-gradient(#FFFFFF,#CFE3FF,#C9D3DB,#FFFFFF,#CFE3FF,#FFFFFF)}
+#callBtn.ready{animation:callPulse 1.4s ease-in-out infinite}
+#callBtn.sealing{animation:callTap .55s ease-in-out infinite}
+#callBtn.sealing img{filter:none;box-shadow:0 0 0 3px #fff,0 0 26px rgba(225,236,255,.95)}
+#callBtn.nope{animation:ultNope .3s}
+@keyframes callPulse{50%{transform:scale(1.07);filter:drop-shadow(0 0 12px rgba(230,240,255,.9))}}
+@keyframes callTap{50%{transform:scale(.9)}}
+#seal{position:absolute;inset:0;z-index:7;display:none;pointer-events:auto;touch-action:none;background:radial-gradient(ellipse at 50% 50%,rgba(24,30,80,0) 30%,rgba(12,16,46,.55) 85%)}
+#seal.on{display:block;animation:sealIn .2s ease-out}
+@keyframes sealIn{from{opacity:0}}
+.sealrow{position:absolute;left:50%;bottom:140px;transform:translateX(-50%);display:flex;gap:14px}
+.sealrow i{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:rgba(16,22,52,.74);box-shadow:inset 0 0 0 2px rgba(255,255,255,.28)}
+.sealrow svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:.45}
+.sealrow i.now{box-shadow:inset 0 0 0 3px #fff,0 0 24px rgba(220,235,255,.85);animation:sealNow .8s ease-in-out infinite}
+.sealrow i.now svg{opacity:1}
+.sealrow i.done{background:radial-gradient(circle at 50% 40%,#FFFFFF,#DCE8FF 60%,#9DB0E0)}
+.sealrow i.done svg{stroke:#1B2257;opacity:1}
+.sealrow.miss{animation:sealMiss .32s}
+@keyframes sealNow{50%{transform:scale(1.1)}}
+@keyframes sealMiss{20%,60%{transform:translateX(calc(-50% - 9px))}40%,80%{transform:translateX(calc(-50% + 9px))}}
+#seal .streak{position:absolute;height:8px;margin-top:-4px;border-radius:8px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(255,255,255,0),#fff);box-shadow:0 0 16px rgba(220,235,255,.9);animation:streak .45s ease-out forwards;pointer-events:none}
+@keyframes streak{to{opacity:0}}
+#seal .streak.ghost{transform:rotate(var(--a)) scaleX(0);animation:ghost .9s ease-out forwards;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9));box-shadow:0 0 0 2px rgba(27,34,87,.35),0 0 16px rgba(220,235,255,.9)}
+@keyframes ghost{55%{transform:rotate(var(--a)) scaleX(1);opacity:1}100%{transform:rotate(var(--a)) scaleX(1);opacity:0}}
+#tipP{text-wrap:balance}
+/* the Star Call card: both ways to call, on one 10 s loop. First the seal: tap the bell; the finger swipes up, down,
+   then flicks toward the creatures; each mark lights only during its stroke; the beam finds them and the bell lands.
+   Then the young players' way: two taps on the bell, and it lands again */
+.calldemo{position:absolute;inset:0;overflow:hidden;--d:10s;background:radial-gradient(circle at 70% 62%,rgba(150,166,255,.3),transparent 50%),linear-gradient(180deg,#1A1F5C,#0E1236)}
+.calldemo .cd-btn{position:absolute;left:7%;top:9%;width:17%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 35%,#4A58B0,#161C4A);box-shadow:0 0 0 3px #C9D3DB;animation:cdBtn var(--d) infinite}
+.calldemo .cd-btn img{position:absolute;inset:12%;width:76%!important;height:76%!important;object-fit:contain}
+.calldemo .cd-c{position:absolute;width:15%!important;height:auto!important;animation:cdCrowd var(--d) infinite}
+.calldemo .cd-c1{left:58%;top:47%}.calldemo .cd-c2{left:71%;top:53%}.calldemo .cd-c3{left:64%;top:60%}
+.calldemo .beam{position:absolute;left:70%;top:0;bottom:24%;width:20%;transform:translateX(-50%);background:linear-gradient(90deg,rgba(100,114,232,0),rgba(248,250,255,.7),rgba(100,114,232,0));opacity:0;animation:cdBeam var(--d) infinite}
+.calldemo .cd-bell{position:absolute;left:70%;top:34%;width:34%!important;height:auto!important;transform:translate(-50%,-160%);opacity:0;filter:drop-shadow(0 0 10px rgba(214,222,255,.6));animation:cdBell var(--d) infinite}
+.calldemo .cd-f{position:absolute;left:15.5%;top:17.5%;width:7%;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.95);box-shadow:0 0 0 4px rgba(255,255,255,.35),0 0 14px rgba(220,235,255,.9);transform:translate(-50%,-50%);animation:cdFinger var(--d) infinite}
+.calldemo .sealrow{bottom:5%;gap:8px;animation:cdRow var(--d) infinite}
+.calldemo .sealrow i{width:34px;height:34px}
+.calldemo .sealrow svg{width:18px;height:18px;opacity:1}
+.calldemo .sealrow i:nth-child(1){animation:cdM1 var(--d) infinite}.calldemo .sealrow i:nth-child(1) svg{animation:cdM1s var(--d) infinite}
+.calldemo .sealrow i:nth-child(2){animation:cdM2 var(--d) infinite}.calldemo .sealrow i:nth-child(2) svg{animation:cdM2s var(--d) infinite}
+.calldemo .sealrow i:nth-child(3){animation:cdM3 var(--d) infinite}.calldemo .sealrow i:nth-child(3) svg{animation:cdM3s var(--d) infinite}
+@keyframes cdBtn{2.4%,6%{transform:scale(.88);box-shadow:0 0 0 3px #fff,0 0 22px rgba(225,236,255,.95)}0%,8.4%,64%,69%,73%,100%{transform:none}67%,71%{transform:scale(.86);box-shadow:0 0 0 3px #fff,0 0 22px rgba(225,236,255,.95)}}
+@keyframes cdFinger{0%{left:15.5%;top:17.5%;opacity:0}2.4%,6%{left:15.5%;top:17.5%;opacity:1}9.6%{left:46%;top:70%;opacity:1}16.8%{left:46%;top:46%}24%{left:46%;top:70%}26.4%{left:46%;top:62%}31.2%{left:64%;top:48%;opacity:1}33.6%{left:64%;top:48%;opacity:0}
+  60%{left:15.5%;top:17.5%;opacity:0}63%,72%{left:15.5%;top:17.5%;opacity:1}66%,70%{left:15.5%;top:16%}67%,71%{left:15.5%;top:18%}75%,100%{left:15.5%;top:17.5%;opacity:0}}
+@keyframes cdRow{0%,56%{opacity:1}60%,96%{opacity:.25}100%{opacity:1}}
+@keyframes cdM1{10.8%,16.8%{background:#F4F8FF;box-shadow:0 0 14px rgba(230,240,255,.9)}0%,9.6%,18.6%,100%{background:rgba(16,22,52,.74)}}
+@keyframes cdM1s{10.8%,16.8%{stroke:#1B2257}}
+@keyframes cdM2{18%,24%{background:#F4F8FF;box-shadow:0 0 14px rgba(230,240,255,.9)}0%,16.8%,25.8%,100%{background:rgba(16,22,52,.74)}}
+@keyframes cdM2s{18%,24%{stroke:#1B2257}}
+@keyframes cdM3{26.4%,31.8%{background:#F4F8FF;box-shadow:0 0 14px rgba(230,240,255,.9)}0%,25.2%,33.6%,100%{background:rgba(16,22,52,.74)}}
+@keyframes cdM3s{26.4%,31.8%{stroke:#1B2257}}
+@keyframes cdBeam{0%,33%,44.4%,73%,82%,100%{opacity:0}36%,42%,76%,80%{opacity:1}}
+@keyframes cdBell{0%,39.6%{transform:translate(-50%,-160%);opacity:0}40.2%{opacity:1}42.6%{transform:translate(-50%,0)}43.8%{transform:translate(-50%,0) scale(1.08,.9)}46.2%{transform:translate(-50%,0) rotate(-6deg)}48.6%{transform:translate(-50%,0) rotate(4deg)}52.8%{transform:translate(-50%,0);opacity:1}57.6%{transform:translate(-50%,-30%);opacity:0}
+  58%,78.6%{transform:translate(-50%,-160%);opacity:0}79.2%{opacity:1}81%{transform:translate(-50%,0)}82%{transform:translate(-50%,0) scale(1.08,.9)}84%{transform:translate(-50%,0) rotate(-6deg)}86%{transform:translate(-50%,0) rotate(4deg)}93%{transform:translate(-50%,0);opacity:1}98%,100%{transform:translate(-50%,-30%);opacity:0}}
+@keyframes cdCrowd{0%,42%{opacity:1;transform:none}45%{opacity:0;transform:scale(1.2) translateY(-20%)}58%{opacity:0;transform:none}62%,81%{opacity:1;transform:none}84%{opacity:0;transform:scale(1.2) translateY(-20%)}98%{opacity:0}100%{opacity:1}}
 </style>
 
 <div id="stage">
@@ -822,11 +888,13 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <div class="skills" id="skills"></div>
     <div class="slottip" id="slotTip" hidden></div>
     <button id="ultBtn" aria-label="Companion ultimate"><span class="ur"></span><img id="ultImg" alt=""><em id="ultLv"></em><b id="ultName"></b></button>
+    <button id="callBtn" aria-label="Star Call: Bell Strike" hidden><span class="ur"></span><img id="callImg" src="art4/calls/bell-star.png?v=9" alt=""><em id="callPips"></em></button>
     <button id="mapBtn" aria-label="Shore map"><canvas id="mapCv"></canvas></button>
     <div id="combo"><b id="comboN">×0</b><span>combo</span></div>
     <div id="cue"></div>
     <div id="toast"></div>
     <div id="joy"><i></i></div>
+    <div id="seal" aria-hidden="true"><div class="sealrow" id="sealRow"></div></div>
     <div id="moveGhost"><i></i></div>
     <div id="coachRing"></div>
     <div id="coachDim"></div>
@@ -1284,14 +1352,14 @@ const AU = (() => {
      - the music dips for a beat under a hero moment, so it lands.
      If a file can't load, the synth version above plays instead. */
   const PHI = 1.618, LADDER = [1, 1 / PHI, 1 / PHI / PHI, 1 / PHI / PHI / PHI], SOFT = [18000, 9000, 5200, 2800];
-  const LOUD = { alarm:-6.0, bell:-25.9, bloop:-8.9, 'boom-big':-7.7, boom:-18.9, bossdown:-5.7, bossroar:-6.7, cardin:-17.3, charge:-8.0, chestdrop:-3.6, combo:-24.1, crackle:-13.0, dart:-9.4, firecrackers:-16.0, firework:-8.7, freeze:-17.1, gem:-21.4, heal:-22.9, heart:-7.2, heartbeat:-22.4, hurt:-9.3, jackpot:-8.4, levelup:-11.0, pop:-13.4, power:-10.1, reveal:-8.6, roar:-6.3, select:-45.8, shatter1:-14.9, shatter2:-26.5, shing:-5.6, spikes:-16.2, splash:-11.4, stomp:-13.1, sweep:-9.8, thud:-26.2, thwip:-4.0, ting:-20.5, victory:-9.7, wave:-11.9, whip:-21.0,
-    'earth-boulder':-10.3, 'earth-quake':-10.7, 'earth-roar':-9.4, 'fire-dash':-9.2, 'fire-drum':-9.6, 'fire-mortar':-9.5, 'fire-roar':-9.5, 'm-earth':-18.2, 'm-fire':-9.5, 'm-metal':-10.4, 'm-water':-10.5, 'm-wood':-17.8, 'metal-blades':-11.6, 'metal-blink':-9.6, 'metal-roar':-9.4, 'metal-toll':-9.6, 'water-cast':-9.4, 'water-pull':-9.6, 'water-roar':-9.2, 'water-wall':-9.5, 'wood-axe':-9.4, 'wood-roar':-9.4, 'wood-roots':-10.0 };
+  const LOUD = { alarm:-7.6, bell:-25.9, bloop:-8.9, 'boom-big':-9.3, boom:-18.9, bossdown:-8.3, bossroar:-8.7, cardin:-17.3, charge:-11.6, chestdrop:-5.5, combo:-24.1, crackle:-13.0, dart:-11.3, firecrackers:-17.9, firework:-14.2, freeze:-19.8, gem:-21.4, heal:-22.9, heart:-9.2, heartbeat:-22.4, hurt:-9.3, jackpot:-11.0, levelup:-13.7, pop:-13.4, power:-12.6, reveal:-10.7, roar:-8.4, select:-45.8, shatter1:-16.1, shatter2:-26.5, shing:-9.2, spikes:-19.1, splash:-11.4, stomp:-13.1, sweep:-12.6, thud:-26.2, thwip:-5.9, ting:-20.5, victory:-12.8, wave:-14.7, whip:-21.0,
+    'call-beam':-12.5, 'call-bell':-12.3, 'call-seal':-15.4, 'call-throw':-12.4, 'call-toll':-12.4, 'earth-boulder':-10.3, 'earth-quake':-13.0, 'earth-roar':-9.4, 'fire-dash':-9.2, 'fire-drum':-9.6, 'fire-mortar':-12.0, 'fire-roar':-9.5, 'm-earth':-20.8, 'm-fire':-9.5, 'm-metal':-12.2, 'm-water':-12.3, 'm-wood':-20.5, 'metal-blades':-13.8, 'metal-blink':-11.4, 'metal-roar':-9.4, 'metal-toll':-10.7, 'water-cast':-11.2, 'water-pull':-9.6, 'water-roar':-10.6, 'water-wall':-9.5, 'wood-axe':-9.4, 'wood-roar':-12.0, 'wood-roots':-11.7 };
   // levelled to -18 dB and never boosted more than 1.4x, so a quiet file can't come out louder than it used to (A: still too loud)
   const level = n => Math.min(1.4, Math.max(.3, Math.pow(10, (-18 - (LOUD[n] ?? -18)) / 20)));
   const MINOR = [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24, 27, 29, 31, 34];   // minor pentatonic steps, in semitones
   const SMP = {}, SVAR = { shatter:['shatter1', 'shatter2'] }, lastRate = {};
   const SFILES = ['gem','shatter1','shatter2','splash','bloop','dart','boom','boom-big','whip','thwip','thud','stomp','bell','ting','shing','levelup','select','cardin','reveal','victory','chestdrop','roar','alarm','hurt','crackle','firecrackers','heal','sweep','freeze','power','wave','firework','pop','bossroar','jackpot','heart','heartbeat','charge','spikes','combo','bossdown',
-    'earth-boulder','earth-quake','earth-roar','fire-dash','fire-drum','fire-mortar','fire-roar','m-earth','m-fire','m-metal','m-water','m-wood','metal-blades','metal-blink','metal-roar','metal-toll','water-cast','water-pull','water-roar','water-wall','wood-axe','wood-roar','wood-roots'];
+    'earth-boulder','earth-quake','earth-roar','fire-dash','fire-drum','fire-mortar','fire-roar','m-earth','m-fire','m-metal','m-water','m-wood','metal-blades','metal-blink','metal-roar','metal-toll','water-cast','water-pull','water-roar','water-wall','wood-axe','wood-roar','wood-roots','call-beam','call-bell','call-seal','call-throw','call-toll'];
   // [file, rung]: 0 hero, 1 big event, 2 regular combat, 3 constant
   const SMAP = { dart:['dart', 3], boom:a => a[0] ? ['boom-big', 1] : ['boom', 2], splash:['splash', 2], bloop:['bloop', 3], whip:['whip', 2], thwip:['thwip', 3],
     thud:a => a[0] ? ['stomp', 1] : ['thud', 2], bell:['bell', 2], ting:['ting', 3], shing:['shing', 2], shatter:['shatter', 3], levelup:['levelup', 0], select:['select', 2],
@@ -1304,9 +1372,9 @@ const AU = (() => {
     if (!mus) return; const t = c.currentTime, v = MUSVOL; mus.gain.cancelScheduledValues(t); mus.gain.setTargetAtTime(v / PHI, t, .03); mus.gain.setTargetAtTime(v, t + .618, .25);
   }
   let voices = 0;
-  function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=8`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
+  function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast'].map(k => 'vo-card-' + k), 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call'].map(k => 'vo-card-' + k), 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -1898,6 +1966,9 @@ const AU = (() => {
       return { sfx:db(this._m.s), mus:db(this._m.u) }; },
     setSfx(v) { if (sfx) sfx.gain.value = v; },
     // slow motion: the score sinks under water and fades while the last notes ring out
+    // drawing a Star Call's seal: the music sinks under water while the world slows, and comes back when it's thrown
+    muffle(on) { if (!musLP) return; const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(musLP.frequency.value, t);
+      musLP.frequency.exponentialRampToValueAtTime(on ? 700 : 20000, t + (on ? .15 : .35)); mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(MUSVOL * (on ? .7 : 1), t + .3); },
     slowmo() { if (!musLP) return; const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(musLP.frequency.value, t); musLP.frequency.exponentialRampToValueAtTime(160, t + 1.1);
       mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(0, t + 1.4); }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
     get on() { return sfxOn; }, get musicOn() { return musOn; }, vo, toggleVoice() { voOn = !voOn; save('morqi.voice', voOn); return voOn; }, get voiceOn() { return voOn; }, get vmiss() { return VFILES.filter(n => !SMP[n]); } };
@@ -2076,7 +2147,7 @@ function startRun() {
     t:0, over:false, won:false, level:LVL, learned:pathOf(keeperEl).slice(0, LVL), apprentice:LVL > 1 ? pathOf(keeperEl)[LVL - 1] : null,
     p:{ x:WORLD / 2, y:WORLD / 2, hp:220, max:220, face:1, hurt:0, r:26, mx:0, my:0 },
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0, z:0 },
-    ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null,
+    ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null, call:LVL >= CALL_LEVEL ? newCall() : null,
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
     lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, qi:{}, qiStones:{}, stoneOut:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
@@ -2145,7 +2216,7 @@ cv.addEventListener('pointerup', endJoy); cv.addEventListener('pointercancel', e
 let loopId = 0;
 function startLoop() { const id = ++loopId; running = true; last = performance.now(); requestAnimationFrame(t => loop(t, id)); }
 function resume() { show(null); startLoop(); }
-function pause() { if (!running || S.over) return; running = false; show('paused'); }
+function pause() { if (!running || S.over) return; closeSeal(); running = false; show('paused'); }
 $('#pauseBtn').onclick = () => { SFX.pop(); pause(); };
 $('#resumeBtn').onclick = () => { SFX.select(); resume(); };
 $('#restartBtn').onclick = () => { show(null); startRun(); };
@@ -2352,7 +2423,7 @@ function crates(dt) {
     if (Math.hypot(it.x - P.x, it.y - 18 - P.y) < 84) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
   S.items = S.items.filter(it => !it.got && (it.kind === 'stone' || it.t < 40));
-  for (const ch of S.chests) { ch.t += dt; if (!ch.got && !hsOn() && !S.holdLevels && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
+  for (const ch of S.chests) { ch.t += dt; if (!ch.got && !hsOn() && !S.holdLevels && !callBusy() && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
   S.chests = S.chests.filter(c => !c.got);
 }
 function useItem(k) {
@@ -2853,6 +2924,9 @@ function teach() {
     }
     break;
   }
+  if (S.call && callReady() && !SEEN.has('_call')) { markSeen('_call');
+    coach('call', 'Star Call: Bell Strike!', 'Tap the bell. Swipe up, down, then toward the creatures. Or tap the bell twice.',
+      () => { const r = $('#callBtn').getBoundingClientRect(), b = stage.getBoundingClientRect(); return { sx:r.left - b.left + r.width / 2, sy:r.top - b.top + r.height / 2, sr:r.width * .62, paint:'#callImg' }; }); }
   if (S.ult.charge >= 1 && !SEEN.has('_ult')) { markSeen('_ult'); S.taught.c_ult = 0; const I = S.ultInfo;
     coach('ult', `${A.y}: ${I.name}!`, `Tap your ${A.y} for one huge hit. It grows every run.`,
       () => { const r = $('#ultBtn').getBoundingClientRect(), b = stage.getBoundingClientRect(); return { sx:r.left - b.left + r.width / 2, sy:r.top - b.top + r.height / 2, sr:r.width * .62, paint:'#ultImg' }; }); }
@@ -3425,6 +3499,7 @@ function hsTick(dt) {
   }
 }
 function hsStart(final) {
+  closeSeal();
   const H = S.hs, P = S.p; H.used = true; H.on = { t:0, p:.35, final };
   S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); AU.song('highest', 2);
   // the world stops for half a second while the camera pushes in on the anthem's first hit
@@ -3476,7 +3551,113 @@ function stoneBurst() {
   stars(P.x, P.y - 40, 90, '#FFE58A', 900); paintThaw(P.x, P.y, 1100);
   for (const e of S.en) if (!e.dead && !e.boss) { stars(e.x, e.y - 20, 3, EL[e.el], 200); kill(e); }
 }
+/* ================= Star Calls ================= */
+// A, 2026-10-05: each boss, once freed, gives the player its power, called down from the sky ("Getting the bosses
+// powers. That's awesome. And timeless"). All power is earned by playing; the Season Path only sells how a call looks.
+// A call is thrown: tap its button, swipe a short hand seal while the world slows, and the last stroke throws it.
+// Young players can tap the button twice instead. A beam of starlight marks the spot, then the call lands.
+// The prototype is the bell ringer's Bell Strike, from Level 2. Tiers 1-5 (try them with ?tier=N); the fifth is Awakened.
+const CALL = { bell:{ n:'Bell Strike', el:'metal', seal:['up', 'down'], R:[170, 195, 220, 245, 275], cd:[45, 42, 38, 34, 30], tolls:[1, 1, 2, 2, 3], still:[0, 0, 0, 3, 3.5] } };
+const CALL_LEVEL = 2, SEAL_SLOW = .25;
+const CALL_T = { throw:.35, beam:1.1, fall:.26, toll:.75, rest:.6, rise:.5 };
+function callTier() { let t = 1; try { t = +(new URLSearchParams(location.search).get('tier')) || 1; } catch (e) {} return clamp(Math.round(t), 1, 5) - 1; }
+function newCall() { const id = 'bell', tr = callTier(); if (!IMG.callBell) { load('callBell', 'art4/calls/bell-star.png?v=9'); load('callBellA', 'art4/calls/bell-star-awakened.png?v=9'); } return { id, tier:tr, max:CALL[id].cd[tr], cd:12, seal:null, strike:null, uses:0 }; }
+const callBusy = () => !!(S && S.call && (S.call.seal || S.call.strike));
+const callReady = () => { const C = S && S.call; return !!C && C.cd <= 0 && !C.strike && !C.seal && !hsOn(); };
+function callDmg() { return 240 * [1, 1.3, 1.6, 2, 2.5][S.call.tier] * (1 + (S.lv - 1) * .07); }
+function openSeal() {
+  const C = S && S.call; if (!C || !running || S.over || S.fall || hsOn()) return false;
+  if (C.seal) { quickCall(); return true; }
+  if (!callReady()) return false;
+  C.seal = { step:0, t0:performance.now() }; joy = null; $('#joy').style.display = 'none';
+  sealUI(); SFX.bx('call-seal', 2, 0); AU.muffle(true); return true;
+}
+function closeSeal() { const C = S && S.call; if (!C || !C.seal) return; C.seal = null; sealUI(); AU.muffle(false); }
+// one swipe of the seal: the right stroke lights its mark, a wrong one starts the seal again; the last stroke throws
+function sealStroke(dx, dy) {
+  const C = S && S.call; if (!C || !C.seal) return; if (hsOn() || !running) { closeSeal(); return; } const seal = CALL[C.id].seal, Sl = C.seal;
+  Sl.t0 = performance.now();
+  if (Sl.step >= seal.length) { throwCall(dx, dy); return; }
+  const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+  if (dir === seal[Sl.step]) { Sl.step++; SFX.bx('call-seal', 2, 0); }
+  else { Sl.step = 0; Sl.miss = performance.now(); SFX.pop(); }
+  sealUI();
+}
+// where the call lands: the thickest crowd (or the boss) in the direction thrown, so a child's rough throw still lands well
+function callTarget(dx, dy) {
+  const P = S.p, B = S.boss && !S.boss.dead ? S.boss : null, R = CALL[S.call.id].R[S.call.tier];
+  const d = Math.hypot(dx || 0, dy || 0), ux = d ? dx / d : 0, uy = d ? dy / d : 0;
+  const seen = e => e.x > camX + 40 / Z && e.x < camX + (W - 40) / Z && e.y > camY + 110 / Z && e.y < camY + (H - 110) / Z;
+  const inCone = e => { if (!seen(e)) return false; if (!d) return true; const ex = e.x - P.x, ey = e.y - P.y, m = Math.hypot(ex, ey) || 1; return (ex * ux + ey * uy) / m > .64; };
+  if (B && inCone(B)) return { x:B.x, y:B.y };
+  const pool = S.en.filter(e => !e.dead && !e.boss && Math.abs(e.x - P.x) < 700 && Math.abs(e.y - P.y) < 700 && inCone(e)).slice(0, 60);
+  let best = null, bn = 0;
+  for (const e of pool) { let n = 0; for (const o of pool) if (Math.abs(o.x - e.x) < R && Math.abs(o.y - e.y) < R * .7) n++; if (n > bn) { bn = n; best = e; } }
+  if (best) return { x:best.x, y:best.y };
+  const lm = S.lastMove || { x:P.face || 1, y:0 }; const fx = d ? ux : lm.x, fy = d ? uy : lm.y;
+  return { x:P.x + fx * 300, y:P.y + fy * 300 };
+}
+// the mark and the bell stay on screen: below the HUD band with room for the bell above the mark, clear of the button
+// column, above the skills bar (design review, 2026-10-05: a throw could land behind the minimap or off the edge)
+function callInView(x, y, R) {
+  const cx = camX, cy = camY, rz = R * Z, bellH = callBellSize(R) * Z * .86;
+  let sx = (x - cx) * Z, sy = (y - cy) * Z;
+  // the HUD band ends lower while a boss's name and health bar show
+  sy = clamp(sy, Math.min(H * .55, (S.boss ? 148 : 96) + bellH), Math.max(H * .55, H - 120 - rz * .55));
+  // the whole mark stays on screen, and beside the spirit animal, bell and map buttons (down to about 270 px) it keeps
+  // clear of the side columns too
+  const side = Math.max(rz + 8, sy - rz * .55 < 270 ? rz * .75 + 86 : 0);
+  sx = clamp(sx, Math.min(W / 2, side), Math.max(W / 2, W - side));
+  return { x:cx + sx / Z, y:cy + sy / Z };
+}
+const callBellSize = R => Math.min(R * 1.95, 236 / Z);
+function throwCall(dx, dy) {
+  const C = S.call, P = S.p; closeSeal();
+  let { x, y } = callTarget(dx, dy);
+  if (S.arena) { const A = S.arena, q = Math.hypot(x - A.x, y - A.y), lim = A.r - 60; if (q > lim) { x = A.x + (x - A.x) / q * lim; y = A.y + (y - A.y) / q * lim; } }
+  ({ x, y } = callInView(x, y, CALL[C.id].R[C.tier])); x = clamp(x, 60, WORLD - 60); y = clamp(y, 60, WORLD - 60);
+  C.cd = C.max; C.uses++; C.strike = { x, y, sx:P.x, sy:P.y - 40, t:0, tolls:0, hit:0, waves:[], trail:[] };
+  SFX.bx('call-throw', 2); P.cheerAt = S.t;
+  return C.strike;
+}
+function quickCall() { const C = S.call; if (!C || (!C.seal && !callReady())) return false; throwCall(0, 0); return true; }
+function callBlast(K, mul, R) {
+  const C = S.call, D = CALL[C.id], tr = C.tier; let n = 0;
+  for (const e of S.en) { if (e.dead || Math.hypot(e.x - K.x, (e.y - K.y) / .55) > R + e.r) continue; n++;
+    if (e.boss) { hurt(e, e.max * .06 * mul, D.el, { kb:0 }); e.frozen = Math.max(e.frozen || 0, 1.1 * mul); }
+    else { hurt(e, callDmg() * mul, D.el, { kb:520 * mul, fx:K.x, fy:K.y }); if (D.still[tr]) e.slow = Math.max(e.slow || 0, D.still[tr]); } }
+  K.hit += n;
+}
+function callTick(dt) {
+  const C = S.call; if (!C) return;
+  if (C.seal && performance.now() - C.seal.t0 > 8000) closeSeal();
+  // level-ups held while the call was drawn and landed come now, one after another
+  if (!C.seal && !C.strike && S.lvlDefer && !S.bloom && !hsOn() && !S.holdLevels && running) flushLevels();
+  if (!C.strike && C.cd > 0) { const was = C.cd; C.cd = Math.max(0, C.cd - dt); if (was > 0 && C.cd <= 0) { SFX.ting(); C.readyAt = S.t; } }
+  const K = C.strike; if (!K) return;
+  const D = CALL[C.id], tr = C.tier, R = D.R[tr], T = CALL_T, t0 = T.throw, t1 = t0 + T.beam, t2 = t1 + T.fall;
+  const was = K.t; K.t += dt; const at = x => was < x && K.t >= x;
+  if (K.t < t0) { const q = K.t / t0; K.trail.push([K.sx + (K.x - K.sx) * q, K.sy + (K.y - K.sy) * q - Math.sin(q * Math.PI) * 150]); if (K.trail.length > 7) K.trail.shift(); }
+  if (at(t0)) SFX.bx('call-beam', 1);
+  if (K.t > t0 && K.t < t1 && Math.random() < .7) { const a = rnd(0, TAU), q = (K.t - t0) / T.beam; fx({ k:'star', x:K.x + Math.cos(a) * R, y:K.y + Math.sin(a) * R * .55, vx:-Math.cos(a) * R * (1.1 + q), vy:-Math.sin(a) * R * .55 * (1.1 + q), drag:.5, life:.7, s:rnd(3, 6), c:'#FFFFFF' }); }
+  if (at(t1)) SFX.sweep();
+  if (at(t2)) {   // the bell lands: the ground thaws in a wide circle, every creature inside is struck and thrown back
+    SFX.bx('call-bell', 0); S.shake = Math.max(S.shake, .8); S.hitstop = Math.max(S.hitstop || 0, .14); S.flashT = .07; S.flashC = '120,132,230';
+    K.waves.push({ t:K.t, r0:R * .3, r1:R * 1.05, life:.5, w:16, disc:1 }, { t:K.t, r0:R * .5, r1:R * 1.45, life:.85, w:7 });
+    debris(K.x, K.y, 16, 560); stars(K.x, K.y - 30, 30 + tr * 6, '#F4F8FF', 520); smoke(K.x, K.y + 10, 10, R * .8, '150,160,215');
+    paintThaw(K.x, K.y, R * 1.15); callBlast(K, 1, R); K.tolls = 1; K.swayAt = S.t;
+  }
+  // later tiers ring again: each toll is a wave of sound that strikes a wider circle
+  if (K.t > t2 && K.tolls < D.tolls[tr] && K.t >= t2 + K.tolls * T.toll) {
+    K.tolls++; K.swayAt = S.t; SFX.bx('call-toll', 1); S.shake = Math.max(S.shake, .4);
+    K.waves.push({ t:K.t, r0:R * .4, r1:R * 1.3, life:.7, w:9 }); stars(K.x, K.y - 80, 14, '#F4F8FF', 420);
+    callBlast(K, .5, R * 1.3);
+  }
+  const end = t2 + (D.tolls[tr] - 1) * T.toll + T.rest + T.rise;
+  if (K.t >= end) C.strike = null;
+}
 function update(dt) {
+  if (S.call && S.call.seal) dt *= SEAL_SLOW;
   S.t += dt;
   const P = S.p;
   let mx = 0, my = 0;
@@ -3507,7 +3688,7 @@ function update(dt) {
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
@@ -4062,6 +4243,7 @@ function draw() {
     if (a.k === 'circle') warnCircle(a.x, a.y, a.r, p);
     else if (a.k === 'lane') { g.save(); g.translate(e.x, e.y); g.rotate(Math.atan2(a.dy, a.dx)); warnLane(a.len + e.r, a.w, p); g.restore(); } }
   g.lineWidth = 1;
+  if (S.call) drawCallGround();
   // enemies: a coloured ring at the feet names their element
   const list = S.en.filter(e => inView(e.x, e.y, e.size)).sort((a, b) => a.y - b.y);
   for (const e of list) { const w = e.r * 2.3; g.drawImage(ringSprite(GROUND_RING[e.el]), e.x - w / 2, e.y + e.r * .7 - w * .23, w, w * .46); }
@@ -4202,7 +4384,7 @@ function draw() {
     if (C && C.k === 'orbit' && C.pts && ok(pim)) C.pts.slice(1).forEach(([x, y], j) => { add(() => glowAt(x, y - 20, 150, col, .7)); g.save(); g.globalAlpha = .75; g.translate(x, y); g.rotate(Math.sin(S.t * 14 + j) * .2); g.drawImage(pim, -45, -75, 90, 90); g.restore(); });
     for (const d of S.ultDrops) {
       const k = Math.min(1, d.t / d.fall), r = d.R * (.5 + .5 * k);
-      g.save(); g.globalAlpha = .35 + .4 * k; g.strokeStyle = col; g.lineWidth = 4; g.fillStyle = 'rgba(255,90,70,.16)'; g.beginPath(); g.ellipse(d.x, d.y, r, r * .55, 0, 0, TAU); g.fill(); g.stroke(); g.restore();
+      g.save(); g.globalAlpha = .35 + .4 * k; g.strokeStyle = col; g.lineWidth = 4; g.fillStyle = col; g.globalAlpha *= .4; g.beginPath(); g.ellipse(d.x, d.y, r, r * .55, 0, 0, TAU); g.fill(); g.globalAlpha /= .4; g.stroke(); g.restore();
       if (k < 1) { const y = d.y - 620 * (1 - k), sz = 44 * d.sz; add(() => glowAt(d.x, y, sz * 3, col, .6));
         const gr = g.createRadialGradient(d.x - sz * .3, y - sz * .35, sz * .1, d.x, y, sz); gr.addColorStop(0, '#FFF2C4'); gr.addColorStop(.35, col); gr.addColorStop(1, '#5A3A12');
         g.fillStyle = gr; g.beginPath(); g.arc(d.x, y, sz, 0, TAU); g.fill(); }
@@ -4262,6 +4444,7 @@ function draw() {
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.el] || '#C9D3DB', 9, false); }
   for (const s of S.eshots) { if (!inView(s.x, s.y, 40)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.k] || SHOT_COL[s.el] || '#7FC4FF', s.boss ? 18 : 14, true, s.k === 'bubble'); }
   g.lineWidth = 1;
+  if (S.call) drawCallTop();
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
   if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
@@ -4332,6 +4515,68 @@ const ADD = { glow:1, spark:1, star:1 };
 // effects can run a frame past their life (the victory flood steps them by hand); a circle never gets a negative size,
 // which would throw and stop the whole animation (playtest 2: "oh, it froze" right at a victory)
 const arc0 = (x, y, r, a0, a1) => g.arc(x, y, r > 0 ? r : 0, a0, a1);
+/* ================= Star Call ================= */
+// everything a Star Call draws is starlight, white over deep indigo, never red: it is the player's own (red means danger).
+// It is painted, not added: added white washes out on the frozen ground (design review, 2026-10-05)
+function star4(x, y, r) { g.beginPath(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, q = i % 2 ? r * .34 : r; g.lineTo(x + Math.cos(a) * q, y + Math.sin(a) * q); } g.closePath(); g.fill(); }
+function callPhases() { const C = S.call, D = CALL[C.id], tr = C.tier, T = CALL_T, t0 = T.throw, t1 = t0 + T.beam, t2 = t1 + T.fall, rest = t2 + (D.tolls[tr] - 1) * T.toll + T.rest;
+  return { C, D, tr, R:D.R[tr], t0, t1, t2, rest, end:rest + T.rise }; }
+// under the characters: the beam's body, the mark that fills while it holds, the bell's shadow, the shock and tolls as
+// ellipses on the ground (the same shape the blast strikes)
+function drawCallGround() {
+  const K = S.call && S.call.strike; if (!K) return; const { R, t0, t1, t2, end } = callPhases(), top = camY + 100 / Z;
+  if (K.t >= t0 && K.t < t2 + .2) {
+    const b = K.t < t2 ? Math.min(1, (K.t - t0) / .18) : 1 - (K.t - t2) / .2, q = Math.min(1, (K.t - t0) / (t1 - t0)), w = R * (.5 - .3 * q);
+    const gr = g.createLinearGradient(K.x - w, 0, K.x + w, 0); gr.addColorStop(0, 'rgba(90,104,220,0)'); gr.addColorStop(.25, `rgba(100,114,232,${(.22 + .14 * q) * b})`); gr.addColorStop(.5, `rgba(248,250,255,${(.45 + .3 * q) * b})`); gr.addColorStop(.75, `rgba(100,114,232,${(.22 + .14 * q) * b})`); gr.addColorStop(1, 'rgba(90,104,220,0)');
+    // it fades in below the HUD band, so the HUD glass never fills with light
+    const h = K.y - top; g.save(); g.fillStyle = gr; for (let i = 0; i < 8; i++) { g.globalAlpha = (i + 1) / 8; g.fillRect(K.x - w, top + i * 20, w * 2, 20); }
+    g.globalAlpha = 1; g.fillRect(K.x - w, top + 160, w * 2, Math.max(0, h - 160)); g.restore();
+  }
+  if (K.t >= t0 && K.t < t2 + .3) {
+    const k = clamp((K.t - t0) / (t2 - t0), 0, 1), fade = K.t > t2 ? 1 - (K.t - t2) / .3 : Math.min(1, (K.t - t0) / .15);
+    g.save(); g.globalAlpha = fade;
+    g.fillStyle = 'rgba(120,136,240,.14)'; g.beginPath(); g.ellipse(K.x, K.y, R, R * .55, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(150,166,255,.22)'; g.beginPath(); g.ellipse(K.x, K.y, R * k, R * .55 * k, 0, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(27,34,87,.55)'; g.lineWidth = 7; g.beginPath(); g.ellipse(K.x, K.y, R, R * .55, 0, 0, TAU); g.stroke();
+    g.strokeStyle = '#FFFFFF'; g.lineWidth = 3.5; g.setLineDash([20, 12]); g.lineDashOffset = -S.t * 70; g.beginPath(); g.ellipse(K.x, K.y, R, R * .55, 0, 0, TAU); g.stroke(); g.setLineDash([]);
+    for (let i = 0; i < 4; i++) { const a = S.t * .9 + i * TAU / 4, x = K.x + Math.cos(a) * R, y = K.y + Math.sin(a) * R * .55; g.fillStyle = '#1B2257'; star4(x, y, 13); g.fillStyle = '#FFFFFF'; star4(x, y, 9.5); }
+    g.restore();
+  }
+  // the bell's shadow grows as it falls and stays while it rests, so it sits on the ground
+  if (K.t > t1 && K.t < end) { const q = K.t < t2 ? (K.t - t1) / (t2 - t1) : 1, out = K.t > end - CALL_T.rise ? 1 - (K.t - (end - CALL_T.rise)) / CALL_T.rise : 1, sw = Math.min(R * .62, callBellSize(R) * .3);
+    g.fillStyle = `rgba(14,18,48,${.42 * Math.min(1, q) * out})`; g.beginPath(); g.ellipse(K.x, K.y + 4, sw * (.4 + .6 * q), sw * .36 * (.4 + .6 * q), 0, 0, TAU); g.fill(); }
+  // the shock and each toll: a deep indigo body with a white rim, spreading over the ground
+  for (const v of K.waves) { const k = (K.t - v.t) / v.life; if (k < 0 || k > 1) continue; const r = v.r0 + (v.r1 - v.r0) * (1 - Math.pow(1 - k, 2)), a = 1 - k;
+    g.save(); if (v.disc) { g.fillStyle = `rgba(70,82,200,${.22 * a})`; g.beginPath(); g.ellipse(K.x, K.y, r, r * .55, 0, 0, TAU); g.fill(); }
+    g.strokeStyle = `rgba(27,34,87,${.6 * a})`; g.lineWidth = v.w + 5; g.beginPath(); g.ellipse(K.x, K.y, r, r * .55, 0, 0, TAU); g.stroke();
+    g.strokeStyle = `rgba(255,255,255,${.95 * a})`; g.lineWidth = v.w * .55; g.beginPath(); g.ellipse(K.x, K.y, r, r * .55, 0, 0, TAU); g.stroke(); g.restore(); }
+}
+// above the characters: the thrown star-stone, the beam's thin bright core, then the bell falling, ringing and rising away
+function drawCallTop() {
+  const K = S.call && S.call.strike; if (!K) return; const { tr, R, t0, t1, t2, rest, end } = callPhases(), top = camY + 100 / Z;
+  if (K.t < t0) { const q = K.t / t0, x = K.sx + (K.x - K.sx) * q, y = K.sy + (K.y - K.sy) * q - Math.sin(q * Math.PI) * 150;
+    K.trail.forEach(([tx, ty], i) => { const f = (i + 1) / K.trail.length; g.fillStyle = `rgba(70,82,200,${.5 * f})`; g.beginPath(); g.arc(tx, ty, 4 + 7 * f, 0, TAU); g.fill(); });
+    add(() => glowAt(x, y, 44, '#C9D2FF', .7)); g.fillStyle = '#1B2257'; star4(x, y, 19); g.fillStyle = '#5B6BD6'; star4(x, y, 15); g.fillStyle = '#FFFFFF'; star4(x, y, 9 + Math.sin(S.t * 40) * 1.5); return; }
+  if (K.t < t2 + .2) { const b = K.t < t2 ? Math.min(1, (K.t - t0) / .18) : 1 - (K.t - t2) / .2, h = K.y - top;
+    const gr = g.createLinearGradient(0, top, 0, top + Math.min(160, h)); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, `rgba(255,255,255,${.85 * b})`);
+    g.fillStyle = gr; g.fillRect(K.x - 2.5, top, 5, Math.min(160, h)); g.fillStyle = `rgba(255,255,255,${.85 * b})`; g.fillRect(K.x - 2.5, top + 160, 5, Math.max(0, h - 160)); }
+  if (K.t < t1) return;
+  const img = IMG[tr === 4 ? 'callBellA' : 'callBell']; if (!ok(img)) return;
+  const sz = callBellSize(R); let y = K.y, a = 1, rot = 0, sx = 1, sy = 1;
+  if (K.t < t2) { const q = (K.t - t1) / (t2 - t1); y = K.y - 900 * (1 - q * q);
+    for (let i = 1; i < 5; i++) { g.fillStyle = `rgba(110,124,236,${.16 - i * .03})`; g.beginPath(); g.ellipse(K.x, y - sz * .45 - i * 70, sz * (.34 - i * .04), sz * .5, 0, 0, TAU); g.fill(); } }
+  else if (K.t > rest) { const q = Math.min(1, (K.t - rest) / (end - rest)); y = K.y - 520 * q * q; a = .6 * (1 - q); }
+  // after the first strike the bell eases back so the fight under it stays readable
+  if (K.t >= t2 && K.t <= rest) a = 1 - .4 * clamp((K.t - t2 - .3) / .3, 0, 1);
+  if (K.t >= t2) { const s = S.t - (K.swayAt ?? S.t); rot = Math.sin(s * 13) * .13 * Math.exp(-s * 3.2); const land = Math.max(0, 1 - (K.t - t2) / .2); sx = 1 + land * .14; sy = 1 - land * .12; }
+  g.save(); g.globalAlpha = a; g.translate(K.x, y); g.rotate(rot); g.scale(sx, sy);
+  add(() => glowAt(0, -sz * .45, sz * 1.05, tr === 4 ? '#B4BEFF' : '#D6DEFF', .2 * a));
+  g.drawImage(img, -sz / 2, -sz * .93, sz, sz);
+  if (tr === 4) { for (let i = 0; i < 9; i++) { const an = S.t * 1.6 + i * TAU / 9, ox = Math.cos(an) * sz * .4, oy = -sz * .4 + Math.sin(an) * sz * .14;
+    g.fillStyle = '#1B2257'; star4(ox, oy, 11 + 2 * Math.sin(S.t * 6 + i)); g.fillStyle = '#FFFFFF'; star4(ox, oy, 8 + 2 * Math.sin(S.t * 6 + i)); } }
+  g.restore();
+}
+
 function drawFX(top) {
   for (const p of FX) {
     const k = p.t / p.life, a = 1 - k;
@@ -4472,8 +4717,8 @@ function options() {
   return opts.slice(0, 3);
 }
 function levelUp() {
-  // never break a Bloom or Ascended, nor the boss's entrance: level-ups wait, then come one after another
-  if (S.bloom || hsOn() || S.holdLevels) { S.lvlDefer = (S.lvlDefer || 0) + 1; return; }
+  // never break a Bloom or Ascended, the boss's entrance or a Star Call: level-ups wait, then come one after another
+  if (S.bloom || hsOn() || S.holdLevels || callBusy()) { S.lvlDefer = (S.lvlDefer || 0) + 1; return; }
   running = false; S.pendingLevel = true;
   const P = S.p;
   ring(P.x, P.y, 20, 260, '#FFE58A', .5, 14, true); stars(P.x, P.y - 40, 26, '#FFE58A', 380); flash(P.x, P.y - 40, 260, '#FFF1C0', .3);
@@ -4650,7 +4895,7 @@ function coachTick(dt) {
   NOTES.t -= dt; if (NOTES.t <= 0 && NOTES.q.length && !COACH.cur && !popupOpen()) { toast(NOTES.q.shift(), 4200); NOTES.t = 5.5; }
   if (COACH.cur) return;
   COACH.gap -= dt;
-  if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel || hsOn()) return;
+  if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel || hsOn() || callBusy()) return;
   showCoach(COACH.q.shift());
 }
 // the picture for each tip: drawn once, the same for every player, or built from the player's own Keeper and animal
@@ -4659,6 +4904,8 @@ function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
+  if (id === 'call') return `<div class="calldemo"><img class="cd-c cd-c1" src="art4/e-wood-a.png?v=8" alt=""><img class="cd-c cd-c2" src="art4/e-water-a.png?v=8" alt=""><img class="cd-c cd-c3" src="art4/e-earth-a.png?v=8" alt=""><i class="beam"></i><img class="cd-bell" src="art4/calls/bell-star.png?v=9" alt="">`
+    + `<div class="cd-btn"><img src="art4/calls/bell-star.png?v=9" alt=""></div><span class="sealrow">${['up', 'down', 'throw'].map(d => `<i><svg viewBox="0 0 24 24">${SEAL_SVG[d]}</svg></i>`).join('')}</span><i class="cd-f"></i></div>`;
   if (id === 'shrine') return `<div class="shrinedemo"><img src="art4/props/x-shrine-${(S && S.lastShrineEl) || 'water'}.png?v=8" alt=""></div>`;
   if (id === 'gem') return `<div class="gemdemo"><img src="art4/k${keeper}.png?v=8" alt="">${[0, 1, 2, 3, 4, 5].map(i => `<i style="--i:${i}"></i>`).join('')}</div>`;
   if (id === 'stone') { const els = S ? stoneEls() : ['wood', 'fire', 'earth', 'metal', 'water']; return `<div class="stonedemo" style="--n:${els.length};--a0:${els.length === 5 ? -90 : 180}deg;--r:${els.length === 5 ? 30 : 17}%">${els.map((el, i) => `<img src="art4/props/x-stone-${el}.png?v=8" alt="" style="--i:${i}">`).join('')}</div>`; }
@@ -4667,10 +4914,10 @@ function tipArt(id) {
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult' };
+const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call:'call' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
-  COACH.cur = c; running = false;
+  COACH.cur = c; running = false; closeSeal();
   if (c.card) AU.vo('vo-card-beast'); else if (CARD_VO[c.id]) AU.vo('vo-card-' + CARD_VO[c.id]);
   if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>'; show('beastCard'); SFX.alarm(); return; }
   // every tip card shows a picture made for it, never a live snapshot of play (A, 2026-10-04: snapshots caught
@@ -4690,6 +4937,53 @@ function coachOk() {
   if (S && !S.over && !popupOpen()) startLoop();
 }
 $('#coachOk').onclick = coachOk;
+
+/* ================= Star Call: the bell button and the seal ================= */
+const SEAL_SVG = { up:'<path d="M12 20V5M5.5 11.5 12 5l6.5 6.5"/>', down:'<path d="M12 4v15M5.5 12.5 12 19l6.5-6.5"/>', left:'<path d="M20 12H5M11.5 5.5 5 12l6.5 6.5"/>', right:'<path d="M4 12h15M12.5 5.5 19 12l-6.5 6.5"/>',
+  throw:'<path d="M12 3.5l2 6.5 6.5 2-6.5 2-2 6.5-2-6.5-6.5-2 6.5-2z"/>' };
+function sealUI() {
+  const C = S && S.call, on = !!(C && C.seal), el = $('#seal'); if (!el) return;
+  el.classList.toggle('on', on); $('#callBtn').classList.toggle('sealing', on);
+  if (!on) return;
+  const seal = CALL[C.id].seal, st = C.seal.step;
+  $('#sealRow').innerHTML = [...seal, 'throw'].map((d, i) => `<i class="${i < st ? 'done' : i === st ? 'now' : ''}"><svg viewBox="0 0 24 24">${SEAL_SVG[d]}</svg></i>`).join('');
+  if (C.seal.miss && performance.now() - C.seal.miss < 60) { const r = $('#sealRow'); r.classList.remove('miss'); void r.offsetWidth; r.classList.add('miss'); }
+}
+// a tap, not a swipe: a ghost stroke grows from the middle of the screen in the direction the next mark wants
+// (for the throw, toward the crowd the call would find)
+function sealHint() {
+  const C = S.call, seal = CALL[C.id].seal, st = C.seal.step, b = stage.getBoundingClientRect(); let a;
+  if (st < seal.length) a = { up:-Math.PI / 2, down:Math.PI / 2, left:Math.PI, right:0 }[seal[st]];
+  else { const t = callTarget(0, 0); a = Math.atan2(t.y - S.p.y, t.x - S.p.x); }
+  const s = document.createElement('i'); s.className = 'streak ghost'; s.style.left = (W / 2) + 'px'; s.style.top = (H * .58) + 'px'; s.style.width = '130px'; s.style.setProperty('--a', a + 'rad');
+  $('#seal').appendChild(s); setTimeout(() => s.remove(), 950); SFX.bx('call-seal', 2, 0); C.seal.t0 = performance.now();
+}
+function sealStreak(x, y, dx, dy) {
+  const b = stage.getBoundingClientRect(), s = document.createElement('i'); s.className = 'streak';
+  s.style.left = (x - b.left) + 'px'; s.style.top = (y - b.top) + 'px'; s.style.width = Math.hypot(dx, dy) + 'px'; s.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+  $('#seal').appendChild(s); setTimeout(() => s.remove(), 460);
+}
+// a seal can be swiped stroke by stroke or in one unbroken zigzag: a turn in a new direction counts as the next stroke,
+// and whatever is left when the finger lifts counts too (so the throw can go any way, even the way the last stroke went)
+{ let p0 = null; const sl = $('#seal');
+  const stroke = (e, dx, dy) => { sealStreak(p0.x, p0.y, dx, dy); const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'd' : 'u'); p0 = { ...p0, x:e.clientX, y:e.clientY, last:dir }; sealStroke(dx, dy); };
+  sl.addEventListener('pointerdown', e => { e.preventDefault(); AU.init(); p0 = { id:e.pointerId, x:e.clientX, y:e.clientY, last:null }; try { sl.setPointerCapture(e.pointerId); } catch (er) {} });
+  const dirOf = (dx, dy) => Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'd' : 'u');
+  sl.addEventListener('pointermove', e => { if (!p0 || e.pointerId !== p0.id || !S || !S.call || !S.call.seal) return; const dx = e.clientX - p0.x, dy = e.clientY - p0.y, m = Math.hypot(dx, dy);
+    if (m < 12) return; const dir = dirOf(dx, dy);
+    if (dir === p0.last) { p0 = { ...p0, x:e.clientX, y:e.clientY }; return; }
+    if (m >= 56) stroke(e, dx, dy); });
+  sl.addEventListener('pointerup', e => { if (!p0 || e.pointerId !== p0.id) return; const dx = e.clientX - p0.x, dy = e.clientY - p0.y; if (S && S.call && S.call.seal) { if (Math.hypot(dx, dy) >= 28 && dirOf(dx, dy) !== p0.last) stroke(e, dx, dy); else if (!p0.last && Math.hypot(dx, dy) < 28) sealHint(); } p0 = null; });
+  sl.addEventListener('pointercancel', () => { p0 = null; });
+}
+$('#callBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); AU.init();
+  if (!openSeal()) { SFX.pop(); const b = $('#callBtn'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); } });
+function callHud(top) {
+  const cb = $('#callBtn'), C = S && S.call; cb.hidden = !C; if (!C) return;
+  if (cb.dataset.k !== C.id + C.tier) { cb.dataset.k = C.id + C.tier; $('#callImg').src = `art4/calls/${C.tier === 4 ? 'bell-star-awakened' : 'bell-star'}.png?v=9`;
+    $('#callPips').innerHTML = '<i></i>'.repeat(C.tier + 1); cb.setAttribute('aria-label', `Star Call: ${CALL[C.id].n}, tier ${C.tier + 1}`); }
+  cb.style.setProperty('--p', C.strike ? '0' : (1 - C.cd / C.max).toFixed(3)); cb.classList.toggle('ready', callReady()); if (top) cb.style.setProperty('--ultTop', top);
+}
 $('#ultBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); AU.init(); if (!fireUlt() && S && S.ult && S.ult.charge < 1) { SFX.pop(); const b = $('#ultBtn'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); } });
 addEventListener('keydown', e => { if (COACH.cur && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); coachOk(); } });
 
@@ -4822,7 +5116,7 @@ function hud() {
   $('#lvPill').textContent = S.lv;
   { const ub = $('#ultBtn'), U = S.ult, ready = U.charge >= 1 && !U.cast; ub.style.setProperty('--p', U.charge.toFixed(3)); ub.classList.toggle('ready', ready); ub.classList.toggle('cast', !!U.cast);
     // sit just under the top HUD, wherever it ends (the wave pill and boss bar change its height)
-    const top = $('#hud .top'); if (top) { const v = Math.round(top.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 12) + 'px'; ub.style.setProperty('--ultTop', v); $('#mapBtn').style.setProperty('--ultTop', v); }
+    const top = $('#hud .top'); if (top) { const v = Math.round(top.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 12) + 'px'; ub.style.setProperty('--ultTop', v); $('#mapBtn').style.setProperty('--ultTop', v); callHud(v); } else callHud();
     // surrounded with the ultimate ready: it pulses harder and chimes once, the moment it can save you
     let near = 0; if (ready) for (const e of S.en) if (!e.dead && !e.boss && Math.abs(e.x - S.p.x) < 190 && Math.abs(e.y - S.p.y) < 190) near++;
     const urge = ready && near >= 10; if (urge && !ub.classList.contains('urge')) SFX.ting(); ub.classList.toggle('urge', urge); }
@@ -5001,6 +5295,7 @@ function pushIn(px, py, z, glide = 0) {
 }
 function fall() {
   if (S.fall) return;
+  closeSeal();
   S.over = true; running = false; joy = null; $('#joy').style.display = 'none';
   S.fall = { t:0, ts:1, dir:S.p.face < 0 ? 1 : -1, puff:0 };
   $('#hud').hidden = true; S.txt = []; if (S.nums) S.nums = [];
@@ -5133,7 +5428,7 @@ function results() {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, run:() => startLoop(), snap:() => { draw(); edgeGlow(); hud(); }, call:{ open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
