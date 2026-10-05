@@ -1033,6 +1033,11 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
    under the thumb never moves; while it spins the button is plainly not ready */
 #chest{justify-content:flex-end;padding-bottom:calc(22px + env(safe-area-inset-bottom, 0px))}
 #chestBtn:disabled{background:rgba(255,255,255,.14)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)!important;color:rgba(255,255,255,.75)!important}
+/* the Fusion card: night glass lit from below by the element being fed, edged in starlight, white type */
+#cards .card.fuse{background:linear-gradient(180deg,#2B2F78 0%,#20245E 55%,var(--c2) 140%)!important;box-shadow:0 0 0 2px #E4EAFF,0 0 22px rgba(200,214,255,.55),0 12px 28px rgba(20,24,80,.5)!important;color:#fff}
+#cards .card.fuse .tab b,#cards .card.fuse .txt,#cards .card.fuse .txt p,#cards .card.fuse .formula{color:#fff!important}
+#cards .card.fuse small{color:rgba(228,234,255,.85)!important}
+#cards .card.fuse .flag{background:linear-gradient(90deg,#FFFFFF,#E4EAFF)!important;color:#1B2257!important;box-shadow:0 3px 10px rgba(200,214,255,.6)!important}
 </style>
 
 <div id="stage">
@@ -1547,7 +1552,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=10`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -4131,6 +4136,55 @@ function tideTick(C, K, dt, at) {
   }
   if (K.t >= P.end) C.strike = null;
 }
+/* ================= element fusions ================= */
+// A, 2026-10-05 ("lets go with your order"): a power that has evolved fuses with a power of the element it feeds, once
+// that one has three stars, and the pair makes a third power that runs beside them. Each link of the feeding cycle has
+// its own fusion, named by the element that feeds; it strikes in the element it feeds into. Level 2 (your element and
+// the one it feeds) is where the first fusion can happen, so the level order itself teaches it
+const FUSE = {
+  water:{ n:'Spring Rain',     icon:'f-water', d:'A rain cloud follows you, and every drop sprouts vines that hold a creature still.' },
+  wood: { n:'Phoenix',         icon:'f-wood',  d:'A phoenix of burning leaves circles you and dives through the biggest crowd.' },
+  fire: { n:'Volcano',         icon:'f-fire',  d:'The ground erupts under the biggest crowd, again and again.' },
+  earth:{ n:'Mountain Blades', icon:'f-earth', d:'Rings of blades rise out of the stone around you and race outward.' },
+  metal:{ n:'Silver Tide',     icon:'f-metal', d:'Silver moons ride a spiral of sea water out from you.' }
+};
+const fuseParts = el => { const a = Object.keys(S.skills).find(id => S.evo[id] && POW[id].e === el), b = Object.keys(S.skills).filter(id => POW[id].e === FEEDS[el] && S.skills[id] >= 3).sort((x, y) => S.skills[y] - S.skills[x])[0]; return a && b ? [a, b] : null; };
+const canFuse = el => !(S.fuse && S.fuse[el]) && !!fuseParts(el);
+const fuseDmg = () => 40 * (1 + (S.lv - 1) * .05);
+// the creature near the Keeper with the most others around it (checked every couple of seconds, never every frame)
+function crowdAt(R = 440, r = 120) { let best = null, bn = 0; const near = S.en.filter(e => !e.dead && !e.boss && Math.hypot(e.x - S.p.x, e.y - S.p.y) < R).slice(0, 80);
+  for (const e of near) { let n = 0; for (const o of near) if (Math.abs(o.x - e.x) < r && Math.hypot(o.x - e.x, o.y - e.y) < r) n++; if (n > bn) { bn = n; best = e; } }
+  if (!best && S.boss && !S.boss.dead && Math.hypot(S.boss.x - S.p.x, S.boss.y - S.p.y) < R) return { x:S.boss.x, y:S.boss.y, n:1 };
+  return best ? { x:best.x, y:best.y, n:bn } : null; }
+function fuseTick(dt) {
+  const F = S.fuse; if (!F) return; const P = S.p, D = fuseDmg(); S.fz = S.fz || [];
+  // Spring Rain: the cloud over the Keeper drops rain on creatures nearby; where a drop lands, vines hold the creature
+  if (F.water && cool('f-water', .2, dt)) { const t = nearest(P.x, P.y, 6, 380); const e = t[(Math.random() * t.length) | 0]; if (e) S.fz.push({ k:'rain', x:e.x + rnd(-16, 16), y:e.y + rnd(-10, 10), t:0, at:.32 }); }
+  // Phoenix: it circles the Keeper, and every two seconds dives through the biggest crowd, leaving burning ground
+  if (F.wood) { const Ph = S.phoenix || (S.phoenix = { a:0, x:P.x, y:P.y - 120, cd:1, dive:null, dir:0 }), x0 = Ph.x, y0 = Ph.y;
+    if (!Ph.dive) { Ph.a += dt * 2.1; const tx = P.x + Math.cos(Ph.a) * 150, ty = P.y + Math.sin(Ph.a) * 90 - 50, q = Math.min(1, dt * 7); Ph.x += (tx - Ph.x) * q; Ph.y += (ty - Ph.y) * q;
+      if ((Ph.cd -= dt) <= 0) { Ph.cd = 2 * cdMul(); const c = crowdAt(); if (c) { const dx = c.x - Ph.x, dy = c.y - Ph.y; Ph.dive = { x0:Ph.x, y0:Ph.y, x1:c.x + dx * .35, y1:c.y + dy * .35, t:0, hit:new Set(), trail:0 }; SFX.whip(); } } }
+    else { const d = Ph.dive; d.t += dt / .6; const q = Math.min(1, d.t), e2 = q * q * (3 - 2 * q); Ph.x = d.x0 + (d.x1 - d.x0) * e2; Ph.y = d.y0 + (d.y1 - d.y0) * e2;
+      inArea(Ph.x, Ph.y, 50, e => { if (!d.hit.has(e)) { d.hit.add(e); hurt(e, D * 1.7, 'fire', { kb:170, fx:Ph.x, fy:Ph.y }); } });
+      if ((d.trail -= dt) <= 0) { d.trail = .08; firePatch(Ph.x, Ph.y, 34, 1.2, 9); } if (q >= 1) Ph.dive = null; }
+    if (Math.hypot(Ph.x - x0, Ph.y - y0) > .5) Ph.dir = Math.atan2(Ph.y - y0, Ph.x - x0); }
+  else S.phoenix = null;
+  // Volcano: the ground cracks under the biggest crowd, then erupts in lava and molten rock
+  if (F.fire && cool('f-fire', 2.4, dt)) { const c = crowdAt(); if (c) S.fz.push({ k:'volc', x:c.x, y:c.y, t:0, at:.5 }); }
+  // Mountain Blades: a ring of blades rises out of the stone and races outward from the Keeper
+  if (F.earth && cool('f-earth', 2, dt)) { S.fz.push({ k:'blades', x:P.x, y:P.y, t:0, r:40, hit:new Set() }); SFX.whip(); }
+  // Silver Tide: six silver moons ride a spiral of water out from the Keeper
+  if (F.metal && cool('f-metal', 1.7, dt)) { const a0 = rnd(0, TAU); for (let i = 0; i < 6; i++) S.fz.push({ k:'moon', x:P.x, y:P.y, a:a0 + i * TAU / 6, d:30, t:0, hit:new Set() }); SFX.splash(); }
+  for (const z of S.fz) { z.t += dt;
+    if (z.k === 'rain' && !z.done && z.t >= z.at) { z.done = 1; inArea(z.x, z.y, 34, e => { hurt(e, D, 'wood', { kb:0, spark:false }); if (!e.boss) e.rooted = Math.max(e.rooted || 0, .8); });
+      drops(z.x, z.y, 5, 110); fx({ k:'vine', x:z.x, y:z.y - 6, R:36, w:4, n:4, a:rnd(0, TAU), life:.5, seed:Math.random() * 100 }); }
+    if (z.k === 'volc' && !z.done && z.t >= z.at) { z.done = 1; explode(z.x, z.y, 110, D * 2.2, 'earth', true); firePatch(z.x, z.y, 80, 2, 12); debris(z.x, z.y, 14, 420); S.shake = Math.max(S.shake, .3); }
+    if (z.k === 'blades') { z.r += 430 * dt; for (const e of S.en) { if (e.dead || z.hit.has(e)) continue; const d = Math.hypot(e.x - z.x, (e.y - z.y) / .7); if (Math.abs(d - z.r) < 28 + e.r * .5) { z.hit.add(e); hurt(e, D * 1.2, 'metal', { kb:190, fx:z.x, fy:z.y }); } } }
+    if (z.k === 'moon') { z.d += 320 * dt; z.a += 1.5 * dt; z.mx = z.x + Math.cos(z.a) * z.d; z.my = z.y + Math.sin(z.a) * z.d * .7;
+      inArea(z.mx, z.my, 24, e => { if (!z.hit.has(e)) { z.hit.add(e); hurt(e, D * .9, 'water', { kb:130, fx:z.mx, fy:z.my }); drops(e.x, e.y - 10, 3, 120); } });
+      if (Math.random() < .4) fx({ k:'drop', x:z.mx, y:z.my, z:10, vx:rnd(-30, 30), vy:rnd(-30, 30), vz:rnd(40, 120), life:.4, s:rnd(2.5, 4) }); } }
+  S.fz = S.fz.filter(z => z.k === 'rain' ? z.t < z.at + .1 : z.k === 'volc' ? z.t < z.at + .6 : z.k === 'blades' ? z.r < 340 : z.d < 380);
+}
 function update(dt) {
   if (S.call && S.call.seal) dt *= SEAL_SLOW;
   S.t += dt;
@@ -4168,7 +4222,7 @@ function update(dt) {
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
@@ -4773,6 +4827,7 @@ function draw() {
     g.globalAlpha = 1;
   }
   // sacred trees (Rising Grove)
+  drawFuseGround();
   for (const tr of S.trees) { const k = Math.min(1, tr.t / .4) * Math.min(1, (tr.life - tr.t) / .4), sw = Math.sin(S.t * 3 + tr.x) * .05;
     g.save(); g.translate(tr.x, tr.y); g.rotate(sw); g.scale(k, k);
     g.fillStyle = '#5A3A1A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.roundRect(-9, -70, 18, 72, 6); g.fill(); g.stroke();
@@ -4932,6 +4987,7 @@ function draw() {
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.el] || '#C9D3DB', 9, false); }
   for (const s of S.eshots) { if (!inView(s.x, s.y, 40)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.k] || SHOT_COL[s.el] || '#7FC4FF', s.boss ? 18 : 14, true, s.k === 'bubble'); }
   g.lineWidth = 1;
+  drawFuseTop();
   if (S.call) drawCallTop();
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
@@ -5018,6 +5074,44 @@ function callPhases() { const C = S.call, D = CALL[C.id], tr = C.tier, T = CALL_
   return { C, D, tr, R:D.R[tr], t0, t1, t2, rest, end:rest + T.rise }; }
 // under the characters: the beam's body, the mark that fills while it holds, the bell's shadow, the shock and tolls as
 // ellipses on the ground (the same shape the blast strikes)
+/* element fusions, drawn: painted like everything else (no added white), round where they fly, never pointing at
+   anything; the Mountain Blades stand upright out of the stone */
+function drawFuseGround() {
+  if (!S.fz) return;
+  for (const z of S.fz) {
+    if (z.k === 'volc' && z.t < z.at) { const k = z.t / z.at; g.save(); g.globalAlpha = .4 + .6 * k; g.fillStyle = 'rgba(70,36,16,.55)'; g.beginPath(); g.ellipse(z.x, z.y, 74 * k, 40 * k, 0, 0, TAU); g.fill();
+      g.strokeStyle = '#FF9A4A'; g.lineWidth = 3; g.lineCap = 'round'; for (let i = 0; i < 6; i++) { const a = i * TAU / 6 + z.x * .01; g.beginPath(); g.moveTo(z.x + Math.cos(a) * 10, z.y + Math.sin(a) * 6); g.lineTo(z.x + Math.cos(a) * 70 * k, z.y + Math.sin(a) * 38 * k); g.stroke(); } g.restore(); }
+    if (z.k === 'blades') { const n = 14, fade = clamp(1 - (z.r - 200) / 140, 0, 1), up = clamp((z.r - 40) / 60, 0, 1); g.save(); g.globalAlpha = fade;
+      for (let i = 0; i < n; i++) { const a = i * TAU / n, x = z.x + Math.cos(a) * z.r, y = z.y + Math.sin(a) * z.r * .7, h = 34 * up;
+        g.fillStyle = '#6B4A2A'; g.beginPath(); g.ellipse(x, y, 13, 6, 0, 0, TAU); g.fill();
+        g.fillStyle = '#4A447A'; g.beginPath(); g.moveTo(x - 10, y); g.quadraticCurveTo(x - 9, y - h * .7, x, y - h - 3); g.quadraticCurveTo(x + 9, y - h * .7, x + 10, y); g.closePath(); g.fill();
+        g.fillStyle = '#E8E4FF'; g.beginPath(); g.moveTo(x - 7, y - 1); g.quadraticCurveTo(x - 6, y - h * .7, x, y - h); g.quadraticCurveTo(x + 6, y - h * .7, x + 7, y - 1); g.closePath(); g.fill();
+        g.fillStyle = '#B9B3EC'; g.beginPath(); g.moveTo(x + 1, y - 2); g.quadraticCurveTo(x + 4, y - h * .6, x, y - h + 2); g.lineTo(x + 1, y - 2); g.fill(); }
+      g.restore(); } }
+}
+function drawFuseTop() {
+  const F = S.fuse; if (!F) return; const P = S.p;
+  // Spring Rain's cloud, and the drops on their way down
+  if (F.water) { const cx = P.x, cy = P.y - 180 + Math.sin(S.t * 2) * 4;
+    for (const [dx, dy, r] of [[-30, 6, 24], [0, -6, 30], [30, 6, 22]]) { g.fillStyle = '#3A4E7A'; g.beginPath(); g.arc(cx + dx, cy + dy, r + 3, 0, TAU); g.fill(); }
+    for (const [dx, dy, r] of [[-30, 6, 24], [0, -6, 30], [30, 6, 22]]) { g.fillStyle = '#9FB3D6'; g.beginPath(); g.arc(cx + dx, cy + dy, r, 0, TAU); g.fill(); g.fillStyle = '#E8F0FA'; g.beginPath(); g.arc(cx + dx, cy + dy - 5, r - 5, 0, TAU); g.fill(); }
+    for (const z of S.fz || []) if (z.k === 'rain' && !z.done) { const q = clamp(z.t / z.at, 0, 1), x = cx + (z.x - cx) * q, y = cy + 20 + (z.y - 20 - cy - 20) * q * q;
+      g.fillStyle = '#2A4A7A'; g.beginPath(); g.arc(x, y, 5.5, 0, TAU); g.fill(); g.fillStyle = '#9CD2FF'; g.beginPath(); g.arc(x, y, 4, 0, TAU); g.fill(); } }
+  // the Volcano's eruption: a column of lava that rises and falls back
+  for (const z of S.fz || []) if (z.k === 'volc' && z.t >= z.at) { const q = (z.t - z.at) / .6, h = 150 * Math.sin(Math.PI * Math.min(1, q)), w = 30 * (1 - q * .5);
+    g.save(); g.globalAlpha = 1 - q * .6; g.fillStyle = '#5A2208'; g.beginPath(); g.moveTo(z.x - w - 4, z.y); g.quadraticCurveTo(z.x - w * .4, z.y - h * .7, z.x, z.y - h - 4); g.quadraticCurveTo(z.x + w * .4, z.y - h * .7, z.x + w + 4, z.y); g.closePath(); g.fill();
+    g.fillStyle = '#FF8A3A'; g.beginPath(); g.moveTo(z.x - w, z.y); g.quadraticCurveTo(z.x - w * .35, z.y - h * .7, z.x, z.y - h); g.quadraticCurveTo(z.x + w * .35, z.y - h * .7, z.x + w, z.y); g.closePath(); g.fill();
+    g.fillStyle = '#FFC24A'; g.beginPath(); g.ellipse(z.x, z.y - h * .45, w * .35, h * .35, 0, 0, TAU); g.fill(); g.restore(); }
+  // Silver Tide's moons: a silver crescent that spins as it rides out
+  for (const z of S.fz || []) if (z.k === 'moon' && z.mx != null) { const rot = z.t * 9 + z.a, fade = clamp(1 - (z.d - 260) / 120, 0, 1); g.save(); g.globalAlpha = fade; g.lineCap = 'round';
+    g.strokeStyle = '#3A4E7A'; g.lineWidth = 10; g.beginPath(); g.arc(z.mx, z.my - 14, 13, rot, rot + Math.PI * 1.2); g.stroke();
+    g.strokeStyle = '#E8EEF6'; g.lineWidth = 6; g.beginPath(); g.arc(z.mx, z.my - 14, 13, rot, rot + Math.PI * 1.2); g.stroke(); g.restore(); }
+  // the Phoenix, with its shadow on the ground under it
+  const Ph = S.phoenix; if (Ph && ok(IMG.fusePhoenix)) { const s = Ph.dive ? 130 : 110, z = Ph.dive ? 20 : 50 + Math.sin(S.t * 4) * 6;
+    g.save(); g.globalAlpha = .25; g.fillStyle = '#0E1C50'; g.beginPath(); g.ellipse(Ph.x, Ph.y + 10, s * .3, s * .12, 0, 0, TAU); g.fill(); g.restore();
+    warmGlow(Ph.x, Ph.y - z, s * 1.4, .3);
+    g.save(); g.translate(Ph.x, Ph.y - z); g.rotate(Ph.dir + Math.PI / 2); g.drawImage(IMG.fusePhoenix, -s / 2, -s / 2, s, s); g.restore(); }
+}
 function drawCallGround() {
   const K = S.call && S.call.strike; if (!K) return; if (S.call.id === 'tide') { drawTideGround(K); drawCallRipples(K); return; } if (S.call.id === 'root') { drawRootGround(K); drawCallRipples(K); return; } if (S.call.id === 'ember') { drawEmberGround(K); drawCallRipples(K); return; } const { R, t0, t1, t2, end } = callPhases(), top = camY + 100 / Z;
   if (K.t >= t0 && K.t < t2 + .2) {
@@ -5404,9 +5498,11 @@ const LODE = { r:[0, 140, 280, 420], at:[0, 3, 6, 9], pet:[1, 24, 36] };
 const lodeCap = () => LODE.pet.filter(l => S.ultInfo.lv >= l).length;
 const lodeDue = () => { const n = S.lode + 1; return n <= lodeCap() && S.lv >= LODE.at[n] && !S.lodeOff[n]; };
 const canEvo = id => S.skills[id] >= 3 && S.gifts[evoGift(id)] && !S.evo[id] && POW[id].e !== S.apprentice;
-const elOf = o => o.kind === 'lode' ? 'metal' : o.kind === 'gift' ? GIFT[o.id].e : o.kind === 'heal' ? 'earth' : POW[o.id].e;
+const elOf = o => o.kind === 'fuse' ? FEEDS[o.id] : o.kind === 'lode' ? 'metal' : o.kind === 'gift' ? GIFT[o.id].e : o.kind === 'heal' ? 'earth' : POW[o.id].e;
 function options() {
   const opts = [], has = (k, id) => opts.some(o => o.kind === k && o.id === id);
+  // a fusion ready to make always comes first: it is the biggest moment a level-up can have
+  const fu = Object.keys(FUSE).find(canFuse); if (fu) opts.push({ kind:'fuse', id:fu });
   const evo = Object.keys(POW).find(canEvo); if (evo) opts.push({ kind:'evo', id:evo });
   const st = START[keeperEl];
   if (!S.evo[st] && S.skills[st] < 5) opts.push({ kind:'active', id:st });
@@ -5440,6 +5536,7 @@ function levelUp() {
   $('#luTitle').textContent = 'Level Up!';
   const opts = options(), tip = $('#luTip');
   if (!S.taught.lu) { S.taught.lu = 1; AU.vo('vo-card-levelup'); tip.innerHTML = 'Pick one. The <b>bars</b> show its level.'; tip.hidden = false; }
+  else if (opts.some(o => o.kind === 'fuse') && !S.taught.lufuse) { S.taught.lufuse = 1; const f = opts.find(o => o.kind === 'fuse'); tip.innerHTML = `<b>FUSION!</b> ${ELNAME[f.id]} feeds ${ELNAME[FEEDS[f.id]]}.`; tip.hidden = false; AU.vo('vo-fusion'); }
   else if (opts.some(o => o.kind === 'evo') && !S.taught.luevo) { S.taught.luevo = 1; tip.innerHTML = '<b>EVOLVE!</b> Take it.'; tip.hidden = false; }
   else if (opts.some(o => o.kind === 'gift') && !S.taught.lugift) { S.taught.lugift = 1; tip.innerHTML = '<b>Gifts</b> (round) unlock evolutions.'; tip.hidden = false; }
   else tip.hidden = true;
@@ -5452,6 +5549,7 @@ function renderLoadout() {
   const cell = (src, col, lvl, cls) => `<span class="slot ${cls}" style="--c:${col}">${src ? `<img src="${src}" alt=""><em>${lvl}</em>` : ''}</span>`;
   let h = '';
   for (let i = 0; i < SLOTS.active; i++) { const id = act[i]; h += id ? cell(icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon), S.evo[id] ? 'var(--gold)' : EL[POW[id].e], S.evo[id] ? '★' : S.skills[id], S.evo[id] ? 'evo' : '') : cell(null, '#3A4A58', '', 'empty'); }
+  for (const el in S.fuse || {}) h += cell(icon(FUSE[el].icon), '#E4EAFF', '+', 'evo');
   for (let i = 0; i < SLOTS.gift; i++) { const id = gif[i]; h += id ? cell(icon(GIFT[id].icon), EL[GIFT[id].e], S.gifts[id], 'gift') : cell(null, '#3A4A58', '', 'gift empty'); }
   $('#loadout').innerHTML = h;
 }
@@ -5463,14 +5561,18 @@ function renderCards(opts) {
   const box = $('#cards'); box.innerHTML = ''; box.classList.remove('picked');
   opts.forEach((o, idx) => {
     const b = document.createElement('button'), el = elOf(o); let html;
-    if (o.kind === 'evo') {
+    if (o.kind === 'fuse') {
+      const Fz = FUSE[o.id], [pa, pb] = fuseParts(o.id); b.className = 'card evo fuse';
+      html = `<span class="tile"><img src="${icon(Fz.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${Fz.n}</b><span class="flag">FUSION!</span></span>
+        <span class="txt"><span class="formula"><img src="${icon(S.evo[pa] ? POW[pa].evoIcon : POW[pa].icon)}" alt="">${S.evo[pa] ? POW[pa].evo : POW[pa].n} + <img src="${icon(POW[pb].icon)}" alt="">${POW[pb].n}</span><p>${Fz.d}</p><small>${ELNAME[o.id]} feeds ${ELNAME[FEEDS[o.id]]}</small></span></span>`;
+    } else if (o.kind === 'evo') {
       const p = POW[o.id], gi = GIFT[evoGift(o.id)]; b.className = 'card evo';
       html = `<span class="tile"><img src="${icon(p.evoIcon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${p.evo}</b><span class="flag">EVOLVE!</span></span>
         <span class="txt"><span class="formula"><img src="${icon(p.icon)}" alt="">${p.n} + <img src="${icon(gi.icon)}" alt="">${gi.n}</span><p>${EVO_DESC[o.id]}</p><small>${ELNAME[FED_BY[p.e]]} feeds ${ELNAME[p.e]}</small></span></span>`;
     } else if (o.kind === 'active') {
       const p = POW[o.id], lv = S.skills[o.id] || 0; b.className = 'card';
       html = `<span class="tile"><img src="${icon(p.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${p.n}</b>${lv ? '' : '<span class="flag">NEW!</span>'}</span>
-        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 2 ? `3 stars + ${GIFT[evoGift(o.id)].n} evolve it` : `evolves into ${p.evo}`}</small>${POW[o.id].e === S.apprentice ? '<small style="color:var(--sun)">Apprentice · up to 3 stars this level</small>' : ''}<span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
+        <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${ELNAME[el]} ${p.role.toLowerCase()} · ${lv >= 2 ? `3 stars + ${GIFT[evoGift(o.id)].n} evolve it` : `evolves into ${p.evo}`}</small>${(() => { const fe = FED_BY[el]; return Object.keys(S.skills).some(id => S.evo[id] && POW[id].e === fe) && !(S.fuse && S.fuse[fe]) ? `<small style="color:#E4EAFF">3 stars fuse it into ${FUSE[fe].n}</small>` : ''; })()}${POW[o.id].e === S.apprentice ? '<small style="color:var(--sun)">Apprentice · up to 3 stars this level</small>' : ''}<span class="chips">2× vs ${beats(el).map(k => `<i class="ec" style="--c:${EL[k]}">${ELNAME[k]}</i>`).join('')}</span></span></span>`;
     } else if (o.kind === 'gift') {
       const gi = GIFT[o.id], lv = S.gifts[o.id] || 0, feeds = Object.keys(POW).filter(k => evoGift(k) === o.id), mine = feeds.filter(k => S.skills[k] && !S.evo[k]);
       b.className = 'card gift';
@@ -5496,12 +5598,15 @@ $('#rerollBtn').onclick = () => { if (!S.rerolls || $('#cards').classList.contai
 function applyPick(o, quiet) {
   const P = S.p, el = elOf(o), col = EL[el];
   S.decl = S.decl || {}; for (const x of S.offered || []) if (x.kind !== 'evo' && x.kind !== 'heal' && x.kind !== 'lode') { const k = x.kind + x.id; S.decl[k] = x === o || (x.kind === o.kind && x.id === o.id) ? 0 : (S.decl[k] || 0) + 1; }
-  if (o.kind === 'evo') { S.evo[o.id] = true; S.skills[o.id] = Math.max(S.skills[o.id], 5); if (!quiet) { SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
+  if (o.kind === 'fuse') { S.fuse = S.fuse || {}; S.fuse[o.id] = true; if (o.id === 'wood' && !IMG.fusePhoenix) load('fusePhoenix', 'art4/fuse/phoenix.png?v=9');
+    if (!quiet) { cue(FUSE[o.id].n, 'Fusion!', 2400); SFX.power(); S.flashT = .3; S.flashC = '236,242,255'; }
+    ring(P.x, P.y, 20, 460, EL[o.id], .7, 18, true); ring(P.x, P.y, 40, 520, EL[FEEDS[o.id]], .8, 14, true); stars(P.x, P.y - 30, 40, '#F4F8FF', 480); }
+  else if (o.kind === 'evo') { S.evo[o.id] = true; S.skills[o.id] = Math.max(S.skills[o.id], 5); if (!quiet) { SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
   else if (o.kind === 'active') { S.skills[o.id] = (S.skills[o.id] || 0) + 1; }
   else if (o.kind === 'gift') { S.gifts[o.id] = (S.gifts[o.id] || 0) + 1; }
   else if (o.kind === 'lode') { S.lode++; }
   else { P.hp = P.max; SFX.heal(); }
-  if (o.kind !== 'evo') { ring(P.x, P.y, 20, 240, col, .5, 12, true); stars(P.x, P.y - 30, 18, col, 360); }
+  if (o.kind !== 'evo' && o.kind !== 'fuse') { ring(P.x, P.y, 20, 240, col, .5, 12, true); stars(P.x, P.y - 30, 18, col, 360); }
   renderSkills();
 }
 function afterPick() {
