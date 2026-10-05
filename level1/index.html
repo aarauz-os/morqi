@@ -1896,7 +1896,7 @@ const AU = (() => {
     // slow motion: the score sinks under water and fades while the last notes ring out
     slowmo() { if (!musLP) return; const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(musLP.frequency.value, t); musLP.frequency.exponentialRampToValueAtTime(160, t + 1.1);
       mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(0, t + 1.4); }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
-    get on() { return sfxOn; }, get musicOn() { return musOn; }, vo, toggleVoice() { voOn = !voOn; save('morqi.voice', voOn); return voOn; }, get voiceOn() { return voOn; } };
+    get on() { return sfxOn; }, get musicOn() { return musOn; }, vo, toggleVoice() { voOn = !voOn; save('morqi.voice', voOn); return voOn; }, get voiceOn() { return voOn; }, get vmiss() { return VFILES.filter(n => !SMP[n]); } };
 })();
 const SFX = AU.S;
 
