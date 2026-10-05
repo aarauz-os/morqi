@@ -1011,6 +1011,8 @@ const stage = $('#stage'), cv = $('#cv'), g = cv.getContext('2d');
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const rnd = (a, b) => a + Math.random() * (b - a), TAU = Math.PI * 2;
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+// the gifts Luma names aloud when picked up (hearts have their own reminders)
+const GIFT_VO = ['magnet', 'cracker', 'dumpling', 'peach', 'tiger', 'frost', 'ward'];
 
 /* ================= data ================= */
 const EL = { wood:'#6FBF4A', fire:'#E8553F', earth:'#E6B23A', metal:'#C9D3DB', water:'#4E9BE0' };
@@ -1304,7 +1306,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=8`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'ascended', 'beast'].map(k => 'vo-card-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast'].map(k => 'vo-card-' + k), 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2047,11 +2049,11 @@ function renderStory() {
   [...$('#storyDots').children].forEach((d, i) => d.classList.toggle('on', i === storyPg));
   $('#storyNext').textContent = storyPg < 2 ? 'Next' : 'Run in';
 }
-const storyGo = () => { SFX.select(); if (storyPg < 2) { storyPg++; renderStory(); return; } if (LVL === 1) { show('howto'); AU.vo('vo-card-howto'); } else intro(LVL); };
+const storyGo = () => { SFX.select(); if (storyPg < 2) { storyPg++; renderStory(); return; } if (LVL === 1) { show(null); startRun(); } else intro(LVL); };
 $('#storyNext').onclick = storyGo; $('#storyArt').onclick = storyGo;
 let howFromPause = false;
 $('#howtoGo').onclick = () => { SFX.select(); if (howFromPause) { howFromPause = false; show('paused'); return; } show(null); startRun(); };
-$('#howBtn').onclick = () => { SFX.pop(); howFromPause = true; show('howto'); };
+$('#howBtn').onclick = () => { SFX.pop(); howFromPause = true; show('howto'); AU.vo('vo-card-howto'); };
 
 /* ================= the world ================= */
 const WORLD = 3600, MASK = 0.25, CAP = 600;
@@ -2350,11 +2352,13 @@ function crates(dt) {
     if (Math.hypot(it.x - P.x, it.y - 18 - P.y) < 84) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
   S.items = S.items.filter(it => !it.got && (it.kind === 'stone' || it.t < 40));
-  for (const ch of S.chests) { ch.t += dt; if (!ch.got && !hsOn() && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
+  for (const ch of S.chests) { ch.t += dt; if (!ch.got && !hsOn() && !S.holdLevels && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
   S.chests = S.chests.filter(c => !c.got);
 }
 function useItem(k) {
   const P = S.p;
+  // Luma names each gift the first time it's picked up in a run, for a player's first few runs, so a pre-reader learns them
+  if (GIFT_VO.includes(k) && !S.taught['g_' + k] && !hsOn()) { S.taught['g_' + k] = 1; const m = fewTimes('_g' + k); if (m && AU.vo('vo-gift-' + k, 0, .6, false)) markSeen(m); }
   if (k === 'magnet') { for (const q of S.gems) q.pull = true; pickupPop("Luma's Call!", '#9FD4FF'); SFX.sweep(); ring(P.x, P.y, 20, 900, '#7FC4FF', .7, 12, true); }
   else if (k === 'heart' || k === 'dumpling' || k === 'peach') {
     const h = k === 'peach' ? P.max : P.max / 3; if (k !== 'peach') { pickupPop('+' + Math.round(h), '#FF7A8A'); SFX.heart(); S.hearts = (S.hearts || 0) + 1; } P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
@@ -2824,14 +2828,17 @@ function ultTick(dt) {
 const live = (o, pool) => (o && !o.dead && !o.pull && (S.en.includes(o) || S.gems.includes(o))) ? o : pool.sort((a, b) => Math.hypot(a.x - S.p.x, a.y - S.p.y) - Math.hypot(b.x - S.p.x, b.y - S.p.y))[0] || o;
 // Luma speaks (A, 2026-10-05): rare, short and helpful, never scolding. One line every 12 s at most, never during
 // Ascended; the boss's arrival and a freed realm always speak.
-function luma(name, force) { if (!S || hsOn() || (S.over && !force)) return; if (!force && S.t - (S.voT ?? -99) < 12) return; if (AU.vo(name, 0, .5, false)) S.voT = S.t; }
+function luma(name, force) { if (!S || hsOn() || (S.over && !force)) return false; if (!force && S.t - (S.voT ?? -99) < 12) return false; if (!AU.vo(name, 0, .5, false)) return false; S.voT = S.t; return true; }
+// a spoken hint for a player's first few runs: the next unused mark ('_crate1', '_crate2', …), or null once it's been said enough
+const fewTimes = (k, n = 3) => { for (let i = 1; i <= n; i++) if (!SEEN.has(k + i)) return k + i; return null; };
 function teach() {
   const P = S.p, A = ANIMAL[animal], tg = S.taught;
   if (P.hp < P.max * .3 && S.items.some(it => it.kind === 'heart') && S.t - (S.heartVoT ?? -99) > 25) { S.heartVoT = S.t; luma('vo-heart-' + (Math.random() < .5 ? 1 : 2)); }
   if (!tg.c_pet && S.t > 6) note('pet', `Your ${A.y} fights beside you, firing ${ELNAME[A.e]} at the creatures ${ELNAME[A.e]} beats.`);
   if (!tg.c_gem && S.t > 7 && S.gems.length >= 3) coach('gem', 'Gems!', 'Walk over gems to collect them. They make you stronger.', () => ({ sx:W / 2, sy:H * .45 }));
   if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. The right element hits twice as hard.', () => { const t = live(e, S.en.filter(o => !o.dead && !o.boss)); return { x:t.x, y:t.y - t.size * .16, r:t.size * .62 }; }, 5.5); }
-  if (!tg.c_crate && S.t > 14 && S.crates.some(c => Math.abs(c.x - P.x) < VW * .42 && Math.abs(c.y - P.y) < VH * .4)) note('crate', 'Frozen lanterns hold gifts: magnets, heals, firecrackers. Break them open!');
+  // frozen lanterns are said aloud, not carded: Luma tells the first few runs to break them for gifts
+  if (!tg.c_crate && S.t > 14 && S.crates.some(c => Math.abs(c.x - P.x) < VW * .42 && Math.abs(c.y - P.y) < VH * .4)) { const k = fewTimes('_crate'); if (!k) tg.c_crate = 1; else if (luma('vo-crate')) { tg.c_crate = 1; markSeen(k); } }
   // Qi Stones have their own moment, so the first item tip skips them
   if (!tg.c_item) { const it = S.items.find(it => ITEM_INFO[it.kind]); if (it) { const nm = ITEM_INFO[it.kind]; note('item', `${nm[0]}: ${nm[1]} Walk over it to use it.`); } }
   if (!tg.c_chest && S.chests.length) note('chest', 'A Spirit Chest! Walk to it for free upgrades, the best way to evolve a power.');
@@ -3415,9 +3422,6 @@ function hsTick(dt) {
     // after the final one "Ascend" plays on until the Warden's theme lands on the next bar; otherwise the world's own song returns
     const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
-    if (!SEEN.has('_highest')) { markSeen('_highest'); S.taught.c_highest = 0;
-      coach('highest', 'You Ascended!', 'Your Qi Stones made you whole: that is who you are becoming. Gather them on every shore to Ascend again.',
-        () => { const cam = S.cam || { x:0, y:0 }; return { sx:(P.x - cam.x) * Z, sy:(P.y - 30 - cam.y) * Z, sr:70 }; }); }
   }
 }
 function hsStart(final) {
@@ -4663,7 +4667,7 @@ function tipArt(id) {
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', highest:'ascended' };
+const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false;
