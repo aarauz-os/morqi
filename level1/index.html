@@ -1019,7 +1019,8 @@ const ANIMAL = {
 };
 const FACE = { rat:1, ox:1, tiger:-1, rabbit:0, dragon:0, snake:-1, horse:1, goat:-1, monkey:0, rooster:0, dog:-1, pig:1 };
 
-// ten powers, a shooter and a guard for each element; each evolves with the gift of the element that feeds it
+// eleven powers; every element has a shooter, and every Keeper starts with theirs (A, 2026-10-05: more projectile
+// powers, and the first minute should be aiming and firing). Each evolves with the gift of the element that feeds it.
 const POW = {
   tide:   { n:'Tide Ring',     e:'water', icon:'p-tide',    evo:'Moon Tide',           evoIcon:'e-moon',        role:'Guard' },
   pearl:  { n:'Dragon Pearls', e:'water', icon:'p-pearl',   evo:'Pearl Storm',         evoIcon:'e-pearlstorm',  role:'Shooter' },
@@ -1029,6 +1030,7 @@ const POW = {
   lantern:{ n:'Lantern Bombs', e:'fire',  icon:'p-lantern', evo:'Lantern Festival',    evoIcon:'e-festival',    role:'Area' },
   stone:  { n:'Stone Ward',    e:'earth', icon:'p-stone',   evo:'Molten Ward',         evoIcon:'e-molten',      role:'Guard' },
   boulder:{ n:'Mountain Fist', e:'earth', icon:'p-boulder', evo:'Meteor Fall',         evoIcon:'e-meteor',      role:'Area' },
+  skip:   { n:'Skipping Stones', e:'earth', icon:'p-skip',  evo:'Landslide',           evoIcon:'e-landslide',   role:'Shooter' },
   bell:   { n:'Golden Bell',   e:'metal', icon:'p-bell',    evo:'Mountain Bell',       evoIcon:'e-mountain',    role:'Guard' },
   swords: { n:'Flying Swords', e:'metal', icon:'p-swords',  evo:'Ten Thousand Swords', evoIcon:'e-swords',      role:'Shooter' }
 };
@@ -1041,7 +1043,7 @@ const GIFT = {
 };
 const GIFT_OF = { water:'spring', wood:'shoot', fire:'kindling', earth:'rooted', metal:'lungs' };
 const evoGift = id => GIFT_OF[FED_BY[POW[id].e]];          // the gift that evolves a power
-const START = { water:'tide', wood:'vine', fire:'ember', earth:'stone', metal:'bell' };
+const START = { water:'pearl', wood:'bamboo', fire:'ember', earth:'skip', metal:'swords' };
 const icon = n => `art4/icons/${n}.jpg?v=8`;   // the version tag makes phones fetch new art instead of a cached copy
 const AWAKEN_AT = [4, 8, 12, 16, 20];
 
@@ -1055,6 +1057,7 @@ const ST = {
   lantern: (l, v) => v ? { n:6, dmg:22, r:96, dur:4, cd:2.4 } : { n:[0,1,2,2,3,3][l], dmg:8 + 3 * l, r:48 + 7 * l, dur:2.4 + .2 * l, cd:2.6 },
   stone:   (l, v) => v ? { n:6, dmg:52, size:30, r:108 } : { n:3 + (l >> 1), dmg:20 + 5 * l, size:16 + 2.5 * l, r:76 + 5 * l },
   boulder: (l, v) => v ? { n:5, dmg:90, r:112, cd:1.5 } : { n:[0,1,2,2,3,3][l], dmg:30 + 8 * l, r:52 + 6 * l, cd:1.8 },
+  skip:    (l, v) => v ? { n:2, dmg:46, hops:6, r:300, cd:.9, quake:80 } : { n:[0,1,1,2,2,2][l], dmg:18 + 5 * l, hops:1 + l, r:240 + 10 * l, cd:1.15 },
   bell:    (l, v) => v ? { R:150, dmg:26, pulse:2 } : { R:70 + 12 * l, dmg:9 + 4 * l },
   swords:  (l, v) => v ? { n:6, dmg:44, range:420, rain:1.3 } : { n:l, dmg:20 + 5 * l, range:300 + 20 * l }
 };
@@ -1070,6 +1073,7 @@ const NEXT = {
   ember:   l => { const a = ST.ember(l), b = ST.ember(l + 1); return l ? say(a, b, [['n', d => more(d, 'fireball', 'fireballs')], ['dmg', 'harder hits']], 'bigger blasts') : 'A homing fireball that explodes on impact'; },
   lantern: l => { const a = ST.lantern(l), b = ST.lantern(l + 1); return l ? say(a, b, [['n', d => more(d, 'lantern', 'lanterns')], ['r', 'wider fire'], ['dmg', 'hotter burn']]) : 'Thrown lanterns burst into pools of fire'; },
   stone:   l => { const a = ST.stone(l), b = ST.stone(l + 1); return l ? say(a, b, [['n', d => more(d, 'boulder', 'boulders')], ['dmg', 'harder hits']], 'bigger boulders') : `${b.n} boulders circle you and smash foes back`; },
+  skip:    l => { const a = ST.skip(l), b = ST.skip(l + 1); return l ? say(a, b, [['n', d => more(d, 'stone', 'stones')], ['hops', d => more(d, 'bounce', 'bounces')], ['dmg', 'harder hits']]) : 'A stone skips from creature to creature'; },
   boulder: l => { const a = ST.boulder(l), b = ST.boulder(l + 1); return l ? say(a, b, [['n', d => more(d, 'boulder', 'boulders')], ['dmg', 'harder hits']], 'a wider quake') : 'A boulder falls from the sky onto the crowd'; },
   bell:    l => { const a = ST.bell(l), b = ST.bell(l + 1); return l ? say(a, b, [['R', 'a wider field'], ['dmg', 'harder hits']]) : 'A golden bagua field hurts and slows all inside it'; },
   swords:  l => { const a = ST.swords(l), b = ST.swords(l + 1); return l ? say(a, b, [['n', d => more(d, 'sword', 'swords')], ['dmg', 'harder hits']], 'longer flight') : 'A flying sword slices out and returns to you'; },
@@ -1084,6 +1088,7 @@ const EVO_DESC = {
   vine:'Twelve vines, and sacred trees sprout to fight beside you.', bamboo:'Spears spiral out in every direction, nonstop.',
   ember:'Six fireballs whose blasts set the ground ablaze.', lantern:'A festival of lanterns that end in fireworks.',
   stone:'Molten boulders that burn everything they touch.', boulder:'Flaming meteors that leave lava where they land.',
+  skip:'Heavy stones skip through six creatures and crack the ground at every hit.',
   bell:'A vast golden field that rings out in great waves.', swords:'Swords rain from the sky around you.'
 };
 
@@ -2418,6 +2423,14 @@ function powers(dt) {
     }
   }
 
+  /* Skipping Stones: a stone flies at the nearest creature and skips on to the next one, and the next */
+  if (sk.skip) {
+    const st = ST.skip(sk.skip, ev.skip);
+    if (cool('skip', st.cd, dt)) { const tg = nearest(P.x, P.y, st.n, 520);
+      tg.forEach(e => { const a = Math.atan2(e.y - P.y, e.x - P.x); S.shots.push({ k:'skip', x:P.x, y:P.y - 24, vx:Math.cos(a) * 640, vy:Math.sin(a) * 640, tgt:e, hops:st.hops, life:1.4, st, hit:new Set() }); });
+      if (tg.length) SFX.thwip(); }
+  }
+
   /* Golden Bell: a rotating bagua field that hurts and slows everything inside */
   if (sk.bell) {
     const st = ST.bell(sk.bell, ev.bell);
@@ -2456,8 +2469,18 @@ function powers(dt) {
       if (s.tgt && !s.tgt.dead) { const a = Math.atan2(s.tgt.y - s.y, s.tgt.x - s.x), sp = 560; s.vx += (Math.cos(a) * sp - s.vx) * Math.min(1, dt * 7); s.vy += (Math.sin(a) * sp - s.vy) * Math.min(1, dt * 7); }
       if (Math.random() < .55) flames(s.x, s.y, 1, 4, 18, 30);
     } else if (s.k === 'bamboo' && Math.random() < .12) leaves(s.x, s.y, 1, 40);
+    else if (s.k === 'skip') {
+      if (!s.tgt || s.tgt.dead) { s.tgt = nearest(s.x, s.y, 1, s.st.r, s.hit)[0]; if (!s.tgt) { s.life = 0; continue; } }
+      const a = Math.atan2(s.tgt.y - s.y, s.tgt.x - s.x), sp = 700; s.vx += (Math.cos(a) * sp - s.vx) * Math.min(1, dt * 12); s.vy += (Math.sin(a) * sp - s.vy) * Math.min(1, dt * 12);
+      if (Math.random() < .3) fx({ k:'smoke', x:s.x, y:s.y, vx:0, vy:0, drag:2, life:.3, s:6, c:'210,180,120' });
+    }
     s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt;
     if (s.k === 'ember') { const hitE = S.en.find(e => !e.dead && Math.abs(e.x - s.x) < e.r + 12 && Math.hypot(e.x - s.x, e.y - s.y) < e.r + 12); if (hitE || s.life <= 0) { s.life = 0; explode(s.x, s.y, s.st.r, s.st.dmg, 'fire', !!S.evo.ember); if (S.evo.ember) firePatch(s.x, s.y, 60, 1.6, 14); } }
+    else if (s.k === 'skip') { const e = s.tgt; if (e && !e.dead && Math.hypot(e.x - s.x, e.y - s.y) < e.r + 14) {
+        // a hit, then a skip on to the nearest creature it has not hit yet
+        s.hit.add(e); hurt(e, s.st.dmg, 'earth', { kb:200, fx:s.x, fy:s.y }); debris(e.x, e.y - 10, 5, 220, '#C8A060'); SFX.thud(false);
+        if (S.evo.skip) { inArea(e.x, e.y, s.st.quake, o => { if (o !== e) hurt(o, s.st.dmg * .5, 'earth', { spark:false, kb:120, fx:e.x, fy:e.y }); }); decal({ k:'crack', x:e.x, y:e.y, r:s.st.quake * .7, life:2.5 }); ring(e.x, e.y, 10, s.st.quake, '#E6B23A', .3, 8, true); }
+        if (--s.hops <= 0) s.life = 0; else { s.tgt = nearest(e.x, e.y, 1, s.st.r, s.hit)[0]; s.life = s.tgt ? 1.2 : 0; } } }
     else if (s.k === 'bamboo') { inArea(s.x, s.y, 10, e => { if (!s.hit.has(e) && s.pierce > 0) { s.hit.add(e); s.pierce--; hurt(e, s.dmg, 'wood', { kb:90 }); burst(e.x, e.y - 14, '#B6F07A', 4, 260); if (s.pierce <= 0) s.life = 0; } }); }
   }
   S.shots = S.shots.filter(s => s.life > 0);
@@ -4005,6 +4028,7 @@ function draw() {
   // projectiles
   for (const s of S.shots) {
     if (s.k === 'ember') { const a = Math.atan2(s.vy, s.vx); g.save(); g.translate(s.x, s.y); g.rotate(a - Math.PI / 2); flameAt(0, 0, 26, .1, s.x); g.restore(); g.fillStyle = '#FFF6D0'; g.beginPath(); g.arc(s.x, s.y, 8, 0, TAU); g.fill(); add(() => glowAt(s.x, s.y, 60, '#FF7A2A', .6)); }
+    else if (s.k === 'skip') energy(s.x, s.y, s.vx, s.vy, '#F0C060', S.evo.skip ? 16 : 13, false);
     else if (s.k === 'bamboo') {
       const a = Math.atan2(s.vy, s.vx);
       add(() => { g.strokeStyle = s.gold ? 'rgba(255,220,120,.6)' : 'rgba(190,255,150,.45)'; g.lineWidth = 6; g.lineCap = 'round'; g.beginPath(); g.moveTo(s.x, s.y); g.lineTo(s.x - s.vx * .06, s.y - s.vy * .06); g.stroke(); });
