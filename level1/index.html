@@ -627,7 +627,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
    the XP line along its foot; under it the next wave (wordless) and the Qi Stones. Colour only where it means
    something: the five element colours, gold for growing. Everything else is glass and white. */
 #hud{--glass:rgba(12,16,44,.42)}
-#hud .top{padding:calc(8px + env(safe-area-inset-top)) 10px 0;gap:7px}
+#hud .top{padding:calc(8px + env(safe-area-inset-top)) 10px 0;gap:7px;z-index:8}
 #hud .hstrip,#hud #wavePill,#hud #stoneRow,#hud #mapBtn{background:var(--glass);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 6px 18px rgba(8,10,34,.18);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4)}
 #hud .hstrip{position:relative;display:flex;align-items:center;gap:8px;height:46px;padding:0 6px;border-radius:23px;overflow:hidden}
 #hud #pauseBtn{width:34px;height:34px;background:rgba(255,255,255,.14);box-shadow:none}
@@ -693,12 +693,12 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 /* every overlay is a night-glass sheet that rises from the bottom: the game stays visible above it, the action sits
    under the thumb, titles are white, gold is kept for rewards, and there is one green button */
 #howto,#levelUp,#paused,#tipCard,#chart,#beastCard{justify-content:flex-end;padding:0;background:rgba(8,10,34,.34);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
-#howto > .panel,#levelUp > .panel,#paused > .panel,#tipCard > .panel,#chart > .panel,#beastCard > .panel{width:100%;max-width:560px;border-radius:30px 30px 0 0;padding:28px 18px calc(20px + env(safe-area-inset-bottom))!important;gap:14px;
+#howto > .panel,#levelUp > .panel,#paused > .panel,#tipCard > .panel,#chart > .panel,#beastCard > .panel,#callPick > .panel{width:100%;max-width:560px;border-radius:30px 30px 0 0;padding:28px 18px calc(20px + env(safe-area-inset-bottom))!important;gap:14px;
   background:linear-gradient(180deg,rgba(28,34,90,.9),rgba(10,14,44,.97))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 0 0 1px rgba(255,255,255,.08),0 -24px 60px rgba(0,0,0,.45)!important;
   -webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);animation:sheetUp .42s cubic-bezier(.2,1.1,.3,1) both}
 #howto > .panel::before,#levelUp > .panel::before,#paused > .panel::before,#tipCard > .panel::before,#chart > .panel::before,#beastCard > .panel::before{content:"";position:absolute;left:50%;top:9px;width:40px;height:5px;margin-left:-20px;border-radius:5px;background:rgba(255,255,255,.28)}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
-#howto .ribbon,#paused .ribbon,#tipCard .ribbon,#chart .ribbon,#beastCard .ribbon{background:none!important;-webkit-background-clip:border-box;background-clip:border-box;color:#fff!important;-webkit-text-fill-color:#fff;filter:none!important;text-shadow:none;font-size:24px}
+#howto .ribbon,#paused .ribbon,#tipCard .ribbon,#chart .ribbon,#beastCard .ribbon,#callPick .ribbon{background:none!important;-webkit-background-clip:border-box;background-clip:border-box;color:#fff!important;-webkit-text-fill-color:#fff;filter:none!important;text-shadow:none;font-size:24px}
 #howto .btn.green,#levelUp .btn.green,#paused .btn.green,#tipCard .btn.green,#chart .btn.green,#beastCard .btn.green{width:100%;max-width:320px}
 /* how to play: three rows on glass */
 #howto .how{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);padding:12px 14px}
@@ -774,7 +774,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 /* Victory: star labels a size up */
 .st3 span{font-size:13px}
 /* a sheet never runs off the screen: it scrolls inside itself, and the creature card lies sideways to stay short */
-#howto > .panel,#levelUp > .panel,#paused > .panel,#tipCard > .panel,#chart > .panel,#beastCard > .panel{max-height:calc(100% - 24px - env(safe-area-inset-top));overflow-y:auto;overscroll-behavior:contain}
+#howto > .panel,#levelUp > .panel,#paused > .panel,#tipCard > .panel,#chart > .panel,#beastCard > .panel,#callPick > .panel{max-height:calc(100% - 24px - env(safe-area-inset-top));overflow-y:auto;overscroll-behavior:contain}
 #beastCard .beast.big{grid-template-columns:120px 1fr;justify-items:start;text-align:left}
 #beastCard .beast.big .pic{width:120px;height:120px;border-radius:30px}
 #beastCard .beast.big .chips{justify-content:flex-start}
@@ -807,12 +807,12 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
    hushes the world under starlight while the seal is swiped; the marks along the bottom say which stroke comes next */
 #callBtn{position:absolute;left:14px;top:calc(var(--ultTop, 168px) + 90px);width:66px;height:66px;border-radius:50%;border:0;padding:0;background:none;pointer-events:auto;z-index:8;--p:0;-webkit-tap-highlight-color:transparent;touch-action:none}
 #callBtn[hidden]{display:none}
-#callBtn .ur{position:absolute;inset:0;border-radius:50%;background:conic-gradient(#C9D3DB calc(var(--p) * 360deg),rgba(16,22,52,.55) 0);-webkit-mask:radial-gradient(circle,transparent 27px,#000 28px);mask:radial-gradient(circle,transparent 27px,#000 28px)}
+#callBtn .ur{position:absolute;inset:0;border-radius:50%;background:conic-gradient(#E4EAFF calc(var(--p) * 360deg),rgba(16,22,52,.55) 0);-webkit-mask:radial-gradient(circle,transparent 27px,#000 28px);mask:radial-gradient(circle,transparent 27px,#000 28px)}
 #callBtn img{position:absolute;left:7px;top:7px;width:52px;height:52px;border-radius:50%;object-fit:contain;padding:4px;box-sizing:border-box;background:radial-gradient(circle at 50% 35%,#4A58B0,#161C4A);filter:grayscale(.85) brightness(.72);transition:filter .3s}
 #callBtn em{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);display:flex;gap:3px;padding:3px 6px;border-radius:99px;background:#1B2257;box-shadow:0 0 0 1.5px rgba(255,255,255,.55)}
 #callBtn em i{width:5px;height:5px;border-radius:50%;background:#F4F8FF}
 #callBtn.ready img{filter:none}
-#callBtn.ready .ur{background:conic-gradient(#FFFFFF,#CFE3FF,#C9D3DB,#FFFFFF,#CFE3FF,#FFFFFF)}
+#callBtn.ready .ur{background:conic-gradient(#FFFFFF,#CFE3FF,#E4EAFF,#FFFFFF,#CFE3FF,#FFFFFF)}
 #callBtn.ready{animation:callPulse 1.4s ease-in-out infinite}
 #callBtn.sealing{animation:callTap .55s ease-in-out infinite}
 #callBtn.sealing img{filter:none;box-shadow:0 0 0 3px #fff,0 0 26px rgba(225,236,255,.95)}
@@ -841,7 +841,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
    then flicks toward the creatures; each mark lights only during its stroke; the beam finds them and the bell lands.
    Then the young players' way: two taps on the bell, and it lands again */
 .calldemo{position:absolute;inset:0;overflow:hidden;--d:10s;background:radial-gradient(circle at 70% 62%,rgba(150,166,255,.3),transparent 50%),linear-gradient(180deg,#1A1F5C,#0E1236)}
-.calldemo .cd-btn{position:absolute;left:7%;top:9%;width:17%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 35%,#4A58B0,#161C4A);box-shadow:0 0 0 3px #C9D3DB;animation:cdBtn var(--d) infinite}
+.calldemo .cd-btn{position:absolute;left:7%;top:9%;width:17%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 35%,#4A58B0,#161C4A);box-shadow:0 0 0 3px #E4EAFF;animation:cdBtn var(--d) infinite}
 .calldemo .cd-btn img{position:absolute;inset:12%;width:76%!important;height:76%!important;object-fit:contain}
 .calldemo .cd-c{position:absolute;width:15%!important;height:auto!important;animation:cdCrowd var(--d) infinite}
 .calldemo .cd-c1{left:58%;top:47%}.calldemo .cd-c2{left:71%;top:53%}.calldemo .cd-c3{left:64%;top:60%}
@@ -868,6 +868,38 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 @keyframes cdBell{0%,39.6%{transform:translate(-50%,-160%);opacity:0}40.2%{opacity:1}42.6%{transform:translate(-50%,0)}43.8%{transform:translate(-50%,0) scale(1.08,.9)}46.2%{transform:translate(-50%,0) rotate(-6deg)}48.6%{transform:translate(-50%,0) rotate(4deg)}52.8%{transform:translate(-50%,0);opacity:1}57.6%{transform:translate(-50%,-30%);opacity:0}
   58%,78.6%{transform:translate(-50%,-160%);opacity:0}79.2%{opacity:1}81%{transform:translate(-50%,0)}82%{transform:translate(-50%,0) scale(1.08,.9)}84%{transform:translate(-50%,0) rotate(-6deg)}86%{transform:translate(-50%,0) rotate(4deg)}93%{transform:translate(-50%,0);opacity:1}98%,100%{transform:translate(-50%,-30%);opacity:0}}
 @keyframes cdCrowd{0%,42%{opacity:1;transform:none}45%{opacity:0;transform:scale(1.2) translateY(-20%)}58%{opacity:0;transform:none}62%,81%{opacity:1;transform:none}84%{opacity:0;transform:scale(1.2) translateY(-20%)}98%{opacity:0}100%{opacity:1}}
+
+/* the freed person's gift on the Victory card: their Star Call, rising into view as they hand it over */
+.resGift{display:flex;align-items:center;gap:12px;padding:8px 16px 8px 8px;border-radius:999px;background:rgba(16,22,52,.6);box-shadow:inset 0 0 0 1.5px rgba(228,234,255,.55),0 0 24px rgba(150,166,255,.35);opacity:0;transform:translateY(14px) scale(.92);transition:opacity .5s,transform .6s cubic-bezier(.2,1.4,.4,1)}
+.resGift.in{opacity:1;transform:none}
+.resGift img{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(214,222,255,.7))}
+.resGift span{display:grid;gap:1px;text-align:left}
+.resGift i{font:800 11px var(--round);font-style:normal;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-2)}
+.resGift b{font:900 18px var(--round);color:#fff}
+/* the Star Call picker: one card per owned call, its gift, what it does and its seal */
+.callOpts{display:grid;gap:10px;width:100%}
+.callOpt{display:grid;grid-template-columns:64px 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;text-align:left;padding:10px 14px 10px 10px;border:0;border-radius:20px;background:rgba(16,22,52,.62);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);color:#fff;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.callOpt.last{box-shadow:inset 0 0 0 2.5px #E4EAFF,0 0 18px rgba(228,234,255,.35)}
+.callOpt:active{transform:scale(.97)}
+.callOpt img{grid-row:1 / 3;width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(214,222,255,.6))}
+.callOpt > span:not(.sealrow) > i{display:block;font:800 10.5px var(--round);font-style:normal;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-2)}
+.callOpt b{display:block;font:900 18px var(--round)}
+#callPick{background:#0C1420 url(art4/hero-tall.jpg?v=9) 50% 0/cover no-repeat;justify-content:flex-end}
+#callPick::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,20,32,.2),rgba(12,20,32,.7))}
+#callPick > .panel{position:relative}
+.callOpt em{display:block;font-style:normal;font-size:13px;color:rgba(255,255,255,.72)}
+.callOpt .sealrow.mini{position:static;transform:none;display:flex;gap:6px;margin-top:6px}
+.callOpt .sealrow.mini i{width:26px;height:26px}
+.callOpt .sealrow.mini svg{width:14px;height:14px;opacity:.9}
+#callBtn.awake img{box-shadow:0 0 0 2px #C3CBFF,0 0 18px rgba(185,196,255,.85)}
+/* the Tide Call card: the finger swipes left then right, flicks toward the creatures, and a wave sweeps through them */
+.calldemo.cd-tide .beam{left:30%}
+.calldemo.cd-tide .cd-f{animation-name:cdFingerT}
+.calldemo .cd-wave{position:absolute;left:28%;top:36%;width:34%;opacity:0;transform:translateX(-30%);transform-origin:50% 100%;animation:cdWave var(--d) infinite}
+.calldemo .cd-wave svg{display:block;width:100%;height:auto;overflow:visible}
+@keyframes cdFingerT{0%{left:15.5%;top:17.5%;opacity:0}2.4%,6%{left:15.5%;top:17.5%;opacity:1}9.6%{left:58%;top:66%;opacity:1}16.8%{left:32%;top:66%}24%{left:58%;top:66%}26.4%{left:50%;top:62%}31.2%{left:64%;top:48%;opacity:1}33.6%{left:64%;top:48%;opacity:0}
+  60%{left:15.5%;top:17.5%;opacity:0}63%,72%{left:15.5%;top:17.5%;opacity:1}66%,70%{left:15.5%;top:16%}67%,71%{left:15.5%;top:18%}75%,100%{left:15.5%;top:17.5%;opacity:0}}
+@keyframes cdWave{0%,39%{opacity:0;transform:translateX(-30%) scaleY(.2)}40.5%{opacity:1;transform:translateX(-10%) scaleY(1)}46%{opacity:1;transform:translateX(150%)}48%,78%{opacity:0;transform:translateX(160%)}78.5%{opacity:0;transform:translateX(-30%) scaleY(.2)}80%{opacity:1;transform:translateX(-10%) scaleY(1)}85.5%{opacity:1;transform:translateX(150%)}88%,100%{opacity:0;transform:translateX(160%)}}
 </style>
 
 <div id="stage">
@@ -888,7 +920,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <div class="skills" id="skills"></div>
     <div class="slottip" id="slotTip" hidden></div>
     <button id="ultBtn" aria-label="Companion ultimate"><span class="ur"></span><img id="ultImg" alt=""><em id="ultLv"></em><b id="ultName"></b></button>
-    <button id="callBtn" aria-label="Star Call: Bell Strike" hidden><span class="ur"></span><img id="callImg" src="art4/calls/bell-star.png?v=9" alt=""><em id="callPips"></em></button>
+    <button id="callBtn" aria-label="Star Call" hidden><span class="ur"></span><img id="callImg" alt=""><em id="callPips"></em></button>
     <button id="mapBtn" aria-label="Shore map"><canvas id="mapCv"></canvas></button>
     <div id="combo"><b id="comboN">×0</b><span>combo</span></div>
     <div id="cue"></div>
@@ -1014,6 +1046,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <div class="panel pop res">
       <h2 class="vicT">Victory!</h2>
       <p class="resQ">"I had stopped feeling anything at all. Thank you, Keeper."</p>
+      <div class="resGift" id="resGift" hidden></div>
       <div class="stars3" id="resStars"></div>
       <div class="resBloom" id="resBloom" hidden></div>
       <div class="chips3" id="resChips"></div>
@@ -1033,6 +1066,12 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     </div>
   </section>
 
+  <section class="scr popup" id="callPick" hidden>
+    <div class="panel pop" style="padding-top:22px">
+      <div class="rb"><span class="ribbon">Pick your Star Call</span></div>
+      <div class="callOpts" id="callOpts"></div>
+    </div>
+  </section>
   <section class="scr popup" id="tipCard" hidden>
     <div class="panel pop" style="padding-top:22px">
       <div class="rb"><span class="ribbon" id="tipT">Tip</span></div>
@@ -1353,13 +1392,13 @@ const AU = (() => {
      If a file can't load, the synth version above plays instead. */
   const PHI = 1.618, LADDER = [1, 1 / PHI, 1 / PHI / PHI, 1 / PHI / PHI / PHI], SOFT = [18000, 9000, 5200, 2800];
   const LOUD = { alarm:-7.6, bell:-25.9, bloop:-8.9, 'boom-big':-9.3, boom:-18.9, bossdown:-8.3, bossroar:-8.7, cardin:-17.3, charge:-11.6, chestdrop:-5.5, combo:-24.1, crackle:-13.0, dart:-11.3, firecrackers:-17.9, firework:-14.2, freeze:-19.8, gem:-21.4, heal:-22.9, heart:-9.2, heartbeat:-22.4, hurt:-9.3, jackpot:-11.0, levelup:-13.7, pop:-13.4, power:-12.6, reveal:-10.7, roar:-8.4, select:-45.8, shatter1:-16.1, shatter2:-26.5, shing:-9.2, spikes:-19.1, splash:-11.4, stomp:-13.1, sweep:-12.6, thud:-26.2, thwip:-5.9, ting:-20.5, victory:-12.8, wave:-14.7, whip:-21.0,
-    'call-beam':-12.5, 'call-bell':-12.3, 'call-seal':-15.4, 'call-throw':-12.4, 'call-toll':-12.4, 'earth-boulder':-10.3, 'earth-quake':-13.0, 'earth-roar':-9.4, 'fire-dash':-9.2, 'fire-drum':-9.6, 'fire-mortar':-12.0, 'fire-roar':-9.5, 'm-earth':-20.8, 'm-fire':-9.5, 'm-metal':-12.2, 'm-water':-12.3, 'm-wood':-20.5, 'metal-blades':-13.8, 'metal-blink':-11.4, 'metal-roar':-9.4, 'metal-toll':-10.7, 'water-cast':-11.2, 'water-pull':-9.6, 'water-roar':-10.6, 'water-wall':-9.5, 'wood-axe':-9.4, 'wood-roar':-12.0, 'wood-roots':-11.7 };
+    'tide-swell':-12.5, 'tide-roll':-12.4, 'tide-crash':-12.5, 'tide-conch':-12.3, 'call-beam':-12.5, 'call-bell':-12.3, 'call-seal':-15.4, 'call-throw':-12.4, 'call-toll':-12.4, 'earth-boulder':-10.3, 'earth-quake':-13.0, 'earth-roar':-9.4, 'fire-dash':-9.2, 'fire-drum':-9.6, 'fire-mortar':-12.0, 'fire-roar':-9.5, 'm-earth':-20.8, 'm-fire':-9.5, 'm-metal':-12.2, 'm-water':-12.3, 'm-wood':-20.5, 'metal-blades':-13.8, 'metal-blink':-11.4, 'metal-roar':-9.4, 'metal-toll':-10.7, 'water-cast':-11.2, 'water-pull':-9.6, 'water-roar':-10.6, 'water-wall':-9.5, 'wood-axe':-9.4, 'wood-roar':-12.0, 'wood-roots':-11.7 };
   // levelled to -18 dB and never boosted more than 1.4x, so a quiet file can't come out louder than it used to (A: still too loud)
   const level = n => Math.min(1.4, Math.max(.3, Math.pow(10, (-18 - (LOUD[n] ?? -18)) / 20)));
   const MINOR = [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24, 27, 29, 31, 34];   // minor pentatonic steps, in semitones
   const SMP = {}, SVAR = { shatter:['shatter1', 'shatter2'] }, lastRate = {};
   const SFILES = ['gem','shatter1','shatter2','splash','bloop','dart','boom','boom-big','whip','thwip','thud','stomp','bell','ting','shing','levelup','select','cardin','reveal','victory','chestdrop','roar','alarm','hurt','crackle','firecrackers','heal','sweep','freeze','power','wave','firework','pop','bossroar','jackpot','heart','heartbeat','charge','spikes','combo','bossdown',
-    'earth-boulder','earth-quake','earth-roar','fire-dash','fire-drum','fire-mortar','fire-roar','m-earth','m-fire','m-metal','m-water','m-wood','metal-blades','metal-blink','metal-roar','metal-toll','water-cast','water-pull','water-roar','water-wall','wood-axe','wood-roar','wood-roots','call-beam','call-bell','call-seal','call-throw','call-toll'];
+    'earth-boulder','earth-quake','earth-roar','fire-dash','fire-drum','fire-mortar','fire-roar','m-earth','m-fire','m-metal','m-water','m-wood','metal-blades','metal-blink','metal-roar','metal-toll','water-cast','water-pull','water-roar','water-wall','wood-axe','wood-roar','wood-roots','call-beam','call-bell','call-seal','call-throw','call-toll','tide-swell','tide-roll','tide-crash','tide-conch'];
   // [file, rung]: 0 hero, 1 big event, 2 regular combat, 3 constant
   const SMAP = { dart:['dart', 3], boom:a => a[0] ? ['boom-big', 1] : ['boom', 2], splash:['splash', 2], bloop:['bloop', 3], whip:['whip', 2], thwip:['thwip', 3],
     thud:a => a[0] ? ['stomp', 1] : ['thud', 2], bell:['bell', 2], ting:['ting', 3], shing:['shing', 2], shatter:['shatter', 3], levelup:['levelup', 0], select:['select', 2],
@@ -1374,7 +1413,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=10`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call'].map(k => 'vo-card-' + k), 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-bell', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2120,10 +2159,10 @@ function renderStory() {
   [...$('#storyDots').children].forEach((d, i) => d.classList.toggle('on', i === storyPg));
   $('#storyNext').textContent = storyPg < 2 ? 'Next' : 'Run in';
 }
-const storyGo = () => { SFX.select(); if (storyPg < 2) { storyPg++; renderStory(); return; } if (LVL === 1) { show(null); startRun(); } else intro(LVL); };
+const storyGo = () => { SFX.select(); if (storyPg < 2) { storyPg++; renderStory(); return; } if (LVL === 1) { show(null); beginRun(); } else intro(LVL); };
 $('#storyNext').onclick = storyGo; $('#storyArt').onclick = storyGo;
 let howFromPause = false;
-$('#howtoGo').onclick = () => { SFX.select(); if (howFromPause) { howFromPause = false; show('paused'); return; } show(null); startRun(); };
+$('#howtoGo').onclick = () => { SFX.select(); if (howFromPause) { howFromPause = false; show('paused'); return; } show(null); beginRun(); };
 $('#howBtn').onclick = () => { SFX.pop(); howFromPause = true; show('howto'); AU.vo('vo-card-howto'); };
 
 /* ================= the world ================= */
@@ -2140,6 +2179,14 @@ function paintThaw(x, y, r) {
   for (let gy = y0; gy <= y1; gy++) for (let gx = x0; gx <= x1; gx++) { const cx = (gx + .5) * c - x, cy = (gy + .5) * c - y; if (cx * cx + cy * cy < r2 && !thawGrid[gy * gridN + gx]) { thawGrid[gy * gridN + gx] = 1; S.thawCells++; } }
 }
 
+// one Star Call per run (A, 2026-10-05): a player who owns more than one picks it before the run (the last pick is
+// remembered); with one it simply comes along; ?call=tide or ?call=bell forces one for testing
+let callPick = null;
+function beginRun() {
+  const own = ownedCalls(), forced = callForced();
+  if (forced || own.length < 2) { callPick = forced || own[0] || null; startRun(); return; }
+  pickCall(own);
+}
 function startRun() {
   resetThaw(); FX.length = 0; GROUND.length = 0; shapeLevel1(keeperEl);
   const A = ANIMAL[animal];
@@ -2147,7 +2194,7 @@ function startRun() {
     t:0, over:false, won:false, level:LVL, learned:pathOf(keeperEl).slice(0, LVL), apprentice:LVL > 1 ? pathOf(keeperEl)[LVL - 1] : null,
     p:{ x:WORLD / 2, y:WORLD / 2, hp:220, max:220, face:1, hurt:0, r:26, mx:0, my:0 },
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0, z:0 },
-    ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null, call:callOwned('bell') ? newCall() : null,
+    ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null, call:callPick && callOwned(callPick) ? newCall(callPick) : null,
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
     lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, qi:{}, qiStones:{}, stoneOut:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
@@ -2230,7 +2277,7 @@ document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init();
 document.querySelectorAll('.sfxBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleSfx(); renderSound(); SFX.select(); });
 document.querySelectorAll('.voBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleVoice(); renderSound(); SFX.select(); });
 renderSound();
-$('#againBtn').onclick = () => { show(null); AU.music(true); startRun(); };
+$('#againBtn').onclick = () => { show(null); AU.music(true); beginRun(); };
 $('#retryBtn').onclick = () => { payPet(); show(null); startRun(); };
 $('#riseBtn').onclick = () => {
   S.over = false; S.fall = null; $('#hud').hidden = false; S.p.hp = S.p.max; S.p.hurt = 2; AU.music(true);
@@ -2321,7 +2368,7 @@ function spawnBoss() {
 function hurt(e, dmg, el, o = {}) {
   if (e.dead) return;
   let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1);
-  const k = eff(el, e.el), strong = k > 1, weak = k < 1;
+  const k = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), strong = k > 1, weak = k < 1;
   m *= k;
   // the words teach, so they show the first few times in a run; after that the coloured hit says it
   if (strong && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
@@ -2924,8 +2971,8 @@ function teach() {
     }
     break;
   }
-  if (S.call && callReady() && !SEEN.has('_call')) { markSeen('_call');
-    coach('call', 'Star Call: Bell Strike!', 'Tap the bell. Swipe up, down, then toward the creatures. Or tap the bell twice.',
+  if (S.call && callReady() && !SEEN.has('_call_' + S.call.id) && !(S.call.id === 'bell' && SEEN.has('_call'))) { markSeen('_call_' + S.call.id); const Dc = CALL[S.call.id];
+    coach('call_' + S.call.id, Dc.card[0], Dc.card[1],
       () => { const r = $('#callBtn').getBoundingClientRect(), b = stage.getBoundingClientRect(); return { sx:r.left - b.left + r.width / 2, sy:r.top - b.top + r.height / 2, sr:r.width * .62, paint:'#callImg' }; }); }
   if (S.ult.charge >= 1 && !SEEN.has('_ult')) { markSeen('_ult'); S.taught.c_ult = 0; const I = S.ultInfo;
     coach('ult', `${A.y}: ${I.name}!`, `Tap your ${A.y} for one huge hit. It grows every run.`,
@@ -3553,20 +3600,35 @@ function stoneBurst() {
 }
 /* ================= Star Calls ================= */
 // A, 2026-10-05: each boss, once freed, gives the player its power, called down from the sky ("Getting the bosses
-// powers. That's awesome. And timeless"). All power is earned by playing; the Season Path only sells how a call looks.
-// A call is thrown: tap its button, swipe a short hand seal while the world slows, and the last stroke throws it.
-// Young players can tap the button twice instead. A beam of starlight marks the spot, then the call lands.
-// Bell Strike is built first; the fisherman's Tide Call (Level 1's boss) comes next. Tiers 1-5 (?tier=N), the fifth Awakened.
-const CALL = { bell:{ n:'Bell Strike', from:'metal', el:'metal', seal:['up', 'down'], R:[170, 195, 220, 245, 275], cd:[45, 42, 38, 34, 30], tolls:[1, 1, 2, 2, 3], still:[0, 0, 0, 3, 3.5] } };
+// powers. That's awesome. And timeless"), and it has to make sense: a call is the gift of the person it came from.
+// All power is earned by playing; the Season Path only sells how a call looks. One call per run (A, 2026-10-05).
+// A call is thrown: tap its button, swipe a short hand seal while the world slows, and the last stroke aims it. Young
+// players can tap the button twice instead. A beam of starlight marks where it begins, then it lands.
+// Tiers 1-5 (?tier=N), the fifth Awakened; ?call=tide or ?call=bell tries a call on any level.
+const CALL = {
+  // the fisherman (fear, healed into courage): the sea he feared rolls out for you and sweeps a lane clear
+  tide:{ n:'Tide Call', from:'water', el:'water', obj:'shell', img:'conch-tide', seal:['left', 'right'], gift:'His old conch', giver:"The fisherman's conch", say:'A wave sweeps the creatures away.',
+    L:[520, 580, 640, 700, 780], Wd:[170, 190, 210, 230, 260], cd:[45, 42, 38, 34, 30], waves:[1, 1, 2, 2, 3], soak:[0, 0, 0, 3, 3.5],
+    card:['Tide Call!', 'Tap the shell. Swipe left, right, then toward the creatures. Or tap the shell twice.'], vo:'call-tide' },
+  // the bell ringer (grief, healed into letting go): the bell that only rang for goodbyes falls and rings for you
+  bell:{ n:'Bell Strike', from:'metal', el:'metal', obj:'bell', img:'bell-star', imgA:'bell-star-awakened', seal:['up', 'down'], gift:'Her bell', giver:"The bell ringer's bell", say:'A great bell falls on the creatures.',
+    R:[170, 195, 220, 245, 275], cd:[45, 42, 38, 34, 30], tolls:[1, 1, 2, 2, 3], still:[0, 0, 0, 3, 3.5],
+    card:['Bell Strike!', 'Tap the bell. Swipe up, down, then toward the creatures. Or tap the bell twice.'], vo:'call' } };
 const SEAL_SLOW = .25;
-// a Star Call is the freed boss's gift (A, 2026-10-05: "These things have to make sense"): Bell Strike is the bell
-// ringer's, so it is yours once the Bell Sentinel is freed. ?call=bell tries it on any level
-const callOwned = id => SEEN.has('_freed-' + CALL[id].from) || new RegExp('[?&]call=' + id).test(location.search);
-const CALL_T = { throw:.35, beam:1.1, fall:.26, toll:.75, rest:.6, rise:.5 };
+const callForced = () => (/[?&]call=(tide|bell)/.exec(location.search) || [])[1];
+// a call is yours once the person who gives it is freed ("These things have to make sense")
+const callOwned = id => SEEN.has('_freed-' + CALL[id].from) || callForced() === id;
+const ownedCalls = () => Object.keys(CALL).filter(callOwned);
+const CALL_T = { throw:.35, beam:1.1, fall:.26, toll:.75, rest:.6, rise:.5, tbeam:.8, swell:.25, crash:.6 };
 function callTier() { let t = 1; try { t = +(new URLSearchParams(location.search).get('tier')) || 1; } catch (e) {} return clamp(Math.round(t), 1, 5) - 1; }
-function newCall() { const id = 'bell', tr = callTier(); if (!IMG.callBell) { load('callBell', 'art4/calls/bell-star.png?v=9'); load('callBellA', 'art4/calls/bell-star-awakened.png?v=9'); } return { id, tier:tr, max:CALL[id].cd[tr], cd:12, seal:null, strike:null, uses:0 }; }
+function newCall(id) {
+  const D = CALL[id], tr = callTier();
+  if (id === 'bell' && !IMG.callBell) { load('callBell', 'art4/calls/bell-star.png?v=9'); load('callBellA', 'art4/calls/bell-star-awakened.png?v=9'); }
+  return { id, tier:tr, max:D.cd[tr], cd:12, seal:null, strike:null, uses:0 };
+}
 const callBusy = () => !!(S && S.call && (S.call.seal || S.call.strike));
 const callReady = () => { const C = S && S.call; return !!C && C.cd <= 0 && !C.strike && !C.seal && !hsOn(); };
+const callSize = C => { const D = CALL[C.id]; return D.R ? D.R[C.tier] : D.Wd[C.tier] * .5; };
 function callDmg() { return 240 * [1, 1.3, 1.6, 2, 2.5][S.call.tier] * (1 + (S.lv - 1) * .07); }
 function openSeal() {
   const C = S && S.call; if (!C || !running || S.over || S.fall || hsOn()) return false;
@@ -3588,7 +3650,7 @@ function sealStroke(dx, dy) {
 }
 // where the call lands: the thickest crowd (or the boss) in the direction thrown, so a child's rough throw still lands well
 function callTarget(dx, dy) {
-  const P = S.p, B = S.boss && !S.boss.dead ? S.boss : null, R = CALL[S.call.id].R[S.call.tier];
+  const P = S.p, B = S.boss && !S.boss.dead ? S.boss : null, R = callSize(S.call);
   const d = Math.hypot(dx || 0, dy || 0), ux = d ? dx / d : 0, uy = d ? dy / d : 0;
   const seen = e => e.x > camX + 40 / Z && e.x < camX + (W - 40) / Z && e.y > camY + 110 / Z && e.y < camY + (H - 110) / Z;
   const inCone = e => { if (!seen(e)) return false; if (!d) return true; const ex = e.x - P.x, ey = e.y - P.y, m = Math.hypot(ex, ey) || 1; return (ex * ux + ey * uy) / m > .64; };
@@ -3600,35 +3662,84 @@ function callTarget(dx, dy) {
   const lm = S.lastMove || { x:P.face || 1, y:0 }; const fx = d ? ux : lm.x, fy = d ? uy : lm.y;
   return { x:P.x + fx * 300, y:P.y + fy * 300 };
 }
-// the mark and the bell stay on screen: below the HUD band with room for the bell above the mark, clear of the button
-// column, above the skills bar (design review, 2026-10-05: a throw could land behind the minimap or off the edge)
-function callInView(x, y, R) {
-  const cx = camX, cy = camY, rz = R * Z, bellH = callBellSize(R) * Z * .86;
+// what the player aims lands where they can see it: below the HUD band (with room for what rises above the mark), clear
+// of the button columns, above the skills bar (design review, 2026-10-05)
+function callInView(x, y, R, up) {
+  const cx = camX, cy = camY, rz = R * Z;
   let sx = (x - cx) * Z, sy = (y - cy) * Z;
-  // the HUD band ends lower while a boss's name and health bar show
-  sy = clamp(sy, Math.min(H * .55, (S.boss ? 148 : 96) + bellH), Math.max(H * .55, H - 120 - rz * .55));
-  // the whole mark stays on screen, and beside the spirit animal, bell and map buttons (down to about 270 px) it keeps
-  // clear of the side columns too
+  sy = clamp(sy, Math.min(H * .55, (S.boss ? 148 : 96) + up), Math.max(H * .55, H - 120 - rz * .55));
   const side = Math.max(rz + 8, sy - rz * .55 < 270 ? rz * .75 + 86 : 0);
   sx = clamp(sx, Math.min(W / 2, side), Math.max(W / 2, W - side));
   return { x:cx + sx / Z, y:cy + sy / Z };
 }
+// the HUD's buttons and labels (spirit animal, its name, the Star Call, the minimap), read once per throw: a lane never
+// runs under them (QA, 2026-10-05: up-left and up-right throws tucked the wave under the button column)
+let HUD_KEEP = [];
+function hudKeep() { const b = stage.getBoundingClientRect(); HUD_KEEP = ['#ultBtn', '#ultName', '#callBtn', '#mapBtn'].map(q => $(q)).filter(e => e && !e.hidden && e.offsetParent && +getComputedStyle(e).opacity > .1)
+  .map(e => e.getBoundingClientRect()).filter(r => r.width).map(r => ({ l:r.left - b.left - 8, t:r.top - b.top - 8, r:r.right - b.left + 8, b:r.bottom - b.top + 8 })); }
+const inPlay = (x, y, mx = 0, my = mx) => { const sx = (x - camX) * Z, sy = (y - camY) * Z; if (sx < 24 + mx || sx > W - 24 - mx || sy < (S.boss ? 160 : 120) + my || sy > H - 110 - my) return false;
+  for (const k of HUD_KEEP) if (sx > k.l - mx && sx < k.r + mx && sy > k.t - my && sy < k.b + my) return false;
+  if (S.arena) { const A = S.arena; if (Math.hypot(x - A.x, y - A.y) > A.r - 40 - Math.max(mx, my) / Z) return false; } return true; };
 const callBellSize = R => Math.min(R * 1.95, 236 / Z);
+// the wave's lane runs through the crowd and away from the Keeper. A phone is narrow, so a sideways throw may tilt up
+// to about 50 degrees toward open space; the lane picked is the longest one that stays on screen (and in an arena),
+// starts clear of the Keeper (the wave never rises over the player) and still passes through the crowd
+function tideLane(P, x0, y0, C, boss) {
+  const D = CALL[C.id], L = D.L[C.tier], w = D.Wd[C.tier];
+  hudKeep();
+  if (boss) { let ux = boss.x - P.x, uy = boss.y - P.y; const d = Math.hypot(ux, uy) || 1; ux /= d; uy /= d;
+    let back = 0; while (back + 20 <= Math.min(L - 60, d - 130) && inPlay(boss.x - ux * (back + 20), boss.y - uy * (back + 20))) back += 20;
+    back = Math.max(back, 60); return { ux, uy, w, len:back + 50, nx:boss.x - ux * back, ny:boss.y - uy * back }; }
+  let ux0 = x0 - P.x, uy0 = y0 - P.y, d = Math.hypot(ux0, uy0);
+  if (d < 60) { const lm = S.lastMove || { x:P.face || 1, y:0 }; ux0 = lm.x; uy0 = lm.y; d = Math.hypot(ux0, uy0) || 1; } ux0 /= d; uy0 /= d;
+  let best = null;
+  for (const rot of [0, .3, -.3, .55, -.55, .85, -.85]) {
+    const ux = ux0 * Math.cos(rot) - uy0 * Math.sin(rot), uy = ux0 * Math.sin(rot) + uy0 * Math.cos(rot), vx = -uy, vy = ux;
+    const mx = (Math.abs(vx) * w / 2 + Math.abs(ux) * 25) * Z, my = (Math.abs(vy) * w / 2 + Math.abs(uy) * 25) * Z;
+    const ok2 = (px, py) => inPlay(px, py, mx, my) && inPlay(px, py - 130, mx, my);
+    // the crowd may sit at the screen's edge: the lane passes through the nearest point inside the play area instead
+    const sx = clamp((x0 - camX) * Z, 26 + mx, W - 26 - mx), sy = clamp((y0 - camY) * Z, (S.boss ? 162 : 122) + Math.max(my, 76), H - 112 - my), x = camX + sx / Z, y = camY + sy / Z;
+    // how far back the lane may start: on screen, and (if the Keeper stands in its path) at least 130 ahead of them
+    const kA = (P.x - x) * ux + (P.y - y) * uy, kL = (P.x - x) * vx + (P.y - y) * vy, above = P.y < y ? 130 * Math.abs(vy) : 0, limit = Math.abs(kL) < w / 2 + 40 + above ? -kA - 130 : L;
+    let back = 0; while (back + 20 <= Math.min(L / 2, limit) && ok2(x - ux * (back + 20), y - uy * (back + 20))) back += 20;
+    if (limit < 0) back = Math.max(limit, -90);
+    let fwd = 0; while (back + fwd + 20 <= L && ok2(x + ux * (fwd + 20), y + uy * (fwd + 20))) fwd += 20;
+    const len = back + fwd, score = len - 90 * Math.abs(rot);
+    if (!best || score > best.score) best = { score, ux, uy, len, back, x, y };
+  }
+  // near an arena wall with no room ahead, the wave rolls along the wall instead (whichever way has more room), never
+  // out past it and never back over the Keeper
+  if (best.len < 160 && S.arena && !tideLane.along) { const A = S.arena, rx = x0 - A.x, ry = y0 - A.y, rd = Math.hypot(rx, ry) || 1; tideLane.along = 1;
+    const alts = [1, -1].map(sg => tideLane({ x:x0 + ry / rd * 100 * sg, y:y0 - rx / rd * 100 * sg }, x0, y0, C)); tideLane.along = 0;
+    const alt = alts[0].len >= alts[1].len ? alts[0] : alts[1]; if (alt.len > best.len) return alt; }
+  // no clear lane toward that crowd at all (it is tucked under the HUD): the wave goes the most open way from the Keeper
+  if (best.len < 100 && !tideLane.open) { tideLane.open = 1; const alts = [[0, 1], [0, -1], [1, 0], [-1, 0]].map(([ax, ay]) => tideLane(P, P.x + ax * 300, P.y + ay * 300, C)); tideLane.open = 0;
+    return alts.reduce((a, b) => b.len > a.len ? b : a); }
+  // a lane is only as long as there is clear room for it (stretching a short one ran it under the HUD)
+  const { ux, uy, back, x, y } = best; let len = Math.max(100, best.len), nx = x - ux * back, ny = y - uy * back;
+  // last guard: if the Keeper would stand inside the lane, its start moves past them
+  const kA = (P.x - nx) * ux + (P.y - ny) * uy, kL = (P.x - nx) * -uy + (P.y - ny) * ux;
+  if (kA > -130 && kA < len && Math.abs(kL) < w / 2 + 30) { const sh = kA + 130; nx += ux * sh; ny += uy * sh; len = Math.max(100, len - sh); }
+  return { ux, uy, w, len, nx, ny };
+}
 function throwCall(dx, dy) {
-  const C = S.call, P = S.p; closeSeal();
-  let { x, y } = callTarget(dx, dy);
+  const C = S.call, P = S.p, D = CALL[C.id]; closeSeal();
+  let { x, y } = callTarget(dx, dy); const tx = x, ty = y;
   if (S.arena) { const A = S.arena, q = Math.hypot(x - A.x, y - A.y), lim = A.r - 60; if (q > lim) { x = A.x + (x - A.x) / q * lim; y = A.y + (y - A.y) / q * lim; } }
-  ({ x, y } = callInView(x, y, CALL[C.id].R[C.tier])); x = clamp(x, 60, WORLD - 60); y = clamp(y, 60, WORLD - 60);
-  C.cd = C.max; C.uses++; C.strike = { x, y, sx:P.x, sy:P.y - 40, t:0, tolls:0, hit:0, waves:[], trail:[] };
-  SFX.bx('call-throw', 2); P.cheerAt = S.t;
-  return C.strike;
+  const R = callSize(C); ({ x, y } = callInView(x, y, R, C.id === 'bell' ? callBellSize(R) * Z * .86 : 70)); x = clamp(x, 60, WORLD - 60); y = clamp(y, 60, WORLD - 60);
+  const K = { x, y, ax:x, ay:y, sx:P.x, sy:P.y - 40, t:0, tolls:0, hit:0, waves:[], trail:[] };
+  if (C.id === 'tide') { const B = S.boss && !S.boss.dead && Math.hypot(tx - S.boss.x, ty - S.boss.y) < 2 ? S.boss : null; Object.assign(K, tideLane(P, tx, ty, C, B)); K.f = 0; K.wi = -1; K.caught = new Map();
+    K.ax = K.nx; K.ay = K.ny; SFX.bx('tide-conch', 1);
+  } else SFX.bx('call-throw', 2);
+  C.cd = C.max; C.uses++; C.strike = K; P.cheerAt = S.t;
+  return K;
 }
 function quickCall() { const C = S.call; if (!C || (!C.seal && !callReady())) return false; throwCall(0, 0); return true; }
 function callBlast(K, mul, R) {
   const C = S.call, D = CALL[C.id], tr = C.tier; let n = 0;
   for (const e of S.en) { if (e.dead || Math.hypot(e.x - K.x, (e.y - K.y) / .55) > R + e.r) continue; n++;
-    if (e.boss) { hurt(e, e.max * .06 * mul, D.el, { kb:0 }); e.frozen = Math.max(e.frozen || 0, 1.1 * mul); }
-    else { hurt(e, callDmg() * mul, D.el, { kb:520 * mul, fx:K.x, fy:K.y }); if (D.still[tr]) e.slow = Math.max(e.slow || 0, D.still[tr]); } }
+    if (e.boss) { hurt(e, e.max * .06 * mul, D.el, { kb:0, gift:1 }); e.frozen = Math.max(e.frozen || 0, 1.1 * mul); }
+    else { hurt(e, callDmg() * mul, D.el, { kb:520 * mul, fx:K.x, fy:K.y, gift:1 }); if (D.still[tr]) e.slow = Math.max(e.slow || 0, D.still[tr]); } }
   K.hit += n;
 }
 function callTick(dt) {
@@ -3638,26 +3749,68 @@ function callTick(dt) {
   if (!C.seal && !C.strike && S.lvlDefer && !S.bloom && !hsOn() && !S.holdLevels && running) flushLevels();
   if (!C.strike && C.cd > 0) { const was = C.cd; C.cd = Math.max(0, C.cd - dt); if (was > 0 && C.cd <= 0) { SFX.ting(); C.readyAt = S.t; } }
   const K = C.strike; if (!K) return;
-  const D = CALL[C.id], tr = C.tier, R = D.R[tr], T = CALL_T, t0 = T.throw, t1 = t0 + T.beam, t2 = t1 + T.fall;
-  const was = K.t; K.t += dt; const at = x => was < x && K.t >= x;
-  if (K.t < t0) { const q = K.t / t0; K.trail.push([K.sx + (K.x - K.sx) * q, K.sy + (K.y - K.sy) * q - Math.sin(q * Math.PI) * 150]); if (K.trail.length > 7) K.trail.shift(); }
+  const was = K.t; K.t += dt; const at = x => was < x && K.t >= x, t0 = CALL_T.throw;
+  if (K.t < t0) { const q = K.t / t0; K.trail.push([K.sx + (K.ax - K.sx) * q, K.sy + (K.ay - K.sy) * q - Math.sin(q * Math.PI) * 150]); if (K.trail.length > 7) K.trail.shift(); }
   if (at(t0)) SFX.bx('call-beam', 1);
+  if (C.id === 'tide') tideTick(C, K, dt, at); else bellTick(C, K, dt, at);
+}
+function bellTick(C, K, dt, at) {
+  const D = CALL[C.id], tr = C.tier, R = D.R[tr], T = CALL_T, t0 = T.throw, t1 = t0 + T.beam, t2 = t1 + T.fall;
   if (K.t > t0 && K.t < t1 && Math.random() < .7) { const a = rnd(0, TAU), q = (K.t - t0) / T.beam; fx({ k:'star', x:K.x + Math.cos(a) * R, y:K.y + Math.sin(a) * R * .55, vx:-Math.cos(a) * R * (1.1 + q), vy:-Math.sin(a) * R * .55 * (1.1 + q), drag:.5, life:.7, s:rnd(3, 6), c:'#FFFFFF' }); }
   if (at(t1)) SFX.sweep();
   if (at(t2)) {   // the bell lands: the ground thaws in a wide circle, every creature inside is struck and thrown back
     SFX.bx('call-bell', 0); S.shake = Math.max(S.shake, .8); S.hitstop = Math.max(S.hitstop || 0, .14); S.flashT = .07; S.flashC = '120,132,230';
-    K.waves.push({ t:K.t, r0:R * .3, r1:R * 1.05, life:.5, w:16, disc:1 }, { t:K.t, r0:R * .5, r1:R * 1.45, life:.85, w:7 });
+    K.waves.push({ t:K.t, x:K.x, y:K.y, r0:R * .3, r1:R * 1.05, life:.5, w:16, disc:1 }, { t:K.t, x:K.x, y:K.y, r0:R * .5, r1:R * 1.45, life:.85, w:7 });
     debris(K.x, K.y, 16, 560); stars(K.x, K.y - 30, 30 + tr * 6, '#F4F8FF', 520); smoke(K.x, K.y + 10, 10, R * .8, '150,160,215');
     paintThaw(K.x, K.y, R * 1.15); callBlast(K, 1, R); K.tolls = 1; K.swayAt = S.t;
   }
   // later tiers ring again: each toll is a wave of sound that strikes a wider circle
   if (K.t > t2 && K.tolls < D.tolls[tr] && K.t >= t2 + K.tolls * T.toll) {
     K.tolls++; K.swayAt = S.t; SFX.bx('call-toll', 1); S.shake = Math.max(S.shake, .4);
-    K.waves.push({ t:K.t, r0:R * .4, r1:R * 1.3, life:.7, w:9 }); stars(K.x, K.y - 80, 14, '#F4F8FF', 420);
+    K.waves.push({ t:K.t, x:K.x, y:K.y, r0:R * .4, r1:R * 1.3, life:.7, w:9 }); stars(K.x, K.y - 80, 14, '#F4F8FF', 420);
     callBlast(K, .5, R * 1.3);
   }
   const end = t2 + (D.tolls[tr] - 1) * T.toll + T.rest + T.rise;
   if (K.t >= end) C.strike = null;
+}
+// the Tide Call's timing: the beam holds at the lane's near end, the wave swells out of it and rolls the lane, crashes
+// at the far end; later tiers send more waves after it
+const tideRoll = K => Math.max(.7, K.len / 760);
+function tidePhase(C, K) {
+  const T = CALL_T, n = CALL[C.id].waves[C.tier], t1 = T.throw + T.tbeam, roll = tideRoll(K), each = T.swell + roll + .3;
+  const i = clamp(Math.floor((K.t - t1) / each), 0, n - 1), s = t1 + i * each;
+  return { n, t1, roll, each, i, rise:s, go:s + T.swell, crash:s + T.swell + roll, end:t1 + n * each + T.crash };
+}
+function tideTick(C, K, dt, at) {
+  const D = CALL[C.id], tr = C.tier, P = tidePhase(C, K), vx = -K.uy, vy = K.ux;
+  if (K.t > CALL_T.throw && K.t < P.t1 && Math.random() < .6) { const a = rnd(0, TAU); fx({ k:'star', x:K.nx + Math.cos(a) * 90, y:K.ny + Math.sin(a) * 50, vx:-Math.cos(a) * 120, vy:-Math.sin(a) * 70, drag:.5, life:.6, s:rnd(3, 6), c:'#FFFFFF' }); }
+  if (K.wi !== P.i && K.t >= P.rise) { K.wi = P.i; K.caught = new Map(); SFX.bx('tide-swell', 1); S.shake = Math.max(S.shake, .25); }
+  if (at(P.go)) SFX.bx('tide-roll', 1);
+  if (K.t >= P.go && K.t < P.crash) {   // the wave rolls: whatever it reaches is struck and carried along at its front
+    const q = (K.t - P.go) / P.roll; K.f = K.len * (q < .5 ? 2 * q * q : 1 - Math.pow(-2 * q + 2, 2) / 2);
+    const fx0 = K.nx + K.ux * K.f, fy0 = K.ny + K.uy * K.f;
+    if ((K.thawT = (K.thawT || 0) - dt) <= 0) { K.thawT = .05; paintThaw(fx0, fy0, K.w * .55); }
+    if (Math.random() < .5) { const l = rnd(-K.w / 2, K.w / 2); fx({ k:'smoke', x:fx0 + vx * l, y:fy0 + vy * l - 60, vx:K.ux * 120, vy:K.uy * 120 - 30, drag:2, life:.6, s:rnd(14, 24), c:'225,240,255' }); }
+    for (let j = 0; j < 3; j++) { const l = rnd(-K.w / 2, K.w / 2); fx({ k:'drop', x:fx0 + vx * l, y:fy0 + vy * l, z:50, vx:K.ux * rnd(200, 380) + rnd(-40, 40), vy:K.uy * rnd(200, 380) + rnd(-40, 40), vz:rnd(160, 380), life:.6, s:rnd(4, 7) }); }
+    for (const e of S.en) { if (e.dead) continue; const ex = e.x - K.nx, ey = e.y - K.ny, a = ex * K.ux + ey * K.uy, l = ex * vx + ey * vy;
+      if (Math.abs(l) > K.w / 2 + e.r) continue;
+      if (!K.caught.has(e) && a > K.f - 60 && a < K.f + 25) {
+        K.caught.set(e, l); K.hit++;
+        if (e.boss) { hurt(e, e.max * .04 * (K.wi ? .6 : 1), D.el, { kb:0, gift:1 }); e.frozen = Math.max(e.frozen || 0, .7);
+          let bx = e.x + K.ux * 140, by = e.y + K.uy * 140; if (S.arena) { const A = S.arena, q2 = Math.hypot(bx - A.x, by - A.y), lim = A.r - 70; if (q2 > lim) { bx = A.x + (bx - A.x) / q2 * lim; by = A.y + (by - A.y) / q2 * lim; } } e.x = bx; e.y = by; }
+        else hurt(e, callDmg() * (K.wi ? .5 : .8), D.el, { kb:0, gift:1 }); }
+      if (!e.boss && K.caught.has(e) && !e.dead) { const ll = K.caught.get(e); e.x = K.nx + K.ux * (K.f + 46) + vx * ll * .9; e.y = K.ny + K.uy * (K.f + 46) + vy * ll * .9; e.frozen = Math.max(e.frozen || 0, .08); e.flash = Math.max(e.flash || 0, .04); }
+    }
+  }
+  if (at(P.crash)) {   // the crash: a burst of spray at the far end, and everything carried is thrown on and soaked
+    const cx = K.nx + K.ux * K.len, cy = K.ny + K.uy * K.len; K.f = K.len;
+    SFX.bx('tide-crash', 0); S.shake = Math.max(S.shake, .6); S.hitstop = Math.max(S.hitstop || 0, .08);
+    K.waves.push({ t:K.t, x:cx, y:cy, r0:K.w * .2, r1:K.w * .9, life:.55, w:12, disc:1, water:1 }, { t:K.t, x:cx, y:cy, r0:K.w * .4, r1:K.w * 1.3, life:.85, w:6, water:1 });
+    for (let j = 0; j < 40; j++) fx({ k:'drop', x:cx + rnd(-K.w / 2, K.w / 2) * vx, y:cy + rnd(-K.w / 2, K.w / 2) * vy, z:30, vx:rnd(-260, 260) + K.ux * 200, vy:rnd(-260, 260) + K.uy * 200, vz:rnd(260, 620), life:.9, s:rnd(4, 9) });
+    smoke(cx, cy, 10, K.w * .7, '205,228,255'); paintThaw(cx, cy, K.w * .8);
+    for (const [e] of K.caught) if (!e.dead && !e.boss) { hurt(e, callDmg() * .3, D.el, { kb:420, fx:cx - K.ux * 80, fy:cy - K.uy * 80, gift:1 }); if (D.soak[tr]) e.slow = Math.max(e.slow || 0, D.soak[tr]); }
+  }
+  if (K.t >= P.end) C.strike = null;
 }
 function update(dt) {
   if (S.call && S.call.seal) dt *= SEAL_SLOW;
@@ -4527,7 +4680,7 @@ function callPhases() { const C = S.call, D = CALL[C.id], tr = C.tier, T = CALL_
 // under the characters: the beam's body, the mark that fills while it holds, the bell's shadow, the shock and tolls as
 // ellipses on the ground (the same shape the blast strikes)
 function drawCallGround() {
-  const K = S.call && S.call.strike; if (!K) return; const { R, t0, t1, t2, end } = callPhases(), top = camY + 100 / Z;
+  const K = S.call && S.call.strike; if (!K) return; if (S.call.id === 'tide') { drawTideGround(K); drawCallRipples(K); return; } const { R, t0, t1, t2, end } = callPhases(), top = camY + 100 / Z;
   if (K.t >= t0 && K.t < t2 + .2) {
     const b = K.t < t2 ? Math.min(1, (K.t - t0) / .18) : 1 - (K.t - t2) / .2, q = Math.min(1, (K.t - t0) / (t1 - t0)), w = R * (.5 - .3 * q);
     const gr = g.createLinearGradient(K.x - w, 0, K.x + w, 0); gr.addColorStop(0, 'rgba(90,104,220,0)'); gr.addColorStop(.25, `rgba(100,114,232,${(.22 + .14 * q) * b})`); gr.addColorStop(.5, `rgba(248,250,255,${(.45 + .3 * q) * b})`); gr.addColorStop(.75, `rgba(100,114,232,${(.22 + .14 * q) * b})`); gr.addColorStop(1, 'rgba(90,104,220,0)');
@@ -4548,18 +4701,91 @@ function drawCallGround() {
   // the bell's shadow grows as it falls and stays while it rests, so it sits on the ground
   if (K.t > t1 && K.t < end) { const q = K.t < t2 ? (K.t - t1) / (t2 - t1) : 1, out = K.t > end - CALL_T.rise ? 1 - (K.t - (end - CALL_T.rise)) / CALL_T.rise : 1, sw = Math.min(R * .62, callBellSize(R) * .3);
     g.fillStyle = `rgba(14,18,48,${.42 * Math.min(1, q) * out})`; g.beginPath(); g.ellipse(K.x, K.y + 4, sw * (.4 + .6 * q), sw * .36 * (.4 + .6 * q), 0, 0, TAU); g.fill(); }
-  // the shock and each toll: a deep indigo body with a white rim, spreading over the ground
+  drawCallRipples(K);
+}
+// the shock, each toll and the tide's crash: a deep body with a white rim, spreading over the ground as an ellipse
+function drawCallRipples(K) {
   for (const v of K.waves) { const k = (K.t - v.t) / v.life; if (k < 0 || k > 1) continue; const r = v.r0 + (v.r1 - v.r0) * (1 - Math.pow(1 - k, 2)), a = 1 - k;
-    g.save(); if (v.disc) { g.fillStyle = `rgba(70,82,200,${.22 * a})`; g.beginPath(); g.ellipse(K.x, K.y, r, r * .55, 0, 0, TAU); g.fill(); }
-    g.strokeStyle = `rgba(27,34,87,${.6 * a})`; g.lineWidth = v.w + 5; g.beginPath(); g.ellipse(K.x, K.y, r, r * .55, 0, 0, TAU); g.stroke();
-    g.strokeStyle = `rgba(255,255,255,${.95 * a})`; g.lineWidth = v.w * .55; g.beginPath(); g.ellipse(K.x, K.y, r, r * .55, 0, 0, TAU); g.stroke(); g.restore(); }
+    g.save(); if (v.disc) { g.fillStyle = v.water ? `rgba(46,111,192,${.28 * a})` : `rgba(70,82,200,${.22 * a})`; g.beginPath(); g.ellipse(v.x, v.y, r, r * .55, 0, 0, TAU); g.fill(); }
+    g.strokeStyle = `rgba(16,30,80,${.6 * a})`; g.lineWidth = v.w + 5; g.beginPath(); g.ellipse(v.x, v.y, r, r * .55, 0, 0, TAU); g.stroke();
+    g.strokeStyle = `rgba(255,255,255,${.95 * a})`; g.lineWidth = v.w * .55; g.beginPath(); g.ellipse(v.x, v.y, r, r * .55, 0, 0, TAU); g.stroke(); g.restore(); }
+}
+function drawCallThrow(K) {
+  const t0 = CALL_T.throw; if (K.t >= t0) return false;
+  const q = K.t / t0, x = K.sx + (K.ax - K.sx) * q, y = K.sy + (K.ay - K.sy) * q - Math.sin(q * Math.PI) * 150;
+  K.trail.forEach(([tx, ty], i) => { const f = (i + 1) / K.trail.length; g.fillStyle = `rgba(70,82,200,${.5 * f})`; g.beginPath(); g.arc(tx, ty, 4 + 7 * f, 0, TAU); g.fill(); });
+  add(() => glowAt(x, y, 44, '#C9D2FF', .7)); g.fillStyle = '#1B2257'; star4(x, y, 19); g.fillStyle = '#5B6BD6'; star4(x, y, 15); g.fillStyle = '#FFFFFF'; star4(x, y, 9 + Math.sin(S.t * 40) * 1.5);
+  return true;
+}
+// the starlight beam, painted under the characters and fading in below the HUD band (shared by every call)
+function drawCallBeam(x, y, w, b) {
+  const top = camY + 100 / Z, h = y - top; if (h <= 0 || b <= 0) return;
+  const gr = g.createLinearGradient(x - w, 0, x + w, 0); gr.addColorStop(0, 'rgba(90,104,220,0)'); gr.addColorStop(.25, `rgba(100,114,232,${.3 * b})`); gr.addColorStop(.5, `rgba(248,250,255,${.7 * b})`); gr.addColorStop(.75, `rgba(100,114,232,${.3 * b})`); gr.addColorStop(1, 'rgba(90,104,220,0)');
+  g.save(); g.fillStyle = gr; for (let i = 0; i < 8; i++) { g.globalAlpha = (i + 1) / 8; g.fillRect(x - w, top + i * 20, w * 2, 20); } g.globalAlpha = 1; g.fillRect(x - w, top + 160, w * 2, Math.max(0, h - 160)); g.restore();
+}
+/* the Tide Call: the lane the wave will take (a starlight mark that fills from the near end), the beam at its start,
+   the wet ground it leaves, and the wave itself, a wall of water facing the camera whichever way it rolls */
+function drawTideGround(K) {
+  const C = S.call, P = tidePhase(C, K), ang = Math.atan2(K.uy, K.ux), t0 = CALL_T.throw, out = K.t > P.end - CALL_T.crash ? Math.max(0, 1 - (K.t - (P.end - CALL_T.crash)) / CALL_T.crash) : 1;
+  if (K.t < t0) return;
+  g.save(); g.translate(K.nx, K.ny); g.rotate(ang);
+  const fill = Math.min(1, (K.t - t0) / CALL_T.tbeam), hw = K.w / 2, rr = Math.min(hw, 40);
+  const lane = len => { g.beginPath(); g.moveTo(rr, -hw); g.lineTo(len - rr, -hw); g.quadraticCurveTo(len, -hw, len, -hw + rr); g.lineTo(len, hw - rr); g.quadraticCurveTo(len, hw, len - rr, hw); g.lineTo(rr, hw); g.quadraticCurveTo(0, hw, 0, hw - rr); g.lineTo(0, -hw + rr); g.quadraticCurveTo(0, -hw, rr, -hw); };
+  g.globalAlpha = out;
+  // the water's path: wet, darker ground behind the wave
+  if (K.f > 0) { g.fillStyle = 'rgba(30,70,150,.22)'; lane(Math.max(2 * rr, K.f)); g.fill(); }
+  g.fillStyle = 'rgba(120,136,240,.12)'; lane(K.len); g.fill();
+  g.fillStyle = 'rgba(150,166,255,.2)'; lane(Math.max(2 * rr, K.len * fill)); g.fill();
+  g.strokeStyle = 'rgba(27,34,87,.55)'; g.lineWidth = 7; lane(K.len); g.stroke();
+  g.strokeStyle = '#FFFFFF'; g.lineWidth = 3.5; g.setLineDash([20, 12]); g.lineDashOffset = S.t * 70; lane(K.len); g.stroke(); g.setLineDash([]);
+  // chevrons inside the mark show which way the wave will roll
+  if (K.t < P.go + .1) for (let c = 1; c <= 3; c++) { const cx = K.len * ((c / 4 + S.t * .35) % 1), b = .85 + .15 * Math.sin(S.t * 8 - c); g.strokeStyle = `rgba(27,34,87,${.45 * b})`; g.lineWidth = 9; g.beginPath(); g.moveTo(cx - 14, -hw * .45); g.lineTo(cx + 10, 0); g.lineTo(cx - 14, hw * .45); g.stroke();
+    g.strokeStyle = `rgba(255,255,255,${.9 * b})`; g.lineWidth = 4; g.stroke(); }
+  g.restore();
+  const b = K.t < P.t1 ? Math.min(1, (K.t - t0) / .18) : Math.max(0, 1 - (K.t - P.t1) / .3);
+  drawCallBeam(K.nx, K.ny, K.w * .45, b);
+}
+// the wave's cross-section, the same curl as the card's picture: a = back (0) to the curling tip (.92), h = height; the
+// front of its base sits at a = .64. It is swept along the crest and drawn back to front, so it reads from any side
+const TIDE_PROFILE = [[0, 0], [.02, .3], [.16, .52], [.32, .68], [.5, .75], [.68, .73], [.84, .6], [.92, .45], [.9, .3], [.84, .24], [.79, .3], [.75, .36], [.68, .3], [.64, .14], [.64, 0]];
+const TIDE_SHADE = ['#2464B8', '#2A6DC2', '#3479CB', '#4A93DC', '#63AAE8', '#8CC8F2', '#B9E2FA', '#DDF3FF', '#8EC6EE', '#2E6CBA', '#1F56A2', '#1F56A2', '#2560AE', '#2C6AB8'];
+const TIDE_SHADE_A = ['#2B3A9E', '#31439F', '#3D50B4', '#5C6FE0', '#7C8DF0', '#B9C4FF', '#DCE2FF', '#F0F3FF', '#A9B4F4', '#3846A8', '#26328A', '#26328A', '#2E3C9C', '#3846A8'];
+function drawTideTop(K) {
+  const C = S.call, P = tidePhase(C, K), aw = C.tier === 4; if (K.t < P.rise || K.t > P.crash + .25) return;
+  const rise = Math.min(1, (K.t - P.rise) / CALL_T.swell), fall = K.t > P.crash ? 1 - (K.t - P.crash) / .25 : 1, Hh = (aw ? 125 : 100) * rise * fall, Lw = 150 * (.6 + .4 * rise);
+  const f = K.t < P.go ? 0 : K.f, vx = -K.uy, vy = K.ux, n = 12, sh = aw ? TIDE_SHADE_A : TIDE_SHADE;
+  // every point of the wave: lateral sample i across the lane, profile point k along the curl
+  const pt = (i, k) => { const s0 = (i / n - .5) * K.w, taper = .7 + .3 * Math.sin(Math.PI * i / n), wob = Math.sin(S.t * 9 + i * .9) * 6 * rise,
+    [a, h] = TIDE_PROFILE[k], d = (a - .64) * Lw + f; return [K.nx + K.ux * d + vx * s0, K.ny + K.uy * d + vy * s0 - h * (Hh * taper + wob * (h > .5 ? 1 : 0))]; };
+  const P2 = []; for (let i = 0; i <= n; i++) { P2.push([]); for (let k = 0; k < TIDE_PROFILE.length; k++) P2[i].push(pt(i, k)); }
+  // the bands of the surface, nearest the camera drawn last
+  const bands = []; for (let k = 0; k < TIDE_PROFILE.length - 1; k++) bands.push({ k, y:(P2[n >> 1][k][1] + P2[n >> 1][k + 1][1]) / 2 + (TIDE_PROFILE[k][1] < .3 && TIDE_PROFILE[k][0] > .6 ? 30 : 0) });
+  bands.sort((a, b) => a.y - b.y);
+  g.save(); g.lineJoin = 'round';
+  for (const { k } of bands) { g.fillStyle = sh[k]; g.strokeStyle = sh[k]; g.lineWidth = 1.5; g.beginPath();
+    for (let i = 0; i <= n; i++) { const [x, y] = P2[i][k]; i ? g.lineTo(x, y) : g.moveTo(x, y); } for (let i = n; i >= 0; i--) g.lineTo(P2[i][k + 1][0], P2[i][k + 1][1]); g.closePath(); g.fill(); g.stroke(); }
+  // the side of the wave that faces the camera shows the curl itself
+  const near = P2[0][3][1] > P2[n][3][1] ? 0 : n, cap = P2[near];
+  const ys = cap.reduce((m, p) => Math.max(m, p[1]), -1e9), gr = g.createLinearGradient(0, ys, 0, ys - Hh);
+  gr.addColorStop(0, sh[0]); gr.addColorStop(.6, sh[3]); gr.addColorStop(1, sh[5]);
+  g.fillStyle = gr; g.beginPath(); cap.forEach(([x, y], k) => k ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fill();
+  g.strokeStyle = 'rgba(14,28,80,.55)'; g.lineWidth = 2.5; g.stroke();
+  // the foam: a white crest line with a dark edge under it (it reads on snow and sand), along the top and round the curl
+  g.lineCap = 'round';
+  // the curl on the near side: its foam rim and the spiral of the tube inside it
+  g.beginPath(); for (let k = 4; k <= 9; k++) { const [x, y] = cap[k]; k > 4 ? g.lineTo(x, y) : g.moveTo(x, y); } g.strokeStyle = 'rgba(14,28,80,.5)'; g.lineWidth = 10; g.stroke(); g.strokeStyle = '#FFFFFF'; g.lineWidth = 6; g.stroke();
+  { const [tx, ty] = cap[8], [bx2, by2] = cap[11], cx = (tx + bx2) / 2, cy = (ty + by2) / 2, rr = Math.max(6, Math.hypot(tx - bx2, ty - by2) * .5);
+    g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 3.5; g.beginPath(); for (let q = 0; q <= 1.0001; q += .05) { const a = q * 4.6 + S.t * 6, r = rr * (1 - q * .8); q ? g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r * .8) : g.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r * .8); } g.stroke(); }
+  // foam along the crest is a chain of bubbles, never a hard line
+  for (let i = 0; i <= n; i++) for (const k of [5, 7]) { const [x, y] = P2[i][k], r = (k === 7 ? 6 : 4.5) + 2 * Math.sin(S.t * 12 + i * 1.7 + k);
+    if (aw) { g.fillStyle = '#1B2257'; star4(x, y - 2, r + 4); g.fillStyle = '#FFFFFF'; star4(x, y - 2, r + 1.5); }
+    else { g.fillStyle = 'rgba(14,28,80,.45)'; g.beginPath(); g.arc(x, y - 1, r + 2, 0, TAU); g.fill(); g.fillStyle = '#FFFFFF'; g.beginPath(); g.arc(x, y - 2, r, 0, TAU); g.fill(); } }
+  g.restore();
 }
 // above the characters: the thrown star-stone, the beam's thin bright core, then the bell falling, ringing and rising away
 function drawCallTop() {
-  const K = S.call && S.call.strike; if (!K) return; const { tr, R, t0, t1, t2, rest, end } = callPhases(), top = camY + 100 / Z;
-  if (K.t < t0) { const q = K.t / t0, x = K.sx + (K.x - K.sx) * q, y = K.sy + (K.y - K.sy) * q - Math.sin(q * Math.PI) * 150;
-    K.trail.forEach(([tx, ty], i) => { const f = (i + 1) / K.trail.length; g.fillStyle = `rgba(70,82,200,${.5 * f})`; g.beginPath(); g.arc(tx, ty, 4 + 7 * f, 0, TAU); g.fill(); });
-    add(() => glowAt(x, y, 44, '#C9D2FF', .7)); g.fillStyle = '#1B2257'; star4(x, y, 19); g.fillStyle = '#5B6BD6'; star4(x, y, 15); g.fillStyle = '#FFFFFF'; star4(x, y, 9 + Math.sin(S.t * 40) * 1.5); return; }
+  const K = S.call && S.call.strike; if (!K) return; if (S.call.id === 'tide') { drawCallThrow(K); drawTideTop(K); return; } const { tr, R, t0, t1, t2, rest, end } = callPhases(), top = camY + 100 / Z;
+  if (drawCallThrow(K)) return;
   if (K.t < t2 + .2) { const b = K.t < t2 ? Math.min(1, (K.t - t0) / .18) : 1 - (K.t - t2) / .2, h = K.y - top;
     const gr = g.createLinearGradient(0, top, 0, top + Math.min(160, h)); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, `rgba(255,255,255,${.85 * b})`);
     g.fillStyle = gr; g.fillRect(K.x - 2.5, top, 5, Math.min(160, h)); g.fillStyle = `rgba(255,255,255,${.85 * b})`; g.fillRect(K.x - 2.5, top + 160, 5, Math.max(0, h - 160)); }
@@ -4914,8 +5140,12 @@ function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
-  if (id === 'call') return `<div class="calldemo"><img class="cd-c cd-c1" src="art4/e-wood-a.png?v=8" alt=""><img class="cd-c cd-c2" src="art4/e-water-a.png?v=8" alt=""><img class="cd-c cd-c3" src="art4/e-earth-a.png?v=8" alt=""><i class="beam"></i><img class="cd-bell" src="art4/calls/bell-star.png?v=9" alt="">`
-    + `<div class="cd-btn"><img src="art4/calls/bell-star.png?v=9" alt=""></div><span class="sealrow">${['up', 'down', 'throw'].map(d => `<i><svg viewBox="0 0 24 24">${SEAL_SVG[d]}</svg></i>`).join('')}</span><i class="cd-f"></i></div>`;
+  if (id.startsWith('call_')) { const cid = id.slice(5), D = CALL[cid], src = `art4/calls/${D.img}.png?v=9`;
+    // the creatures in the picture are ones this call's element beats, so the card teaches the real chart
+    const [b1, b2] = beats(D.el);
+    return `<div class="calldemo cd-${cid}"><img class="cd-c cd-c1" src="art4/e-${b1}-a.png?v=8" alt=""><img class="cd-c cd-c2" src="art4/e-${b2}-a.png?v=8" alt=""><img class="cd-c cd-c3" src="art4/e-${b1}-b.png?v=8" alt=""><i class="beam"></i>`
+      + (cid === 'tide' ? '<i class="cd-wave"><svg viewBox="0 0 100 70" aria-hidden="true"><defs><linearGradient id="cdwg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#1F5FB4"/><stop offset=".6" stop-color="#4E9BE0"/><stop offset="1" stop-color="#A8E0FF"/></linearGradient></defs><path d="M0,46 C14,34 30,24 50,22 C68,20 84,26 92,38 C97,46 94,55 86,56 C80,56 78,50 82,46 C74,42 66,48 64,60 L64,70 L0,70 Z" fill="url(#cdwg)" stroke="rgba(14,28,80,.6)" stroke-width="2"/><path d="M0,46 C14,34 30,24 50,22 C68,20 84,26 92,38 C97,46 94,55 86,56 C80,56 78,50 82,46" fill="none" stroke="rgba(14,28,80,.55)" stroke-width="7" stroke-linecap="round"/><path d="M0,46 C14,34 30,24 50,22 C68,20 84,26 92,38 C97,46 94,55 86,56 C80,56 78,50 82,46" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg></i>' : `<img class="cd-bell" src="${src}" alt="">`)
+      + `<div class="cd-btn"><img src="${src}" alt=""></div><span class="sealrow">${[...D.seal, 'throw'].map(d => `<i><svg viewBox="0 0 24 24">${SEAL_SVG[d]}</svg></i>`).join('')}</span><i class="cd-f"></i></div>`; }
   if (id === 'shrine') return `<div class="shrinedemo"><img src="art4/props/x-shrine-${(S && S.lastShrineEl) || 'water'}.png?v=8" alt=""></div>`;
   if (id === 'gem') return `<div class="gemdemo"><img src="art4/k${keeper}.png?v=8" alt="">${[0, 1, 2, 3, 4, 5].map(i => `<i style="--i:${i}"></i>`).join('')}</div>`;
   if (id === 'stone') { const els = S ? stoneEls() : ['wood', 'fire', 'earth', 'metal', 'water']; return `<div class="stonedemo" style="--n:${els.length};--a0:${els.length === 5 ? -90 : 180}deg;--r:${els.length === 5 ? 30 : 17}%">${els.map((el, i) => `<img src="art4/props/x-stone-${el}.png?v=8" alt="" style="--i:${i}">`).join('')}</div>`; }
@@ -4924,7 +5154,7 @@ function tipArt(id) {
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call:'call' };
+const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal();
@@ -4988,10 +5218,18 @@ function sealStreak(x, y, dx, dy) {
 }
 $('#callBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); AU.init();
   if (!openSeal()) { SFX.pop(); const b = $('#callBtn'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); } });
+function pickCall(own) {
+  let last = null; try { last = store.get('morqi.call'); } catch (e) {}
+  const order = own.slice().sort((a, b) => (b === last) - (a === last));
+  $('#callOpts').innerHTML = order.map((id, i) => { const D = CALL[id];
+    return `<button class="callOpt${i === 0 && last ? ' last' : ''}" data-id="${id}"><img src="art4/calls/${D.img}.png?v=9" alt=""><span><i>${D.giver}</i><b>${D.n}</b><em>${D.say}</em></span><span class="sealrow mini">${[...D.seal, 'throw'].map(d => `<i><svg viewBox="0 0 24 24">${SEAL_SVG[d]}</svg></i>`).join('')}</span></button>`; }).join('');
+  show('callPick'); AU.vo('vo-card-pick');
+}
+$('#callOpts').addEventListener('click', e => { const b = e.target.closest('.callOpt'); if (!b) return; SFX.select(); callPick = b.dataset.id; store.set('morqi.call', callPick); show(null); startRun(); });
 function callHud(top) {
   const cb = $('#callBtn'), C = S && S.call; cb.hidden = !C; if (!C) return;
-  if (cb.dataset.k !== C.id + C.tier) { cb.dataset.k = C.id + C.tier; $('#callImg').src = `art4/calls/${C.tier === 4 ? 'bell-star-awakened' : 'bell-star'}.png?v=9`;
-    $('#callPips').innerHTML = '<i></i>'.repeat(C.tier + 1); cb.setAttribute('aria-label', `Star Call: ${CALL[C.id].n}, tier ${C.tier + 1}`); }
+  if (cb.dataset.k !== C.id + C.tier) { cb.dataset.k = C.id + C.tier; const D = CALL[C.id]; $('#callImg').src = `art4/calls/${C.tier === 4 && D.imgA ? D.imgA : D.img}.png?v=9`; cb.classList.toggle('awake', C.tier === 4);
+    $('#callPips').innerHTML = '<i></i>'.repeat(C.tier + 1); cb.setAttribute('aria-label', `Star Call: ${D.n}, tier ${C.tier + 1}`); }
   cb.style.setProperty('--p', C.strike ? '0' : (1 - C.cd / C.max).toFixed(3)); cb.classList.toggle('ready', callReady()); if (top) cb.style.setProperty('--ultTop', top);
 }
 $('#ultBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); AU.init(); if (!fireUlt() && S && S.ult && S.ult.charge < 1) { SFX.pop(); const b = $('#ultBtn'); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); } });
@@ -5189,7 +5427,11 @@ function win() {
   $('#hud').hidden = true;
   S.txt = []; if (S.nums) S.nums = []; S.bolt = null; S.warn = null; S.shrines = []; S.chests = [];
   for (const e of S.en) if (!e.dead && !e.boss) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, '#CFE9FF', 160); }
-  const B = S.boss, T = S.tf = { t:0, x:B.x, y:B.y, el:B.el, s:B.size, flip:S.p.x > B.x, who:freedOf(B.realm || B.el), img:ok(IMG[poseImg(B, 'up')]) ? IMG[poseImg(B, 'up')] : IMG[B.img], cue:0, r:0 };
+  const B = S.boss, realm = B.realm || worldOf(), gift = Object.keys(CALL).find(id => CALL[id].from === realm);
+  // each freed person gives their Star Call, the first time they're freed (A, 2026-10-05)
+  S.giftNew = gift && !SEEN.has('_freed-' + realm) ? gift : null; markSeen('_freed-' + realm);
+  if (S.giftNew && !callPick) callPick = S.giftNew;
+  const T = S.tf = { t:0, x:B.x, y:B.y, el:B.el, s:B.size, flip:S.p.x > B.x, who:freedOf(B.realm || B.el), img:ok(IMG[poseImg(B, 'up')]) ? IMG[poseImg(B, 'up')] : IMG[B.img], cue:0, r:0 };
   let last = performance.now();
   const at = (k, t, fn) => { if (T.cue === k && T.t >= t) { T.cue++; fn(); } };
   const step = now => {
@@ -5209,8 +5451,6 @@ function win() {
     at(10, 4.3, () => { floatText(T.x, T.y - T.s * .95, 'Victory!', '#FFE08A', 46); SFX.fanfare(true); });
     // the person the boss was thanks you in their own voice, with the words the Victory card then shows (A, 2026-10-05)
     at(11, 4.9, () => AU.vo('vo-thanks-' + (B.realm || worldOf()), 0, .4));
-    // remember who was freed: each freed boss gives the player its Star Call
-    markSeen('_freed-' + (B.realm || worldOf()));
     if (T.t > 3.3 && T.r < 2600) { T.r += 70; paintThaw(T.x, T.y, T.r); for (let i = 0; i < 6; i++) paintThaw(rnd(0, WORLD), rnd(0, WORLD), 180); }
     // night lifts into dawn
     if (T.t > 3.3) S.night = Math.max(0, (S.night || 0) - dt / 1.8);
@@ -5412,6 +5652,11 @@ function results() {
   $('#hud').hidden = true;
   { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
   { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `"${f.q} Thank you, Keeper."`; }
+  { const id = S.giftNew, el = $('#resGift'); el.hidden = !id; el.classList.remove('in');
+    if (id) { const D = CALL[id]; el.innerHTML = `<img src="art4/calls/${D.img}.png?v=9" alt=""><span><i>${D.gift}</i><b>${D.n}</b></span>`;
+      setTimeout(() => { el.classList.add('in'); SFX.bx('call-seal', 2, 0); }, reduce ? 0 : 1500);
+      const t0 = performance.now(), say = () => { if ($('#results').hidden || performance.now() - t0 > 15000) return; if (!AU.vo('vo-given-' + id, 0, .4, false)) setTimeout(say, 300); };
+      setTimeout(say, 1800); } }
   // three stars, and each one rewards the five elements without a word: free the shore, evolve a power (the gift of the
   // element that feeds it: the feeding cycle), and free creatures with the element that beats them (the controlling cycle)
   const sec = Math.floor(S.t), evoIds = Object.keys(S.evo);
@@ -5440,7 +5685,7 @@ function results() {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, run:() => startLoop(), snap:() => { draw(); edgeGlow(); hud(); }, call:{ open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, run:() => startLoop(), snap:() => { draw(); edgeGlow(); hud(); }, call:{ get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
@@ -5468,7 +5713,7 @@ function intro(n) {
   $('#introList').innerHTML = '';
   show('intro');
 }
-$('#introGo').onclick = () => { SFX.select(); show(null); AU.music(true); startRun(); };
+$('#introGo').onclick = () => { SFX.select(); show(null); AU.music(true); beginRun(); };
 $('#beastOk').onclick = () => coachOk();
 $('#tipOk').onclick = () => coachOk();
 let chartFrom = null;
