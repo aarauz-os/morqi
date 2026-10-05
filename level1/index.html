@@ -1222,6 +1222,20 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .set-t .ibtn.off::after{content:"";position:absolute;left:50%;top:50%;width:30px;height:3px;margin:-1.5px 0 0 -15px;border-radius:2px;background:#fff;transform:rotate(-45deg);box-shadow:0 0 0 2px rgba(18,22,60,.95)}
 .tabs button.off::before{content:"";position:absolute;top:8px;right:calc(50% - 24px);width:16px;height:16px;border-radius:50%;background:#1E2560 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='6' y='11' width='12' height='9' rx='2' fill='%23fff'/%3E%3Cpath d='M9 11V8.5a3 3 0 0 1 6 0V11' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E") 50% 50%/11px no-repeat;box-shadow:0 0 0 2px #0E1236}
 .gr-sub{text-align:center;font-size:13px;opacity:.7;margin-top:-8px}
+
+/* the Star Call reveal: a night sky, the gift rising in starlight, what it does playing below */
+#callReveal{background:radial-gradient(90% 60% at 50% 30%,#2C3586,#0B1030 70%);justify-content:center;padding:calc(20px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom))}
+.crv{width:100%;max-width:400px;display:grid;justify-items:center;gap:10px;text-align:center;color:#fff}
+.crv-k{font-family:var(--round);font-weight:900;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#E4EAFF}
+.crv-art{width:150px;height:150px;object-fit:contain;filter:drop-shadow(0 0 22px rgba(228,234,255,.7));animation:crvRise .9s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes crvRise{from{transform:translateY(40px) scale(.6);opacity:0}}
+.crv-n{font-family:var(--round);font-weight:900;font-size:32px;line-height:1.05}
+.crv-from{font-weight:800;font-size:14px;opacity:.75}
+.crv-demo{width:100%;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+#crvGo{min-width:240px;margin-top:6px}
+#resGift{cursor:pointer}
+.crv-demo{position:relative;aspect-ratio:4/3;max-height:34vh}
+.crv-art{width:min(150px,22vh);height:min(150px,22vh)}
 </style>
 
 <div id="stage">
@@ -1440,6 +1454,16 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     </div>
   </section>
 
+  <section class="scr" id="callReveal" hidden aria-label="A new Star Call">
+    <div class="crv">
+      <span class="crv-k">New Star Call!</span>
+      <img class="crv-art" id="crvArt" alt="">
+      <h2 class="crv-n" id="crvName"></h2>
+      <p class="crv-from" id="crvFrom"></p>
+      <div class="crv-demo" id="crvDemo"></div>
+      <button class="btn green" id="crvGo">Got it</button>
+    </div>
+  </section>
   <section class="scr popup" id="callPick" hidden>
     <div class="panel pop" style="padding-top:22px">
       <div class="rb"><span class="ribbon">Pick your Star Call</span></div>
@@ -1790,7 +1814,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=11`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2468,11 +2492,13 @@ function show(id) { document.querySelectorAll('.scr').forEach(s => { s.hidden = 
 const FRONT = ['home', 'map', 'book', 'season'];
 // a sheet that opens under a thumb still dragging (a level-up, a teaching card, a chest) ignores taps until that finger
 // lifts and 600 ms more, so a reflexive tap to dash never picks a power blind (ergonomics review, 2026-10-05)
-let tapHold = null, tapUntil = 0;
-function guardTaps() { if (typeof joy !== 'undefined' && joy) { tapHold = joy.id; joy = null; const j = document.getElementById('joy'); if (j) j.style.display = 'none'; } }
+let tapHold = null, tapUntil = 0, tapHoldAt = 0;
+// (A's Level 3 video, 2026-10-05: a creature card stayed up for two minutes; a guard that missed its finger lifting
+// blocked every tap, so it now lets go after 1.5 s whatever happens)
+function guardTaps() { if (typeof joy !== 'undefined' && joy) { tapHold = joy.id; tapHoldAt = performance.now(); joy = null; const j = document.getElementById('joy'); if (j) j.style.display = 'none'; } }
 addEventListener('pointerup', e => { if (tapHold != null && e.pointerId === tapHold) { tapHold = null; tapUntil = performance.now() + 600; } }, true);
 addEventListener('pointercancel', e => { if (tapHold != null && e.pointerId === tapHold) { tapHold = null; tapUntil = performance.now() + 600; } }, true);
-addEventListener('click', e => { if ((tapHold != null || performance.now() < tapUntil) && e.isTrusted && e.target.closest && e.target.closest('.scr, #coach, #tipCard')) { e.stopPropagation(); e.preventDefault(); } }, true);
+addEventListener('click', e => { if (tapHold != null && performance.now() - tapHoldAt > 1500) tapHold = null; if ((tapHold != null || performance.now() < tapUntil) && e.isTrusted && e.target.closest && e.target.closest('.scr, #coach, #tipCard')) { e.stopPropagation(); e.preventDefault(); } }, true);
 const kb = $('#keepers'), ksImg = $('#ksImg');
 for (let k = 1; k <= KEEPERS; k++) { const i = new Image(); i.src = `art4/k${k}-hi.png?v=8`; }
 // the seven Keepers have names and one line each (design review, 2026-10-04: kids bond with a name they can say)
@@ -2689,7 +2715,7 @@ function confirmTwice(b, label, go, armed = 'Tap again to start over') { const L
 $('#retryBtn').onclick = e => { const b = e.currentTarget; if (S && S.rises <= 0) { payPet(); show(null); startRun(); return; } confirmTwice(b, 'Start over', () => { payPet(); show(null); startRun(); }); };
 $('#riseBtn').onclick = () => {
   if (!S || S.rises <= 0) return; S.rises--;
-  S.over = false; S.fall = null; $('#hud').hidden = false; S.p.hp = S.p.max; S.p.hurt = 2; AU.music(true);
+  S.over = false; S.fall = null; $('#hud').hidden = false; S.p.hp = S.p.max; S.p.hurt = 2; S.p.safe = 3; AU.music(true);
   for (const e of S.en) if (!e.boss) { const d = Math.hypot(e.x - S.p.x, e.y - S.p.y) || 1; e.kx = (e.x - S.p.x) / d * 700; e.ky = (e.y - S.p.y) / d * 700; e.kb = .5; }
   ring(S.p.x, S.p.y, 20, 520, '#FFE6A3', .6, 14, true); stars(S.p.x, S.p.y, 30, '#FFE58A', 400); SFX.levelup(); resume();
   if (S.rises === 0 && !S.lightUsed) setTimeout(() => luma('vo-lastrise', true), 900);
@@ -2889,7 +2915,7 @@ function useItem(k) {
   if (GIFT_VO.includes(k) && !S.taught['g_' + k] && !hsOn()) { S.taught['g_' + k] = 1; const m = fewTimes('_g' + k); if (m && AU.vo('vo-gift-' + k, 0, .6, false)) markSeen(m); }
   if (k === 'magnet') { for (const q of S.gems) q.pull = true; pickupPop('Gem Wind!', '#A8F4FF'); SFX.sweep(); ring(P.x, P.y, 20, 900, '#A8F4FF', .7, 12, true); }
   else if (k === 'heart' || k === 'dumpling' || k === 'peach') {
-    const h = (k === 'peach' ? P.max : P.max / 3) * (1 + .12 * (S.grow.wood || 0)); if (k !== 'peach') { pickupPop('+' + Math.round(h), '#FF7A8A'); SFX.heart(); S.hearts = (S.hearts || 0) + 1; } P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
+    const h = (k === 'peach' ? P.max : P.max / 3) * (1 + .12 * (S.grow.wood || 0)); P.safe = 3; if (k !== 'peach') { pickupPop('+' + Math.round(h), '#FF7A8A'); SFX.heart(); S.hearts = (S.hearts || 0) + 1; } P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
     if (k === 'peach') pickupPop('Peach!', '#FFB0C8'); SFX.heal();
     for (let i = 0; i < 14; i++) fx({ k:'plus', x:P.x + rnd(-40, 40), y:P.y + rnd(-30, 20), vx:0, vy:-rnd(60, 120), life:rnd(.5, .9), s:rnd(7, 11), c:'#8FF0A0' });
   } else if (k === 'ward') { S.buffs.ward = 15; pickupPop('Jade Ward!', '#7FF0C0'); SFX.bell(true); ring(P.x, P.y, 20, 240, '#5FE3B4', .6, 14, true); }
@@ -3637,15 +3663,15 @@ function bossFight(b, ph, dt) {
     SFX.boom(true); S.shake = Math.max(S.shake, .35); ring(S.bolt.x, S.bolt.y, 10, 160, B.bolt, .4, 10, true); shards(S.bolt.x, S.bolt.y, '#E8F1FF', 10, 300);
   }
   if (enraged && !b.enraged) { b.enraged = true; b.castAt = S.t + .6; SFX.bx(B.snd.roar, 0); S.shake = .6; S.hitstop = .18; ring(b.x, b.y, 30, 520, B.glow, .7, 20, true); }
-  S.heartT -= dt; if (S.heartT <= 0) { S.heartT = enraged ? 12 : 18; if (!S.items.some(it => it.kind === 'heart')) { const a = rnd(0, TAU), r = rnd(.35, .8) * A.r; S.items.push({ x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, kind:'heart', t:0, z:30, vz:200 }); } }
+  S.heartT -= dt; if (P.hp < P.max * .35) S.heartT = Math.min(S.heartT, 5); if (S.heartT <= 0) { S.heartT = enraged ? 10 : 14; if (!S.items.some(it => it.kind === 'heart')) { const a = rnd(0, TAU), r = rnd(.35, .8) * A.r; S.items.push({ x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, kind:'heart', t:0, z:30, vz:200 }); } }
   for (const f of S.bossFx) { f.t += dt; bossFxTick(b, B, f, ph, dt); }
   S.bossFx = S.bossFx.filter(f => f.t < (f.end ?? f.wind + .3));
   // a spiral of its own shots while it spins
-  if (b.spiral > 0) { b.spiral -= dt; b.spinT = (b.spinT || 0) - dt; if (b.spinT <= 0) { b.spinT = enraged ? .07 : .1; b.spinA = (b.spinA || 0) + .42;
+  if (b.spiral > 0) { b.spiral -= dt; b.spinT = (b.spinT || 0) - dt; if (b.spinT <= 0) { b.spinT = enraged ? .1 : .14; b.spinA = (b.spinA || 0) + .42;
       for (const k of [0, Math.PI]) { const an = b.spinA + k; S.eshots.push({ k:B.shot, x:b.x, y:b.y - 40, vx:Math.cos(an) * 250, vy:Math.sin(an) * 250, life:2.8, rot:an, el, dmg:10, boss:1 }); } } }
   // the Bell Sentinel's fans of blades: volleys with gaps between the blades
   if (b.fan) { b.fan.t -= dt; if (b.fan.t <= 0) { b.fan.t = .42; b.fan.n--; b.castAt = S.t; const base = Math.atan2(P.y - b.y, P.x - b.x) + rnd(-.08, .08);
-      for (let i = -3; i <= 3; i++) { const an = base + i * .24; S.eshots.push({ k:'blade', x:b.x, y:b.y - 50, vx:Math.cos(an) * 285, vy:Math.sin(an) * 285, life:2.6, rot:0, el, dmg:10, boss:1, src:'fan' }); }
+      for (let i = -3; i <= 3; i++) { const an = base + i * .3; S.eshots.push({ k:'blade', x:b.x, y:b.y - 50, vx:Math.cos(an) * 285, vy:Math.sin(an) * 285, life:2.6, rot:0, el, dmg:10, boss:1, src:'fan' }); }
       SFX.bx(B.snd.cast, 2, 200); SFX.shing(); if (b.fan.n <= 0) b.fan = null; } }
   // its vanishing step: it fades out, reappears behind you and slashes the ground where it lands
   if (b.blink) { const k = b.blink; k.t += dt;
@@ -3661,7 +3687,7 @@ function bossFight(b, ph, dt) {
     if (a.ph === 0 && a.t >= a.wind) { a.ph = 1; a.t = 0; SFX.charge(); SFX.bx(B.snd.charge, 1, 300); S.shake = Math.max(S.shake, .3); }
     else if (a.ph === 1) { b.x += a.dx * a.spd * dt; b.y += a.dy * a.spd * dt;
       if ((b.dustT = (b.dustT || 0) - dt) <= 0) { b.dustT = .04; smoke(b.x, b.y + 50, 2, 30, B.mist);
-        if (el === 'fire') { if ((b.trT = (b.trT || 0) - .04) <= 0) { b.trT = .2; hazard('cinder', b.x, b.y + 30, 34, 1.6, 6); } flames(b.x, b.y + 30, 2, 20, 30); }
+        if (el === 'fire') { if ((b.trT = (b.trT || 0) - .04) <= 0) { b.trT = .2; hazard('cinder', b.x, b.y + 30, 34, 1.1, 6); } flames(b.x, b.y + 30, 2, 20, 30); }
         else if (el === 'water') drops(b.x, b.y + 40, 4, 220);
         else if (el === 'wood') leaves(b.x, b.y, 2, 160);
         else if (el === 'earth') debris(b.x, b.y + 40, 2, 200);
@@ -3681,33 +3707,33 @@ function bossFight(b, ph, dt) {
     SFX.bx('m-' + el, 2, 300); }
   if (b.atk > 0 || b.spiral > 0 || b.fan || b.blink) return;
   const pat = B.pats[b.pat++ % B.pats.length], d = Math.hypot(P.x - b.x, P.y - b.y) || 1, aim = Math.atan2(P.y - b.y, P.x - b.x);
-  b.atk = (enraged ? 1.5 : 2.4 - ph * .35); b.stompAt = S.t;
-  if (pat === 'charge') b.act = { k:'lane', ph:0, t:0, wind:.85, dx:(P.x - b.x) / d, dy:(P.y - b.y) / d, spd:enraged ? 980 : 820, dur:.75, len:620, w:170 };
-  else if (pat === 'spikes' || pat === 'mortar') { const n = 3 + ph; b.castAt = S.t; if (pat === 'mortar') SFX.bx(B.snd.cast, 1, 300);
-    for (let i = 0; i < n; i++) { const an = rnd(0, TAU), r = i ? rnd(70, 170) : 0; S.bossFx.push({ k:'spike', skin:B.skin, sx:b.x, sy:b.y - 80, x:P.x + Math.cos(an) * r + P.mx * 80, y:P.y + Math.sin(an) * r + P.my * 80, r:72, t:-i * .12, wind:pat === 'mortar' ? 1.1 : .95 }); } }
+  b.atk = (enraged ? 1.9 : 2.8 - ph * .3); b.stompAt = S.t;
+  if (pat === 'charge') b.act = { k:'lane', ph:0, t:0, wind:1, dx:(P.x - b.x) / d, dy:(P.y - b.y) / d, spd:enraged ? 980 : 820, dur:.75, len:620, w:170 };
+  else if (pat === 'spikes' || pat === 'mortar') { const n = 2 + ph; b.castAt = S.t; if (pat === 'mortar') SFX.bx(B.snd.cast, 1, 300);
+    for (let i = 0; i < n; i++) { const an = rnd(0, TAU), r = i ? rnd(70, 170) : 0; S.bossFx.push({ k:'spike', skin:B.skin, sx:b.x, sy:b.y - 80, x:P.x + Math.cos(an) * r + P.mx * 80, y:P.y + Math.sin(an) * r + P.my * 80, r:72, t:-i * .14, wind:pat === 'mortar' ? 1.25 : 1.1 }); } }
   else if (pat === 'spiral') { b.spiral = enraged ? 2.6 : 2; b.castAt = S.t; SFX.alarm(); SFX.bx(B.snd.cast, 2, 300); }
-  else if (pat === 'stomp') S.bossFx.push({ k:'quake', x:b.x, y:b.y, r:230, t:0, wind:.9 });
+  else if (pat === 'stomp') S.bossFx.push({ k:'quake', x:b.x, y:b.y, r:230, t:0, wind:1.05 });
   // the Drowned Lantern: a whirlpool drags you toward its lantern, where the cold bites; run against it
   else if (pat === 'undertow') { S.bossFx.push({ k:'pull', x:b.x, y:b.y, core:125, t:0, wind:.75, dur:enraged ? 3 : 2.5, end:(enraged ? 3 : 2.5) + 1.1, tick:0 }); b.atk += 2; SFX.bx(B.snd.cast, 1, 300); }
   // the Thorn Tyrant: lines of roots race out toward you, one burst after another
   else if (pat === 'roots') { const lines = ph === 0 ? [0] : ph === 1 ? [0, (Math.random() < .5 ? -1 : 1) * .78] : [-.78, 0, .78];
     for (const off of lines) for (let i = 0; i < 9; i++) { const an = aim + off, rr = 120 + i * 98, x = b.x + Math.cos(an) * rr, y = b.y + Math.sin(an) * rr;
-      if (Math.hypot(x - A.x, y - A.y) > A.r - 30) break; S.bossFx.push({ k:'spike', skin:'root', line:1, x, y, r:58, t:0, wind:.8 + i * .085 }); }
+      if (Math.hypot(x - A.x, y - A.y) > A.r - 30) break; S.bossFx.push({ k:'spike', skin:'root', line:1, x, y, r:58, t:0, wind:.95 + i * .085 }); }
     b.castAt = S.t; SFX.bx(B.snd.slam, 1, 300); }
   // the Ember Drummer: each beat sends a ring of fire out across the arena, with one gap to stand in
   // (A's Level 3 run, 2026-10-05: three falls in 80 s, nearly all to drum rings, so a round is now two rings, three when
   // enraged, a second apart, with wider gaps that sit near you and move only a little from one ring to the next)
-  else if (pat === 'drums') { const n = ph > 1 ? 3 : 2, spd = 340 + ph * 25; let gap = aim + (Math.random() < .5 ? -1 : 1) * rnd(.4, .7);
+  else if (pat === 'drums') { const n = ph > 1 ? 3 : 2, spd = 295 + ph * 20; let gap = aim + (Math.random() < .5 ? -1 : 1) * rnd(.4, .7);
     for (let i = 0; i < n; i++) { if (i) gap += (Math.random() < .5 ? -1 : 1) * rnd(.25, .45);
-      S.bossFx.push({ k:'drum', x:b.x, y:b.y, gap, gw:1.3 - ph * .05, spd, t:-i * 1, wind:.7, end:.7 + (A.r * 2 + 120) / spd }); }
-    b.atk += n * .6; }
+      S.bossFx.push({ k:'drum', x:b.x, y:b.y, gap, gw:1.7 - ph * .05, spd, t:-i * 1.35, wind:.8, end:.8 + (A.r * 2 + 120) / spd }); }
+    b.atk += n * .8; }
   // the Stone Matron: boulders roll down lanes across the arena, one lane always on you, with room between them
-  else if (pat === 'boulders') { const dir = rnd(0, TAU), dx = Math.cos(dir), dy = Math.sin(dir), nx = -dy, ny = dx, offs = ph === 0 ? [0, (Math.random() < .5 ? -1 : 1) * 280] : [-280, 0, 280], len = A.r * 2.4, spd = 700 + ph * 70;
+  else if (pat === 'boulders') { const dir = rnd(0, TAU), dx = Math.cos(dir), dy = Math.sin(dir), nx = -dy, ny = dx, offs = ph === 0 ? [0, (Math.random() < .5 ? -1 : 1) * 280] : [-280, 0, 280], len = A.r * 2.4, spd = 620 + ph * 60;
     offs.forEach((o, i) => { const cx = P.x + nx * (o + rnd(-30, 30)), cy = P.y + ny * (o + rnd(-30, 30)), t = (cx - A.x) * dx + (cy - A.y) * dy, mx = cx - dx * t, my = cy - dy * t;
-      S.bossFx.push({ k:'boulder', x:mx - dx * len / 2, y:my - dy * len / 2, dx, dy, len, w:150, r:66, spd, t:-i * .3, wind:1.05, end:1.05 + len / spd }); });
+      S.bossFx.push({ k:'boulder', x:mx - dx * len / 2, y:my - dy * len / 2, dx, dy, len, w:150, r:66, spd, t:-i * .35, wind:1.2, end:1.2 + len / spd }); });
     b.castAt = S.t; SFX.bx(B.snd.cast, 1, 300); b.atk += .8; }
   // the Bell Sentinel: its bell tolls in a great ring that slows anyone caught inside, then it vanishes and steps behind you
-  else if (pat === 'toll') S.bossFx.push({ k:'toll', x:b.x, y:b.y, r:250 + ph * 25, t:0, wind:1.6 });
+  else if (pat === 'toll') S.bossFx.push({ k:'toll', x:b.x, y:b.y, r:250 + ph * 25, t:0, wind:1.85 });
   else if (pat === 'fan') { b.fan = { n:ph > 1 ? 3 : 2, t:.5 }; b.castAt = S.t; }
   else if (pat === 'blink') { b.blink = { ph:0, t:0 }; SFX.bx(B.snd.charge, 1, 200); smoke(b.x, b.y, 8, 36, B.mist); }
 }
@@ -3718,7 +3744,7 @@ function bossFxTick(b, B, f, ph, dt) {
     const on = f.t >= f.wind && f.t < f.wind + f.dur, d = Math.hypot(P.x - f.x, P.y - f.y) || 1;
     if (on && !f.started) { f.started = true; SFX.bx(B.snd.sig, 1, 400); S.shake = Math.max(S.shake, .25); }
     if (on) {
-      if (!S.dash && !hsOn() && !S.bloom) { const k = (enraged ? 150 : 118) * Math.min(1, 140 / Math.max(140, d * .5)); P.x -= (P.x - f.x) / d * k * dt; P.y -= (P.y - f.y) / d * k * dt; }
+      if (!S.dash && !hsOn() && !S.bloom) { const k = (enraged ? 130 : 100) * Math.min(1, 140 / Math.max(140, d * .5)); P.x -= (P.x - f.x) / d * k * dt; P.y -= (P.y - f.y) / d * k * dt; }
       if ((f.pt = (f.pt || 0) - dt) <= 0) { f.pt = .03; const an = rnd(0, TAU), r = rnd(260, 460); fx({ k:'drop', x:f.x + Math.cos(an) * r, y:f.y + Math.sin(an) * r * .7, z:4, vx:-Math.cos(an + .6) * r * 1.4, vy:-Math.sin(an + .6) * r, vz:0, life:.6, s:rnd(3, 6) }); }
       if (d < f.core && (f.tick -= dt) <= 0) { f.tick = .5; if (ouch(15, f.x, f.y, { push:80, el, src:'undertow' })) drops(P.x, P.y, 8, 200); } }
     if (f.t >= f.wind + f.dur && !f.done) { f.done = true; const n = 14 + ph * 2;
@@ -3793,7 +3819,7 @@ function breakOut() {
   return true;
 }
 function ouch(dmg, fx, fy, o = {}) {
-  const P = S.p; if (P.hurt > 0 || S.bloom || hsOn()) return false;
+  const P = S.p; if (P.hurt > 0 || P.safe > 0 || S.bloom || hsOn()) return false;
   const hit = dmg * armourVs(o.el) * (BOSS_SRC.has(o.src) ? bossHit() : lvHit());
   P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1; P.rx = (P.x - fx) / d * 14; P.ry = (P.y - fy) / d * 14;
   if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30);
@@ -3902,7 +3928,7 @@ const BLOOM = { at:6, r:70 };
 // stars (and so practising the elements again) is how it grows.
 const starsOf = n => +(store.get('morqi.stars.' + n) || 0);
 const starTotal = () => LEVELS.reduce((t, _, i) => t + starsOf(i + 1), 0);
-const bloomLife = (t = starTotal()) => t >= 12 ? 12 : t >= 6 ? 9 : 6;
+const bloomLife = () => 12;
 const BLOOM_COL = { water:'#7FE3FF', wood:'#7FE08A', fire:'#FFB347', earth:'#FFD66E', metal:'#E8EEFF' };
 function bloomTick(dt) {
   const P = S.p;
@@ -4298,9 +4324,9 @@ function rootTick(C, K, dt, at) {
   if (K.held && K.t > P.grow && K.t < P.rel && (K.drainT = (K.drainT ?? 0) - dt) <= 0) { K.drainT = .25; let n = 0;
     for (const h of K.held) { const e = h.e; if (e.dead) continue; n += e.boss ? 12 : 1;
       hurt(e, e.boss ? e.max * D.drain[tr] * .25 : callDmg() * .05, D.el, { kb:0, gift:1, spark:false }); }
-    if (n) { const heal = Math.min(26, .7 * n) * .25; S.p.hp = Math.min(S.p.max, S.p.hp + heal); K.healed = (K.healed || 0) + heal;
+    if (n) { const heal = Math.min(30, 5 + .8 * n) * .25; S.p.hp = Math.min(S.p.max, S.p.hp + heal); K.healed = (K.healed || 0) + heal; ring(S.p.x, S.p.y, 18, 70, '#8FF0A0', .35, 5, false);
       const live = K.held.filter(h => !h.e.dead); for (let i = 0; i < Math.min(6, live.length); i++) { const e = live[(Math.random() * live.length) | 0].e;
-        fx({ k:'cinder', x:e.x + rnd(-10, 10), y:e.y - (e.size || 60) * .4, vx:rnd(-60, 60), vy:-rnd(60, 120), home:340, life:2, s:rnd(3.5, 5.5), c:'#E6F4FF', rim:'#3A4E7A' }); }
+        fx({ k:'cinder', x:e.x + rnd(-10, 10), y:e.y - (e.size || 60) * .4, vx:rnd(-80, 80), vy:-rnd(80, 140), home:460, life:3, s:rnd(6, 9), c:'#B8F5C8', rim:'#2E6A3A', trail:1 }); }
       fx({ k:'plus', x:S.p.x + rnd(-20, 20), y:S.p.y - 10, vx:0, vy:-60, life:.6, s:8, c:'#8FF0A0' }); } }
   // blossoms: later tiers open one each second the creatures wait
   if (D.bloom[tr] && K.held && K.t > P.grow && K.t < P.rel && (K.bloomT = (K.bloomT ?? 1) - dt) <= 0) { K.bloomT = 1; K.blooms++; SFX.bx('call-seal', 2, 0); for (const h of K.held) if (!h.e.dead) leaves(h.e.x, h.e.y - 30, 2, 50); }
@@ -4439,7 +4465,7 @@ function update(dt) {
   if (keys.a || keys.arrowleft) mx -= 1; if (keys.d || keys.arrowright) mx += 1;
   if (keys.w || keys.arrowup) my -= 1; if (keys.s || keys.arrowdown) my += 1;
   const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
-  P.slowT = Math.max(0, (P.slowT || 0) - dt); const spd = MOVE * (1 + .03 * (S.grow.metal || 0)) * (P.slowT > 0 ? .6 : 1);
+  P.slowT = Math.max(0, (P.slowT || 0) - dt); P.safe = Math.max(0, (P.safe || 0) - dt); const spd = MOVE * (1 + .03 * (S.grow.metal || 0)) * (P.slowT > 0 ? .6 : 1);
   // the Keeper's speed eases toward where the thumb points: quick to get going, a short glide to stop, so a turn curves
   // instead of snapping (A, 2026-10-05: "movement is very slow … make it more flowy"); a hard turn kicks up a skid of dust
   const vx0 = P.vx || 0, vy0 = P.vy || 0, ease = 1 - Math.exp(-(m > .1 ? 18 : 9) * dt);
@@ -4478,7 +4504,7 @@ function update(dt) {
     if (S.bloom && !e.boss) { bloomCreature(e, Math.hypot(P.x - e.x, P.y - e.y), dt); continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
     if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
-    if (d < e.r + P.r && P.hurt <= 0 && !hsOn()) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
+    if (d < e.r + P.r && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
       const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el); P.hp -= hit; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
       if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? A.r - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
@@ -4486,7 +4512,7 @@ function update(dt) {
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
   for (const s of S.eshots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; s.rot += dt * 8;
-    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.src || (s.boss ? 'spiral' : 'shot'), el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, SHOT_HIT[s.k] || '#CFE9FF', 4, 160); SFX.hurt(); } }
+    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.src || (s.boss ? 'spiral' : 'shot'), el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, SHOT_HIT[s.k] || '#CFE9FF', 4, 160); SFX.hurt(); } }
   S.eshots = S.eshots.filter(s => s.life > 0);
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
@@ -5202,6 +5228,8 @@ function draw() {
   const run = P.moving, cyc = S.t * 13, bob = run ? (useRun ? Math.abs(Math.sin(S.t * Math.PI * 5)) * 3 : Math.abs(Math.sin(cyc)) * 6) : 0;
   const lean = (P.vx || 0) / MOVE * (useRun ? .07 : .15), ksx = run ? 1 - Math.abs(Math.cos(cyc)) * .04 : 1 - Math.sin(S.t * 2.6) * .01, ksy = run ? 1 + Math.abs(Math.cos(cyc)) * .05 : 1 + Math.sin(S.t * 2.6) * .022;
   const kx = P.x + (P.rx || 0), ky = P.y + (P.ry || 0);
+  if (P.safe > 0) { const a = Math.min(1, P.safe / .5), pu = 1 + Math.sin(S.t * 6) * .04; g.save(); g.globalAlpha = .9 * a;
+    g.fillStyle = 'rgba(255,190,214,.14)'; g.strokeStyle = 'rgba(255,214,228,.75)'; g.lineWidth = 3; g.beginPath(); g.ellipse(kx, ky - 42, 58 * pu, 66 * pu, 0, 0, TAU); g.fill(); g.stroke(); g.restore(); }
   g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(P.x, P.y + 30, 26 - bob * .8, 9, 0, 0, TAU); g.fill();
   if (S.buffs.ward > 0) { const k = Math.min(1, S.buffs.ward / 2); g.save(); g.globalAlpha = .55 * k; g.strokeStyle = '#5FE3B4'; g.lineWidth = 4; g.beginPath(); for (let i = 0; i <= 6; i++) { const a = i / 6 * TAU + S.t * .6; g.lineTo(kx + Math.cos(a) * 52, ky - 26 + Math.sin(a) * 40); } g.stroke(); g.restore(); g.lineWidth = 1; }
   if (S.buffs.tiger > 0) add(() => { glowAt(kx, ky - 30, 170 + Math.sin(S.t * 18) * 14, '#FF9A3A', .8); if (Math.random() < .5) flames(kx, ky - 10, 1, 20, 22, 120); });
@@ -5633,7 +5661,7 @@ function drawFX(top) {
         g.beginPath(); for (const [u, v] of [[-w, -h], [w, -h], [w, h], [-w, h]]) g.lineTo(p.x + (u * c - v * sn) * .6, y + (u * sn + v * c) * .6); g.closePath(); g.fill();
         g.globalAlpha = 1;
       }
-      else if (p.k === 'cinder') { const r = p.s * (1 - k * .4); g.globalAlpha = a; g.fillStyle = p.rim || '#5A2208'; g.beginPath(); arc0(p.x, p.y - (p.z || 0), r + 2, 0, TAU); g.fill(); g.fillStyle = p.c; g.beginPath(); arc0(p.x, p.y - (p.z || 0), r, 0, TAU); g.fill(); g.globalAlpha = 1; }
+      else if (p.k === 'cinder') { const r = p.s * (1 - k * .4); if (p.trail) for (const q of [.035, .07]) { g.globalAlpha = a * (1 - q * 8); g.fillStyle = p.c; g.beginPath(); arc0(p.x - p.vx * q, p.y - (p.z || 0) - p.vy * q, r * (1 - q * 6), 0, TAU); g.fill(); } g.globalAlpha = a; g.fillStyle = p.rim || '#5A2208'; g.beginPath(); arc0(p.x, p.y - (p.z || 0), r + 2, 0, TAU); g.fill(); g.fillStyle = p.c; g.beginPath(); arc0(p.x, p.y - (p.z || 0), r, 0, TAU); g.fill(); g.globalAlpha = 1; }
       else if (p.k === 'drop') { g.fillStyle = `rgba(170,220,255,${a})`; g.beginPath(); arc0(p.x, p.y - p.z, p.s, 0, TAU); g.fill(); }
       else if (p.k === 'leaf') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.globalAlpha = a; g.fillStyle = p.c; g.beginPath(); g.ellipse(0, 0, p.s, p.s * .45, 0, 0, TAU); g.fill(); g.restore(); g.globalAlpha = 1; }
       else if (p.k === 'vine') drawVine(p, k);
@@ -5987,8 +6015,8 @@ function showCoach(c) {
   COACH.cur = c; running = false; closeSeal(); guardTaps();
   // (A, 2026-10-05, after playing: "chill out on adding the 'move away from the red line' line everytime theres a new
   // enemy type"): the red-shapes warning is spoken and shown the first time only
-  const redOnce = c.card && !SEEN.has('_redtip'); if (redOnce) markSeen('_redtip');
-  if (c.card) { if (redOnce) AU.vo('vo-card-beast'); } else if (CARD_VO[c.id]) AU.vo('vo-card-' + CARD_VO[c.id]);
+  const redOnce = c.card && S.level <= 2 && !SEEN.has('_redtip'); if (redOnce) markSeen('_redtip');
+  if (c.card) AU.vo(redOnce ? 'vo-card-beast' : 'vo-newcreature'); else if (CARD_VO[c.id]) AU.vo('vo-card-' + CARD_VO[c.id]);
   if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + (redOnce ? '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>' : ''); show('beastCard'); SFX.alarm(); return; }
   // every tip card shows a picture made for it, never a live snapshot of play (A, 2026-10-04: snapshots caught
   // flashes, empty ground or the wrong moment, and "I can't waste people's time with these inconsistencies")
@@ -6506,12 +6534,12 @@ function petProgHTML(r) {
 function results() {
   $('#hud').hidden = true;
   { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
-  { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `"${f.q} Thank you, Keeper."`; }
+  { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `${PEOPLE[S.boss ? S.boss.realm || S.boss.el : worldOf()]} is free!`; }
   { const id = S.giftNew, el = $('#resGift'); el.hidden = !id; el.classList.remove('in');
     if (id) { const D = CALL[id]; el.innerHTML = `<img src="art4/calls/${D.img}.png?v=9" alt=""><span><i>${D.gift}</i><b>${D.n}</b></span>`;
       setTimeout(() => { el.classList.add('in'); SFX.bx('call-seal', 2, 0); }, reduce ? 0 : 1500);
-      const t0 = performance.now(), say = () => { if ($('#results').hidden || performance.now() - t0 > 15000) return; if (!AU.vo('vo-given-' + id, 0, .4, false)) setTimeout(say, 300); };
-      setTimeout(say, 1800); } }
+      // a new Star Call gets its own full screen: the gift, its name, a picture of what it does, and the giver's voice
+      setTimeout(() => { if (!$('#results').hidden && !S.revealed) openReveal(id); }, reduce ? 600 : 3600); } }
   // three stars, and each one rewards the five elements without a word: free the shore, evolve a power (the gift of the
   // element that feeds it: the feeding cycle), and free creatures with the element that beats them (the controlling cycle)
   const sec = Math.floor(S.t), evoIds = Object.keys(S.evo);
@@ -6756,6 +6784,14 @@ $('#qiRiseBtn').onclick = () => { if (!S) return; const qp = 100 * (1 + (S.qiRis
 // Sanctuary, the Journey and Settings open for now (A, 2026-10-05); everything else waits, greyed
 const PITCH = /[?&]from=pitch/.test(location.search);
 if (PITCH) document.querySelectorAll('#tabs [data-tab="book"], #tabs [data-tab="keepers"], #tabs [data-tab="season"]').forEach(b => { b.classList.add('off'); b.setAttribute('aria-disabled', 'true'); });
+
+// the new Star Call, shown on its own screen after a Victory (A, 2026-10-05: "introduced to the actual new Star Call on
+// a different full screen with a visual of what it does"); the giver hands it over in their own voice
+function openReveal(id) { const D = CALL[id]; if (!D || !S) return; S.revealed = true;
+  $('#crvArt').src = `art4/calls/${D.img}.png?v=9`; $('#crvArt').alt = D.gift; $('#crvName').textContent = D.n; $('#crvFrom').textContent = D.giver;
+  $('#crvDemo').innerHTML = tipArt('call_' + id); show('callReveal'); SFX.bx('call-seal', 1, 0); setTimeout(() => AU.vo('vo-given-' + id, 0, .4), 700); }
+$('#crvGo').onclick = () => { SFX.select(); show('results'); };
+$('#resGift').addEventListener('click', () => { if (S && S.giftNew) openReveal(S.giftNew); });
 })();
 </script>
 </body></html>
