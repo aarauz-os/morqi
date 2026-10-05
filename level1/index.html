@@ -4068,7 +4068,7 @@ function emberTick(C, K, dt, at) {
   // game time falls behind real time in any stall or hit-stop; once it has drifted 30 ms the embers are rescheduled to
   // the music's beats, so small hitches never add up (QA, 2026-10-05: five 80 ms stalls had them 176 ms late)
   if (K.first == null && K.t >= mark) { K.first = 1; resync(); K.r0 = now; K.g0 = K.t; }
-  else if (K.first != null && Math.abs((now - K.r0) - (K.t - K.g0)) > .03) { resync(); K.r0 = now; K.g0 = K.t; }
+  else if (K.first != null && (now - K.r0) - (K.t - K.g0) > .03) { resync(); K.r0 = now; K.g0 = K.t; }
   // the dance draws them in: each dancer steps toward the nearest ember still to fall, so a crowd tucked under the top
   // bar (where nothing may land) dances down into reach (QA, 2026-10-05)
   if (K.dancers && !K.ring) for (const e of K.dancers) { if (e.dead || !(e.dance > 0)) continue; let best = null, bd = 1e9;
@@ -5684,23 +5684,24 @@ function sealStreak(x, y, dx, dy) {
   s.style.left = (x - b.left) + 'px'; s.style.top = (y - b.top) + 'px'; s.style.width = Math.hypot(dx, dy) + 'px'; s.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
   $('#seal').appendChild(s); setTimeout(() => s.remove(), 460);
 }
-// a seal can be swiped stroke by stroke or in one unbroken zigzag: a turn in a new direction counts as the next stroke,
-// and whatever is left when the finger lifts counts too (so the throw can go any way, even the way the last stroke went)
+// a seal can be swiped stroke by stroke or in one unbroken zigzag: a turn in a new direction counts as the next stroke.
+// The throw is always a touch of its own: once the seal is complete, the rest of the touch that completed it does
+// nothing (A, 2026-10-05: the tail of the second swipe was being taken as the throw), and the next touch throws, any way
 { let p0 = null; const sl = $('#seal');
-  const stroke = (e, dx, dy) => { sealStreak(p0.x, p0.y, dx, dy); const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'd' : 'u'); p0 = { ...p0, x:e.clientX, y:e.clientY, rx:e.clientX, ry:e.clientY, last:dir }; sealStroke(dx, dy); };
+  const stroke = (e, dx, dy) => { sealStreak(p0.x, p0.y, dx, dy); const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'd' : 'u'); p0 = { ...p0, x:e.clientX, y:e.clientY, rx:e.clientX, ry:e.clientY, last:dir }; sealStroke(dx, dy); if (sealDone()) p0.doneHere = true; };
+  const sealDone = () => { const C = S && S.call; return !!(C && C.seal && C.seal.step >= CALL[C.id].seal.length); };
   const ring = (x, y) => { const b = stage.getBoundingClientRect(), r = document.createElement('i'); r.className = 'holdring'; r.style.left = (x - b.left) + 'px'; r.style.top = (y - b.top) + 'px'; sl.appendChild(r); return r; };
   const unhold = () => { if (p0 && p0.ht) { clearTimeout(p0.ht); p0.ht = null; } if (p0 && p0.ring) { p0.ring.remove(); p0.ring = null; } };
   sl.addEventListener('pointerdown', e => { e.preventDefault(); AU.init(); p0 = { id:e.pointerId, x:e.clientX, y:e.clientY, last:null }; try { sl.setPointerCapture(e.pointerId); } catch (er) {}
     const C = S && S.call; if (C && C.seal && CALL[C.id].seal[C.seal.step] === 'hold') { const q = p0; q.ring = ring(e.clientX, e.clientY);
-      q.ht = setTimeout(() => { if (p0 !== q) return; unhold(); q.last = 'hold'; q.rx = q.x; q.ry = q.y; sealStroke('hold'); }, 600); } });
+      q.ht = setTimeout(() => { if (p0 !== q) return; unhold(); q.last = 'hold'; q.rx = q.x; q.ry = q.y; sealStroke('hold'); if (sealDone()) q.doneHere = true; }, 600); } });
   const dirOf = (dx, dy) => Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'd' : 'u');
   sl.addEventListener('pointermove', e => { if (!p0 || e.pointerId !== p0.id || !S || !S.call || !S.call.seal) return; const dx = e.clientX - p0.x, dy = e.clientY - p0.y, m = Math.hypot(dx, dy);
-    if (m < 12) return; if (m > 14) unhold(); const dir = dirOf(dx, dy);
+    if (p0.doneHere) return; if (m < 12) return; if (m > 14) unhold(); const dir = dirOf(dx, dy);
     if (dir === p0.last) { p0 = { ...p0, x:e.clientX, y:e.clientY }; return; }
     if (m >= 56) stroke(e, dx, dy); });
   sl.addEventListener('pointerup', e => { if (!p0 || e.pointerId !== p0.id) return; unhold(); const dx = e.clientX - p0.x, dy = e.clientY - p0.y; const C = S && S.call, ready = C && C.seal && C.seal.step >= CALL[C.id].seal.length, tx = e.clientX - (p0.rx ?? p0.x), ty = e.clientY - (p0.ry ?? p0.y);
-    // ready to throw and the finger kept going the same way: that whole last stretch is the throw
-    if (ready && p0.last && Math.hypot(tx, ty) >= 40 && dirOf(dx, dy) === p0.last) { sealStroke(tx, ty); p0 = null; return; }
+    if (p0.doneHere) { p0 = null; return; }
     if (S && S.call && S.call.seal) { const want = CALL[S.call.id].seal[S.call.seal.step];
       if (want === 'beat' && Math.hypot(dx, dy) < 22) { const b = stage.getBoundingClientRect(), r = document.createElement('i'); r.className = 'tapring'; r.style.left = (e.clientX - b.left) + 'px'; r.style.top = (e.clientY - b.top) + 'px'; sl.appendChild(r); setTimeout(() => r.remove(), 500); sealStroke('beat'); }
       else if (Math.hypot(dx, dy) >= 28 && dirOf(dx, dy) !== p0.last) stroke(e, dx, dy); else if (!p0.last && Math.hypot(dx, dy) < 28) sealHint(); } p0 = null; });
