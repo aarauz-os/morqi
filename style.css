@@ -200,3 +200,5 @@ html.paged .h em{background:none;-webkit-background-clip:border-box;background-c
 /* on phones the five worlds become one swipeable strip, so no world sits alone in a row */
 @media (max-width:860px){html:not(.paged) .worlds{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding-bottom:8px;margin-inline:-20px;padding-inline:20px}
   html:not(.paged) .world{flex:0 0 46%;scroll-snap-align:start}}
+html.paged .op .pt img{aspect-ratio:16/10}
+.op .pt .label{font-size:10.5px;padding:3px 9px}
