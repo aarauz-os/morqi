@@ -779,6 +779,13 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #beastCard .beast.big .pic{width:120px;height:120px;border-radius:30px}
 #beastCard .beast.big .chips{justify-content:flex-start}
 /* the Highest Self tip: the Keeper as the hooded master in gold light */
+/* the gem card: your Keeper with gems flying in; the stone card: the five Qi Stones in an arc */
+.gemdemo,.stonedemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 58%,rgba(127,232,255,.35),transparent 60%),linear-gradient(180deg,#2A2F7A,#141A44)}
+.gemdemo img{height:78%!important;width:auto!important;object-fit:contain;filter:drop-shadow(0 6px 12px rgba(0,0,0,.4))}
+.gemdemo i{position:absolute;width:16px;height:16px;transform:rotate(45deg);background:linear-gradient(135deg,#E6FDFF,#5FE0F5 60%,#1C9CC0);box-shadow:0 0 12px #7FE8FF;left:calc(12% + var(--i) * 15%);top:calc(14% + (var(--i) * 37 % 4) * 14%);animation:gemIn 1.6s calc(var(--i) * .22s) ease-in infinite}
+@keyframes gemIn{0%{opacity:0}20%{opacity:1}100%{opacity:0;left:48%;top:66%;transform:rotate(45deg) scale(.4)}}
+.stonedemo{background:radial-gradient(circle at 50% 50%,rgba(255,228,150,.3),transparent 62%),linear-gradient(180deg,#2A2F7A,#141A44)}
+.stonedemo img{position:absolute;width:21%!important;height:auto!important;left:calc(50% + cos(calc(var(--i) * 72deg - 90deg)) * 30% - 10.5%);top:calc(50% + sin(calc(var(--i) * 72deg - 90deg)) * 34% - 13%);filter:drop-shadow(0 0 10px rgba(255,255,255,.55));animation:float 3s calc(var(--i) * -.6s) ease-in-out infinite}
 .hsdemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 55%,rgba(255,224,138,.55),rgba(255,197,74,.12) 45%,transparent 70%),linear-gradient(180deg,#2A2F7A,#141A44)}
 .hsdemo img{height:92%!important;width:auto!important;max-width:none;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,224,138,.8));animation:float 3s ease-in-out infinite}
 /* a realm boss's first-meeting card: the boss in its own glow, its minion at its side */
@@ -2313,9 +2320,9 @@ function crates(dt) {
   if ((S.crateT = (S.crateT ?? 36) - dt) <= 0 && S.crates.length < 3) { S.crateT = 36; placeCrate(false); }
   for (const it of S.items) {
     it.t += dt; if (it.vz) { it.vz -= 900 * dt; it.z = Math.max(0, it.z + it.vz * dt); if (it.z === 0) it.vz = 0; }
-    // a Qi Stone shines where it fell for a moment, then flies to you on its own (Gene's playtest, 2026-10-04: one stone
-    // lay off her path for six minutes and the level never ended)
-    if (it.kind === 'stone' && it.t > 2.4) { const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1100, 160 + (it.t - 2.4) * 520) * dt;
+    // a Qi Stone waits for you to collect it, with a glowing arrow at your side that grows the longer it waits (A,
+    // 2026-10-05); after 20 s it flies to you, so a level can never stall on one (Gene's ran ten minutes on a lost stone)
+    if (it.kind === 'stone' && it.t > 20) { const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1100, 160 + (it.t - 20) * 520) * dt;
       it.x += (P.x - it.x) / d * Math.min(d, v); it.y += (P.y - it.y) / d * Math.min(d, v); if (Math.random() < .6) fx({ k:'glow', x:it.x, y:it.y - 20, s:40, s1:6, c:EL[it.el], life:.35 }); }
     if (Math.hypot(it.x - P.x, it.y - P.y) < 60) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
@@ -2795,6 +2802,7 @@ const live = (o, pool) => (o && !o.dead && !o.pull && (S.en.includes(o) || S.gem
 function teach() {
   const P = S.p, A = ANIMAL[animal], tg = S.taught;
   if (!tg.c_pet && S.t > 6) note('pet', `Your ${A.y} fights beside you, firing ${ELNAME[A.e]} at the creatures ${ELNAME[A.e]} beats.`);
+  if (!tg.c_gem && S.t > 7 && S.gems.length >= 3) coach('gem', 'Gems!', 'Walk over gems to collect them. They make you stronger.', () => ({ sx:W / 2, sy:H * .45 }));
   if (!tg.c_enemy) { const e = S.en.find(e => !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 330); if (e) coach('enemy', 'Crystal creatures', 'The ring at their feet is their element. The right element hits twice as hard.', () => { const t = live(e, S.en.filter(o => !o.dead && !o.boss)); return { x:t.x, y:t.y - t.size * .16, r:t.size * .62 }; }, 5.5); }
   if (!tg.c_crate && S.t > 14 && S.crates.some(c => Math.abs(c.x - P.x) < VW * .42 && Math.abs(c.y - P.y) < VH * .4)) note('crate', 'Frozen lanterns hold gifts: magnets, heals, firecrackers. Break them open!');
   // Qi Stones have their own moment, so the first item tip skips them
@@ -3418,6 +3426,7 @@ function qiKill(e) {
   const el = e.el; S.qi[el] = (S.qi[el] || 0) + 1;
   if (stoneEls().includes(el) && !S.qiStones[el] && !S.stoneOut[el] && S.qi[el] >= stoneNeed()) {
     S.stoneOut[el] = true; S.items.push({ x:e.x, y:e.y, kind:'stone', el, t:0, z:30, vz:320 });
+    if (!SEEN.has('_stone')) { markSeen('_stone'); coach('stone', 'A Qi Stone!', 'Walk to it to collect it. Gather all five to free the land and wake the boss.', () => ({ sx:W / 2, sy:H * .45 })); }
     ring(e.x, e.y, 10, 280, EL[el], .7, 14, true); stars(e.x, e.y - 30, 20, EL[el], 340); SFX.chestDrop();
   }
 }
@@ -4223,6 +4232,14 @@ function draw() {
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
   if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
   drawFX(true);
+  // a waiting Qi Stone: a glowing arrow at your side points to it, small at first and growing brighter and bigger the
+  // longer it waits (A, 2026-10-05: a reminder that does not get in the way)
+  { const P = S.p; let best = null, bd = 1e9; for (const it of S.items) if (it.kind === 'stone' && it.t > 1.2) { const d = Math.hypot(it.x - P.x, it.y - P.y); if (d < bd) { bd = d; best = it; } }
+    if (best && bd > 120) { const a = Math.atan2(best.y - P.y, best.x - P.x), gr = Math.min(1, (best.t - 1.2) / 12), pulse = .5 + .5 * Math.sin(S.t * 5), s = .8 + .7 * gr, r = 74 + 14 * gr + pulse * 6, x = P.x + Math.cos(a) * r, y = P.y - 30 + Math.sin(a) * r * .8, col = GROUND_RING[best.el];
+      add(() => glowAt(x, y, 90 * s, col, .5 + .35 * pulse));
+      g.save(); g.translate(x, y); g.rotate(a); g.scale(s, s); g.lineJoin = 'round';
+      g.fillStyle = col; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3.5; g.beginPath(); g.moveTo(20, 0); g.lineTo(-10, -15); g.lineTo(-4, 0); g.lineTo(-10, 15); g.closePath(); g.fill(); g.stroke();
+      g.restore(); } }
   // damage numbers and callouts
   g.textAlign = 'center'; g.lineJoin = 'round';
   for (const n of S.nums) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 28 : n.weak ? 15 : 19) * pk;
@@ -4234,7 +4251,7 @@ function draw() {
   for (const it of S.items) if (it.kind === 'stone') {   // a stone off screen gets an arrow in its element's colour
     const sx = (it.x - cx) * Z, sy = (it.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
     const a = Math.atan2(sy - H / 2, sx - W / 2), ex = clamp(sx, 30, W - 30), ey = clamp(sy, 150, H - 40), k = 1 + Math.sin(S.t * 6) * .15;
-    g.save(); g.translate(ex, ey); g.rotate(a); g.scale(k, k); g.fillStyle = EL[it.el]; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-9, -13); g.lineTo(-9, 13); g.closePath(); g.fill(); g.stroke(); g.restore();
+    g.save(); g.translate(ex, ey); g.rotate(a); g.scale(k, k); g.fillStyle = GROUND_RING[it.el]; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-9, -13); g.lineTo(-9, 13); g.closePath(); g.fill(); g.stroke(); g.restore();
   }
   if (S.bloomSeed) {   // the seed off screen gets a golden arrow that pulses
     const sd = S.bloomSeed, sx = (sd.x - cx) * Z, sy = (sd.y - cy) * Z;
@@ -4400,9 +4417,8 @@ function options() {
   const nG0 = Object.keys(S.gifts).length;
   if (nG0 < SLOTS.gift) { const key = Object.keys(S.skills).filter(id => !S.evo[id] && S.skills[id] >= 2 && !S.gifts[evoGift(id)] && POW[id].e !== S.apprentice).sort((a, b) => S.skills[b] - S.skills[a])[0];
     if (key && !has('gift', evoGift(key))) opts.push({ kind:'gift', id:evoGift(key) }); }
-  // the Lodestone's reach now grows on its own as your spirit animal grows, never as a card (A, 2026-10-05: a pick spent on
-  // pulling in gems felt like a waste when the game pulls them in anyway)
-  while (lodeDue()) S.lode++;
+  // the Lodestone shows up once per rank; pass it by and it is gone for this run
+  if (lodeDue() && opts.length < 3) { S.lodeOff[S.lode + 1] = 1; opts.push({ kind:'lode', id:'lode' }); }
   const pool = [], nA = Object.keys(S.skills).length, nG = Object.keys(S.gifts).length;
   for (const id in POW) if (S.learned.includes(POW[id].e) && !S.evo[id] && (S.skills[id] ? S.skills[id] < maxStars(id) : nA < SLOTS.active)) pool.push({ kind:'active', id });
   // a new gift is always one that evolves a power you hold (playtest sims: random picks filled the gift slots with gifts
@@ -4604,6 +4620,8 @@ function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
+  if (id === 'gem') return `<div class="gemdemo"><img src="art4/k${keeper}.png?v=8" alt="">${[0, 1, 2, 3, 4, 5].map(i => `<i style="--i:${i}"></i>`).join('')}</div>`;
+  if (id === 'stone') return `<div class="stonedemo">${['wood', 'fire', 'earth', 'metal', 'water'].map((el, i) => `<img src="art4/props/x-stone-${el}.png?v=8" alt="" style="--i:${i}">`).join('')}</div>`;
   if (id.startsWith('boss-')) { const b = id.slice(5); return `<div class="bossart" style="--c:${BOSSES[b].glow}"><img src="art4/bosses/${b}.png?v=9" alt=""><img class="mn" src="art4/e-${b}-m.png?v=8" alt=""></div>`; }
   if (TIP_ART[id]) return `<img class="tipart" src="art4/tips/${TIP_ART[id]}.jpg?v=8" alt="">`;
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
@@ -4641,6 +4659,7 @@ function renderSkills() {
   $('#ultLv').textContent = 'Lv ' + I.lv; $('#ultName').textContent = I.name; ub.setAttribute('aria-label', `${A.y} ultimate: ${I.name}`);
   for (const id in S.skills) h += `<span class="slot ${S.evo[id] ? 'evo' : ''}" data-k="p" data-id="${id}" style="--c:${EL[POW[id].e]}"><img src="${icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon)}" alt="${POW[id].n}"><em>${S.evo[id] ? '★' : S.skills[id]}</em></span>`;
   for (const id in S.gifts) h += `<span class="slot gift" data-k="g" data-id="${id}" style="--c:${EL[GIFT[id].e]}"><img src="${icon(GIFT[id].icon)}" alt="${GIFT[id].n}"><em>${S.gifts[id]}</em></span>`;
+  if (S.lode) h += `<span class="slot gift" data-k="l" style="--c:${EL.metal}"><img src="${icon('g-lodestone')}" alt="Lodestone"><em>${S.lode}</em></span>`;
   box.innerHTML = h;
 }
 // the row at the bottom is what you have, and it all works on its own; tapping one says so in a small bubble that
