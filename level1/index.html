@@ -2147,7 +2147,7 @@ function startRun() {
     t:0, over:false, won:false, level:LVL, learned:pathOf(keeperEl).slice(0, LVL), apprentice:LVL > 1 ? pathOf(keeperEl)[LVL - 1] : null,
     p:{ x:WORLD / 2, y:WORLD / 2, hp:220, max:220, face:1, hurt:0, r:26, mx:0, my:0 },
     pet:{ x:WORLD / 2 - 40, y:WORLD / 2 + 30, cd:1.5, bob:0, target:null, dash:0, dir:0, z:0 },
-    ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null, call:LVL >= CALL_LEVEL ? newCall() : null,
+    ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null, call:callOwned('bell') ? newCall() : null,
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
     lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, qi:{}, qiStones:{}, stoneOut:{}, evo:{}, cds:{}, ang:{},
     thawed:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
@@ -2430,7 +2430,7 @@ function useItem(k) {
   const P = S.p;
   // Luma names each gift the first time it's picked up in a run, for a player's first few runs, so a pre-reader learns them
   if (GIFT_VO.includes(k) && !S.taught['g_' + k] && !hsOn()) { S.taught['g_' + k] = 1; const m = fewTimes('_g' + k); if (m && AU.vo('vo-gift-' + k, 0, .6, false)) markSeen(m); }
-  if (k === 'magnet') { for (const q of S.gems) q.pull = true; pickupPop("Luma's Call!", '#9FD4FF'); SFX.sweep(); ring(P.x, P.y, 20, 900, '#7FC4FF', .7, 12, true); }
+  if (k === 'magnet') { for (const q of S.gems) q.pull = true; pickupPop('Gem Wind!', '#A8F4FF'); SFX.sweep(); ring(P.x, P.y, 20, 900, '#A8F4FF', .7, 12, true); }
   else if (k === 'heart' || k === 'dumpling' || k === 'peach') {
     const h = k === 'peach' ? P.max : P.max / 3; if (k !== 'peach') { pickupPop('+' + Math.round(h), '#FF7A8A'); SFX.heart(); S.hearts = (S.hearts || 0) + 1; } P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
     if (k === 'peach') pickupPop('Peach!', '#FFB0C8'); SFX.heal();
@@ -2439,7 +2439,7 @@ function useItem(k) {
   else if (k === 'tiger') { S.buffs.tiger = 12; pickupPop('Tiger Talisman!', '#FFC27A'); SFX.roar(); ring(P.x, P.y, 20, 300, '#FFB347', .6, 14, true); stars(P.x, P.y - 30, 24, '#FFB347', 320); }
   else if (k === 'frost') {
     S.freeze = 3.2; for (const e of S.en) if (!e.boss && Math.abs(e.x - P.x) < VW * .7 && Math.abs(e.y - P.y) < VH * .7) e.frozen = 3.2;
-    pickupPop('Frost Bell!', '#CFEFFF'); SFX.freeze(); S.flashT = .25; S.flashC = '200,235,255'; ring(P.x, P.y, 20, 1000, '#CFEFFF', .8, 16, true);
+    pickupPop('Frost Charm!', '#CFEFFF'); SFX.freeze(); S.flashT = .25; S.flashC = '200,235,255'; ring(P.x, P.y, 20, 1000, '#CFEFFF', .8, 16, true);
   } else {
     pickupPop('Firecrackers!', '#FFB08A'); SFX.firecrackers(); S.shake = .7; S.flashT = .2; S.flashC = '255,220,170';
     for (const e of S.en) if (!e.dead && Math.abs(e.x - P.x) < VW * .62 && Math.abs(e.y - P.y) < VH * .62) { if (e.boss) hurt(e, e.max * .05, 'fire'); else hurt(e, 9999, 'fire', { spark:false }); }
@@ -2931,7 +2931,7 @@ function teach() {
     coach('ult', `${A.y}: ${I.name}!`, `Tap your ${A.y} for one huge hit. It grows every run.`,
       () => { const r = $('#ultBtn').getBoundingClientRect(), b = stage.getBoundingClientRect(); return { sx:r.left - b.left + r.width / 2, sy:r.top - b.top + r.height / 2, sr:r.width * .62, paint:'#ultImg' }; }); }
 }
-const ITEM_INFO = { magnet:["Luma's Call", 'Pulls every gem on the map to you.'], cracker:['Firecrackers', 'Clears every creature on screen.'], dumpling:['Dumpling', 'Heals you.'], heart:['Heart', 'Restores a quarter of your health. Health barely refills on its own.'], peach:['Peach of Immortality', 'Heals you fully.'], tiger:['Tiger Talisman', 'Your powers hit 50% harder for a while.'], frost:['Frost Bell', 'Freezes everything on screen.'], ward:['Jade Ward', 'For a while, elements that beat yours hurt you half as much.'] };
+const ITEM_INFO = { magnet:['Gem Wind', 'Blows every gem on the map to you.'], cracker:['Firecrackers', 'Clears every creature on screen.'], dumpling:['Dumpling', 'Heals you.'], heart:['Heart', 'Restores a quarter of your health. Health barely refills on its own.'], peach:['Peach of Immortality', 'Heals you fully.'], tiger:['Tiger Talisman', 'Your powers hit 50% harder for a while.'], frost:['Frost Charm', 'Freezes everything on screen.'], ward:['Jade Ward', 'For a while, elements that beat yours hurt you half as much.'] };
 // ten scripted waves before the boss: each one a single element, in a shape you can read, announced two seconds ahead
 // five levels, one world per element in the order they feed each other (water, wood, fire, earth, metal), so the level
 // order itself teaches the feeding cycle; paced the way the genre does it: level 1 is simple chasers of two elements (built per Keeper by shapeLevel1);
@@ -3556,9 +3556,12 @@ function stoneBurst() {
 // powers. That's awesome. And timeless"). All power is earned by playing; the Season Path only sells how a call looks.
 // A call is thrown: tap its button, swipe a short hand seal while the world slows, and the last stroke throws it.
 // Young players can tap the button twice instead. A beam of starlight marks the spot, then the call lands.
-// The prototype is the bell ringer's Bell Strike, from Level 2. Tiers 1-5 (try them with ?tier=N); the fifth is Awakened.
-const CALL = { bell:{ n:'Bell Strike', el:'metal', seal:['up', 'down'], R:[170, 195, 220, 245, 275], cd:[45, 42, 38, 34, 30], tolls:[1, 1, 2, 2, 3], still:[0, 0, 0, 3, 3.5] } };
-const CALL_LEVEL = 2, SEAL_SLOW = .25;
+// Bell Strike is built first; the fisherman's Tide Call (Level 1's boss) comes next. Tiers 1-5 (?tier=N), the fifth Awakened.
+const CALL = { bell:{ n:'Bell Strike', from:'metal', el:'metal', seal:['up', 'down'], R:[170, 195, 220, 245, 275], cd:[45, 42, 38, 34, 30], tolls:[1, 1, 2, 2, 3], still:[0, 0, 0, 3, 3.5] } };
+const SEAL_SLOW = .25;
+// a Star Call is the freed boss's gift (A, 2026-10-05: "These things have to make sense"): Bell Strike is the bell
+// ringer's, so it is yours once the Bell Sentinel is freed. ?call=bell tries it on any level
+const callOwned = id => SEEN.has('_freed-' + CALL[id].from) || new RegExp('[?&]call=' + id).test(location.search);
 const CALL_T = { throw:.35, beam:1.1, fall:.26, toll:.75, rest:.6, rise:.5 };
 function callTier() { let t = 1; try { t = +(new URLSearchParams(location.search).get('tier')) || 1; } catch (e) {} return clamp(Math.round(t), 1, 5) - 1; }
 function newCall() { const id = 'bell', tr = callTier(); if (!IMG.callBell) { load('callBell', 'art4/calls/bell-star.png?v=9'); load('callBellA', 'art4/calls/bell-star-awakened.png?v=9'); } return { id, tier:tr, max:CALL[id].cd[tr], cd:12, seal:null, strike:null, uses:0 }; }
@@ -4643,13 +4646,14 @@ function drawItem(it) {
     return;
   }
   g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(x, it.y + 8, 18, 6, 0, 0, TAU); g.fill();
-  const col = { magnet:'#7FC4FF', cracker:'#FF7A5A', dumpling:'#FFF1C9', peach:'#FF9AB8', tiger:'#FFB347', frost:'#CFEFFF', ward:'#5FE3B4', heart:'#FF6A80' }[it.kind];
+  const col = { magnet:'#A8F4FF', cracker:'#FF7A5A', dumpling:'#FFF1C9', peach:'#FF9AB8', tiger:'#FFB347', frost:'#CFEFFF', ward:'#5FE3B4', heart:'#FF6A80' }[it.kind];
   add(() => glowAt(x, y, 110, col, .55 + .2 * Math.sin(it.t * 6)));
   g.strokeStyle = '#1A1206'; g.lineWidth = 3;
-  if (it.kind === 'magnet') {          // Luma's Call: a blue fox-fire
-    add(() => { glowAt(x, y, 60, '#4E9BE0', 1); glowAt(x, y - 8, 34, '#BFE3FF', 1); });
-    g.fillStyle = '#7FC4FF'; g.beginPath(); g.moveTo(x, y - 24); g.quadraticCurveTo(x + 18, y - 4, x + 10, y + 12); g.quadraticCurveTo(x, y + 18, x - 10, y + 12); g.quadraticCurveTo(x - 18, y - 4, x, y - 24); g.fill(); g.stroke();
-    g.fillStyle = '#E6F6FF'; g.beginPath(); g.arc(x, y + 4, 6, 0, TAU); g.fill();
+  if (it.kind === 'magnet') {          // Gem Wind: a white gust curling round three real gems
+    g.save(); g.lineCap = 'round';
+    for (const [r, a0, w] of [[17, 0, 5], [10, 2.1, 4]]) { const a = a0 + it.t * 3; g.strokeStyle = '#1B2257'; g.lineWidth = w + 3; g.beginPath(); g.arc(x, y, r, a, a + 3.6); g.stroke(); g.strokeStyle = '#FFFFFF'; g.lineWidth = w; g.beginPath(); g.arc(x, y, r, a, a + 3.6); g.stroke(); }
+    for (let i = 0; i < 3; i++) { const a = -it.t * 4 + i * TAU / 3; g.drawImage(gemSprite(1), x + Math.cos(a) * 25 - 15, y + Math.sin(a) * 15 - 15, 30, 30); }
+    g.restore();
   } else if (it.kind === 'cracker') {
     for (let i = 0; i < 3; i++) { g.fillStyle = '#E8553F'; g.fillRect(x - 17 + i * 12, y - 12 + (i % 2) * 4, 10, 22); g.strokeRect(x - 17 + i * 12, y - 12 + (i % 2) * 4, 10, 22); g.fillStyle = '#FFD24A'; g.fillRect(x - 17 + i * 12, y - 12 + (i % 2) * 4, 10, 4); }
     add(() => glowAt(x + 13, y - 22, 20 + Math.sin(it.t * 30) * 6, '#FFF1C9', 1));
@@ -4667,9 +4671,15 @@ function drawItem(it) {
   } else if (it.kind === 'tiger') {
     g.save(); g.translate(x, y); g.rotate(Math.sin(it.t * 3) * .1); g.fillStyle = '#FFD24A'; g.fillRect(-12, -22, 24, 44); g.strokeRect(-12, -22, 24, 44);
     g.strokeStyle = '#C8251A'; g.lineWidth = 3; g.beginPath(); g.moveTo(-6, -14); g.lineTo(6, -14); g.moveTo(0, -18); g.lineTo(0, 14); g.moveTo(-6, -2); g.lineTo(6, 4); g.moveTo(-6, 10); g.lineTo(6, 10); g.stroke(); g.restore();
-  } else {
-    g.fillStyle = '#DDEBF5'; g.beginPath(); g.moveTo(x - 15, y + 12); g.quadraticCurveTo(x - 15, y - 18, x, y - 18); g.quadraticCurveTo(x + 15, y - 18, x + 15, y + 12); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle = '#7FC4FF'; g.beginPath(); g.arc(x, y + 14, 5, 0, TAU); g.fill(); g.stroke();
+  } else {                             // Frost Charm: a round ice charm on a loop, a six-armed snowflake on its face
+    g.save(); g.translate(x, y); g.rotate(Math.sin(it.t * 3) * .12);
+    g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.arc(0, -21, 5, 0, TAU); g.stroke();
+    g.fillStyle = '#BFE6FF'; g.beginPath(); g.arc(0, 0, 17, 0, TAU); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.arc(-5, -6, 6, 0, TAU); g.fill();
+    g.strokeStyle = '#FFFFFF'; g.lineWidth = 2.6; g.lineCap = 'round'; g.beginPath();
+    for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3, c = Math.cos(a), sn = Math.sin(a); g.moveTo(0, 0); g.lineTo(c * 12, sn * 12);
+      const bx = c * 7.5, by = sn * 7.5; g.moveTo(bx, by); g.lineTo(bx + Math.cos(a + .8) * 4, by + Math.sin(a + .8) * 4); g.moveTo(bx, by); g.lineTo(bx + Math.cos(a - .8) * 4, by + Math.sin(a - .8) * 4); }
+    g.stroke(); g.restore();
   }
   g.lineWidth = 1;
 }
@@ -5199,6 +5209,8 @@ function win() {
     at(10, 4.3, () => { floatText(T.x, T.y - T.s * .95, 'Victory!', '#FFE08A', 46); SFX.fanfare(true); });
     // the person the boss was thanks you in their own voice, with the words the Victory card then shows (A, 2026-10-05)
     at(11, 4.9, () => AU.vo('vo-thanks-' + (B.realm || worldOf()), 0, .4));
+    // remember who was freed: each freed boss gives the player its Star Call
+    markSeen('_freed-' + (B.realm || worldOf()));
     if (T.t > 3.3 && T.r < 2600) { T.r += 70; paintThaw(T.x, T.y, T.r); for (let i = 0; i < 6; i++) paintThaw(rnd(0, WORLD), rnd(0, WORLD), 180); }
     // night lifts into dawn
     if (T.t > 3.3) S.night = Math.max(0, (S.night || 0) - dt / 1.8);
