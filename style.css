@@ -197,3 +197,6 @@ html.paged .phone{box-shadow:0 0 0 1px rgba(255,255,255,.12)}
 html.paged .h em{background:none;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:var(--gold);color:var(--gold)}
 .label{width:auto;justify-self:start}
 @media (max-width:860px){html:not(.paged) .photos img:first-child{grid-column:1/-1;aspect-ratio:4/3}}
+/* on phones the five worlds become one swipeable strip, so no world sits alone in a row */
+@media (max-width:860px){html:not(.paged) .worlds{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding-bottom:8px;margin-inline:-20px;padding-inline:20px}
+  html:not(.paged) .world{flex:0 0 46%;scroll-snap-align:start}}
