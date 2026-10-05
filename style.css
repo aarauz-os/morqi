@@ -1,0 +1,199 @@
+/* MorQi investor materials: the bible and the one-pager share this sheet, so they read as one family.
+   The game's own night: deep indigo turning to dawn gold, the five element colours used only to mean their element,
+   the game's rounded type, and real screens in phone frames. On screen each page is a band you scroll; printed (or
+   with ?paged) each band becomes one 16:9 page, and the one-pager one letter-size sheet. */
+:root{
+  --night:#0B1033; --deep:#070920; --dusk:#1A2260;
+  --glass:rgba(255,255,255,.06); --line:rgba(255,255,255,.13);
+  --text:#F4F1FF; --muted:rgba(244,241,255,.7); --faint:rgba(244,241,255,.5);
+  --gold:#FFD45A; --gold-2:#F2A93B; --jade:#6FF2CF; --go:#3FCF6E;
+  --water:#4E9BE0; --wood:#6FBF4A; --fire:#E8553F; --earth:#E6B23A; --metal:#C9D3DB;
+  --round:"Nunito",ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif;
+  --han:"Shippori Mincho B1","Hiragino Mincho ProN",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--deep)}
+body{margin:0;background:var(--deep);color:var(--text);font:600 16px/1.55 var(--round);-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-weight:900;letter-spacing:-.018em;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+img{max-width:100%}
+
+/* a page band */
+.pg{position:relative;overflow:hidden;padding-inline:20px;padding-block:72px;background:var(--bg,var(--night))}
+.pg > .in{position:relative;max-width:1120px;margin:0 auto;display:grid;gap:28px}
+.pg:nth-of-type(even){--bg:linear-gradient(180deg,#0D1340,#0A0E30)}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.eyebrow .n{color:var(--faint);letter-spacing:.08em}
+.h{font-size:clamp(32px,5vw,58px);line-height:1.02}
+.h em{font-style:normal;background:linear-gradient(180deg,#FFF6CC 10%,var(--gold) 50%,var(--gold-2) 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:clamp(17px,1.6vw,20px);line-height:1.5;color:var(--muted);max-width:60ch}
+.small{font-size:13.5px;color:var(--faint)}
+.src{font-size:11.5px;line-height:1.4;color:var(--faint);max-width:none}
+.split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:48px;align-items:center}
+.split.rev{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+.split > *{min-width:0}
+.stack{display:grid;gap:18px;align-content:start}
+
+/* the five element dots, the brand's quiet signature */
+.dots{display:flex;gap:7px}.dots i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.w{--c:var(--water)}.wd{--c:var(--wood)}.f{--c:var(--fire)}.e{--c:var(--earth)}.m{--c:var(--metal)}
+
+/* real screens in phone frames */
+.phones{display:flex;gap:18px;justify-content:center;align-items:flex-end}
+.phone{flex:0 1 auto;width:min(100%,250px);border-radius:28px;padding:5px;background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,.04));box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.08)}
+.phone img{display:block;width:100%;aspect-ratio:390/844;object-fit:cover;border-radius:23px}
+.phone.sm{width:min(100%,190px)}
+.phone.lift{transform:translateY(-22px)}
+figure{margin:0;display:grid;gap:8px}
+figcaption{font-size:12.5px;color:var(--faint);text-align:center}
+
+/* big numbers */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.stat{display:grid;gap:6px;align-content:start;padding:22px 20px;border-radius:24px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--line)}
+.stat b{font-size:clamp(36px,4.4vw,54px);line-height:1;font-weight:900;letter-spacing:-.03em;color:var(--c,var(--gold));font-variant-numeric:tabular-nums}
+.stat span{font-size:15px;line-height:1.45;color:var(--muted)}
+.stat small{font-size:11.5px;color:var(--faint)}
+.stats.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+/* lists of short beats */
+.beats{display:grid;gap:14px;margin:0;padding:0;list-style:none}
+.beats li{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start}
+.beats li > i{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:900 16px var(--round);font-style:normal;color:var(--deep);background:var(--c,var(--gold))}
+.beats li > div{min-width:0}
+.beats b{display:block;font-size:17px}
+.beats span{color:var(--muted);font-size:15px}
+
+/* the five worlds */
+.worlds{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.world{display:grid;gap:10px;justify-items:center;text-align:center}
+.world .phone{width:100%}
+.world b{font-size:15px;line-height:1.2;color:var(--c)}
+.world small{font-size:12px;color:var(--faint)}
+.han{font-family:var(--han);font-weight:800;color:var(--c);font-size:22px;line-height:1}
+
+/* quotes */
+.quote{font-size:clamp(20px,2.2vw,26px);line-height:1.35;font-weight:800;font-style:italic;color:var(--text);max-width:34ch}
+.quote + .who{font-size:13.5px;color:var(--faint)}
+
+/* playtest photos */
+.photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.photos img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:20px;display:block}
+.label{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:99px;background:rgba(255,255,255,.08);color:var(--muted);width:max-content;max-width:100%}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+.tbl td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl td:last-child{text-align:right;white-space:nowrap;padding-left:16px;font-weight:800}
+.tbl tr.total td{border-bottom:0;font-weight:900;color:var(--gold)}
+
+/* timeline */
+.road{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.step{display:grid;gap:6px;align-content:start;padding:18px 16px;border-radius:20px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--line)}
+.step .when{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--c,var(--gold))}
+.step b{font-size:16px;line-height:1.25}
+.step span{font-size:13.5px;line-height:1.45;color:var(--muted)}
+.step.done{--c:var(--jade);background:rgba(111,242,207,.07)}
+
+/* people */
+.team{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.person{display:grid;gap:8px;padding:22px;border-radius:24px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--line)}
+.person .av{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font:900 22px var(--round);color:var(--deep);background:var(--c)}
+.person b{font-size:20px}
+.person span{color:var(--muted);font-size:15px}
+
+/* buttons and contact */
+.cta{display:inline-flex;align-items:center;gap:10px;padding:14px 26px;border-radius:99px;font:900 18px var(--round);color:#0B2A14;text-decoration:none;background:linear-gradient(180deg,#9DF2A8,#3FCF6E 60%,#2BA957);box-shadow:inset 0 2px 0 rgba(255,255,255,.55),0 10px 26px rgba(63,207,110,.35);width:max-content;max-width:100%}
+.cta:focus-visible,a:focus-visible{outline:3px solid var(--jade);outline-offset:3px}
+.contact{display:grid;gap:2px}
+.contact b{font-size:20px}
+.contact span{font-size:15px;color:var(--muted);user-select:all}
+
+/* the cover */
+.cover{--bg:var(--deep);min-height:min(92vh,860px);display:grid;align-items:end;padding-block:56px}
+.cover .art{position:absolute;inset:0;background:var(--deep) url(img/hero-wide.jpg) 50% 30%/cover no-repeat}
+.cover .art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,9,32,.15) 30%,rgba(7,9,32,.7) 62%,var(--deep) 96%)}
+.cover .logo{width:min(70vw,420px);filter:drop-shadow(0 8px 20px rgba(10,20,60,.5))}
+.cover .tag{font-size:clamp(22px,2.8vw,34px);font-weight:900;line-height:1.15}
+.meta{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:14px;color:var(--muted)}
+.meta span{display:inline-flex;align-items:center;gap:8px}
+.meta span + span::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--faint)}
+
+@media (max-width:860px){
+  .split,.split.rev{grid-template-columns:1fr;gap:32px}
+  .stats,.stats.four,.team{grid-template-columns:1fr}
+  .worlds{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .road{grid-template-columns:1fr}
+  .photos{grid-template-columns:1fr 1fr}
+  .phones .phone{width:min(46%,230px)}
+  .phone.lift{transform:none}
+  .cover .art{background-image:url(img/hero-tall.jpg);background-position:50% 0}
+}
+
+/* ---------- paged: printing, or opened with ?paged ---------- */
+@page{size:13.333in 7.5in;margin:0}
+html.paged body{width:13.333in}
+html.paged .pg{width:13.333in;height:7.5in;padding:.5in .62in;break-after:page;page-break-after:always;display:grid;align-content:center}
+html.paged .pg > .in{max-width:none;width:100%;gap:20px}
+html.paged .h{font-size:44px}
+html.paged .lede{font-size:17px}
+html.paged .cover{min-height:0;align-items:end}
+html.paged .cover .art{background-image:url(img/hero-wide.jpg);background-position:50% 30%}
+html.paged .cover .logo{width:360px}
+html.paged .phone{width:200px}
+html.paged .phone.sm{width:150px}
+html.paged .worlds{grid-template-columns:repeat(5,150px);justify-content:space-between}
+html.paged .world .phone{width:150px}
+html.paged .stat{padding:18px}
+html.paged .stat b{font-size:44px}
+html.paged .split{gap:40px}
+html.paged .photos img{aspect-ratio:4/5}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- the one-pager: the bible's first glance, one letter-size sheet ---------- */
+.op{max-width:860px;margin:0 auto;display:grid;background:var(--night)}
+.op .band{position:relative;overflow:hidden;padding:40px 32px 30px;display:grid;gap:10px;align-content:end;min-height:300px}
+.op .band .art{position:absolute;inset:0;background:var(--deep) url(img/hero-wide.jpg) 50% 28%/cover no-repeat}
+.op .band .art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,9,32,.05) 20%,rgba(7,9,32,.65) 60%,var(--night) 98%)}
+.op .band > *:not(.art){position:relative}
+.op .band .logo{width:260px}
+.op .band .tag{font-size:26px;font-weight:900;line-height:1.15}
+.op .body{padding:4px 32px 30px;display:grid;gap:22px}
+.op .three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.op .pt{display:grid;gap:8px;align-content:start;padding:16px;border-radius:20px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--line)}
+.op .pt img{width:100%;aspect-ratio:4/3;object-fit:cover;object-position:50% 30%;border-radius:14px;display:block}
+.op .pt b{font-size:15.5px;line-height:1.25}
+.op .pt span{font-size:13px;line-height:1.45;color:var(--muted)}
+.op .ask{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start;padding:20px;border-radius:22px;background:linear-gradient(135deg,rgba(255,212,90,.12),rgba(255,255,255,.04));box-shadow:inset 0 0 0 1px rgba(255,212,90,.3)}
+.op .ask > *{min-width:0}
+.op .ask .amt{font-size:46px;font-weight:900;line-height:1;color:var(--gold);letter-spacing:-.03em}
+.op .ask .tbl{font-size:13px}
+.op .ask .tbl td{padding:5px 0}
+.op .foot{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;justify-content:space-between}
+@media (max-width:760px){.op .three,.op .ask{grid-template-columns:1fr}.op .band,.op .body{padding-inline:16px}}
+html.paged.letter body{width:8.5in}
+html.paged.letter .op{width:8.5in;height:11in;max-width:none;overflow:hidden;grid-template-rows:auto 1fr}
+html.paged #worlds .lede{font-size:15.5px}
+html.paged #worlds .world .phone{width:140px}
+html.paged #worlds .worlds{grid-template-columns:repeat(5,140px)}
+/* printed pages always use the wide layout, whatever width the printer reports, and no soft shadows (PDFs draw them as boxes) */
+html.paged .split{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px}
+html.paged .split.rev{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+html.paged .stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+html.paged .team{grid-template-columns:repeat(3,minmax(0,1fr))}
+html.paged .road{grid-template-columns:repeat(5,minmax(0,1fr))}
+html.paged .photos{grid-template-columns:repeat(3,minmax(0,1fr))}
+html.paged .phones .phone{width:200px}
+html.paged .phones .phone.sm{width:150px}
+html.paged .phone.lift{transform:translateY(-22px)}
+html.paged .cover .art{background-image:url(img/hero-wide.jpg)}
+html.paged .op .three{grid-template-columns:repeat(3,minmax(0,1fr))}
+html.paged .op .ask{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
+html.paged .op .band,html.paged .op .body{padding-inline:32px}
+html.paged .cta{box-shadow:inset 0 2px 0 rgba(255,255,255,.55)}
+html.paged .phone{box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+html.paged .h em{background:none;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:var(--gold);color:var(--gold)}
+.label{width:auto;justify-self:start}
+@media (max-width:860px){html:not(.paged) .photos img:first-child{grid-column:1/-1;aspect-ratio:4/3}}
