@@ -1104,7 +1104,7 @@ const KIND = {
   'metal-b':{ n:'Blade Mantis',      beh:'dash',   hp:1,   sp:.95, short:'Dashes along a red line: sidestep it', tip:'It freezes, shows a red line, then dashes along it. Sidestep the line.' },
   'metal-c':{ n:'Bell Knight',       beh:'blades', hp:1,   sp:.85, short:'Throws a fan of spinning blades', tip:'It flashes, then throws a fan of spinning blades. Move sideways between them.' }
 };
-Object.keys(KIND).forEach(k => load('e-' + k, `art4/e-${k}.png?v=8`));
+Object.keys(KIND).forEach(k => { load('e-' + k, `art4/e-${k}.png?v=8`); load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=8`); });
 const lookSrc = p => p;   // the bold look is the only look now; kept so image paths have one place to change
 ['x-stone-wood','x-stone-fire','x-stone-earth','x-stone-metal','x-stone-water','x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=8`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=8'), texM = load('tm', 'art4/t-meadow.jpg?v=8');
@@ -1718,6 +1718,39 @@ const AU = (() => {
     if (i % 2 === 0) hat(t, i % 4 ? .014 : .022);
     if ((bar & 3) === 3 && i >= 12) taiko(t, .12 + (i - 12) * .05, 90);   // a war-drum fill into every fourth bar
   }
+  /* "Blossom": the Element Bloom's own song (A, 2026-10-04: in dance mode "the world and the music has to be
+     somewhat different to show that change"). The battle stops and the shore throws a party: C major, the happiest
+     turn in the score (C, A minor, F, G), a bouncy 808 that jumps the octave, claps on every beat two and four, a
+     plucked silk-string arpeggio and a cheerful vocal-chop hook that climbs to a high C at the golden 62%. House rules
+     kept: hook first (a Bloom lasts six seconds or more), a surprise A flat chord at the golden point, the four-part
+     form, every repeating voice at or below about 700 Hz. */
+  const BLOS = {
+    ch:[[261.63, 329.63, 392], [220, 261.63, 329.63], [174.61, 220, 261.63], [196, 246.94, 293.66]],
+    root:[32.7, 55, 43.65, 49],
+    hook:[[[0, 329.63], [3, 392], [6, 440], [10, 392], [12, 440], [20, 523.25], [22, 523.25], [26, 440], [28, 392]],
+          [[0, 329.63], [3, 392], [6, 440], [10, 392], [12, 440], [20, 523.25], [22, 440], [26, 392], [28, 329.63], [30, 293.66]]],
+    surp:[207.65, 261.63, 311.13],
+    kicks:[[0, 7, 10], [0, 3, 10, 13]] };
+  function blossomStep(s, t) {
+    const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = BLOS, gold = golden(bar), p = part(bar), C = R.ch[ch];
+    // the party starts: a bright swell, a clap and the first chord at once
+    if (s === 0) { riser(t, SIX * 3, .08); clap(t, .3, .45); b808(t, 65.41, SIX * 8, 32.7, .6); }
+    if (k === 0) keys(t, gold ? R.surp : C, SIX * 30, .028, 2600);
+    // at the golden point the drums hold their breath under the surprise chord
+    if (gold && i < 8) { if (i === 0) for (const f of R.surp) silk(t, f, .05); return; }
+    // a plucked silk arpeggio, up and down the chord, in the middle register
+    if (p !== 2 && i % 2 === 0) silk(t, C[[0, 1, 2, 1, 0, 1, 2, 1][(i >> 1) & 7]], .03);
+    // the hook; while it rests, a "hey" on the backbeat
+    if (hookOn(bar)) sing(R.hook[(bar >> 1) & 1], bar, k, (f, d, g, l) => chop(t + d, f, .07 * g, SIX * 1.8 * l));
+    else if (i === 4 || i === 12) chop(t, C[2], .045, SIX * 1.2);
+    // the bounce: kicks with an 808 that jumps the octave, claps on two and four, bright hats with an open lift
+    groove(t, bar, i, R, ch, 2, .6);
+    if (i === 4 || i === 12) clap(t, .24, .35);
+    if (i % 2 === 0) hat(t, i % 4 ? .016 : .024);
+    if (i % 4 === 2 && p !== 2) hat(t, .018, true);
+    // a clap roll into each fourth bar
+    if ((bar & 3) === 3 && i >= 12) clap(t, .1 + (i - 12) * .04, .2);
+  }
   function music(play) {
     if (!c) return;
     if (!play) { if (M.timer) { clearInterval(M.timer); M.timer = null; } return; }
@@ -1729,8 +1762,8 @@ const AU = (() => {
       if (!c) return; if (M.next < c.currentTime - .1) M.next = c.currentTime + .05;  // back from a hidden tab: skip, don't pile up
       while (M.next < c.currentTime + .2) {
         if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
-        if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep }[M.song] || pathStep)(M.step, M.next);
-        if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest') bloomLayer(M.step, M.next);
+        if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, blossom:blossomStep }[M.song] || pathStep)(M.step, M.next);
+        if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest' && M.song !== 'blossom') bloomLayer(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
         M.next += SIX; M.step++;
       }
@@ -3068,10 +3101,10 @@ function bloomTick(dt) {
 }
 function startBloom() {
   const P = S.p, w = worldOf(); S.bloomSeed = null; S.bloomDone = true; S.bloom = { t:0, w, f:.4, life:bloomLife() };
-  S.eshots = []; S.flashT = .35; S.flashC = '255,246,214'; S.shake = .5; AU.bloom(true); SFX.jackpot(true);
+  S.eshots = []; S.flashT = .35; S.flashC = '255,246,214'; S.shake = .5; AU.song('blossom', 2); SFX.jackpot(true);
   ring(P.x, P.y, 20, 1400, BLOOM_COL[w], 1.4, 30, true); stars(P.x, P.y - 40, 60, '#FFE58A', 700); paintThaw(P.x, P.y, 520);
 }
-function endBloom() { const P = S.p; S.bloom = null; AU.bloom(false); SFX.sweep(); ring(P.x, P.y, 20, 900, '#FFFFFF', .9, 18, true); paintThaw(P.x, P.y, 700); flushLevels(); }
+function endBloom() { const P = S.p; S.bloom = null; AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]); SFX.sweep(); ring(P.x, P.y, 20, 900, '#FFFFFF', .9, 18, true); paintThaw(P.x, P.y, 700); flushLevels(); }
 // level-ups that waited for a Bloom or a Highest Self
 function flushLevels() { if (!S.lvlDefer) return; S.queued += S.lvlDefer - 1; S.lvlDefer = 0; levelUp(); }
 function bloomFlourish(B) {
@@ -3444,8 +3477,31 @@ function drawWeather() {
   weather(off, 1 - r); weather(on, r); g.globalAlpha = 1;
   // a Bloom shifts the whole picture into a dream of the world, easing in and out
   const B = S.bloom; if (B) { const k = Math.min(1, B.t / .8, (B.life - B.t) / .8);
-    g.globalCompositeOperation = 'overlay'; g.fillStyle = BLOOM_COL[B.w] || '#FFE08A'; g.globalAlpha = .32 * k; g.fillRect(0, 0, W, H);
-    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; weather(on, k); weather(on, k); }
+    g.globalCompositeOperation = 'overlay'; g.fillStyle = BLOOM_COL[B.w] || '#FFE08A'; g.globalAlpha = .2 * k; g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; weather(on, k); bloomParty(k); }
+}
+// the Bloom is a party (A, 2026-10-04: dance mode needs the world to change too): soft rays of warm light from above,
+// petals in the five element colours drifting down, and a warm glow at the edges that pulses on every beat. All of it
+// stays light and at the edges, so the play area keeps reading clearly
+function bloomParty(k) {
+  const b = AU.beat(), q = Math.pow(1 - b.ph, 3), T = S.t;
+  g.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 5; i++) { const x = W * (.1 + i * .2) + Math.sin(T * .4 + i) * 30, w = W * .12;
+    const gr = g.createLinearGradient(0, 0, 0, H * .5); gr.addColorStop(0, `rgba(255,226,150,${.09 * k})`); gr.addColorStop(1, 'rgba(255,226,150,0)');
+    g.fillStyle = gr; g.beginPath(); g.moveTo(x - w * .3, 0); g.lineTo(x + w * .3, 0); g.lineTo(x + w + 30, H * .5); g.lineTo(x - w - 30, H * .5); g.closePath(); g.fill(); }
+  g.globalCompositeOperation = 'source-over';
+  const cols = [EL.water, EL.wood, EL.fire, EL.earth, '#F4F6FF'];
+  for (let i = 0; i < 34; i++) {
+    const h1 = hsh(i + 7), h2 = hsh(i + 77), h3 = hsh(i + 177), sp = 40 + h2 * 50;
+    const x = ((h1 * W + Math.sin(T * (.8 + h3) + i) * 40) % W + W) % W, y = ((h2 * H + T * sp) % (H + 40)) - 20, r = T * (1 + h3 * 2) + i;
+    g.save(); g.translate(x, y); g.rotate(r); g.globalAlpha = .85 * k; g.fillStyle = cols[i % 5];
+    g.beginPath(); g.ellipse(0, 0, 7 + h3 * 4, 3.5 + h3 * 2, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.ellipse(-2, -1, 3, 1.2, 0, 0, TAU); g.fill(); g.restore();
+  }
+  g.globalAlpha = 1;
+  const v = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .42, W / 2, H / 2, Math.max(W, H) * .72);
+  v.addColorStop(0, 'rgba(255,200,120,0)'); v.addColorStop(1, `rgba(255,${180 + Math.round(40 * q)},${120 + Math.round(60 * q)},${(.22 + .18 * q) * k})`);
+  g.fillStyle = v; g.fillRect(0, 0, W, H);
 }
 function weather(kind, a) {
   if (a < .03) return; const T = S.t, wrap = (v, m) => ((v % m) + m) % m;
@@ -3612,7 +3668,9 @@ function draw() {
   for (const e of list) { const w = e.r * 2.3; g.drawImage(ringSprite(EL[e.el]), e.x - w / 2, e.y + e.r * .7 - w * .23, w, w * .46); }
   g.lineWidth = 1;
   for (const e of list) {
-    const im = e.boss ? (ok(IMG[e.img]) ? IMG[e.img] : null) : e.own ? tinted(e.img, '#000', 0) : tinted(e.img, EL[e.el]), s = e.size, wind = e.act && e.act.ph === 0 ? Math.min(1, e.act.t / e.act.wind) : 0, rolling = e.act && e.act.ph === 1 && e.act.k === 'lane';
+    // during a Bloom the creatures wear their happy faces, freed of the spell for a moment
+    const art = S.bloom && !e.boss && e.own && ok(IMG[e.img + '-happy']) ? e.img + '-happy' : e.img;
+    const im = e.boss ? (ok(IMG[e.img]) ? IMG[e.img] : null) : e.own ? tinted(art, '#000', 0) : tinted(art, EL[e.el]), s = e.size, wind = e.act && e.act.ph === 0 ? Math.min(1, e.act.t / e.act.wind) : 0, rolling = e.act && e.act.ph === 1 && e.act.k === 'lane';
     if (!im) continue;
     const hk = Math.max(0, 1 - (S.t - (e.hitAt ?? -9)) / .16), bk = Math.max(0, 1 - (S.t - (e.biteAt ?? -9)) / .2), froz = e.frozen > 0;
     const step = froz ? 0 : Math.sin(e.wob * 1.7), toward = S.p.x > e.x ? 1 : -1;
@@ -3628,9 +3686,9 @@ function draw() {
     if (e.boss) { drawWarden(e, hk); continue; }
     g.save(); g.translate(e.x, e.y + e.r * .5 - hop); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
     g.drawImage(im, -s / 2, -s * .62 - e.r * .5, s, s);
-    if (hk > 0) { const wh = silhouette(e.img, '#FFFFFF'); if (wh) { g.globalAlpha = hk * (e.boss ? .22 : .9); g.drawImage(wh, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
-    if (froz) { const ic = silhouette(e.img, '#BFE8FF'); if (ic) { g.globalAlpha = .55; g.drawImage(ic, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
-    if (wind) { const rd = silhouette(e.img, '#FF3A2A'); if (rd) { g.globalAlpha = wind * .45 * (.6 + .4 * Math.sin(S.t * 30)); g.drawImage(rd, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
+    if (hk > 0) { const wh = silhouette(art, '#FFFFFF'); if (wh) { g.globalAlpha = hk * (e.boss ? .22 : .9); g.drawImage(wh, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
+    if (froz) { const ic = silhouette(art, '#BFE8FF'); if (ic) { g.globalAlpha = .55; g.drawImage(ic, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
+    if (wind) { const rd = silhouette(art, '#FF3A2A'); if (rd) { g.globalAlpha = wind * .45 * (.6 + .4 * Math.sin(S.t * 30)); g.drawImage(rd, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
     g.restore();
     if (wind) { const y = e.y - s * .62 - 18 - Math.sin(S.t * 12) * 3; g.font = '900 30px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(60,10,6,.8)'; g.strokeText('!', e.x, y); g.fillStyle = '#FF4A3A'; g.fillText('!', e.x, y); g.lineWidth = 1; }
     if (e.tagT > 0) { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
