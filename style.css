@@ -229,3 +229,29 @@ html.paged #business .beats{gap:8px}
 html.paged #business .spath{padding:12px 18px;gap:8px}
 html.paged #business .spath-track .ring{width:50px;height:50px}
 html.paged #business .spath-track::before{top:25px}
+
+/* the five realm bosses, each over its element's glow, with the person it was in a small portrait at its feet */
+.rogues{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.rogue{display:grid;gap:10px;text-align:center;justify-items:center}
+.rogue .art{position:relative;width:100%;aspect-ratio:1;border-radius:22px;border:1px solid var(--line);background:radial-gradient(circle at 50% 58%,color-mix(in srgb,var(--c) 42%,transparent),transparent 66%),var(--glass)}
+.rogue .boss{position:absolute;inset:4% 6% 6%;width:88%;height:90%;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))}
+.rogue .was{position:absolute;right:-4px;bottom:-6px;width:38%;aspect-ratio:1;object-fit:cover;border-radius:50%;border:2.5px solid #fff;background:var(--dusk);box-shadow:0 6px 14px rgba(0,0,0,.4)}
+.rogue figcaption{display:grid;gap:2px}
+.rogue b{font-size:15px;line-height:1.2;color:var(--c)}
+.rogue span{font-size:13px;font-weight:800;color:var(--text)}
+.rogue small{font-size:12px;color:var(--faint)}
+/* page 6: headline and text side by side above the five; on phones the five come straight after the headline */
+.vill{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:48px;align-items:end}
+.vill .rogues{grid-column:1/-1}
+@media (max-width:860px){html:not(.paged) .vill{grid-template-columns:minmax(0,1fr)}html:not(.paged) .vill .rogues{order:2}html:not(.paged) .vill .vt{order:3}}
+html.paged .vill{column-gap:40px}
+html.paged .rogue .was{width:42%}
+html.paged #change .h{font-size:46px}
+html.paged #change .lede{font-size:15.5px}
+html.paged #change .quote{font-size:19px}
+html.paged .rogues{grid-template-columns:repeat(5,190px);justify-content:space-between}
+@media (max-width:860px){html:not(.paged) .rogues{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding-bottom:8px;margin-inline:-20px;padding-inline:20px}
+  html:not(.paged) .rogue{flex:0 0 46%;scroll-snap-align:start}}
+html.paged .rogue .was{box-shadow:none}
+/* the swipe strips snap each card to the page's 20 px gutter, not to the screen's edge */
+@media (max-width:860px){html:not(.paged) .worlds,html:not(.paged) .rogues{scroll-padding-inline:20px}}

@@ -848,7 +848,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   </section>
 
   <section class="scr" id="story" hidden>
-    <div class="story"><img src="art4/luma.jpg?v=8" alt="Luma, the little fox spirit of the hearth, with one glowing tail."><img class="story-warden" src="art4/bosses/water.png?v=8" alt="The Drowned Lantern, waiting in the dark."></div>
+    <div class="story"><img src="art4/luma.jpg?v=8" alt="Luma, the little fox spirit of the hearth, with one glowing tail."><img class="story-warden" src="art4/bosses/water.png?v=9" alt="The Drowned Lantern, waiting in the dark."></div>
     <h2 class="ck">The shore has gone still</h2>
     <p>The Stillmaker froze this shore and left the Drowned Lantern to keep it still. Luma, the fox spirit of your hearth, sends you out with your spirit animal. Gather the shore's Qi Stones, and the Drowned Lantern will rise from the sea.</p>
     <button class="btn green" id="storyNext">Run in</button>
@@ -1091,7 +1091,7 @@ ZOD.forEach(z => { load(z + 'y', `art4/a-${z}-y.png?v=8`); load(z + 'm', `art4/a
 ['f1', 'up', 'slam', 'dash', 'cast'].forEach(n => load('w-' + n, `art4/warden/${n}.png?v=8`));   // the Warden's poses
 // the five realm bosses, each with its idle pose and four attack poses, and its minion
 // (loaded when its level starts, so a run only fetches the one boss it will meet)
-function loadBoss(b) { if (IMG['bz-' + b]) return; load('bz-' + b, `art4/bosses/${b}.png?v=8`); for (const n of ['up', 'slam', 'dash', 'cast']) load(`bz-${b}-${n}`, `art4/bosses/${b}-${n}.png?v=8`); }
+function loadBoss(b) { if (IMG['bz-' + b]) return; load('bz-' + b, `art4/bosses/${b}.png?v=9`); for (const n of ['up', 'slam', 'dash', 'cast']) load(`bz-${b}-${n}`, `art4/bosses/${b}-${n}.png?v=9`); }
 // every element sends its own creatures: a swarm creature (a), a specialist with its own trick (b) and a brute (c)
 const ROLE = { critter:'a', wolf:'b', golem:'c', minion:'m' };
 const KIND = {
@@ -3519,10 +3519,15 @@ function drawGround(cx, cy) {
   for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) { const t = tiles.get(i * 64 + j); g.drawImage(t.c, i * TILE - TPAD, j * TILE - TPAD, TILE + TPAD * 2, TILE + TPAD * 2); }
 }
 const RINGS = {};
+// on the ground, red means one thing only: an attack is coming (A, 2026-10-04: "go with what you believe" on fire
+// rings that read as warnings). Fire's ring at a creature's feet is deep flame orange, the colour of fire's shots: clear
+// of warning red and of earth's gold. Every element ring also has a crisp dark edge, so rings read as solid markings
+// while warnings stay soft red light with no dark lines: different in colour and in form.
+const GROUND_RING = { ...EL, fire:'#FF7A2A' };
 function ringSprite(col) {
   if (RINGS[col]) return RINGS[col];
   const c = document.createElement('canvas'); c.width = 96; c.height = 44; const x = c.getContext('2d');
-  x.fillStyle = 'rgba(0,0,0,.25)'; x.beginPath(); x.ellipse(48, 22, 42, 17, 0, 0, TAU); x.fill(); x.strokeStyle = col; x.lineWidth = 6; x.stroke();
+  x.fillStyle = 'rgba(0,0,0,.25)'; x.beginPath(); x.ellipse(48, 22, 42, 17, 0, 0, TAU); x.fill(); x.strokeStyle = 'rgba(16,14,30,.75)'; x.lineWidth = 9; x.stroke(); x.strokeStyle = col; x.lineWidth = 5; x.stroke();
   return RINGS[col] = c;
 }
 // boss fights fall into night: the realm darkens to deep indigo outside a moonlit arena, the boss glows with its own
@@ -3930,7 +3935,7 @@ function draw() {
   g.lineWidth = 1;
   // enemies: a coloured ring at the feet names their element
   const list = S.en.filter(e => inView(e.x, e.y, e.size)).sort((a, b) => a.y - b.y);
-  for (const e of list) { const w = e.r * 2.3; g.drawImage(ringSprite(EL[e.el]), e.x - w / 2, e.y + e.r * .7 - w * .23, w, w * .46); }
+  for (const e of list) { const w = e.r * 2.3; g.drawImage(ringSprite(GROUND_RING[e.el]), e.x - w / 2, e.y + e.r * .7 - w * .23, w, w * .46); }
   g.lineWidth = 1;
   for (const e of list) {
     // during a Bloom the creatures wear their happy faces, freed of the spell for a moment
@@ -3957,7 +3962,7 @@ function draw() {
     g.restore();
     if (wind) { const y = e.y - s * .62 - 18 - Math.sin(S.t * 12) * 3; g.font = '900 30px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(60,10,6,.8)'; g.strokeText('!', e.x, y); g.fillStyle = '#FF4A3A'; g.fillText('!', e.x, y); g.lineWidth = 1; }
     if (e.tagT > 0) { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
-      g.strokeStyle = EL[e.el]; g.lineWidth = 4; g.beginPath(); g.ellipse(e.x, e.y + e.r * .5, e.r * 1.8 + Math.sin(S.t * 8) * 4, e.r * .8, 0, 0, TAU); g.stroke();
+      g.strokeStyle = GROUND_RING[e.el]; g.lineWidth = 4; g.beginPath(); g.ellipse(e.x, e.y + e.r * .5, e.r * 1.8 + Math.sin(S.t * 8) * 4, e.r * .8, 0, 0, TAU); g.stroke();
       g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, e.x, y); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, e.x, y); g.globalAlpha = 1; g.lineWidth = 1; }
     if (e.type === 'golem') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(e.x - 42, e.y - s * .62 - 14, 84, 10); g.fillStyle = EL[e.el]; g.fillRect(e.x - 40, e.y - s * .62 - 12, 80 * Math.max(0, e.hp / e.max), 6); }
   }
@@ -4510,7 +4515,7 @@ function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
-  if (id.startsWith('boss-')) { const b = id.slice(5); return `<div class="bossart" style="--c:${BOSSES[b].glow}"><img src="art4/bosses/${b}.png?v=8" alt=""><img class="mn" src="art4/e-${b}-m.png?v=8" alt=""></div>`; }
+  if (id.startsWith('boss-')) { const b = id.slice(5); return `<div class="bossart" style="--c:${BOSSES[b].glow}"><img src="art4/bosses/${b}.png?v=9" alt=""><img class="mn" src="art4/e-${b}-m.png?v=8" alt=""></div>`; }
   if (TIP_ART[id]) return `<img class="tipart" src="art4/tips/${TIP_ART[id]}.jpg?v=8" alt="">`;
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
@@ -4692,7 +4697,7 @@ const FREED = {
   wood: { img:'b-free-wood', q:'I was so angry the grove would not grow my way that I froze it still.', alt:'The woodcarver, freed, holding a sprouting sapling.' },
   fire: { img:'b-free-fire', q:'I chased every bright moment until nothing felt warm anymore.', alt:'The drummer, freed, holding a warm lantern-flower.' },
   earth:{ img:'b-free-earth', q:'I worried about everyone so much that I forgot to live.', alt:'The grandmother, freed, carrying a basket of buns.' },
-  metal:{ img:'b-free-metal', q:'I held on to what I lost so tightly that nothing new could reach me.', alt:'The temple keeper, freed, holding a small bell.' }
+  metal:{ img:'b-free-metal', q:'I held on to what I lost so tightly that nothing new could reach me.', alt:'The bell ringer, freed, holding a small bell.' }
 };
 const freedOf = el => { const f = FREED[el] || FREED.water; return ok(IMG[f.img]) ? f : { ...f, img:'b-fisher' }; };
 // each feeds the next
