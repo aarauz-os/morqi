@@ -756,6 +756,10 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 /* the Highest Self tip: the Keeper as the hooded master in gold light */
 .hsdemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 55%,rgba(255,224,138,.55),rgba(255,197,74,.12) 45%,transparent 70%),linear-gradient(180deg,#2A2F7A,#141A44)}
 .hsdemo img{height:92%!important;width:auto!important;max-width:none;object-fit:contain;filter:drop-shadow(0 0 18px rgba(255,224,138,.8));animation:float 3s ease-in-out infinite}
+/* a realm boss's first-meeting card: the boss in its own glow, its minion at its side */
+.bossart{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:0 22% 3% 4%;background:radial-gradient(circle at 42% 60%,color-mix(in srgb,var(--c) 55%,transparent),transparent 62%),linear-gradient(180deg,#1E2350,#0E1230)}
+.bossart img{position:static;height:94%!important;width:auto!important;max-width:100%;object-fit:contain;filter:drop-shadow(0 0 16px var(--c));animation:float 3s ease-in-out infinite}
+.bossart img.mn{position:absolute;right:5%;bottom:5%;height:42%!important;max-width:30%;animation-delay:-1.4s}
 /* tip pictures: made for each card */
 .snap .tipart{display:block;width:100%;height:100%;object-fit:cover}
 .ultdemo{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--c) 35%,transparent),transparent 65%),linear-gradient(180deg,#2A2F7A,#141A44)}
@@ -779,7 +783,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <div class="xp" id="xpBar"><i></i></div>
       </div>
       <div class="hrow"><span id="wavePill" role="status"></span><div id="stoneRow" aria-label="Qi Stones"></div></div>
-      <div id="bossWrap"><div class="bossname" id="bossName">The Still Warden</div><div id="bossBar"><i></i></div></div>
+      <div id="bossWrap"><div class="bossname" id="bossName"></div><div id="bossBar"><i></i></div></div>
     </div>
     <div class="skills" id="skills"></div>
     <button id="ultBtn" aria-label="Companion ultimate"><span class="ur"></span><img id="ultImg" alt=""><em id="ultLv"></em><b id="ultName"></b></button>
@@ -844,9 +848,9 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   </section>
 
   <section class="scr" id="story" hidden>
-    <div class="story"><img src="art4/luma.jpg?v=8" alt="Luma, the little fox spirit of the hearth, with one glowing tail."><img class="story-warden" src="art4/b-warden.png?v=8" alt="The Still Warden, waiting in the dark."></div>
+    <div class="story"><img src="art4/luma.jpg?v=8" alt="Luma, the little fox spirit of the hearth, with one glowing tail."><img class="story-warden" src="art4/bosses/water.png?v=8" alt="The Drowned Lantern, waiting in the dark."></div>
     <h2 class="ck">The shore has gone still</h2>
-    <p>The Stillmaker froze this shore and left a Warden to keep it still. Luma, the fox spirit of your hearth, sends you out with your spirit animal. Gather the shore's Qi Stones, and the Warden will come.</p>
+    <p>The Stillmaker froze this shore and left the Drowned Lantern to keep it still. Luma, the fox spirit of your hearth, sends you out with your spirit animal. Gather the shore's Qi Stones, and the Drowned Lantern will rise from the sea.</p>
     <button class="btn green" id="storyNext">Run in</button>
   </section>
 
@@ -856,7 +860,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <div class="howto">
         <div class="how"><span class="ic"><span class="ghost"><i></i></span></span><div><b>Move</b><span>Drag anywhere. Your powers <em>fire on their own</em>. <em>Tap</em> to dash.</span></div></div>
         <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="rgba(255,255,255,.55)" stroke-width="1.6" fill="none"><path d="M28 9L46 22L39 45L17 45L10 22Z"/><path d="M28 9L39 45L10 22L46 22L17 45Z" stroke="rgba(255,255,255,.3)"/></g><g stroke="#0B1033" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g></svg></span><div><b>Match the element</b><span>Every creature is weak to two elements. Hit it with one and it frees <em>twice as fast</em>.</span><button class="btn blue small" id="chartBtn">See the wheel</button></div></div>
-        <div class="how"><span class="ic stones5"><img src="art4/props/x-stone-water.png?v=8" alt=""><img src="art4/props/x-stone-fire.png?v=8" alt=""><img src="art4/props/x-stone-wood.png?v=8" alt=""></span><div><b>Gather the stones</b><span>Free creatures of each element to earn its <em>Qi Stone</em>. Hold them all and the Warden comes.</span></div></div>
+        <div class="how"><span class="ic stones5"><img src="art4/props/x-stone-water.png?v=8" alt=""><img src="art4/props/x-stone-fire.png?v=8" alt=""><img src="art4/props/x-stone-wood.png?v=8" alt=""></span><div><b>Gather the stones</b><span>Free creatures of each element to earn its <em>Qi Stone</em>. Hold them all and the realm's boss comes.</span></div></div>
       </div>
       <button class="btn green" id="howtoGo">Let's go!</button>
     </div>
@@ -1085,8 +1089,11 @@ for (let k = 1; k <= KEEPERS; k++) { load('k' + k, `art4/k${k}.png?v=8`); for (l
 ZOD.forEach(z => { load(z + 'y', `art4/a-${z}-y.png?v=8`); load(z + 'm', `art4/a-${z}-m.png?v=8`); });
 ['e-critter','e-wolf','e-golem','b-warden','b-fisher','b-free-wood','b-free-fire','b-free-earth','b-free-metal'].forEach(n => load(n, `art4/${n}.png?v=8`));
 ['f1', 'up', 'slam', 'dash', 'cast'].forEach(n => load('w-' + n, `art4/warden/${n}.png?v=8`));   // the Warden's poses
+// the five realm bosses, each with its idle pose and four attack poses, and its minion
+// (loaded when its level starts, so a run only fetches the one boss it will meet)
+function loadBoss(b) { if (IMG['bz-' + b]) return; load('bz-' + b, `art4/bosses/${b}.png?v=8`); for (const n of ['up', 'slam', 'dash', 'cast']) load(`bz-${b}-${n}`, `art4/bosses/${b}-${n}.png?v=8`); }
 // every element sends its own creatures: a swarm creature (a), a specialist with its own trick (b) and a brute (c)
-const ROLE = { critter:'a', wolf:'b', golem:'c' };
+const ROLE = { critter:'a', wolf:'b', golem:'c', minion:'m' };
 const KIND = {
   'water-a':{ n:'Frost Jelly',       beh:'weave',  hp:1,   sp:.95, f:2.2, amp:.9 },
   'water-b':{ n:'Spout Frog',        face:-1, beh:'spit',   hp:1.1, sp:.85, short:'Spits bubbles that slow you down', tip:'It stops at a distance and spits bubbles. A bubble slows you down, so keep moving.' },
@@ -1102,9 +1109,15 @@ const KIND = {
   'earth-c':{ n:'Stone Ox',          beh:'slam',   hp:1.3, sp:.8,  short:'Stamps a red circle around itself', tip:'It stamps the ground. Get out of the red circle before it lands.' },
   'metal-a':{ n:'Bronze Hornet',     face:-1, beh:'zigzag', hp:.75, sp:1.3, f:5, amp:1.1 },
   'metal-b':{ n:'Blade Mantis',      beh:'dash',   hp:1,   sp:.95, short:'Dashes along a red line: sidestep it', tip:'It freezes, shows a red line, then dashes along it. Sidestep the line.' },
-  'metal-c':{ n:'Bell Knight',       beh:'blades', hp:1,   sp:.85, short:'Throws a fan of spinning blades', tip:'It flashes, then throws a fan of spinning blades. Move sideways between them.' }
+  'metal-c':{ n:'Bell Knight',       beh:'blades', hp:1,   sp:.85, short:'Throws a fan of spinning blades', tip:'It flashes, then throws a fan of spinning blades. Move sideways between them.' },
+  // each realm boss's minions: its own family, not smaller copies of it, and each attacks in a way that suits its boss
+  'water-m':{ n:'Lantern Wisp',      beh:'spit',   hp:1,   sp:1.05, minion:1 },
+  'wood-m': { n:'Splinterling',      beh:'dash',   hp:1,   sp:1.1,  minion:1 },
+  'fire-m': { n:'Cinder Dancer',     beh:'zigzag', hp:.85, sp:1.3,  f:5, amp:1.1, minion:1 },
+  'earth-m':{ n:'Worry Stone',       beh:'roll',   hp:1.4, sp:.85,  minion:1 },
+  'metal-m':{ n:'Chime Wraith',      beh:'weave',  hp:1,   sp:1.1,  f:2.4, amp:1, minion:1 }
 };
-Object.keys(KIND).forEach(k => { load('e-' + k, `art4/e-${k}.png?v=8`); load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=8`); });
+Object.keys(KIND).forEach(k => { load('e-' + k, `art4/e-${k}.png?v=8`); if (!KIND[k].minion) load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=8`); });
 const lookSrc = p => p;   // the bold look is the only look now; kept so image paths have one place to change
 ['x-stone-wood','x-stone-fire','x-stone-earth','x-stone-metal','x-stone-water','x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water'].forEach(n => load(n, `art4/props/${n}.png?v=8`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=8'), texM = load('tm', 'art4/t-meadow.jpg?v=8');
@@ -1223,12 +1236,14 @@ const AU = (() => {
      - the music dips for a beat under a hero moment, so it lands.
      If a file can't load, the synth version above plays instead. */
   const PHI = 1.618, LADDER = [1, 1 / PHI, 1 / PHI / PHI, 1 / PHI / PHI / PHI], SOFT = [18000, 9000, 5200, 2800];
-  const LOUD = { alarm:-6.0, bell:-25.9, bloop:-8.9, 'boom-big':-7.7, boom:-18.9, bossdown:-5.7, bossroar:-6.7, cardin:-17.3, charge:-8.0, chestdrop:-3.6, combo:-24.1, crackle:-13.0, dart:-9.4, firecrackers:-16.0, firework:-8.7, freeze:-17.1, gem:-21.4, heal:-22.9, heart:-7.2, heartbeat:-22.4, hurt:-9.3, jackpot:-8.4, levelup:-11.0, pop:-13.4, power:-10.1, reveal:-8.6, roar:-6.3, select:-45.8, shatter1:-14.9, shatter2:-26.5, shing:-5.6, spikes:-16.2, splash:-11.4, stomp:-13.1, sweep:-9.8, thud:-26.2, thwip:-4.0, ting:-20.5, victory:-9.7, wave:-11.9, whip:-21.0 };
+  const LOUD = { alarm:-6.0, bell:-25.9, bloop:-8.9, 'boom-big':-7.7, boom:-18.9, bossdown:-5.7, bossroar:-6.7, cardin:-17.3, charge:-8.0, chestdrop:-3.6, combo:-24.1, crackle:-13.0, dart:-9.4, firecrackers:-16.0, firework:-8.7, freeze:-17.1, gem:-21.4, heal:-22.9, heart:-7.2, heartbeat:-22.4, hurt:-9.3, jackpot:-8.4, levelup:-11.0, pop:-13.4, power:-10.1, reveal:-8.6, roar:-6.3, select:-45.8, shatter1:-14.9, shatter2:-26.5, shing:-5.6, spikes:-16.2, splash:-11.4, stomp:-13.1, sweep:-9.8, thud:-26.2, thwip:-4.0, ting:-20.5, victory:-9.7, wave:-11.9, whip:-21.0,
+    'earth-boulder':-10.3, 'earth-quake':-10.7, 'earth-roar':-9.4, 'fire-dash':-9.2, 'fire-drum':-9.6, 'fire-mortar':-9.5, 'fire-roar':-9.5, 'm-earth':-18.2, 'm-fire':-9.5, 'm-metal':-10.4, 'm-water':-10.5, 'm-wood':-17.8, 'metal-blades':-11.6, 'metal-blink':-9.6, 'metal-roar':-9.4, 'metal-toll':-9.6, 'water-cast':-9.4, 'water-pull':-9.6, 'water-roar':-9.2, 'water-wall':-9.5, 'wood-axe':-9.4, 'wood-roar':-9.4, 'wood-roots':-10.0 };
   // levelled to -18 dB and never boosted more than 1.4x, so a quiet file can't come out louder than it used to (A: still too loud)
   const level = n => Math.min(1.4, Math.max(.3, Math.pow(10, (-18 - (LOUD[n] ?? -18)) / 20)));
   const MINOR = [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24, 27, 29, 31, 34];   // minor pentatonic steps, in semitones
   const SMP = {}, SVAR = { shatter:['shatter1', 'shatter2'] }, lastRate = {};
-  const SFILES = ['gem','shatter1','shatter2','splash','bloop','dart','boom','boom-big','whip','thwip','thud','stomp','bell','ting','shing','levelup','select','cardin','reveal','victory','chestdrop','roar','alarm','hurt','crackle','firecrackers','heal','sweep','freeze','power','wave','firework','pop','bossroar','jackpot','heart','heartbeat','charge','spikes','combo','bossdown'];
+  const SFILES = ['gem','shatter1','shatter2','splash','bloop','dart','boom','boom-big','whip','thwip','thud','stomp','bell','ting','shing','levelup','select','cardin','reveal','victory','chestdrop','roar','alarm','hurt','crackle','firecrackers','heal','sweep','freeze','power','wave','firework','pop','bossroar','jackpot','heart','heartbeat','charge','spikes','combo','bossdown',
+    'earth-boulder','earth-quake','earth-roar','fire-dash','fire-drum','fire-mortar','fire-roar','m-earth','m-fire','m-metal','m-water','m-wood','metal-blades','metal-blink','metal-roar','metal-toll','water-cast','water-pull','water-roar','water-wall','wood-axe','wood-roar','wood-roots'];
   // [file, rung]: 0 hero, 1 big event, 2 regular combat, 3 constant
   const SMAP = { dart:['dart', 3], boom:a => a[0] ? ['boom-big', 1] : ['boom', 2], splash:['splash', 2], bloop:['bloop', 3], whip:['whip', 2], thwip:['thwip', 3],
     thud:a => a[0] ? ['stomp', 1] : ['thud', 2], bell:['bell', 2], ting:['ting', 3], shing:['shing', 2], shatter:['shatter', 3], levelup:['levelup', 0], select:['select', 2],
@@ -1259,6 +1274,13 @@ const AU = (() => {
       if (SGATE[k] && !gate('s' + k, SGATE[k])) return;
       if (!smp(m[0], m[1])) return synth.apply(S, a);
     }; }
+  // each realm boss's own voice (a roar and its attacks) and its minions', from ElevenLabs (A approved the boss art first,
+  // the rule for generated sound); if a file can't load, the nearest synth sound plays instead
+  const BX = { roar:'roar', pull:'charge', wall:'stomp', cast:'alarm', roots:'spikes', axe:'stomp', mortar:'boom', dash:'charge', drum:'stomp', boulder:'stomp', quake:'stomp', toll:'bell', blink:'whip', blades:'shing' };
+  S.bx = function (n, rung = 1, gap = 89) {
+    if (!c || !sfxOn || !gate('bx' + n, gap)) return;
+    if (!smp(n, rung)) { const f = n.startsWith('m-') ? 'pop' : BX[n.split('-')[1]]; if (f && S[f]) S[f](true); }
+  };
   { const synthCombo = S.combo; S.combo = function (n) { if (!c || !sfxOn) return; if (!smp('combo', 2, Math.pow(2, MINOR[Math.min(n, 14)] / 12 - .5))) synthCombo.call(S, n); }; }
   // the five element lights of a Warden's change: one bell, rising a pentatonic step each, held in the middle register
   S.node = function (i) { if (!c || !sfxOn) return; if (!smp('bell', 1, Math.pow(2, MINOR[i * 2] / 12 - .75))) S.ting(); };
@@ -1982,8 +2004,8 @@ function startRun() {
   paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
-  // Afterglow opens, then the level themes take turns; every boss shares the Warden's
-  S.props = scatterProps(worldOf());
+  // Afterglow opens, then the level themes take turns; every realm boss shares the one boss theme
+  S.props = scatterProps(worldOf()); loadBoss(worldOf());
   AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
@@ -2071,7 +2093,9 @@ function cue(big, small, ms = 1800, warn) { const c = $('#cue'), top = $('#hud .
 const ETYPE = {
   critter:{ img:'e-critter', r:20, hp:16, sp:66, dmg:9, xp:1, size:76 },
   wolf:{ img:'e-wolf', r:24, hp:28, sp:84, dmg:12, xp:3, size:96 },
-  golem:{ img:'e-golem', r:38, hp:420, sp:48, dmg:24, xp:12, size:156 }
+  golem:{ img:'e-golem', r:38, hp:420, sp:48, dmg:24, xp:12, size:156 },
+  // a realm boss's minions: tougher than a swarm creature, quicker than a brute
+  minion:{ img:'e-critter', r:24, hp:30, sp:80, dmg:11, xp:2, size:104 }
 };
 const ELS = ['wood', 'fire', 'earth', 'metal', 'water'];
 function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.93, 1.13, 1.32, 1.43, 1.57][S.level - 1]; }   // level 1 eases you in; later levels are tougher   // toughness keeps pace with the player's growing powers
@@ -2109,22 +2133,30 @@ function ring2(n) {
 }
 function spawnBoss() {
   S.bossSpawned = true;
-  const e = { type:'boss', boss:true, x:S.p.x, y:S.p.y - 260, r:70, hp:1, max:1, sp:62, dmg:16, xp:0, el:LEVELS[S.level - 1].boss[0], size:260, img:'b-warden', hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:0, phase:0, atk:3, summon:5, frozen:0 };
+  // each realm has its own boss, in its realm's element (A, 2026-10-04)
+  const realm = worldOf(), B = BOSSES[realm], img = ok(IMG['bz-' + realm]) ? 'bz-' + realm : 'b-warden';
+  const e = { type:'boss', boss:true, realm, x:S.p.x, y:S.p.y - 260, r:76, hp:1, max:1, sp:62, dmg:16, xp:0, el:realm, size:img === 'b-warden' ? 260 : 300, img, hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:0, phase:0, atk:3, summon:5, frozen:0 };
   e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1]);   // a real fight: about a minute
   S.en.push(e); S.boss = e;
   if (eff(e.el, keeperEl) > 1) S.items.push({ x:S.p.x + 80, y:S.p.y + 40, kind:'ward', t:0, z:10, vz:260 });
   // room to dodge, so the boss can really attack; the whole arena always sits inside the world (playtest 2: a boss that
-  // arrived near the world's edge left half its arena off the map, and the camera could not follow there)
-  { const r = Math.max(430, Math.min(VW, VH) * .62), m = r + 90;   // extra room above for the HUD and below for the power row
+  // arrived near the world's edge left half its arena off the map, and the camera could not follow there). A, 2026-10-04:
+  // the arena should not feel congested or make attacks hard to evade, so it is about a third wider than the Warden's was.
+  { const r = Math.max(580, Math.min(VW, VH) * .82), m = r + 90;   // extra room above for the HUD and below for the power row
     S.arena = { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
-    const A = S.arena; e.x = A.x; e.y = A.y - 260;
-    if (Math.hypot(S.p.x - A.x, S.p.y - A.y) > r - 80) { S.p.x = A.x; S.p.y = A.y + 160; ring(S.p.x, S.p.y, 20, 260, '#FFE6A3', .5, 12, true); } }
-  e.pat = 0; e.atk = 2.2; S.bossFx = []; S.heartT = 3;
+    const A = S.arena; e.x = A.x; e.y = A.y - 280;
+    if (Math.hypot(S.p.x - A.x, S.p.y - A.y) > r - 80) { S.p.x = A.x; S.p.y = A.y + 180; ring(S.p.x, S.p.y, 20, 260, '#FFE6A3', .5, 12, true); } }
+  e.pat = 0; e.atk = 2.6; S.bossFx = []; S.heartT = 3;
   for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.arena.x, m.y - S.arena.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
-  SFX.bossroar(); SFX.stomp(); S.shake = .6; AU.song('boss'); S.flashT = .45; S.flashC = '110,96,255'; ring(e.x, e.y, 30, 900, '#8F7CFF', .9, 24, true);
-  ring(e.x, e.y, 20, 400, '#BFE3FF', .8, 16, true); smoke(e.x, e.y + 60, 14, 50, '200,220,235');
-  setTimeout(() => { if (S && !S.over) awaken(); }, 1400);
+  SFX.bx(B.snd.roar, 0); SFX.stomp(); S.shake = .6; AU.song('boss'); S.flashT = .45; S.flashC = '110,96,255'; ring(e.x, e.y, 30, 900, B.glow, .9, 24, true);
+  ring(e.x, e.y, 20, 400, '#FFFFFF', .8, 16, true); smoke(e.x, e.y + 60, 14, 50, B.mist);
+  // the first time a player meets each boss, one card names it and how to beat its signature attack
+  // (the spirit animal's awakening follows that card; without a card it comes 1.4 s in, and never later than 12 s)
+  const card = !SEEN.has('_boss-' + realm);
+  if (card) setTimeout(() => { if (!S || S.over) return; coach('boss-' + realm, B.name, B.tip, () => ({ sx:W / 2, sy:H * .4 })); COACH.gap = 0; }, 1100);
+  const wake = () => { if (S && !S.over && !S.bossWoke) { S.bossWoke = true; awaken(); } };
+  setTimeout(wake, card ? 12000 : 1400);
 }
 
 // one place for every hit: element bonus, buffs, flash, squash, knockback, numbers and sparks
@@ -2690,7 +2722,7 @@ function teach() {
   if (!tg.c_item) { const it = S.items.find(it => ITEM_INFO[it.kind]); if (it) { const nm = ITEM_INFO[it.kind]; note('item', `${nm[0]}: ${nm[1]} Walk over it to use it.`); } }
   if (!tg.c_chest && S.chests.length) note('chest', 'A Spirit Chest! Walk to it for free upgrades, the best way to evolve a power.');
   for (const e of S.en) {
-    if (!e.K || e.boss || tg['n_' + e.kid] || Math.abs(e.x - P.x) > VW * .4 || Math.abs(e.y - P.y) > VH * .36) continue;
+    if (!e.K || e.boss || e.K.minion || tg['n_' + e.kid] || Math.abs(e.x - P.x) > VW * .4 || Math.abs(e.y - P.y) > VH * .36) continue;
     tg['n_' + e.kid] = 1; e.tagT = 3.5;
     if ((e.K.tip || e.type === 'golem') && !SEEN.has(e.kid)) {
       markSeen(e.kid);
@@ -2846,19 +2878,17 @@ function direct(dt) {
   } else if (S.boss && !S.boss.dead) {
     const b = S.boss, ph = b.hp < b.max * .34 ? 2 : b.hp < b.max * .67 ? 1 : 0;
     if (ph !== b.phase) {
-      b.phase = ph; b.el = LV().boss[ph];
-      if (eff(b.el, keeperEl) > 1) { const a = rnd(0, TAU); S.items.push({ x:S.p.x + Math.cos(a) * 90, y:S.p.y + Math.sin(a) * 90, kind:'ward', t:0, z:10, vz:260 }); }   // the shore helps a Keeper this element beats
-      ring(b.x, b.y, 20, 360, EL[b.el], .6, 16, true); SFX.stomp(); S.shake = .5;
+      // a realm boss keeps its realm's element; each new phase it roars and hits harder
+      b.phase = ph; SFX.bx(bossOf(b).snd.roar, 1, 2000);
+      if (eff(b.el, keeperEl) > 1) { const a = rnd(0, TAU); S.items.push({ x:S.p.x + Math.cos(a) * 90, y:S.p.y + Math.sin(a) * 90, kind:'ward', t:0, z:10, vz:260 }); }   // the realm helps a Keeper this element beats
+      ring(b.x, b.y, 20, 420, bossOf(b).glow, .6, 16, true); SFX.stomp(); S.shake = .5;
     }
     bossFight(b, ph, dt);
-    S.spawnAcc += dt * 1.2; while (S.spawnAcc > 1) { S.spawnAcc--; spawn('critter'); }
+    // during the fight the boss's own minions keep coming instead of the realm's creatures (A, 2026-10-04)
+    S.spawnAcc += dt * .8; while (S.spawnAcc > 1) { S.spawnAcc--; spawn('minion', null, 1, b.realm); }
   }
 }
 
-/* ================= the boss fight ================= */
-// the Warden hunts you and rotates four attacks, each shown on the ground first: a charge along a red lane, ice spikes under your
-// feet, a spiral of shards and a stomp. In its last phase it is enraged and faster. Hearts appear in the arena to fight over.
-const PATTERNS = ['charge', 'spikes', 'spiral', 'stomp'];
 /* ================= element healing shrines ================= */
 // Demaris' idea from playtest one ("I want a definite way to go get my life up … but I gotta go get that"): clear enough
 // creatures of one element and a shrine of that element rises nearby. Stand in it to heal, up to a third of your health.
@@ -2902,49 +2932,178 @@ function shrines(dt) {
   }
   S.shrines = S.shrines.filter(sh => sh.t < sh.life);
 }
+/* ================= the realm bosses ================= */
+// Every realm has its own boss (A, 2026-10-04: "a boss that makes sense for that level"). Each is a person frozen by
+// the feeling its element holds out of balance, with its own poses, attacks, sound, effects and minions; all of them
+// share the one boss theme. Every attack still shows on the ground first, so a watchful player can always get clear,
+// and each signature attack asks for its own answer: run against the pull, step off the root line, find the gap in
+// the drum ring, stand between the boulder lanes, leave the bell's ring.
+const BOSSES = {
+  water:{ name:'The Drowned Lantern', pats:['undertow', 'spikes', 'charge', 'spiral', 'undertow', 'stomp'], shot:'bubble', skin:'geyser',
+    glow:'#7FD0FF', mist:'190,225,255', edge:['#CFE6F7', '#9CC3E0'], bolt:'#CFE0FF',
+    snd:{ roar:'water-roar', sig:'water-pull', slam:'water-wall', charge:'water-wall', cast:'water-cast' },
+    tip:'When the whirlpool spins, run away from its lantern.' },
+  wood:{ name:'The Thorn Tyrant', pats:['roots', 'charge', 'spiral', 'roots', 'stomp'], shot:'thorn', skin:'root',
+    glow:'#8FE060', mist:'150,200,110', edge:['#A8D070', '#5E8A3A'], bolt:'#D8FF9A',
+    snd:{ roar:'wood-roar', sig:'wood-roots', slam:'wood-axe', charge:'wood-axe', cast:'wood-roots' },
+    tip:'When a red line points at you, step sideways before the roots burst up.' },
+  fire:{ name:'The Ember Drummer', pats:['drums', 'mortar', 'charge', 'drums', 'spiral'], shot:'ember', skin:'mortar',
+    glow:'#FF8A3A', mist:'255,150,90', edge:['#FFB866', '#E0603A'], bolt:'#FFD08A',
+    snd:{ roar:'fire-roar', sig:'fire-drum', slam:'fire-drum', charge:'fire-dash', cast:'fire-mortar' },
+    tip:'Each drum beat sends a ring of fire, so run to its bright gap.' },
+  earth:{ name:'The Stone Matron', pats:['boulders', 'spikes', 'stomp', 'boulders', 'charge'], shot:'pebble', skin:'sink',
+    glow:'#E8B860', mist:'215,185,140', edge:['#D8B070', '#A87A40'], bolt:'#FFE0A0',
+    snd:{ roar:'earth-roar', sig:'earth-boulder', slam:'earth-quake', charge:'earth-boulder', cast:'earth-quake' },
+    tip:'Boulders roll down the red lanes, so stand between them.' },
+  metal:{ name:'The Bell Sentinel', pats:['toll', 'fan', 'blink', 'spikes', 'toll', 'spiral'], shot:'blade', skin:'sword',
+    glow:'#C9D3DB', aura:.22, rage:'#7E8CA8', mist:'210,218,228', edge:['#E6EAF0', '#AEB8C4'], bolt:'#FFFFFF',
+    snd:{ roar:'metal-roar', sig:'metal-toll', slam:'metal-toll', charge:'metal-blink', cast:'metal-blades' },
+    tip:'When its bell glows, run out of the big red ring before it rings.' }
+};
+const bossOf = b => BOSSES[b && b.realm] || BOSSES.water;
+// a red shape on the ground is drawn as an ellipse (the ground seen at an angle, 0.7 as tall as wide), and it hits as
+// exactly that ellipse, so stepping out of the shape you see is always safe (QA, 2026-10-04)
+const inGround = (px, py, x, y, r) => ((px - x) / r) ** 2 + ((py - y) / (r * .7)) ** 2 < 1;
+const angGap = (a, b) => Math.abs(((a - b) % TAU + TAU * 1.5) % TAU - Math.PI);
 function bossFight(b, ph, dt) {
-  const P = S.p, A = S.arena, enraged = ph === 2;
-  S.night = Math.min(1, (S.night || 0) + dt / 2.4);   // the boss pulls the shore into night
+  const P = S.p, A = S.arena, enraged = ph === 2, B = bossOf(b), el = b.realm;
+  S.night = Math.min(1, (S.night || 0) + dt / 2.4);   // the boss pulls its realm into night
   if (S.bolt) S.bolt.t += dt;
   if (enraged && (S.boltT = (S.boltT ?? 2) - dt) <= 0) {   // and when enraged, lightning strikes around the arena
-    S.boltT = rnd(3, 6); const a = rnd(0, TAU), r = rnd(.3, .9) * A.r; S.bolt = { t:0, x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, seed:Array.from({ length:10 }, () => rnd(-1, 1)) };
-    SFX.boom(true); S.shake = Math.max(S.shake, .35); ring(S.bolt.x, S.bolt.y, 10, 160, '#CFE0FF', .4, 10, true); shards(S.bolt.x, S.bolt.y, '#E8F1FF', 10, 300);
+    S.boltT = rnd(3, 6); const a = rnd(0, TAU), r = rnd(.3, .9) * A.r; S.bolt = { t:0, x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, c:B.bolt, seed:Array.from({ length:10 }, () => rnd(-1, 1)) };
+    SFX.boom(true); S.shake = Math.max(S.shake, .35); ring(S.bolt.x, S.bolt.y, 10, 160, B.bolt, .4, 10, true); shards(S.bolt.x, S.bolt.y, '#E8F1FF', 10, 300);
   }
-  if (enraged && !b.enraged) { b.enraged = true; b.castAt = S.t + .6; SFX.bossroar(); S.shake = .6; S.hitstop = .18; }
+  if (enraged && !b.enraged) { b.enraged = true; b.castAt = S.t + .6; SFX.bx(B.snd.roar, 0); S.shake = .6; S.hitstop = .18; ring(b.x, b.y, 30, 520, B.glow, .7, 20, true); }
   S.heartT -= dt; if (S.heartT <= 0) { S.heartT = enraged ? 12 : 18; if (!S.items.some(it => it.kind === 'heart')) { const a = rnd(0, TAU), r = rnd(.35, .8) * A.r; S.items.push({ x:A.x + Math.cos(a) * r, y:A.y + Math.sin(a) * r, kind:'heart', t:0, z:30, vz:200 }); } }
-  // ground hazards from spikes and stomps
-  for (const f of S.bossFx) { f.t += dt; if (!f.done && f.t >= f.wind) { f.done = true;
-      const inside = Math.hypot(P.x - f.x, P.y - f.y) < f.r + P.r * .5;
-      if (f.k === 'spike') { for (let i = 0; i < 6; i++) { const an = i / 6 * TAU; fx({ k:'spike', x:f.x + Math.cos(an) * f.r * .45, y:f.y + Math.sin(an) * f.r * .3, life:.7, s:42, c:'#BFE6FF', rot:an }); } shards(f.x, f.y, '#DDF1FF', 8, 260); SFX.spikes(); if (inside && ouch(24, f.x, f.y, { push:50, el:b.el, src:'spikes' })) S.hitstop = .07; }
-      else { ring(f.x, f.y, 20, f.r * 1.15, EL[b.el], .5, 16, true); debris(f.x, f.y, 16, 360); SFX.stomp(); S.shake = Math.max(S.shake, .45); if (inside && ouch(28, f.x, f.y, { push:110, el:b.el, src:'stomp' })) S.hitstop = .09;
-        const n = 10 + ph * 4; for (let i = 0; i < n; i++) { const an = i / n * TAU; S.eshots.push({ x:b.x, y:b.y, vx:Math.cos(an) * 230, vy:Math.sin(an) * 230, life:2.6, rot:an, el:b.el, boss:1 }); } } } }
-  S.bossFx = S.bossFx.filter(f => f.t < f.wind + .3);
-  // a spiral of shards while it spins
+  for (const f of S.bossFx) { f.t += dt; bossFxTick(b, B, f, ph, dt); }
+  S.bossFx = S.bossFx.filter(f => f.t < (f.end ?? f.wind + .3));
+  // a spiral of its own shots while it spins
   if (b.spiral > 0) { b.spiral -= dt; b.spinT = (b.spinT || 0) - dt; if (b.spinT <= 0) { b.spinT = enraged ? .07 : .1; b.spinA = (b.spinA || 0) + .42;
-      for (const k of [0, Math.PI]) { const an = b.spinA + k; S.eshots.push({ x:b.x, y:b.y - 40, vx:Math.cos(an) * 250, vy:Math.sin(an) * 250, life:2.8, rot:an, el:b.el, dmg:10, boss:1 }); } } }
-  // the charge itself
+      for (const k of [0, Math.PI]) { const an = b.spinA + k; S.eshots.push({ k:B.shot, x:b.x, y:b.y - 40, vx:Math.cos(an) * 250, vy:Math.sin(an) * 250, life:2.8, rot:an, el, dmg:10, boss:1 }); } } }
+  // the Bell Sentinel's fans of blades: volleys with gaps between the blades
+  if (b.fan) { b.fan.t -= dt; if (b.fan.t <= 0) { b.fan.t = .42; b.fan.n--; b.castAt = S.t; const base = Math.atan2(P.y - b.y, P.x - b.x) + rnd(-.08, .08);
+      for (let i = -3; i <= 3; i++) { const an = base + i * .24; S.eshots.push({ k:'blade', x:b.x, y:b.y - 50, vx:Math.cos(an) * 285, vy:Math.sin(an) * 285, life:2.6, rot:0, el, dmg:10, boss:1, src:'fan' }); }
+      SFX.bx(B.snd.cast, 2, 200); SFX.shing(); if (b.fan.n <= 0) b.fan = null; } }
+  // its vanishing step: it fades out, reappears behind you and slashes the ground where it lands
+  if (b.blink) { const k = b.blink; k.t += dt;
+    if (k.ph === 0 && k.t >= .38) { k.ph = 1; k.t = 0; const ox = b.x, oy = b.y;
+      let dx = S.lastMove ? -S.lastMove.x : (P.x - b.x), dy = S.lastMove ? -S.lastMove.y : (P.y - b.y); const m = Math.hypot(dx, dy) || 1;
+      let tx = P.x + dx / m * 190, ty = P.y + dy / m * 190; const d = Math.hypot(tx - A.x, ty - A.y), lim = A.r - 90; if (d > lim) { tx = A.x + (tx - A.x) / d * lim; ty = A.y + (ty - A.y) / d * lim; }
+      b.x = tx; b.y = ty; smoke(ox, oy, 12, 40, B.mist); stars(ox, oy - 60, 14, '#FFFFFF', 300); ring(tx, ty, 20, 220, B.glow, .4, 12, true); stars(tx, ty - 60, 16, '#FFFFFF', 360);
+      SFX.bx(B.snd.charge, 1, 200); S.bossFx.push({ k:'slash', x:tx, y:ty, r:150, t:0, wind:.62 }); }
+    else if (k.ph === 1 && k.t >= .3) b.blink = null; }
+  // the charge itself, each boss leaving its own trail
   const a = b.act;
   if (a && a.k === 'lane') { a.t += dt;
-    if (a.ph === 0 && a.t >= a.wind) { a.ph = 1; a.t = 0; SFX.charge(); S.shake = Math.max(S.shake, .3); }
-    else if (a.ph === 1) { b.x += a.dx * a.spd * dt; b.y += a.dy * a.spd * dt; if ((b.dustT = (b.dustT || 0) - dt) <= 0) { b.dustT = .04; smoke(b.x, b.y + 50, 2, 30, '210,230,245'); }
+    if (a.ph === 0 && a.t >= a.wind) { a.ph = 1; a.t = 0; SFX.charge(); SFX.bx(B.snd.charge, 1, 300); S.shake = Math.max(S.shake, .3); }
+    else if (a.ph === 1) { b.x += a.dx * a.spd * dt; b.y += a.dy * a.spd * dt;
+      if ((b.dustT = (b.dustT || 0) - dt) <= 0) { b.dustT = .04; smoke(b.x, b.y + 50, 2, 30, B.mist);
+        if (el === 'fire') { if ((b.trT = (b.trT || 0) - .04) <= 0) { b.trT = .1; hazard('cinder', b.x, b.y + 30, 34, 2.4, 6); } flames(b.x, b.y + 30, 2, 20, 30); }
+        else if (el === 'water') drops(b.x, b.y + 40, 4, 220);
+        else if (el === 'wood') leaves(b.x, b.y, 2, 160);
+        else if (el === 'earth') debris(b.x, b.y + 40, 2, 200);
+        else fx({ k:'glow', x:b.x, y:b.y - 60, s:180, s1:60, c:B.glow, life:.3 }); }
       if (Math.hypot(b.x - A.x, b.y - A.y) > A.r - 70 || a.t >= a.dur) { b.act = null; S.shake = Math.max(S.shake, .35); debris(b.x, b.y + 40, 10, 300); SFX.thud(true); } }
     return; }
   b.atk -= dt; b.summon -= dt;
-  if ((b.wispT = (b.wispT || 0) - dt) <= 0) { b.wispT = .05; fx({ k:'smoke', x:b.x + rnd(-70, 70), y:b.y + rnd(10, 60), vx:rnd(-30, 30), vy:-rnd(30, 80), drag:1, life:rnd(.6, 1.1), s:rnd(16, 30), c:'200,225,250' }); }   // icy wisps off its robe
-  if (b.summon <= 0) { b.summon = 9; b.castAt = S.t; for (let i = 0; i < 4; i++) spawn('critter', { x:b.x + rnd(-140, 140), y:b.y + rnd(-140, 140) }); }
-  if (b.atk > 0 || b.spiral > 0) return;
-  const pat = PATTERNS[b.pat++ % PATTERNS.length], d = Math.hypot(P.x - b.x, P.y - b.y) || 1;
+  // its living presence: mist off the Lantern, leaves off the Tyrant, embers off the Drummer, dust off the Matron, glints off the Sentinel
+  if ((b.wispT = (b.wispT || 0) - dt) <= 0) { b.wispT = el === 'fire' ? .08 : .06;
+    if (el === 'fire') flames(b.x + rnd(-60, 60), b.y + rnd(-30, 30), 1, 10, 26, 160);
+    else if (el === 'wood') fx({ k:'leaf', x:b.x + rnd(-90, 90), y:b.y - rnd(20, 160), vx:rnd(-40, 40), vy:rnd(20, 60), drag:1, rot:rnd(0, TAU), vr:rnd(-6, 6), life:rnd(.8, 1.3), s:rnd(6, 10), c:Math.random() < .5 ? '#6FAE3A' : '#3E6A2A' });
+    else if (el === 'metal') fx({ k:'star', x:b.x + rnd(-80, 80), y:b.y - rnd(20, 200), vx:0, vy:-rnd(10, 40), drag:1, life:rnd(.5, .9), s:rnd(4, 8), c:'#FFFFFF' });
+    else fx({ k:'smoke', x:b.x + rnd(-70, 70), y:b.y + rnd(10, 60), vx:rnd(-30, 30), vy:-rnd(30, 80), drag:1, life:rnd(.6, 1.1), s:rnd(16, 30), c:B.mist }); }
+  // it calls its minions
+  if (b.summon <= 0) { b.summon = enraged ? 8 : 10; b.castAt = S.t; const n = 3 + Math.min(ph, 1);
+    for (let i = 0; i < n; i++) { const an = i / n * TAU + rnd(-.3, .3), m = spawn('minion', { x:b.x + Math.cos(an) * 150, y:b.y + Math.sin(an) * 150 }, 1, el); if (m) { ring(m.x, m.y, 10, 90, B.glow, .4, 8, true); smoke(m.x, m.y, 4, 26, B.mist); } }
+    SFX.bx('m-' + el, 2, 300); }
+  if (b.atk > 0 || b.spiral > 0 || b.fan || b.blink) return;
+  const pat = B.pats[b.pat++ % B.pats.length], d = Math.hypot(P.x - b.x, P.y - b.y) || 1, aim = Math.atan2(P.y - b.y, P.x - b.x);
   b.atk = (enraged ? 1.5 : 2.4 - ph * .35); b.stompAt = S.t;
   if (pat === 'charge') b.act = { k:'lane', ph:0, t:0, wind:.85, dx:(P.x - b.x) / d, dy:(P.y - b.y) / d, spd:enraged ? 980 : 820, dur:.75, len:620, w:170 };
-  else if (pat === 'spikes') { const n = 3 + ph; for (let i = 0; i < n; i++) { const an = rnd(0, TAU), r = i ? rnd(60, 150) : 0; S.bossFx.push({ k:'spike', x:P.x + Math.cos(an) * r + P.mx * 80, y:P.y + Math.sin(an) * r + P.my * 80, r:72, t:-i * .12, wind:.95 }); } }
-  else if (pat === 'spiral') { b.spiral = enraged ? 2.6 : 2; b.castAt = S.t; SFX.alarm(); }
-  else S.bossFx.push({ k:'quake', x:b.x, y:b.y, r:210, t:0, wind:.9 });
+  else if (pat === 'spikes' || pat === 'mortar') { const n = 3 + ph; b.castAt = S.t; if (pat === 'mortar') SFX.bx(B.snd.cast, 1, 300);
+    for (let i = 0; i < n; i++) { const an = rnd(0, TAU), r = i ? rnd(70, 170) : 0; S.bossFx.push({ k:'spike', skin:B.skin, sx:b.x, sy:b.y - 80, x:P.x + Math.cos(an) * r + P.mx * 80, y:P.y + Math.sin(an) * r + P.my * 80, r:72, t:-i * .12, wind:pat === 'mortar' ? 1.1 : .95 }); } }
+  else if (pat === 'spiral') { b.spiral = enraged ? 2.6 : 2; b.castAt = S.t; SFX.alarm(); SFX.bx(B.snd.cast, 2, 300); }
+  else if (pat === 'stomp') S.bossFx.push({ k:'quake', x:b.x, y:b.y, r:230, t:0, wind:.9 });
+  // the Drowned Lantern: a whirlpool drags you toward its lantern, where the cold bites; run against it
+  else if (pat === 'undertow') { S.bossFx.push({ k:'pull', x:b.x, y:b.y, core:125, t:0, wind:.75, dur:enraged ? 3 : 2.5, end:(enraged ? 3 : 2.5) + 1.1, tick:0 }); b.atk += 2; SFX.bx(B.snd.cast, 1, 300); }
+  // the Thorn Tyrant: lines of roots race out toward you, one burst after another
+  else if (pat === 'roots') { const lines = ph === 0 ? [0] : ph === 1 ? [0, (Math.random() < .5 ? -1 : 1) * .78] : [-.78, 0, .78];
+    for (const off of lines) for (let i = 0; i < 9; i++) { const an = aim + off, rr = 120 + i * 98, x = b.x + Math.cos(an) * rr, y = b.y + Math.sin(an) * rr;
+      if (Math.hypot(x - A.x, y - A.y) > A.r - 30) break; S.bossFx.push({ k:'spike', skin:'root', line:1, x, y, r:58, t:0, wind:.8 + i * .085 }); }
+    b.castAt = S.t; SFX.bx(B.snd.slam, 1, 300); }
+  // the Ember Drummer: each beat sends a ring of fire out across the arena, with one gap to stand in
+  else if (pat === 'drums') { const n = 2 + ph; let gap = aim + Math.PI + (Math.random() < .5 ? -1 : 1) * rnd(.3, .6);
+    for (let i = 0; i < n; i++) { if (i) gap += (Math.random() < .5 ? -1 : 1) * rnd(.25, .5); const spd = 360 + ph * 30;
+      S.bossFx.push({ k:'drum', x:b.x, y:b.y, gap:Math.atan2(P.y - b.y, P.x - b.x) + (i ? gap - aim - Math.PI : (Math.random() < .5 ? -1 : 1) * rnd(.45, .75)), gw:1.15 - ph * .1, spd, t:-i * .9, wind:.62, end:.62 + (A.r * 2 + 120) / spd }); }
+    b.atk += n * .5; }
+  // the Stone Matron: boulders roll down lanes across the arena, one lane always on you, with room between them
+  else if (pat === 'boulders') { const dir = rnd(0, TAU), dx = Math.cos(dir), dy = Math.sin(dir), nx = -dy, ny = dx, offs = ph === 0 ? [0, (Math.random() < .5 ? -1 : 1) * 280] : [-280, 0, 280], len = A.r * 2.4, spd = 700 + ph * 70;
+    offs.forEach((o, i) => { const cx = P.x + nx * (o + rnd(-30, 30)), cy = P.y + ny * (o + rnd(-30, 30)), t = (cx - A.x) * dx + (cy - A.y) * dy, mx = cx - dx * t, my = cy - dy * t;
+      S.bossFx.push({ k:'boulder', x:mx - dx * len / 2, y:my - dy * len / 2, dx, dy, len, w:150, r:66, spd, t:-i * .3, wind:1.05, end:1.05 + len / spd }); });
+    b.castAt = S.t; SFX.bx(B.snd.cast, 1, 300); b.atk += .8; }
+  // the Bell Sentinel: its bell tolls in a great ring that slows anyone caught inside, then it vanishes and steps behind you
+  else if (pat === 'toll') S.bossFx.push({ k:'toll', x:b.x, y:b.y, r:250 + ph * 25, t:0, wind:1.6 });
+  else if (pat === 'fan') { b.fan = { n:2 + ph, t:.5 }; b.castAt = S.t; }
+  else if (pat === 'blink') { b.blink = { ph:0, t:0 }; SFX.bx(B.snd.charge, 1, 200); smoke(b.x, b.y, 8, 36, B.mist); }
+}
+// each ground attack lands on its own: what it does, how it looks and how it sounds
+function bossFxTick(b, B, f, ph, dt) {
+  const P = S.p, el = b.realm, enraged = ph === 2;
+  if (f.k === 'pull') { f.x = b.x; f.y = b.y;
+    const on = f.t >= f.wind && f.t < f.wind + f.dur, d = Math.hypot(P.x - f.x, P.y - f.y) || 1;
+    if (on && !f.started) { f.started = true; SFX.bx(B.snd.sig, 1, 400); S.shake = Math.max(S.shake, .25); }
+    if (on) {
+      if (!S.dash && !hsOn() && !S.bloom) { const k = (enraged ? 150 : 118) * Math.min(1, 140 / Math.max(140, d * .5)); P.x -= (P.x - f.x) / d * k * dt; P.y -= (P.y - f.y) / d * k * dt; }
+      if ((f.pt = (f.pt || 0) - dt) <= 0) { f.pt = .03; const an = rnd(0, TAU), r = rnd(260, 460); fx({ k:'drop', x:f.x + Math.cos(an) * r, y:f.y + Math.sin(an) * r * .7, z:4, vx:-Math.cos(an + .6) * r * 1.4, vy:-Math.sin(an + .6) * r, vz:0, life:.6, s:rnd(3, 6) }); }
+      if (d < f.core && (f.tick -= dt) <= 0) { f.tick = .5; if (ouch(15, f.x, f.y, { push:80, el, src:'undertow' })) drops(P.x, P.y, 8, 200); } }
+    if (f.t >= f.wind + f.dur && !f.done) { f.done = true; const n = 14 + ph * 2;
+      for (let i = 0; i < n; i++) { const an = i / n * TAU; S.eshots.push({ k:'bubble', x:f.x, y:f.y - 30, vx:Math.cos(an) * 210, vy:Math.sin(an) * 210, life:2.4, rot:0, el, dmg:9, boss:1 }); }
+      ring(f.x, f.y, 30, 380, B.glow, .5, 16, true); drops(f.x, f.y, 24, 420); SFX.bx(B.snd.slam, 1, 200); SFX.splash(); }
+    return; }
+  if (f.k === 'drum') {
+    if (f.t >= f.wind && !f.fired) { f.fired = true; b.beatAt = S.t; SFX.bx(B.snd.sig, 1, 120); SFX.boom(false); S.shake = Math.max(S.shake, .3); ring(f.x, f.y, 40, 200, '#FFB050', .3, 22, true); flames(f.x, f.y + 30, 10, 60, 40); }
+    if (f.fired && !f.hit) { const R = 60 + (f.t - f.wind) * f.spd, d = Math.hypot(P.x - f.x, P.y - f.y);
+      if (Math.abs(d - R) < 22 + P.r * .4 && angGap(Math.atan2(P.y - f.y, P.x - f.x), f.gap) > f.gw / 2) { f.hit = true; if (ouch(22, f.x, f.y, { push:70, el, src:'drums' })) flames(P.x, P.y, 6, 20, 30); } }
+    return; }
+  if (f.k === 'boulder') {
+    if (f.t < f.wind) return;
+    if (!f.rolling) { f.rolling = true; SFX.bx(B.snd.sig, 1, 250); S.shake = Math.max(S.shake, .2); }
+    const q = (f.t - f.wind) * f.spd, x = f.x + f.dx * q, y = f.y + f.dy * q; f.bx = x; f.by = y;
+    if ((f.dt = (f.dt || 0) - dt) <= 0) { f.dt = .05; smoke(x, y + 30, 2, 34, B.mist); if (Math.random() < .4) debris(x, y + 30, 1, 160); }
+    if (!f.hit && Math.hypot(P.x - x, P.y - y) < f.r + P.r * .6) { f.hit = true; if (ouch(26, x, y, { push:130, shake:.4, el, src:'boulders' })) debris(P.x, P.y, 8, 260); }
+    return; }
+  if (f.done || f.t < f.wind) return;
+  f.done = true;
+  const inside = inGround(P.x, P.y, f.x, f.y, f.r + P.r * .5);
+  if (f.k === 'spike') { landSpike(b, B, f); if (inside && ouch(f.line ? 20 : 24, f.x, f.y, { push:50, el, src:f.line ? 'roots' : f.skin === 'mortar' ? 'mortar' : 'spikes' })) S.hitstop = .07; }
+  else if (f.k === 'slash') { for (let i = 0; i < 3; i++) ring(f.x, f.y, 10 + i * 20, f.r * (1 + i * .15), i ? '#FFFFFF' : B.glow, .35 + i * .08, 10, true); stars(f.x, f.y, 18, '#FFFFFF', 420); SFX.shing(); S.shake = Math.max(S.shake, .3);
+    if (inside && ouch(22, f.x, f.y, { push:100, el, src:'blink' })) S.hitstop = .08; }
+  else if (f.k === 'toll') { b.tollAt = S.t; for (let i = 0; i < 4; i++) ring(f.x, f.y, 30 + i * 30, f.r * (1.1 + i * .25), i % 2 ? '#FFFFFF' : B.glow, .5 + i * .15, 18 - i * 3, true);
+    flash(f.x, f.y - 60, 420, '#FFFFFF', .25); SFX.bx(B.snd.sig, 1, 300); S.shake = Math.max(S.shake, .55); S.hitstop = Math.max(S.hitstop || 0, .06);
+    if (inside && ouch(16, f.x, f.y, { push:120, slow:1.8, el, src:'toll' })) S.hitstop = .1;
+    if (enraged) for (let i = 0; i < 10; i++) { const an = i / 10 * TAU; S.eshots.push({ k:'blade', x:f.x, y:f.y - 40, vx:Math.cos(an) * 240, vy:Math.sin(an) * 240, life:2.6, rot:0, el, dmg:9, boss:1 }); } }
+  else { b.slamAt = S.t; ring(f.x, f.y, 20, f.r * 1.15, B.glow, .5, 16, true); SFX.stomp(); SFX.bx(B.snd.slam, 1, 200); S.shake = Math.max(S.shake, .45);
+    if (el === 'water') drops(f.x, f.y, 26, 460); else if (el === 'wood') leaves(f.x, f.y, 18, 380); else if (el === 'fire') flames(f.x, f.y, 14, f.r * .6, 40); else if (el === 'metal') stars(f.x, f.y, 20, '#FFFFFF', 420);
+    debris(f.x, f.y, el === 'earth' ? 26 : 12, 360);
+    if (inside && ouch(28, f.x, f.y, { push:110, el, src:'stomp' })) S.hitstop = .09;
+    const n = 10 + ph * 4; for (let i = 0; i < n; i++) { const an = i / n * TAU; S.eshots.push({ k:B.shot, x:b.x, y:b.y, vx:Math.cos(an) * 230, vy:Math.sin(an) * 230, life:2.6, rot:an, el, boss:1 }); } }
+}
+// a ground strike, dressed in its boss's element
+function landSpike(b, B, f) {
+  const sp = (c, n, s) => { for (let i = 0; i < n; i++) { const an = i / n * TAU; fx({ k:'spike', x:f.x + Math.cos(an) * f.r * .45, y:f.y + Math.sin(an) * f.r * .3, life:.7, s, c, rot:an }); } };
+  if (f.skin === 'geyser') { sp('#9FDCFF', 6, 48); drops(f.x, f.y, 16, 380); smoke(f.x, f.y - 20, 5, 40, '200,235,255'); SFX.splash(); SFX.bx('water-wall', 2, 300); }
+  else if (f.skin === 'root') { sp('#6FAE3A', 5, 46); sp('#4A2E1A', 3, 30); leaves(f.x, f.y, 5, 220); debris(f.x, f.y, 5, 220); SFX.bx('wood-roots', 2, 260); SFX.thud(false); }
+  else if (f.skin === 'mortar') { flash(f.x, f.y, 260, '#FFB050', .25); flames(f.x, f.y, 10, f.r * .6, 36); stars(f.x, f.y - 30, 18, '#FFE08A', 420); smoke(f.x, f.y, 5, 40, '90,60,50'); hazard('cinder', f.x, f.y, 40, 1.8, 5); SFX.boom(true); SFX.firework(); }
+  else if (f.skin === 'sink') { decal({ k:'crack', x:f.x, y:f.y, r:f.r * 1.1, life:5 }); debris(f.x, f.y, 14, 320); smoke(f.x, f.y, 6, 44, '160,130,90'); SFX.bx('earth-quake', 2, 300); S.shake = Math.max(S.shake, .25); }
+  else if (f.skin === 'sword') { sp('#E6EEF4', 4, 54); stars(f.x, f.y - 20, 12, '#FFFFFF', 300); ring(f.x, f.y, 10, f.r, '#FFFFFF', .3, 8, true); SFX.shing(); }
+  else { sp('#BFE6FF', 6, 42); shards(f.x, f.y, '#DDF1FF', 8, 260); SFX.spikes(); }
 }
 
 /* ================= creature tricks ================= */
 // every attack winds up first, with a red circle or lane on the ground, so a watchful player can always step clear
 // A, after play: "the boss hits feel too inconsequential … makes it unnecessary to look for lives". A charge now takes about
 // a quarter of your health on Level 1 and a third by Level 5, so four or five hits end it and the arena hearts matter.
+const BOSS_SRC = new Set(['spikes', 'stomp', 'charge', 'undertow', 'roots', 'mortar', 'drums', 'boulders', 'toll', 'blink']);
 const bossHit = () => [1.5, 1.7, 1.9, 2, 2.1][S.level - 1];   // the first bosses teach; the later ones punish
 const lvHit = () => S.level === 1 ? .8 : 1.1;              // level 1's creatures bite softer while you learn
 // tap to break out (playtest 1: "I want one way to create a big hole through the middle", and Abby kept tapping to see
@@ -2970,9 +3129,10 @@ function breakOut() {
 }
 function ouch(dmg, fx, fy, o = {}) {
   const P = S.p; if (P.hurt > 0 || S.bloom || hsOn()) return false;
-  const hit = dmg * armourVs(o.el) * (o.src === 'spikes' || o.src === 'stomp' || o.src === 'charge' ? bossHit() : lvHit());
+  const hit = dmg * armourVs(o.el) * (BOSS_SRC.has(o.src) ? bossHit() : lvHit());
   P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1; P.rx = (P.x - fx) / d * 14; P.ry = (P.y - fy) / d * 14;
-  if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30); }
+  if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30);
+    if (S.arena) { const A = S.arena, q = Math.hypot(P.x - A.x, P.y - A.y), lim = A.r - 34; if (q > lim) { P.x = A.x + (P.x - A.x) / q * lim; P.y = A.y + (P.y - A.y) / q * lim; } } }
   if (o.slow) P.slowT = Math.max(P.slowT || 0, o.slow);
   P.hp -= hit; S.shake = Math.max(S.shake, o.shake || .12); S.pet.hitAt = S.t; S.lastHit = { src:o.src || 'trap', el:o.el, kid:o.kid };
   floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt();
@@ -2981,6 +3141,7 @@ function ouch(dmg, fx, fy, o = {}) {
 }
 // your Keeper has your spirit animal's element: creatures whose element beats yours hit harder, the rest hit softer
 function armourVs(el) { let m = 1 - (S.gifts.rooted || 0) * .08; if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
+const SHOT_HIT = { bubble:'#7FC4FF', thorn:'#7FCF4A', ember:'#FFB050', pebble:'#C8A060', blade:'#E6EEF4' };
 function hazard(k, x, y, r, life, dmg) { if (S.hz.length < 60) S.hz.push({ k, x, y, r, life, t:0, dmg, tick:0, rot:rnd(0, TAU) }); }
 function brain(e, P, d, dt, s) {
   const K = e.K, a = e.act, ux = (P.x - e.x) / d, uy = (P.y - e.y) / d;
@@ -3027,7 +3188,7 @@ function strike(e, a) {
   if (a.k === 'spit') { const v = 240; S.eshots.push({ k:'bubble', x:e.x, y:e.y - 20, vx:(P.x - e.x) / d * v, vy:(P.y - e.y) / d * v, life:2.6, rot:0, dmg:6, slow:1.6, el:'water' }); SFX.pop(); return; }
   if (a.k === 'glint') { const base = Math.atan2(P.y - e.y, P.x - e.x); for (let i = -2; i <= 2; i++) { const an = base + i * .26; S.eshots.push({ k:'blade', x:e.x, y:e.y - 30, vx:Math.cos(an) * 270, vy:Math.sin(an) * 270, life:2.4, rot:0, dmg:10, el:'metal' }); } SFX.shing(); return; }
   if (a.k === 'circle') {
-    const inside = Math.hypot(P.x - a.x, P.y - a.y) < a.r + P.r * .5;
+    const inside = inGround(P.x, P.y, a.x, a.y, a.r + P.r * .5);
     ring(a.x, a.y, 16, a.r * 1.1, col, .45, 12, true); shards(a.x, a.y, col, 8, a.r * 1.6);
     if (a.bomb) {
       flash(a.x, a.y, a.r * 2.2, '#FF8A2A', .25); flames(a.x, a.y, 10, a.r * .8, 30); smoke(a.x, a.y, 8, a.r * .6, '90,60,50'); SFX.boom(true); S.shake = Math.max(S.shake, .3);
@@ -3237,7 +3398,7 @@ function update(dt) {
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
   for (const s of S.eshots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; s.rot += dt * 8;
-    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.boss ? 'spiral' : 'shot', el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, s.k === 'bubble' ? '#7FC4FF' : '#CFE9FF', 4, 160); SFX.hurt(); } }
+    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.src || (s.boss ? 'spiral' : 'shot'), el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, SHOT_HIT[s.k] || '#CFE9FF', 4, 160); SFX.hurt(); } }
   S.eshots = S.eshots.filter(s => s.life > 0);
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
@@ -3364,8 +3525,8 @@ function ringSprite(col) {
   x.fillStyle = 'rgba(0,0,0,.25)'; x.beginPath(); x.ellipse(48, 22, 42, 17, 0, 0, TAU); x.fill(); x.strokeStyle = col; x.lineWidth = 6; x.stroke();
   return RINGS[col] = c;
 }
-// boss fights fall into night: the shore darkens to deep indigo with a pool of light around the Keeper, the Warden
-// glows with its own cold light, aurora ribbons ripple overhead, spirit motes drift, and an enraged Warden calls lightning
+// boss fights fall into night: the realm darkens to deep indigo outside a moonlit arena, the boss glows with its own
+// light, aurora ribbons ripple overhead, spirit motes drift, and an enraged boss calls lightning
 function drawNight(cx, cy) {
   const n = S.night, P = S.p, px = (P.x - cx) * Z, py = (P.y - cy) * Z - 20, B = S.boss && !S.boss.dead ? S.boss : null;
   g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
@@ -3379,7 +3540,7 @@ function drawNight(cx, cy) {
   v.addColorStop(Math.min(.99, ar / R * 1.12), mix(wt, [118, 122, 196])); v.addColorStop(1, mix(wt, [40, 44, 112]));
   g.globalCompositeOperation = 'multiply'; g.fillStyle = v; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
   g.globalCompositeOperation = 'lighter';
-  if (B) glowAt((B.x - cx) * Z, (B.y - cy) * Z - B.size * .3 * Z, 420 * Z * 1.6, EL[B.el], (B.enraged ? .5 : .32) * n);
+  if (B) glowAt((B.x - cx) * Z, (B.y - cy) * Z - B.size * .3 * Z, 420 * Z * 1.6, bossOf(B).glow, (B.enraged ? .5 : .32) * n);
   glowAt(px, py, 240, '#FFD9A0', .22 * n);
   for (let k = 0; k < 3; k++) {   // the aurora
     const base = 150 + k * 46, gr = g.createLinearGradient(0, base - 40, 0, base + 90); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(.5, ['#36F5B8', '#7C6BFF', '#3FB8FF'][k]); gr.addColorStop(1, 'rgba(0,0,0,0)');
@@ -3396,49 +3557,167 @@ function drawNight(cx, cy) {
   const bt = S.bolt;
   if (bt && bt.t < .45) {   // lightning: a jagged white bolt from the sky to the arena, then the screen flares
     const k = 1 - bt.t / .45, tx = (bt.x - cx) * Z, ty = (bt.y - cy) * Z;
-    g.globalAlpha = .35 * k; g.fillStyle = '#C8D8FF'; g.fillRect(0, 0, W, H);
+    g.globalAlpha = .35 * k; g.fillStyle = bt.c || '#C8D8FF'; g.fillRect(0, 0, W, H);
     for (const [w, a] of [[14, .25], [6, .6], [2.5, 1]]) { g.globalAlpha = a * k; g.strokeStyle = w > 6 ? '#8FB0FF' : '#FFFFFF'; g.lineWidth = w; g.beginPath(); g.moveTo(tx + bt.seed[0] * 40, -10);
       for (let j = 1; j <= 9; j++) g.lineTo(tx + bt.seed[j] * 60 * (1 - j / 10), -10 + (ty + 10) * j / 9); g.stroke(); }
     glowAt(tx, ty, 260, '#BFD4FF', .8 * k);
   }
   g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
 }
-// the Warden is animated, not a gliding picture: it drifts between two hover frames, and every attack has its own pose
-// (rising with the staff overhead before a stomp, the slam itself, a crouch and a lunge for the charge, arms flung wide to
-// cast spikes, spirals and summons). Poses cross-fade, and squash, lean, bob and an icy aura keep it alive between them.
-function wardenPose(b) {
-  const a = b.act, quake = S.bossFx.find(f => f.k === 'quake'), spike = S.bossFx.some(f => f.k === 'spike' && !f.done);
-  if (a && a.k === 'lane') return a.ph === 0 ? ['w-dash', 'coil'] : ['w-dash', 'rush'];
-  if (quake && !quake.done) return ['w-up', 'rise'];
-  if (quake && quake.done) return ['w-slam', 'land'];
-  if (b.spiral > 0) return ['w-cast', 'spin'];
-  if (spike || S.t - (b.castAt ?? -9) < .7) return ['w-cast', 'cast'];
-  return [Math.sin(S.t * 2.4) > 0 ? 'w-f1' : 'b-warden', 'idle'];
+// a realm boss is animated, not a gliding picture: an idle with its own personality (the Drummer bounces like it can't
+// keep still, the Tyrant sways its weight, the Matron breathes heavy, the Lantern and the Sentinel hover), and every
+// attack has its own pose: rising before a slam, the slam itself, a crouch and a lunge for the charge, a cast for its
+// spells. Poses cross-fade, and squash, lean, bob and its aura keep it alive between them.
+const POSE_SCALE = { up:1.12, slam:1.08, dash:1.06, cast:1.02, '':1 };
+function bossPose(b) {
+  const a = b.act, F = S.bossFx, slam = F.find(f => f.k === 'quake' || f.k === 'toll'), drum = F.find(f => f.k === 'drum' && !f.fired && f.t >= 0);
+  if (b.blink) return ['cast', 'blink'];
+  if (a && a.k === 'lane') return a.ph === 0 ? ['dash', 'coil'] : ['dash', 'rush'];
+  if (slam && !slam.done) return ['up', 'rise', slam];
+  if (slam && slam.done) return ['slam', 'land', slam];
+  if (drum) return ['up', 'beat', drum];
+  if (S.t - (b.beatAt ?? -9) < .28) return ['slam', 'hit'];
+  if (F.some(f => f.k === 'pull' && !f.done)) return ['cast', 'whirl'];
+  if (b.spiral > 0) return ['cast', 'spin'];
+  if (b.fan || F.some(f => !f.done && (f.k === 'spike' || (f.k === 'boulder' && !f.rolling))) || S.t - (b.castAt ?? -9) < .7) return ['cast', 'cast'];
+  return ['', 'idle'];
 }
-function drawWarden(b, hk) {
-  let [name, mode] = wardenPose(b); if (!ok(IMG[name])) name = 'b-warden';
+// (the old Warden's poses stay as the fallback if a realm boss's art can't load)
+const poseImg = (b, p) => !p ? b.img : b.img === 'b-warden' ? 'w-' + p : b.img + '-' + p;
+function drawBoss(b, hk) {
+  const [p, mode, f] = bossPose(b); let name = poseImg(b, p); if (!ok(IMG[name])) name = b.img;
   if (name !== b.pose) { b.prev = b.pose; b.pose = name; b.poseAt = S.t; }
-  const k = Math.min(1, (S.t - (b.poseAt ?? -9)) / (mode === 'idle' ? .45 : .1)), s = b.size, P = S.p, a = b.act, col = EL[b.el];
-  let bob = Math.sin(S.t * 2.4) * 9, rot = Math.sin(S.t * 1.3) * .04, sx = 1 + Math.sin(S.t * 2.4) * .02, sy = 1 - Math.sin(S.t * 2.4) * .02, flip = P.x > b.x, ox = 0;
-  if (mode === 'coil') { const w = Math.min(1, a.t / a.wind), j = Math.sin(S.t * 46) * w; sx += w * .1; sy -= w * .12; ox = j * 5; bob = -6 * w; flip = a.dx < 0; }
-  if (mode === 'rush') { sx += .12; sy -= .06; rot = (a.dx >= 0 ? 1 : -1) * .1; flip = a.dx < 0; bob = 0; }
-  if (mode === 'rise') { const q = S.bossFx.find(f => f.k === 'quake'), w = Math.min(1, q.t / q.wind); sy += w * .12; sx -= w * .06; bob = 10 + w * 28; ox = Math.sin(S.t * 40) * w * 3; }
-  if (mode === 'land') { const q = S.bossFx.find(f => f.k === 'quake'), w = Math.max(0, 1 - (q.t - q.wind) / .3); sx += w * .18; sy -= w * .16; bob = -w * 8; }
-  if (mode === 'spin') { sx *= Math.cos(S.t * 9); rot = Math.sin(S.t * 18) * .06; }
+  const k = Math.min(1, (S.t - (b.poseAt ?? -9)) / (mode === 'idle' ? .3 : .1)), P = S.p, a = b.act, col = bossOf(b).glow, s = b.size * (POSE_SCALE[p] || 1), T = S.t;
+  let bob = 0, rot = 0, sx = 1, sy = 1, flip = P.x > b.x, ox = 0, al = 1;
+  // its idle, in character
+  if (b.realm === 'fire') { const h = Math.abs(Math.sin(T * 7)); bob = h * 18; rot = Math.sin(T * 3.5) * .08 + Math.sin(T * 53) * .012; sx = 1 + (1 - h) * .06; sy = 1 - (1 - h) * .06; ox = Math.sin(T * 41) * 1.5; }
+  else if (b.realm === 'wood') { rot = Math.sin(T * 1.6) * .06; bob = Math.abs(Math.sin(T * 1.6)) * 8; sy = 1 - Math.abs(Math.cos(T * 1.6)) * .03; }
+  else if (b.realm === 'earth') { sy = 1 + Math.sin(T * 1.8) * .03; sx = 1 - Math.sin(T * 1.8) * .02; bob = 2; }
+  else if (b.realm === 'metal') { bob = 10 + Math.sin(T * 1.2) * 8; rot = Math.sin(T * .9) * .03; }
+  else { bob = 12 + Math.sin(T * 1.8) * 12; rot = Math.sin(T * 1.1) * .05; sx = 1 + Math.sin(T * 2.4) * .02; sy = 1 - Math.sin(T * 2.4) * .02; }
+  if (mode === 'coil') { const w = Math.min(1, a.t / a.wind), j = Math.sin(T * 46) * w; sx = 1 + w * .1; sy = 1 - w * .12; ox = j * 5; bob = -6 * w; rot = 0; flip = a.dx < 0; }
+  if (mode === 'rush') { sx = 1.12; sy = .94; rot = (a.dx >= 0 ? 1 : -1) * .1; flip = a.dx < 0; bob = 0; }
+  if (mode === 'rise' || mode === 'beat') { const w = Math.min(1, f.t / f.wind); sy = 1 + w * .12; sx = 1 - w * .06; bob = (mode === 'beat' ? 6 : 10) + w * (mode === 'beat' ? 18 : 28); ox = Math.sin(T * 40) * w * 3; rot = 0; }
+  if (mode === 'land') { const w = Math.max(0, 1 - (f.t - f.wind) / .3); sx = 1 + w * .18; sy = 1 - w * .16; bob = -w * 8; rot = 0; }
+  if (mode === 'hit') { const w = Math.max(0, 1 - (T - b.beatAt) / .28); sx = 1 + w * .16; sy = 1 - w * .15; bob = 0; rot = 0; }
+  if (mode === 'whirl') { rot = Math.sin(T * 6) * .08; bob += 6; }
+  if (mode === 'spin') { sx *= Math.cos(T * 9); rot = Math.sin(T * 18) * .06; }
   if (mode === 'cast') { sx += .04; sy += .05; bob += 6; }
+  if (mode === 'blink') { const kk = b.blink; al = kk.ph === 0 ? Math.max(0, 1 - kk.t / .38) : Math.min(1, kk.t / .3); ox = Math.sin(T * 60) * 6 * (1 - al); }
   sx += hk * .05; sy -= hk * .04;
-  // its cold aura, brighter when enraged, and a shadow that shrinks as it rises
-  add(() => glowAt(b.x, b.y - s * .3 - bob, s * (b.enraged ? 2.4 : 1.9) * (1 + .05 * Math.sin(S.t * 5)), col, b.enraged ? .75 : .5));
-  g.fillStyle = 'rgba(0,10,30,.32)'; g.beginPath(); g.ellipse(b.x, b.y + b.r * .55, b.r * (1.5 - Math.max(0, bob) / 120), b.r * .45, 0, 0, TAU); g.fill();
-  const drawIm = (n, al) => { const im = IMG[n]; if (!ok(im) || al <= 0) return; g.globalAlpha = al; g.drawImage(im, -s / 2, -s * .62 - b.r * .5, s, s); };
-  g.save(); g.translate(b.x + ox, b.y + b.r * .5 - bob); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
+  // its aura, brighter when enraged, and a shadow that shrinks as it rises
+  add(() => glowAt(b.x, b.y - s * .35 - bob, s * (b.enraged ? 2.3 : 1.8) * (1 + .05 * Math.sin(T * 5)), col, (b.enraged ? .7 : .45) * (bossOf(b).aura || 1) * al));
+  g.globalAlpha = al; g.fillStyle = 'rgba(0,10,30,.34)'; g.beginPath(); g.ellipse(b.x, b.y + b.r * .55, b.r * (1.6 - Math.max(0, bob) / 120), b.r * .48, 0, 0, TAU); g.fill(); g.globalAlpha = 1;
+  const top = -s * .94, drawIm = (n, o) => { const im = IMG[n]; if (!ok(im) || o <= 0) return; g.globalAlpha = o * al; g.drawImage(im, -s / 2, top, s, s); };
+  g.save(); g.translate(b.x + ox, b.y + b.r * .55 - bob); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
   if (k < 1 && b.prev) drawIm(b.prev, 1 - k); drawIm(name, k < 1 && b.prev ? k : 1); g.globalAlpha = 1;
-  if (hk > 0) { const wh = silhouette(name, '#FFFFFF'); if (wh) { g.globalAlpha = hk * .22; g.drawImage(wh, -s / 2, -s * .62 - b.r * .5, s, s); } }
-  if (mode === 'coil' || mode === 'rise') { const rd = silhouette(name, '#FF3A2A'); if (rd) { g.globalAlpha = .3 * (.6 + .4 * Math.sin(S.t * 30)); g.drawImage(rd, -s / 2, -s * .62 - b.r * .5, s, s); } }
-  if (b.enraged) { const rg = silhouette(name, col); if (rg) { g.globalAlpha = .18 + .1 * Math.sin(S.t * 12); g.drawImage(rg, -s / 2, -s * .62 - b.r * .5, s, s); } }
+  if (hk > 0) { const wh = silhouette(name, '#FFFFFF'); if (wh) { g.globalAlpha = hk * .22 * al; g.drawImage(wh, -s / 2, top, s, s); } }
+  if (mode === 'coil' || mode === 'rise' || mode === 'beat') { const rd = silhouette(name, '#FF3A2A'); if (rd) { g.globalAlpha = .3 * (.6 + .4 * Math.sin(T * 30)) * al; g.drawImage(rd, -s / 2, top, s, s); } }
+  // (a silver boss on pale stone would wash to white, so the Sentinel rages in steel and keeps a fainter aura)
+  if (b.enraged) { const rg = silhouette(name, bossOf(b).rage || col); if (rg) { g.globalAlpha = (.18 + .1 * Math.sin(T * 12)) * al; g.drawImage(rg, -s / 2, top, s, s); } }
   g.globalAlpha = 1; g.restore();
-  // its eyes: two cold sparks that flare during wind-ups
-  if (mode === 'coil' || mode === 'rise' || mode === 'cast') add(() => glowAt(b.x, b.y - s * .5 - bob, 90 + Math.sin(S.t * 30) * 14, '#BFEFFF', .9));
+}
+// the signature attacks' ground shapes. Rings and whirlpools are true circles, because they hit as true circles; every
+// other red shape is an ellipse and hits as that ellipse (inGround).
+// attack warnings are soft and light, like the shots (A, 2026-10-04: "same goes for the attack warnings"): a red tint,
+// a red glow that fills from the middle as the attack winds up, a soft red halo and one thin coral rim that pulses.
+// No heavy dark outline, but still unmistakable on every ground, because fights must stay readable.
+function warnCircle(x, y, r, p, sq = .7) {
+  const pulse = .75 + .25 * Math.sin(S.t * 24), el = rr => { g.beginPath(); g.ellipse(x, y, rr, rr * sq, 0, 0, TAU); };
+  // all painted, not added, so the red stays red on green grass, gold sand and pale stone alike
+  g.fillStyle = 'rgba(255,40,30,.18)'; el(r); g.fill();
+  g.strokeStyle = `rgba(255,40,30,${.3 + .12 * pulse})`; g.lineWidth = 11; el(r); g.stroke();
+  if (p > .02) { g.save(); g.translate(x, y); g.scale(1, sq); const gr = g.createRadialGradient(0, 0, 0, 0, 0, r * p);
+    gr.addColorStop(0, 'rgba(255,40,30,.1)'); gr.addColorStop(1, `rgba(255,40,30,${.35 * pulse})`); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r * p, 0, TAU); g.fill(); g.restore(); }
+  g.strokeStyle = `rgba(255,${90 + 40 * pulse | 0},${70 + 30 * pulse | 0},.95)`; g.lineWidth = 2.5; el(r); g.stroke();
+}
+// the same for a lane, drawn in the lane's own frame (rotated so it runs along +x from 0 to L)
+function warnLane(L, W, p, dim = 1) {
+  const pulse = .75 + .25 * Math.sin(S.t * 24), R = W / 2, cap = () => { g.beginPath(); g.roundRect(0, -R, L, W, R); };
+  g.globalAlpha = dim; g.fillStyle = 'rgba(255,40,30,.16)'; cap(); g.fill(); g.strokeStyle = `rgba(255,40,30,${.28 + .1 * pulse})`; g.lineWidth = 10; cap(); g.stroke();
+  const gr = g.createLinearGradient(0, 0, L, 0); gr.addColorStop(0, `rgba(255,40,30,${.14 + .08 * p})`); gr.addColorStop(1, 'rgba(255,40,30,0)'); g.fillStyle = gr; cap(); g.fill();
+  if (p > .02) { g.save(); cap(); g.clip(); const sw = g.createLinearGradient(0, 0, L * p, 0); sw.addColorStop(0, 'rgba(255,40,30,0)'); sw.addColorStop(1, `rgba(255,40,30,${.35 * pulse})`); g.fillStyle = sw; g.fillRect(0, -R, L * p, W); g.restore(); }
+  g.strokeStyle = `rgba(255,${90 + 40 * pulse | 0},${70 + 30 * pulse | 0},.95)`; g.lineWidth = 2.5; g.setLineDash([16, 14]); g.lineDashOffset = -S.t * 70; cap(); g.stroke(); g.setLineDash([]);
+  g.strokeStyle = '#FFF4EE'; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
+  const n = Math.max(3, Math.round(L / 160)); for (let c = 0; c < n; c++) { const q = (c / n + S.t * .7) % 1, cx = R + q * (L - W); g.globalAlpha = Math.sin(q * Math.PI) * .8 * dim; g.beginPath(); g.moveTo(cx - 8, -10); g.lineTo(cx + 5, 0); g.lineTo(cx - 8, 10); g.stroke(); }
+  g.globalAlpha = 1; g.lineCap = 'butt'; g.lineJoin = 'miter';
+}
+// a great round boulder of amber stone, rolling, its cracks glowing with the Matron's own gold
+function drawBoulder(x, y, r, rot) {
+  add(() => glowAt(x, y, r * 3.2, '#E8B860', .35));
+  const gr = g.createRadialGradient(x - r * .35, y - r * .4, r * .1, x, y, r); gr.addColorStop(0, '#E2C08A'); gr.addColorStop(.55, '#A8783E'); gr.addColorStop(1, '#5A3A1A');
+  g.fillStyle = gr; g.strokeStyle = '#2A1808'; g.lineWidth = 4; g.beginPath();
+  for (let i = 0; i < 14; i++) { const a = i / 14 * TAU, rr = r * (1 + .05 * Math.sin(i * 2.7)); g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } g.closePath(); g.fill(); g.stroke();
+  g.save(); g.beginPath(); g.arc(x, y, r * .96, 0, TAU); g.clip(); g.translate(x, y); g.rotate(rot); g.lineCap = 'round';
+  const crack = (w, c) => { g.strokeStyle = c; g.lineWidth = w; g.beginPath(); g.moveTo(-r * .7, -r * .2); g.lineTo(-r * .2, -r * .05); g.lineTo(0, r * .35); g.lineTo(r * .45, r * .5); g.moveTo(-r * .2, -r * .05); g.lineTo(r * .25, -r * .45); g.lineTo(r * .7, -r * .3); g.moveTo(r * .1, r * .1); g.lineTo(r * .6, r * .05); g.stroke(); };
+  crack(7, 'rgba(40,20,4,.6)'); add(() => crack(3.5, '#FFD27A'));
+  g.restore();
+  g.fillStyle = 'rgba(255,240,210,.35)'; g.beginPath(); g.ellipse(x - r * .35, y - r * .45, r * .3, r * .16, -.5, 0, TAU); g.fill();
+}
+function drawBossFx(f) {
+  const p = Math.min(1, Math.max(0, f.t) / f.wind), pulse = .75 + .25 * Math.sin(S.t * 24), A = S.arena;
+  if (f.k === 'pull') {   // the Drowned Lantern's whirlpool: arms spiralling in, a red core where the cold bites
+    const on = f.t >= f.wind, fade = on ? Math.min(1, (f.wind + f.dur + .4 - f.t) / .4) : p;
+    g.lineCap = 'round';
+    for (let i = 0; i < 6; i++) { const base = i / 6 * TAU - S.t * 3.2; g.beginPath();
+      for (let r = 70; r <= 470; r += 20) { const an = base + r * .011, x = f.x + Math.cos(an) * r, y = f.y + Math.sin(an) * r; r === 70 ? g.moveTo(x, y) : g.lineTo(x, y); }
+      g.strokeStyle = `rgba(120,200,255,${.4 * fade})`; g.lineWidth = 12; g.stroke(); g.strokeStyle = `rgba(230,248,255,${.55 * fade})`; g.lineWidth = 3; g.stroke(); }
+    add(() => glowAt(f.x, f.y, 520, '#3F8FD8', .45 * fade));
+    g.globalAlpha = fade; warnCircle(f.x, f.y, f.core, on ? 1 : p, 1); g.globalAlpha = 1;
+    return; }
+  if (f.k === 'drum') {   // the Ember Drummer's ring of fire, with its one bright gap
+    const g0 = f.gap - f.gw / 2, g1 = f.gap + f.gw / 2, reach = A.r + 60;
+    if (!f.fired) {
+      add(() => { g.fillStyle = `rgba(255,226,140,${.2 + .12 * pulse})`; g.beginPath(); g.moveTo(f.x, f.y); g.arc(f.x, f.y, reach, g0, g1); g.closePath(); g.fill(); });
+      g.strokeStyle = `rgba(255,236,170,${.6 * p})`; g.lineWidth = 3; g.setLineDash([14, 12]); g.lineDashOffset = -S.t * 60; g.beginPath(); g.moveTo(f.x + Math.cos(g0) * 60, f.y + Math.sin(g0) * 60); g.lineTo(f.x + Math.cos(g0) * reach, f.y + Math.sin(g0) * reach); g.moveTo(f.x + Math.cos(g1) * 60, f.y + Math.sin(g1) * 60); g.lineTo(f.x + Math.cos(g1) * reach, f.y + Math.sin(g1) * reach); g.stroke(); g.setLineDash([]);
+      add(() => { g.strokeStyle = `rgba(255,70,40,${.35 + .25 * pulse})`; g.lineWidth = 14 * p + 4; g.beginPath(); g.arc(f.x, f.y, 60 + p * 30, g1, g0 + TAU); g.stroke(); g.strokeStyle = 'rgba(255,225,200,.9)'; g.lineWidth = 2.5; g.stroke(); });
+      return; }
+    const R = 60 + (f.t - f.wind) * f.spd, fade = Math.min(1, (reach - R) / 80 + .2);
+    if (R > reach + 40) return;
+    g.fillStyle = 'rgba(255,236,170,.08)'; g.beginPath(); g.moveTo(f.x, f.y); g.arc(f.x, f.y, reach, g0, g1); g.closePath(); g.fill();
+    g.lineCap = 'round'; g.globalAlpha = fade;
+    g.strokeStyle = 'rgba(200,40,10,.9)'; g.lineWidth = 30; g.beginPath(); g.arc(f.x, f.y, R, g1, g0 + TAU); g.stroke();
+    add(() => { g.strokeStyle = '#FF9A3A'; g.lineWidth = 18; g.beginPath(); g.arc(f.x, f.y, R, g1, g0 + TAU); g.stroke(); g.strokeStyle = '#FFF1C0'; g.lineWidth = 5; g.stroke(); });
+    const n = Math.max(8, R / 45 | 0), span = TAU - f.gw;
+    for (let i = 0; i <= n; i++) { const an = g1 + span * i / n, x = f.x + Math.cos(an) * R, y = f.y + Math.sin(an) * R; flameAt(x, y + 8, 30, .15, i * 1.7 + f.gap, fade * .9); }
+    g.globalAlpha = 1; return; }
+  if (f.k === 'boulder') {   // the Stone Matron's boulders: a lane first, then the boulder thunders down it
+    g.save(); g.translate(f.x, f.y); g.rotate(Math.atan2(f.dy, f.dx)); const L = f.len, W = f.w, R = W / 2;
+    const roll = f.t >= f.wind; warnLane(L, W, roll ? 1 : p, roll ? Math.max(0, .5 - (f.t - f.wind) * .35) : 1);
+    g.restore(); g.globalAlpha = 1;
+    if (roll && f.bx != null) { const r = f.r, q = (f.t - f.wind) * f.spd;
+      g.fillStyle = 'rgba(20,12,4,.35)'; g.beginPath(); g.ellipse(f.bx, f.by + r * .55, r * 1.05, r * .38, 0, 0, TAU); g.fill();
+      drawBoulder(f.bx, f.by - r * .45, r, q / r); }
+    return; }
+  if (f.done) return;
+  // every other attack: a red shape on the ground that fills up, dressed for its boss
+  warnCircle(f.x, f.y, f.r, p);
+  if (f.k === 'toll') for (let i = 0; i < 3; i++) { const q = (i / 3 + S.t * .9) % 1; g.strokeStyle = `rgba(255,255,255,${.5 * Math.sin(q * Math.PI)})`; g.lineWidth = 3; g.beginPath(); g.ellipse(f.x, f.y, f.r * q, f.r * .7 * q, 0, 0, TAU); g.stroke(); }
+  if (f.k === 'slash') { g.strokeStyle = `rgba(255,255,255,${.4 + .4 * pulse})`; g.lineWidth = 4; g.lineCap = 'round'; for (const d of [-1, 1]) { g.beginPath(); g.moveTo(f.x - f.r * .6, f.y - d * f.r * .4); g.lineTo(f.x + f.r * .6, f.y + d * f.r * .4); g.stroke(); } }
+  if (f.skin === 'mortar' && f.sx != null) {   // the firework shell arcing in from the drum
+    const x = f.sx + (f.x - f.sx) * p, y = f.sy + (f.y - f.sy) * p - Math.sin(p * Math.PI) * 260;
+    add(() => glowAt(x, y, 90, '#FF9A3A', .9)); g.fillStyle = '#FFE6A0'; g.beginPath(); g.arc(x, y, 9, 0, TAU); g.fill();
+    if (Math.random() < .5) fx({ k:'star', x, y, vx:rnd(-30, 30), vy:rnd(-30, 30), drag:2, life:.35, s:5, c:'#FFB050' }); }
+  if (f.skin === 'sword') {   // a sword falling point first
+    const y = f.y - (1 - p) * 340 - 30; g.save(); g.translate(f.x, y); glowAt(0, -30, 120, '#C9D3DB', .55 * p);
+    g.globalAlpha = Math.min(1, p * 2); g.fillStyle = '#E6EEF4'; g.strokeStyle = '#2A3440'; g.lineWidth = 2.5;
+    g.beginPath(); g.moveTo(0, 30); g.lineTo(-7, 6); g.lineTo(-7, -46); g.lineTo(7, -46); g.lineTo(7, 6); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#7A8794'; g.fillRect(-16, -52, 32, 7); g.strokeRect(-16, -52, 32, 7); g.fillStyle = '#4A3A2A'; g.fillRect(-4, -72, 8, 20); g.restore(); g.globalAlpha = 1; }
+}
+// each shot glows in its light colour around a deeper body of the same hue, so it reads on bright stone and sand too
+const SHOT_BODY = { '#6FC8FF':'#2F8FE8', '#8FE060':'#3F9A22', '#FF8A3A':'#F0501A', '#F0C060':'#C8861A', '#C9D3DB':'#5E6B78' };
+const SHOT_COL = { water:'#6FC8FF', wood:'#8FE060', fire:'#FF8A3A', earth:'#F0C060', metal:'#C9D3DB', bubble:'#6FC8FF', thorn:'#8FE060', ember:'#FF8A3A', pebble:'#F0C060', blade:'#C9D3DB' };
+function energy(x, y, vx, vy, col, sz, foe, ring) {
+  const v = Math.hypot(vx, vy) || 1, ux = vx / v, uy = vy / v, pulse = .5 + .5 * Math.sin(S.t * 14 + x * .05);
+  // the halo and tail are painted, not added, so they keep their colour on sand and pale stone instead of washing white
+  for (let i = 4; i >= 1; i--) glowAt(x - ux * i * sz * .7, y - uy * i * sz * .7, sz * (2.4 - i * .35), col, .5 - i * .08);
+  glowAt(x, y, sz * 3.4, col, .75);
+  // a body of saturated colour under the white core, so the element still reads against a bright aura
+  g.fillStyle = SHOT_BODY[col] || col; g.beginPath(); g.arc(x, y, sz * .78, 0, TAU); g.fill();
+  // danger has one sign your own shots never carry: a pulsing coral-red rim, the same red as the ground warnings
+  if (foe) { g.strokeStyle = `rgba(255,70,50,${.7 + .3 * pulse})`; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, sz * (1.05 + .12 * pulse), 0, TAU); g.stroke();
+    if (ring) { g.strokeStyle = 'rgba(232,246,255,.8)'; g.lineWidth = 1.5; g.beginPath(); g.arc(x, y, sz * .9, 0, TAU); g.stroke(); } }
+  add(() => glowAt(x, y, sz * 1.2, '#FFFFFF', .6)); g.fillStyle = '#FFFFFF'; g.beginPath(); g.arc(x, y, sz * .32, 0, TAU); g.fill();
 }
 function silhouette(name, col) {
   const key = name + col; if (SIL[key]) return SIL[key];
@@ -3551,7 +3830,7 @@ function draw() {
   // in the boss arena the camera follows you, held within the arena so its edge stays in view
   // (playtest 1: with the camera locked to the arena's centre, its top hid under the HUD and so did the player)
   const AR = S.arena, fxp = AR ? clamp(P.x, AR.x - AR.r * .6, AR.x + AR.r * .6) : P.x, fyp = AR ? clamp(P.y, AR.y - AR.r * .6, AR.y + AR.r * .6) : P.y;
-  // during a Warden's change the camera glides to it instead
+  // during a boss's change the camera glides to it instead
   const TF = S.tf, tx = TF ? TF.x : fxp, ty = TF ? TF.y - TF.s * .3 : fyp, ease = TF ? .06 : .2;
   camX += (tx - VW / 2 - camX) * ease; camY += (ty - VH / 2 - camY) * ease;
   camX = clamp(camX, 0, WORLD - VW); camY = clamp(camY, 0, WORLD - VH);
@@ -3580,9 +3859,11 @@ function draw() {
   if (S.arena) {
     const A = S.arena;
     g.fillStyle = 'rgba(8,16,24,.5)'; g.beginPath(); g.rect(cx, cy, VW, VH); g.arc(A.x, A.y, A.r, 0, TAU); g.fill('evenodd');
-    add(() => { g.strokeStyle = 'rgba(140,200,255,.35)'; g.lineWidth = 18; g.beginPath(); g.arc(A.x, A.y, A.r, 0, TAU); g.stroke(); });
-    for (let i = 0; i < 64; i++) { const a = i / 64 * TAU, h = 26 + (i % 3) * 12, bx = A.x + Math.cos(a) * A.r, by = A.y + Math.sin(a) * A.r;
-      g.fillStyle = i % 2 ? '#CFE6F7' : '#9CC3E0'; g.strokeStyle = '#1A2A3A'; g.lineWidth = 2; g.beginPath(); g.moveTo(bx - 9, by); g.lineTo(bx, by - h); g.lineTo(bx + 9, by); g.closePath(); g.fill(); g.stroke(); }
+    // its rim of crystals takes the realm boss's colours
+    const BB = bossOf(S.boss), n = Math.round(A.r / 7);
+    add(() => { g.globalAlpha = .35; g.strokeStyle = BB.glow; g.lineWidth = 18; g.beginPath(); g.arc(A.x, A.y, A.r, 0, TAU); g.stroke(); g.globalAlpha = 1; });
+    for (let i = 0; i < n; i++) { const a = i / n * TAU, h = 26 + (i % 3) * 12, bx = A.x + Math.cos(a) * A.r, by = A.y + Math.sin(a) * A.r;
+      g.fillStyle = BB.edge[i % 2]; g.strokeStyle = '#1A2A3A'; g.lineWidth = 2; g.beginPath(); g.moveTo(bx - 9, by); g.lineTo(bx, by - h); g.lineTo(bx + 9, by); g.closePath(); g.fill(); g.stroke(); }
     g.lineWidth = 1;
   }
   // Golden Bell: a rotating bagua under your feet
@@ -3641,27 +3922,11 @@ function draw() {
     else { g.globalAlpha = k * .8; g.fillStyle = 'rgba(60,20,10,.4)'; g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r * .6, 0, 0, TAU); g.fill(); const w = h.r * 1.1 * (1 + Math.sin(S.t * 18 + h.rot) * .1); g.drawImage(flameSprite(1), h.x - w / 2, h.y - w * 1.1, w, w * 1.5); g.globalAlpha = 1; }
   }
   // the boss's ground attacks fill up in red first
-  if (S.bossFx) for (const f of S.bossFx) { if (f.done || f.t < 0) continue; const p = Math.min(1, f.t / f.wind), pulse = .75 + .25 * Math.sin(S.t * 24);
-    g.fillStyle = 'rgba(255,30,20,.28)'; g.beginPath(); g.ellipse(f.x, f.y, f.r, f.r * .7, 0, 0, TAU); g.fill();
-    g.fillStyle = `rgba(255,50,30,${.5 * pulse})`; g.beginPath(); g.ellipse(f.x, f.y, f.r * p, f.r * .7 * p, 0, 0, TAU); g.fill();
-    g.strokeStyle = 'rgba(90,0,0,.85)'; g.lineWidth = 7; g.beginPath(); g.ellipse(f.x, f.y, f.r, f.r * .7, 0, 0, TAU); g.stroke();
-    g.strokeStyle = `rgba(255,${120 + 100 * pulse | 0},90,1)`; g.lineWidth = 3; g.stroke(); }
-  // attack warnings: a bold red shape fills up, then the attack lands
-  for (const e of S.en) { const a = e.act; if (!a || a.ph !== 0 || e.dead) continue; const p = Math.min(1, a.t / a.wind), pulse = .75 + .25 * Math.sin(S.t * 24);
-    const edge = path => { g.strokeStyle = 'rgba(90,0,0,.85)'; g.lineWidth = 7; path(); g.stroke(); g.strokeStyle = `rgba(255,${120 + 100 * pulse | 0},90,1)`; g.lineWidth = 3; path(); g.stroke(); };
-    if (a.k === 'circle') { const el = (r) => () => { g.beginPath(); g.ellipse(a.x, a.y, r, r * .7, 0, 0, TAU); };
-      g.fillStyle = 'rgba(255,30,20,.28)'; el(a.r)(); g.fill(); g.fillStyle = `rgba(255,50,30,${.5 * pulse})`; el(a.r * p)(); g.fill(); edge(el(a.r)); }
-    else if (a.k === 'lane') {   // a soft, rounded lane: a warm glow that fades toward its end, a glow that fills it, drifting chevrons
-      g.save(); g.translate(e.x, e.y); g.rotate(Math.atan2(a.dy, a.dx)); const L = a.len + e.r, W = a.w, R = W / 2;
-      const cap = () => { g.beginPath(); g.moveTo(R, -R); g.lineTo(L - R, -R); g.arc(L - R, 0, R, -Math.PI / 2, Math.PI / 2); g.lineTo(R, R); g.arc(R, 0, R, Math.PI / 2, Math.PI * 1.5); g.closePath(); };
-      const gr = g.createLinearGradient(0, 0, L, 0); gr.addColorStop(0, `rgba(255,90,70,${.26 + .12 * p})`); gr.addColorStop(1, 'rgba(255,90,70,.06)');
-      g.fillStyle = gr; cap(); g.fill();
-      g.save(); cap(); g.clip(); const sw = g.createLinearGradient(0, 0, Math.max(1, L * p), 0); sw.addColorStop(0, 'rgba(255,110,80,0)'); sw.addColorStop(1, `rgba(255,130,100,${.42 * pulse})`); g.fillStyle = sw; g.fillRect(0, -R, L * p, W); g.restore();
-      g.strokeStyle = `rgba(255,190,170,${.45 + .2 * pulse})`; g.lineWidth = 2.5; g.setLineDash([16, 14]); g.lineDashOffset = -S.t * 70; cap(); g.stroke(); g.setLineDash([]);
-      g.strokeStyle = 'rgba(255,240,232,1)'; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
-      for (let c = 0; c < 3; c++) { const q = (c / 3 + S.t * .7) % 1, cx = R + q * (L - W); g.globalAlpha = Math.sin(q * Math.PI) * .7; g.beginPath(); g.moveTo(cx - 8, -10); g.lineTo(cx + 5, 0); g.lineTo(cx - 8, 10); g.stroke(); }
-      g.globalAlpha = 1; g.lineCap = 'butt'; g.lineJoin = 'miter'; g.restore(); }
-  }
+  if (S.bossFx) for (const f of S.bossFx) if (f.t >= 0) drawBossFx(f);
+  // attack warnings: a red light fills up on the ground, then the attack lands
+  for (const e of S.en) { const a = e.act; if (!a || a.ph !== 0 || e.dead) continue; const p = Math.min(1, a.t / a.wind);
+    if (a.k === 'circle') warnCircle(a.x, a.y, a.r, p);
+    else if (a.k === 'lane') { g.save(); g.translate(e.x, e.y); g.rotate(Math.atan2(a.dy, a.dx)); warnLane(a.len + e.r, a.w, p); g.restore(); } }
   g.lineWidth = 1;
   // enemies: a coloured ring at the feet names their element
   const list = S.en.filter(e => inView(e.x, e.y, e.size)).sort((a, b) => a.y - b.y);
@@ -3683,7 +3948,7 @@ function draw() {
       if (S.bloom) { const b = AU.beat(), q = Math.pow(1 - b.ph, 6); rot = Math.sin(b.ph * TAU + e.ph) * .18; hop = Math.pow(1 - b.ph, 4) * 14; sx = 1 + q * .12; sy = 1 - q * .14; } }
     const flip = e.own ? (e.K.face === -1 && toward > 0) : (e.type === 'wolf' && toward > 0);
     if (e.own && !e.boss && fly) { g.fillStyle = 'rgba(10,20,30,.25)'; g.beginPath(); g.ellipse(e.x, e.y + e.r * .6, e.r * .9, e.r * .35, 0, 0, TAU); g.fill(); }
-    if (e.boss) { drawWarden(e, hk); continue; }
+    if (e.boss) { drawBoss(e, hk); continue; }
     g.save(); g.translate(e.x, e.y + e.r * .5 - hop); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
     g.drawImage(im, -s / 2, -s * .62 - e.r * .5, s, s);
     if (hk > 0) { const wh = silhouette(art, '#FFFFFF'); if (wh) { g.globalAlpha = hk * (e.boss ? .22 : .9); g.drawImage(wh, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
@@ -3856,20 +4121,12 @@ function draw() {
     g.fillStyle = gr; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, Math.max(10, 78 * hb), 10, 5); g.fill();
     g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.roundRect(P.x - 36, P.y + 44.5, Math.max(4, 78 * hb - 6), 3, 2); g.fill(); }
   }
-  // enemy ice shards
-  // spirit animal shots, each in its element
-  for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue;
-    if (s.el === 'water') { add(() => glowAt(s.x, s.y, 50, '#5FB4FF', .55)); g.fillStyle = 'rgba(110,190,255,.75)'; g.strokeStyle = '#E8F6FF'; g.lineWidth = 3; g.beginPath(); g.arc(s.x, s.y, 11, 0, TAU); g.fill(); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.arc(s.x - 4, s.y - 4, 3, 0, TAU); g.fill(); }
-    else if (s.el === 'wood') { g.save(); g.translate(s.x, s.y); g.rotate(s.rot); g.fillStyle = '#7FCF4A'; g.strokeStyle = '#1A3A10'; g.lineWidth = 2.5; for (const q of [0, Math.PI]) { g.beginPath(); g.ellipse(Math.cos(q) * 9, Math.sin(q) * 9, 11, 5, q, 0, TAU); g.fill(); g.stroke(); } g.restore(); }
-    else if (s.el === 'fire') { add(() => glowAt(s.x, s.y, 60, '#FF7A2A', .6)); g.save(); g.translate(s.x, s.y); g.rotate(Math.atan2(s.vy, s.vx) - Math.PI / 2); flameAt(0, 0, 24, .1, s.x); g.restore(); g.fillStyle = '#FFF6D0'; g.beginPath(); g.arc(s.x, s.y, 6, 0, TAU); g.fill(); }
-    else if (s.el === 'earth') { g.save(); g.translate(s.x, s.y); g.rotate(s.rot); g.fillStyle = '#B8863A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); for (let i = 0; i < 7; i++) { const r = 11 + (i % 2) * 3; g.lineTo(Math.cos(i * TAU / 7) * r, Math.sin(i * TAU / 7) * r); } g.closePath(); g.fill(); g.stroke(); g.restore(); }
-    else { add(() => glowAt(s.x, s.y, 36, '#FFE58A', .5)); g.save(); g.translate(s.x, s.y); g.rotate(Math.atan2(s.vy, s.vx)); g.fillStyle = '#FFE58A'; g.strokeStyle = '#3A2A06'; g.lineWidth = 2; g.beginPath(); g.moveTo(14, 0); g.lineTo(-10, -3.5); g.lineTo(-10, 3.5); g.closePath(); g.fill(); g.stroke(); g.restore(); }
-  }
+  // projectiles are light, not objects (A, 2026-10-04: "a lighter energy type" instead of the hard shapes): a white
+  // core, a halo in the element's colour and a short comet tail. Enemy and boss shots are larger and carry a pulsing
+  // coral-red rim, so they read as danger beside your own; a bubble that slows you keeps an inner ring.
+  for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.el] || '#C9D3DB', 9, false); }
+  for (const s of S.eshots) { if (!inView(s.x, s.y, 40)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.k] || SHOT_COL[s.el] || '#7FC4FF', s.boss ? 16 : 14, true, s.k === 'bubble'); }
   g.lineWidth = 1;
-  for (const s of S.eshots) {
-    if (s.k === 'bubble') { add(() => glowAt(s.x, s.y, 54, '#5FB4FF', .6)); g.fillStyle = 'rgba(120,200,255,.55)'; g.strokeStyle = '#E8F6FF'; g.lineWidth = 3; g.beginPath(); g.arc(s.x, s.y, 14, 0, TAU); g.fill(); g.stroke(); g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.arc(s.x - 5, s.y - 5, 4, 0, TAU); g.fill(); continue; }
-    if (s.k === 'blade') { add(() => glowAt(s.x, s.y, 50, '#FFE6A0', .5)); g.save(); g.translate(s.x, s.y); g.rotate(s.rot * 2); g.fillStyle = '#E6EEF4'; g.strokeStyle = '#2A3440'; g.lineWidth = 2.5; g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? 6 : 17; g.lineTo(Math.cos(i * TAU / 8) * r, Math.sin(i * TAU / 8) * r); } g.closePath(); g.fill(); g.stroke(); g.fillStyle = '#E6B23A'; g.beginPath(); g.arc(0, 0, 4, 0, TAU); g.fill(); g.restore(); continue; }
-    add(() => glowAt(s.x, s.y, 50, '#7FC4FF', .7)); g.save(); g.translate(s.x, s.y); g.rotate(s.rot); g.fillStyle = '#E6F6FF'; g.strokeStyle = '#2A5A8A'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(14, 0); g.lineTo(0, 6); g.lineTo(-14, 0); g.lineTo(0, -6); g.closePath(); g.fill(); g.stroke(); g.restore(); }
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
   if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
@@ -4253,6 +4510,7 @@ function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
+  if (id.startsWith('boss-')) { const b = id.slice(5); return `<div class="bossart" style="--c:${BOSSES[b].glow}"><img src="art4/bosses/${b}.png?v=8" alt=""><img class="mn" src="art4/e-${b}-m.png?v=8" alt=""></div>`; }
   if (TIP_ART[id]) return `<img class="tipart" src="art4/tips/${TIP_ART[id]}.jpg?v=8" alt="">`;
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
@@ -4262,13 +4520,15 @@ function showCoach(c) {
   // every tip card shows a picture made for it, never a live snapshot of play (A, 2026-10-04: snapshots caught
   // flashes, empty ground or the wrong moment, and "I can't waste people's time with these inconsistencies")
   $('#tipT').textContent = c.title; $('#tipP').textContent = c.text; $('#tipOk').textContent = COACH.q.length ? 'Next' : 'OK';
-  $('#tipSnap').innerHTML = tipArt(c.id);
+  $('#tipSnap').innerHTML = tipArt(c.id); if (c.id.startsWith('boss-')) markSeen('_' + c.id);
   show('tipCard'); SFX.pop(); $('#tipOk').focus({ preventScroll:true });
 }
 function coachOk() {
   if (!COACH.cur) return;
   show(null);
-  hideCoach(); COACH.cur = null; SFX.select();
+  const was = COACH.cur.id; hideCoach(); COACH.cur = null; SFX.select();
+  // the spirit animal's awakening waits until the boss's card is closed, so the boss has the screen to itself first
+  if (was && was.startsWith('boss-') && S && !S.over && !S.bossWoke) { S.bossWoke = true; setTimeout(() => { if (S && !S.over) awaken(); }, 900); }
   if (COACH.q.length && !popupOpen()) { showCoach(COACH.q.shift()); return; }
   COACH.gap = 6;
   if (S && !S.over && !popupOpen()) startLoop();
@@ -4413,7 +4673,7 @@ function hud() {
   { const need = stoneNeed(), key = (freeMore ? 'F' : '') + stoneEls().map(el => S.qiStones[el] ? 'S' : Math.min(20, Math.floor((S.qi[el] || 0) / need * 20))).join(',');
     const row = $('#stoneRow'); if (row.dataset.k !== key) { row.dataset.k = key;
       row.innerHTML = ELS.filter(el => stoneEls().includes(el)).map(el => `<i class="sk${S.qiStones[el] ? ' got' : freeMore ? ' need' : ''}" style="--c:${EL[el]};--p:${Math.min(1, (S.qi[el] || 0) / need).toFixed(2)}">${S.qiStones[el] ? `<img src="art4/props/x-stone-${el}.png?v=8" alt="${ELNAME[el]} stone">` : ''}</i>`).join(''); } }
-  if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = `The Still Warden \u00b7 ${ELNAME[S.boss.el]}`; }
+  if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = bossOf(S.boss).name; $('#bossBar i').style.background = EL[S.boss.el]; }
 }
 function loop(now, id) {
   if (!running || id !== loopId) return;
@@ -4453,7 +4713,7 @@ function win() {
   $('#hud').hidden = true;
   S.txt = []; if (S.nums) S.nums = []; S.bolt = null; S.warn = null; S.shrines = []; S.chests = [];
   for (const e of S.en) if (!e.dead && !e.boss) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, '#CFE9FF', 160); }
-  const B = S.boss, T = S.tf = { t:0, x:B.x, y:B.y, el:B.el, s:B.size, flip:S.p.x > B.x, who:freedOf(B.el), cue:0, r:0 };
+  const B = S.boss, T = S.tf = { t:0, x:B.x, y:B.y, el:B.el, s:B.size, flip:S.p.x > B.x, who:freedOf(B.realm || B.el), img:ok(IMG[poseImg(B, 'up')]) ? IMG[poseImg(B, 'up')] : IMG[B.img], cue:0, r:0 };
   let last = performance.now();
   const at = (k, t, fn) => { if (T.cue === k && T.t >= t) { T.cue++; fn(); } };
   const step = now => {
@@ -4485,10 +4745,10 @@ function drawChange(T) {
   const a = T.t, s = T.s, cx = T.x, cy = T.y - s * .45, cam = S.cam || { x:0, y:0 };
   g.setTransform(DPR * Z, 0, 0, DPR * Z, -cam.x * DPR * Z, -cam.y * DPR * Z);
   const sprite = (img, x, y, w, alpha, flip) => { if (!ok(img)) return; const h = w * img.naturalHeight / img.naturalWidth; g.save(); g.globalAlpha = alpha; g.translate(x, y); if (flip) g.scale(-1, 1); g.drawImage(img, -w / 2, -h, w, h); g.restore(); };
-  // the Warden, shuddering harder as light breaks through it, then gone in the flash
+  // the boss, shuddering harder as light breaks through it, then gone in the flash
   if (a < 3.5) {
     const k = Math.min(1, a / 3.3), j = Math.sin(a * 52) * k * 9, lift = k * 18, fade = a < 3.3 ? 1 : 1 - (a - 3.3) / .2;
-    const img = ok(IMG['w-up']) ? IMG['w-up'] : IMG['b-warden'];
+    const img = T.img;
     sprite(img, T.x + j, T.y - lift, s * (1 - k * .08), fade, T.flip);
     g.globalCompositeOperation = 'lighter'; sprite(img, T.x + j, T.y - lift, s * (1 - k * .08), Math.min(.85, k * k) * fade, T.flip); g.globalCompositeOperation = 'source-over';
     // shafts of light breaking out of it
@@ -4529,8 +4789,16 @@ function defeatTip() {
     spikes:['Red circles mean spikes', 'Keep moving, and never stop inside one.'],
     stomp:['A big red ring means stomp', 'Run out of the ring before it slams down.'],
     spiral:['The spiral has gaps', 'Slip sideways into a gap instead of running away.'],
+    undertow:['Run against the whirlpool', 'When it spins, run away from its lantern. Only the red middle hurts.'],
+    roots:['Roots race in lines', 'Step sideways off the red line before the roots burst up.'],
+    drums:['Find the gap in the fire', 'Every ring of fire has one bright gap. Stand in it and the ring passes you by.'],
+    mortar:['Fireworks land in red circles', 'Keep moving when the shells fly, and never stop inside a circle.'],
+    boulders:['Stand between the lanes', 'Boulders only roll down the red lanes. Step into the space between them.'],
+    toll:['Leave the bell\'s ring', 'When the big red ring appears, run out of it before the bell rings.'],
+    blink:['It appears behind you', 'When it vanishes, keep moving: it slashes the spot where it lands.'],
+    fan:['Blades fly in fans', 'Move sideways into a gap between the blades.'],
     hug:['Keep your distance', "Your powers reach far. Circle it from outside its reach."] };
-  if (B && BOSS[H.src]) return { img:src('b-warden'), t:BOSS[H.src][0], p:BOSS[H.src][1] };
+  if (B && BOSS[H.src]) return { img:src(B.img), t:BOSS[H.src][0], p:BOSS[H.src][1] };
   if (H.el && eff(H.el, keeperEl) > 1) {
     const cs = weakTo(H.el), pw = Object.keys(POW).filter(id => cs.includes(POW[id].e)).slice(0, 2);
     return { img:crea || (pw[0] ? icon(POW[pw[0]].icon) : null), t:`${ELNAME[H.el]} beats ${ELNAME[keeperEl]}`,
@@ -4640,7 +4908,7 @@ function frostOf(img, fr) {
 function lose(fell) {
   S.over = true; running = false; AU.music(false); if (!fell) SFX.stomp();
   const B = S.boss && !S.boss.dead ? S.boss : null, WV = LV().waves, tip = defeatTip(); let title, line, frac;
-  if (B) { const left = B.hp / B.max; frac = 1 - left; title = left < .34 ? 'So close!' : 'Nearly there!'; line = `The Warden had only ${Math.max(1, Math.ceil(left * 100))}% left`; }
+  if (B) { const left = B.hp / B.max; frac = 1 - left; const nm = bossOf(B).name; title = left < .34 ? 'So close!' : 'Keep going, Keeper!'; line = left < .34 ? `${nm} is almost free` : left < .67 ? `${nm} is half beaten` : `${nm} is still strong`; }
   else if (S.waveIdx) { frac = S.waveIdx / (WV.length + 1); title = S.waveIdx >= WV.length ? 'Almost there!' : 'Keep going, Keeper!'; line = `You reached wave ${S.waveIdx} of ${WV.length}`; }
   else { frac = Math.min(1, S.t / 120) * .2; title = 'Keep going, Keeper!'; line = `You held on for ${Math.floor(S.t / 60)}:${String(Math.floor(S.t % 60)).padStart(2, '0')}`; }
   $('#riseImg').src = `art4/rise/k${keeper}.jpg?v=8`; $('#riseT').textContent = title; $('#riseProg').textContent = line;
@@ -4662,11 +4930,11 @@ function petProgHTML(r) {
 function results() {
   $('#hud').hidden = true;
   { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
-  { const f = freedOf(S.boss ? S.boss.el : 'water'), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `"${f.q} Thank you, Keeper."`; }
+  { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `"${f.q} Thank you, Keeper."`; }
   // three stars, and each one rewards the five elements without a word: free the shore, evolve a power (the gift of the
   // element that feeds it: the feeding cycle), and free creatures with the element that beats them (the controlling cycle)
   const sec = Math.floor(S.t), evoIds = Object.keys(S.evo);
-  const goals = [[S.won, 'Freed the shore'], [evoIds.length > 0, 'Evolved a power'], [S.thawed > 0 && (S.wise || 0) / S.thawed >= WISE, 'Used their weakness']];
+  const goals = [[S.won, 'Freed the ' + { water:'shore', wood:'grove', fire:'ridge', earth:'hills', metal:'city' }[worldOf()]], [evoIds.length > 0, 'Evolved a power'], [S.thawed > 0 && (S.wise || 0) / S.thawed >= WISE, 'Used their weakness']];
   const star = `<path d="M50 6l12.6 27.4 29.9 3.3-22.3 20.2 6.2 29.4L50 71.2 23.6 86.3l6.2-29.4L7.5 36.7l29.9-3.3z"`;
   $('#resStars').innerHTML = goals.map(([got, label]) => `<div class="st3${got ? ' got' : ''}"><svg viewBox="0 0 100 100" aria-hidden="true">
     <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6C2"/><stop offset=".5" stop-color="#FFC94A"/><stop offset="1" stop-color="#EE8A14"/></linearGradient></defs>
