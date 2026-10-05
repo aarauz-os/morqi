@@ -756,7 +756,21 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .revgrow span{font:900 13px var(--round);letter-spacing:.12em;text-transform:uppercase;color:#FFD45A}
 /* the story: the Warden waits in the dark corner of Luma's picture */
 .story{position:relative}
-.story .story-warden{position:absolute;right:-6%;bottom:-4%;width:38%;height:auto;aspect-ratio:auto;object-fit:contain;filter:brightness(.25) saturate(.4) drop-shadow(0 0 12px rgba(120,180,255,.6));opacity:.9}
+/* the storybook: one picture per page, with the player's own Keeper and spirit animal on Luma's page and the level's
+   boss rising on the last; three dots show where you are, and tapping the picture turns the page */
+.story{cursor:pointer}
+.story .sbg{animation:storyIn .5s ease both}
+.story .st-k,.story .st-a,.story .st-b{position:absolute;height:auto;aspect-ratio:auto;object-fit:contain;pointer-events:none}
+.story .st-k{left:3%;bottom:2%;width:34%;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));animation:storyRun .6s .15s ease both}
+.story .st-a{left:30%;bottom:3%;width:22%;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));animation:storyRun .6s .3s ease both}
+.story .st-b{right:-2%;bottom:-6%;width:52%;filter:drop-shadow(0 0 18px var(--c));animation:storyRise 1.2s .2s ease-out both}
+@keyframes storyIn{from{opacity:.2;transform:scale(1.04)}to{opacity:1;transform:none}}
+@keyframes storyRun{from{opacity:0;transform:translateX(-30%)}to{opacity:1;transform:none}}
+@keyframes storyRise{from{opacity:0;transform:translateY(30%)}to{opacity:1;transform:none}}
+.sdots{display:flex;gap:8px;justify-content:center}
+.sdots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:width .2s,background .2s}
+.sdots i.on{width:22px;border-radius:4px;background:#fff}
+@media (prefers-reduced-motion:reduce){.story .sbg,.story .st-k,.story .st-a,.story .st-b{animation:none}}
 /* Victory: star labels a size up */
 .st3 span{font-size:13px}
 /* a sheet never runs off the screen: it scrolls inside itself, and the creature card lies sideways to stay short */
@@ -860,10 +874,11 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   </section>
 
   <section class="scr" id="story" hidden>
-    <div class="story"><img src="art4/luma.jpg?v=8" alt="Luma, the little fox spirit of the hearth, with one glowing tail."><img class="story-warden" src="art4/bosses/water.png?v=9" alt="The Drowned Lantern, waiting in the dark."></div>
-    <h2 class="ck">The shore has gone still</h2>
-    <p>The Stillmaker froze this shore and left the Drowned Lantern to keep it still. Luma, the fox spirit of your hearth, sends you out with your spirit animal. Gather the shore's Qi Stones, and the Drowned Lantern will rise from the sea.</p>
-    <button class="btn green" id="storyNext">Run in</button>
+    <div class="story" id="storyArt"></div>
+    <h2 class="ck" id="storyT">The shore has gone still</h2>
+    <p id="storyP"></p>
+    <div class="sdots" id="storyDots" aria-hidden="true"><i></i><i></i><i></i></div>
+    <button class="btn green" id="storyNext">Next</button>
   </section>
 
   <section class="scr popup" id="howto" hidden>
@@ -1987,8 +2002,28 @@ $('#yearNext').onclick = () => {
   $('#revP').textContent = `You were born ${ELNAME[keeperEl]}, so your first power is ${POW[START[keeperEl]].n}.`;
   SFX.fanfare(false); show('reveal');
 };
-$('#revNext').onclick = () => { SFX.select(); show('story'); };
-$('#storyNext').onclick = () => { SFX.select(); if (LVL === 1) show('howto'); else intro(LVL); };
+$('#revNext').onclick = () => { SFX.select(); storyPg = 0; renderStory(); show('story'); };
+// the story, told in three pictures (A, 2026-10-05: the one-picture story "needs imagery to make more sense"): the frost
+// freezes the realm, Luma sends you and your own spirit animal out, and the five Qi Stones call the realm's boss.
+// Every line follows the level being played.
+let storyPg = 0;
+const STORY_WORD = { water:'shore', wood:'grove', fire:'ridge', earth:'hills', metal:'city' };
+function renderStory() {
+  const realm = ['water', 'wood', 'fire', 'earth', 'metal'][LVL - 1], place = LEVELS[LVL - 1].name.replace(/^The /, 'the '), B = BOSSES[realm], A = ANIMAL[animal], w = STORY_WORD[realm];
+  const art = $('#storyArt'), pages = [
+    { img:'story-frost', t:`The ${w} ${realm === 'earth' ? 'have' : 'has'} gone still`, p:`The Stillmaker's frost froze ${place}. Everyone stopped, right where they stood.`, alt:'A storm of frost sweeps over a lantern-lit village and freezes its people mid-moment.' },
+    { img:'luma', t:'Luma sends you out', p:`Luma, the fox spirit of your hearth, sends you and your ${A.y} to bring ${place} back to life.`, alt:'Luma, the little fox spirit of the hearth, beside the fire.',
+      over:`<img class="st-k" src="art4/run/k${keeper}-r2.png?v=8" alt=""><img class="st-a" src="art4/a-${animal}-y.png?v=8" alt="">` },
+    { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn the five Qi Stones. Gather them all, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
+      over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } ];
+  const pg = pages[storyPg], src = pg.img === 'luma' ? 'art4/luma.jpg?v=8' : `art4/story/${pg.img}.jpg?v=8`;
+  art.innerHTML = `<img class="sbg" src="${src}" alt="${pg.alt}">${pg.over || ''}`; art.className = 'story pg' + storyPg;
+  $('#storyT').textContent = pg.t; $('#storyP').textContent = pg.p;
+  [...$('#storyDots').children].forEach((d, i) => d.classList.toggle('on', i === storyPg));
+  $('#storyNext').textContent = storyPg < 2 ? 'Next' : 'Run in';
+}
+const storyGo = () => { SFX.select(); if (storyPg < 2) { storyPg++; renderStory(); return; } if (LVL === 1) show('howto'); else intro(LVL); };
+$('#storyNext').onclick = storyGo; $('#storyArt').onclick = storyGo;
 let howFromPause = false;
 $('#howtoGo').onclick = () => { SFX.select(); if (howFromPause) { howFromPause = false; show('paused'); return; } show(null); startRun(); };
 $('#howBtn').onclick = () => { SFX.pop(); howFromPause = true; show('howto'); };
