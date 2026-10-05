@@ -1198,6 +1198,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .th-sheet{display:grid;gap:14px;justify-items:center;text-align:center}
 #themeSheet .th-name{display:flex;align-items:center;gap:8px;font-family:var(--round);font-weight:900;font-size:26px;color:#FFD66E}#themeSheet .th-name svg{width:26px;height:26px}
 .th-t{max-width:30ch;font-size:15px;line-height:1.45;color:rgba(255,255,255,.88)}.th-t b{color:#FFD66E}
+.set-mus{text-align:center;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.8)}.set-mus b{color:#FFD66E}
 .set-grown{display:grid;gap:4px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.06);font-size:13.5px;line-height:1.4}.set-grown b{font-size:14px}
 #setDone{justify-self:center;min-width:220px}
 .qiRise{display:inline-flex!important;align-items:center;justify-content:center;gap:8px}.qiRise img{width:28px;height:28px}
@@ -1329,6 +1330,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <label class="set-t"><button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button><span>Sounds</span></label>
         <label class="set-t"><button class="ibtn voBtn" aria-label="Voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg></button><span>Voice</span></label>
       </div>
+      <p class="set-mus" id="setMus"></p>
       <div class="set-grown"><b>For grown-ups</b><span>No ads interrupt play. Sparks are earned by playing, and a few more for playing with the music on.</span></div>
       <button class="btn green" id="setDone">Done</button></div></div>
     <div class="hm-over" id="themeSheet" hidden><div class="hm-sheet th-sheet">
@@ -2776,16 +2778,38 @@ function pause() { if (!running || S.over) return; closeSeal(); running = false;
 $('#pauseBtn').onclick = () => { SFX.pop(); pause(); };
 $('#resumeBtn').onclick = () => { SFX.select(); resume(); };
 $('#restartBtn').onclick = e => confirmTwice(e.currentTarget, 'Start over', () => { show(null); startRun(); });
+// Sparks for keeping the music on over time (A, 2026-10-05: "extra for keeping it on for a week, a month, 3M, 6M, and
+// 12M being $60 worth of Sparks. scale it business wise (the most profitable way) with the lesser milestones"). Counted
+// in calendar days since the music was last switched on; switching it off starts the count again. A milestone is paid
+// at the end of the next level after it is reached, so it also brings players back. The early ones land on the days
+// players most often leave (7, 30, 90), each step is about three times the last, and two thirds of the year's total
+// waits at twelve months, where only the most loyal collect it. One year is 6,000 Sparks: $60 at a reference rate of
+// 100 Sparks to the dollar. Players only ever see Sparks.
+const MUS_MILES = [[7, 100, '1 week'], [30, 300, '1 month'], [91, 800, '3 months'], [182, 2000, '6 months'], [365, 6000, '1 year']], DAY = 864e5;
+function musDays() { const t = +(store.get('morqi.musSince') || 0); return t ? Math.floor((Date.now() - t) / DAY) : 0; }
+function musStreak(on) {
+  if (on && !store.get('morqi.musSince')) { store.set('morqi.musSince', String(Date.now())); store.set('morqi.musPaid', '-1'); }
+  if (!on) { store.set('morqi.musSince', ''); store.set('morqi.musPaid', '-1'); }
+}
+// every milestone reached since the last one paid, all at once: a player who comes back after a year gets the year
+function musMilestone() {
+  const d = musDays(), paid = +(store.get('morqi.musPaid') || -1); let n = 0, at = -1;
+  for (let j = paid + 1; j < MUS_MILES.length; j++) if (d >= MUS_MILES[j][0]) { n += MUS_MILES[j][1]; at = j; }
+  if (at < 0) return null; store.set('morqi.musPaid', String(at)); return { n, label:MUS_MILES[at][2] };
+}
 function renderSound() {
   // the round icon buttons, in the pause menu and on the title, grey out when off
   document.querySelectorAll('.musBtn').forEach(b => { b.classList.toggle('off', !AU.musicOn); b.setAttribute('aria-pressed', AU.musicOn); });
   document.querySelectorAll('.sfxBtn').forEach(b => { b.classList.toggle('off', !AU.on); b.setAttribute('aria-pressed', AU.on); });
   document.querySelectorAll('.voBtn').forEach(b => { b.classList.toggle('off', !AU.voiceOn); b.setAttribute('aria-pressed', AU.voiceOn); });
+  const next = MUS_MILES.find(m => m[0] > musDays()), d = musDays();
+  $('#setMus').innerHTML = !AU.musicOn ? 'Keep the music on to earn Sparks at 1 week, 1 month, 3 months, 6 months and 1 year.'
+    : `Music on for ${d} ${d === 1 ? 'day' : 'days'}${next ? ` · ${next[2]}: <b>+${next[1].toLocaleString()} Sparks</b>` : ''}`;
 }
-document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleMusic(); if (S && !S.over && !AU.musicOn) S.musAll = false; if (AU.musicOn && S && !S.over) AU.music(true); renderSound(); SFX.select(); });
+document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleMusic(); musStreak(AU.musicOn); if (S && !S.over && !AU.musicOn) S.musAll = false; if (AU.musicOn && S && !S.over) AU.music(true); renderSound(); SFX.select(); });
 document.querySelectorAll('.sfxBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleSfx(); renderSound(); SFX.select(); });
 document.querySelectorAll('.voBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleVoice(); renderSound(); SFX.select(); });
-renderSound();
+musStreak(AU.musicOn); renderSound();
 $('#againBtn').onclick = () => { show(null); AU.music(true); beginRun(); };
 // starting over throws a run away, so it asks twice (ergonomics review, 2026-10-05); with no rises left it is the only
 // way on, and goes at once
@@ -6744,7 +6768,7 @@ function results() {
     renderLevels(); }
   [...$('#resStars').children].forEach((el, i) => { if (goals[i][0]) setTimeout(() => { el.classList.add('in'); SFX.ting(); }, reduce ? 0 : 700 + i * 380); });
   const clock = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
-  payQi(); $('#resChips').innerHTML = `<span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span><span class="chip3 qi" style="--a:#FFD66E;--b:#E09A1E"><img src="art4/icons/icon-spark.png?v=9" alt="">+${S.qiGot}</span>${S.qiMus ? `<span class="chip3" style="--a:#FFD66E;--b:#E09A1E">${S.qiMus > 10 ? 'New theme' : 'Music on'} +${S.qiMus}</span>` : ''}`
+  payQi(); $('#resChips').innerHTML = `<span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span><span class="chip3 qi" style="--a:#FFD66E;--b:#E09A1E"><img src="art4/icons/icon-spark.png?v=9" alt="">+${S.qiGot}</span>${S.qiMus ? `<span class="chip3" style="--a:#FFD66E;--b:#E09A1E">${S.qiMus > 10 ? 'New theme' : 'Music on'} +${S.qiMus}</span>` : ''}${S.musMile ? `<span class="chip3" style="--a:#FFD66E;--b:#E09A1E">Music ${S.musMile.label} +${S.musMile.n.toLocaleString()}</span>` : ''}`
     + `<span class="chip3" style="--a:#A99CFF;--b:#6F5CF0">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
     + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('');
   $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:18 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${8 + (i * 7) % 9}px;--c:${['#FFE08A', '#7FF0C0', '#FFFFFF', '#FFB8D0'][i % 4]};--t:${5 + (i * 3) % 5}s;--d:${(i * .43) % 4}s"></i>`).join('');
@@ -6960,7 +6984,8 @@ function musicSparks() {
   if (store.get('morqi.themeBonus') === 'want:' + THEME.id) { store.set('morqi.themeBonus', 'paid:' + THEME.id); return 310; }
   return 10;
 }
-function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; S.qiMus = musicSparks(); S.qiGot = Math.round(S.thawed / 8) + (S.won ? 40 : 0) + S.qiMus; addQi(S.qiGot);
+function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; S.qiMus = musicSparks(); S.musMile = S.qiMus ? musMilestone() : null;
+  S.qiGot = Math.round(S.thawed / 8) + (S.won ? 40 : 0) + S.qiMus + (S.musMile ? S.musMile.n : 0); addQi(S.qiGot);
   if (S.won && S.qiGot && !SEEN.has('_sparks')) { markSeen('_sparks'); setTimeout(() => AU.vo('vo-sparks', 0, .5), 2600); } }
 function renderGrow() {
   const g = grown(), q = qi(); $('#grQi').textContent = q.toLocaleString(); $('#hmQiN').textContent = q.toLocaleString();
@@ -6984,8 +7009,8 @@ function renderGrow() {
 const openSheet = id => { $(id).hidden = false; guardTaps(); $('#tabs').classList.add('under'); if (id === '#growSheet') { store.set('morqi.sparksTaught', '1'); $('#hmQi').classList.remove('hint'); } };
 const closeSheet = o => { o.hidden = true; if (![...document.querySelectorAll('.hm-over')].some(x => !x.hidden)) $('#tabs').classList.remove('under'); };
 $('#hmQi').onclick = () => { SFX.select(); renderGrow(); openSheet('#growSheet'); };
-$('#hmGear').onclick = () => { SFX.select(); openSheet('#setSheet'); };
-$('#thOn').onclick = () => { AU.init(); if (!AU.musicOn) AU.toggleMusic(); AU.music(true); AU.song('home'); renderSound(); SFX.select(); closeSheet($('#themeSheet')); };
+$('#hmGear').onclick = () => { SFX.select(); renderSound(); openSheet('#setSheet'); };
+$('#thOn').onclick = () => { AU.init(); if (!AU.musicOn) { AU.toggleMusic(); musStreak(true); } AU.music(true); AU.song('home'); renderSound(); SFX.select(); closeSheet($('#themeSheet')); };
 $('#thNo').onclick = () => { SFX.select(); closeSheet($('#themeSheet')); };
 $('#setDone').onclick = () => { SFX.select(); closeSheet($('#setSheet')); };
 $('#grDone').onclick = () => { SFX.select(); closeSheet($('#growSheet')); };
