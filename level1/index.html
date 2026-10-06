@@ -1862,6 +1862,8 @@ const AU = (() => {
     power() { tone({ f:200, f1:800, type:'sawtooth', dur:.4, vol:.08, lp:1500 }); this.levelup(); },
     // the genie (Ascended): out, a swirl of air rising into a warm chord with a sub underneath; in, the swirl falling
     // back into one soft chime. Everything pitched sits at or below about 700 Hz, the air above it
+    // each Ascended tier opens on its own chime, one rising note per tier (F, A, C, E flat, F), all under 700 Hz
+    tier(n) { [174.61, 220, 261.63, 311.13, 349.23].slice(0, n).forEach((f, i) => tone({ f, at:.5 + i * .11, dur:.7, vol:.07, type:'triangle', att:.01 })); },
     genie(out) {
       if (out) { noise({ ft:'bandpass', f:300, f1:4200, q:2.5, dur:.9, vol:.14 }); tone({ f:55, f1:110, dur:1.1, vol:.22 });
         [349.23, 440, 523.25].forEach((f, i) => tone({ f, at:.35 + i * .07, dur:1.4, vol:.06, type:'triangle', att:.03 })); }
@@ -2833,7 +2835,7 @@ function startRun() {
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   // Afterglow opens, then the level themes take turns; every realm boss shares the one boss theme
   S.props = scatterProps(worldOf()); loadBoss(worldOf());
-  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); renderSkills(); startLoop();
+  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -4346,7 +4348,17 @@ function hsTick(dt) {
   // the first two seconds: the horde rushes in from every side and prism fireworks break through it
   if (O.horde > 0) { const n = Math.min(O.horde, 30); O.horde -= n; for (let i = 0; i < n; i++) { const a = rnd(0, TAU), d = rnd(320, 720);
     const e = spawn(Math.random() < .2 ? 'wolf' : 'critter', { x:P.x + Math.cos(a) * d, y:P.y + Math.sin(a) * d * .9 }, 1.35); if (e) e.horde = 1; } }
-  if (O.tier >= 3 && O.t < 2.2 && (O.prismT = (O.prismT ?? 0) - dt) <= 0) { O.prismT = .065; const near = S.en.filter(e => !e.dead && !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 680);
+  /* What each tier adds, stacking (A, 2026-10-06: "a new mechanic or visual buff done per tier of the ascended not just
+     longer"): 1 the genie and its wave; 2 the genie strikes on every beat; 3 prism fire for the whole of it; 4 the wheel
+     pulls every creature in on a spiral; 5 time slows for every creature, and balance. */
+  const ti = O.tier;
+  if (ti >= 2 && O.t > .6 && O.t < O.life - 1) { const q = Math.floor(beatPos()); if (q !== O.lastBeat) { O.lastBeat = q; genieStrike(O); } }
+  for (const s of O.gshots || []) { s.t += dt; if (!s.hit && s.t >= .35) { s.hit = true; genieImpact(s); } }
+  if (O.gshots) O.gshots = O.gshots.filter(s => s.t < .6);
+  if (ti >= 4 && O.t < O.life - 1) for (const e of S.en) if (!e.dead && !e.boss) { const dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy) || 1;
+    if (d < 1300 && d > 90) { const sp = (d > 700 ? 340 : 230) * dt; e.x += (dx / d * .8 - dy / d * .6) * sp; e.y += (dy / d * .8 + dx / d * .6) * sp; } }
+  if (ti >= 5) for (const e of S.en) if (!e.dead) e.slow = Math.max(e.slow || 0, .25);
+  if (ti >= 3 && (O.t < 2.2 || O.t < O.life - 1) && (O.prismT = (O.prismT ?? 0) - dt) <= 0) { O.prismT = O.t < 2.2 ? .065 : .45; const near = S.en.filter(e => !e.dead && !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 680);
     const e = near[(Math.random() * near.length) | 0]; if (e) prismBurst(e.x + rnd(-30, 30), e.y + rnd(-30, 30)); else { const a = rnd(0, TAU), d = rnd(150, 420); prismBurst(P.x + Math.cos(a) * d, P.y + Math.sin(a) * d * .8); } }
   // one wave on each downbeat; after a pause the count picks up from now instead of firing every missed wave at once
   // a lower tier (Level 5's tower, one tier per stone) breaks only its first waves, then pulses; only the fifth tier
@@ -4393,7 +4405,7 @@ function hsStart(final, tier = 5, finisher = false) {
   S.capBoost = H.on.horde + 20;   // ten times the usual crowd comes for the first two seconds (A, 2026-10-05)
   S.eshots = []; S.flashT = .12; S.flashC = '255,224,160'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); H.on.q0 = beatPos();
   // the world stops for half a second while the camera pushes in on the anthem's first hit
-  S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true); SFX.genie(true); AU.vo('vo-ascended', .35, .8);
+  S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true); SFX.genie(true); SFX.tier(H.on.tier); AU.vo('vo-ascended', .35, .8);
   ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true);
   for (const q of S.gems) q.pull = true;
 }
@@ -4412,6 +4424,21 @@ function prismBurst(x, y) {
   inArea(x, y, 160, e => hurt(e, e.boss ? 300 : 2000, ASC[(Math.random() * 5) | 0], { kb:300, fx:x, fy:y, spark:false }));
   SFX.firework();
 }
+// tier 2 and up: on every beat the genie hurls an orb of the next element at a creature, and it bursts where it lands
+function genieStrike(O) {
+  // anything on the field is in reach; with the field cleared, the genie strikes the ground round the Keeper, a guard on
+  // every beat (QA, 2026-10-06: the waves left nothing within 650 after two seconds, so most beats had no strike)
+  const P = S.p, near = S.en.filter(e => !e.dead && Math.hypot(e.x - P.x, e.y - P.y) < 1300), el = ASC[(O.strikeN = (O.strikeN || 0) + 1) % 5];
+  const e = near.length ? near[(Math.random() * near.length) | 0] : null, a = O.strikeN * 2.4, tx = e ? e.x : P.x + Math.cos(a) * 300, ty = e ? e.y : P.y + Math.sin(a) * 200;
+  (O.gshots = O.gshots || []).push({ x0:O.gx || P.x, y0:(O.gy || P.y - 200), x:tx, y:ty, t:0, el });
+}
+function genieImpact(s) {
+  const [c1, c2] = ASC_COL[s.el];
+  ring(s.x, s.y, 8, 120, c1, .35, 9, false); ring(s.x, s.y, 4, 70, c2, .25, 5, false); burst(s.x, s.y - 10, c1, 8, 300);
+  inArea(s.x, s.y, 110, e => hurt(e, e.boss ? 260 : 2000, s.el, { kb:300, fx:s.x, fy:s.y }));
+  if (s.el === 'fire') flames(s.x, s.y, 3, 16, 30, 160); else if (s.el === 'earth') debris(s.x, s.y, 5, 260, '#9A7040'); else if (s.el === 'water') drops(s.x, s.y, 7, 260); else if (s.el === 'wood') leaves(s.x, s.y, 6, 240); else shards(s.x, s.y, c1, 5, 260);
+  SFX.boom(false);
+}
 // the element gathers in before it breaks: motes of its colour stream to the Keeper
 function ascGather(els) {
   const P = S.p;
@@ -4424,8 +4451,9 @@ function ascWave(el) {
   // an element not learned yet is a taste of what is coming (A, 2026-10-05)
   // drawn under the wheel, clear of the genie above (design review, 2026-10-05)
   if (!S.learned.includes(el)) floatText(P.x, P.y + 150, 'A taste of ' + ELNAME[el] + '!', ASC_COL[el][0], 24);
-  S.hitstop = Math.max(S.hitstop, .06); S.shake = Math.max(S.shake, el === 'earth' ? .75 : .45); S.flashT = .1; S.flashC = rgbOf(c1);
-  flash(P.x, P.y - 30, 560, c1, .3); ring(P.x, P.y, 30, 260, c2, .3, 20, true);
+  S.hitstop = Math.max(S.hitstop, .06); S.shake = Math.max(S.shake, el === 'earth' ? .75 : .45); if (el !== 'metal') { S.flashT = .1; S.flashC = rgbOf(c1); }
+  // metal's silver would add up to white glare, so it lands with rings alone (2026-10-06)
+  if (el !== 'metal') flash(P.x, P.y - 30, 400, c1, .2); ring(P.x, P.y, 30, 260, el === 'metal' ? '#8E9AA6' : c2, .3, 20, el !== 'metal');
   ({ fire:() => { SFX.bx('ember-burst', 1, 0); SFX.boom(true); }, earth:() => { SFX.bx('earth-quake', 1, 0); SFX.stomp(); }, metal:() => { SFX.bx('call-bell', 1, 0); SFX.shing(); },
      water:() => { SFX.bx('tide-crash', 1, 0); SFX.wave(); }, wood:() => { SFX.bx('wood-roots', 1, 0); SFX.whip(); } })[el]();
   for (const q of S.gems) q.pull = true;
@@ -6039,7 +6067,15 @@ function drawGenie(kx, ky, im) {
   add(() => { const N = 26; for (let i = 0; i <= N; i++) { const u = i / N, cx = bx + (gx - bx) * u + Math.sin(u * 7 - S.t * 6) * 64 * u * (1 - u), cy = by + (gy + GS * .28 - by) * u;
     glowAt(cx, cy, (8 + 34 * u) * Math.max(.35, sc), ASC_COL[ASC[((u * 5 + S.t * 2) | 0) % 5]][0], .55 * Math.min(1, e * 2)); }
     glowAt(gx, gy, GS * 1.1, '#FFE08A', .5 * e); });
+  // the tier shows round the genie: one ring of light per tier, each in its element, turning round its waist and drawn
+  // behind it, so no ring ever crosses its face (QA, 2026-10-06)
+  for (let i = 0; i < O.tier; i++) { const R = GS * (.36 + i * .07), a0 = S.t * (1.4 - i * .18) * (i % 2 ? -1 : 1);
+    g.strokeStyle = ASC_COL[ASC[i]][0]; g.globalAlpha = .9 * e; g.lineWidth = 5; g.lineCap = 'round'; g.setLineDash([R * .5, R * .3]); g.lineDashOffset = -a0 * R;
+    g.beginPath(); g.ellipse(gx, gy + GS * .22, R, R * .3, 0, 0, TAU); g.stroke(); g.setLineDash([]); g.globalAlpha = 1; g.lineWidth = 1; g.lineCap = 'butt'; }
   g.save(); g.globalAlpha = Math.min(1, e * 1.6); g.translate(gx, gy); if (S.p.face < 0) g.scale(-1, 1); g.drawImage(genieSprite(im), -GS / 2, -GS * .55, GS, GS); g.restore();
+  // the genie's strikes: an orb of the element streaking from the genie to where it bursts
+  for (const s of O.gshots || []) { if (s.hit) continue; const q = Math.min(1, s.t / .35), x = s.x0 + (s.x - s.x0) * q, y = s.y0 + (s.y - s.y0) * q - Math.sin(q * Math.PI) * 60, c = ASC_COL[s.el][0];
+    add(() => { glowAt(x, y, 70, c, .85); for (let k = 1; k < 5; k++) { const qq = Math.max(0, q - k * .06); glowAt(s.x0 + (s.x - s.x0) * qq, s.y0 + (s.y - s.y0) * qq - Math.sin(qq * Math.PI) * 60, 44 - k * 7, c, .5 - k * .1); } }); }
 }
 const ASC_R = 172, ASC_SQ = .42;
 const ascNode = (cx, cy, i) => { const a = -Math.PI / 2 + i * TAU / 5; return [cx + Math.cos(a) * ASC_R, cy + Math.sin(a) * ASC_R * ASC_SQ]; };
@@ -6053,6 +6089,11 @@ function drawAscendGround() {
     if (w.el === 'earth') { g.strokeStyle = 'rgba(40,26,10,.55)'; g.lineWidth = 5; g.beginPath(); arc0(w.x, w.y, w.r * .97, 0, TAU); g.stroke(); }
     if (w.el === 'metal') { g.strokeStyle = c2; g.lineWidth = 2; for (const f of [1, .93]) { g.beginPath(); arc0(w.x, w.y, w.r * f, 0, TAU); g.stroke(); } }
     g.globalAlpha = 1; }
+  // tier 4 and up: five spiral arms sweep the ground, drawing every creature in
+  if (O.tier >= 4 && O.t < O.life - 1) { g.save(); g.lineCap = 'round';
+    for (let a = 0; a < 5; a++) { g.strokeStyle = ASC_COL[ASC[a]][0]; g.globalAlpha = .5 * life; g.lineWidth = 10; g.beginPath();
+      for (let k = 0; k <= 40; k++) { const u = k / 40, r = 150 + u * 520, an = a * TAU / 5 - S.t * 2.2 + u * 3.2; g.lineTo(cx + Math.cos(an) * r, cy + Math.sin(an) * r * .55); } g.stroke(); }
+    g.restore(); g.lineWidth = 1; }
   g.save(); g.globalAlpha = life;
   // the wheel: a dark glass disc, a gold rim, a slow outer ring of marks
   g.fillStyle = 'rgba(14,18,48,.38)'; g.beginPath(); g.ellipse(cx, cy, ASC_R + 30, (ASC_R + 30) * ASC_SQ, 0, 0, TAU); g.fill();
@@ -7435,7 +7476,7 @@ function results() {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: () => hsStart(false), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
