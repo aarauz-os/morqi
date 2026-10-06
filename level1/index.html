@@ -193,7 +193,7 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 @keyframes blink{50%{opacity:.3}}
 .card .txt p{margin:0;font-size:13px;line-height:1.3;font-weight:800;color:var(--ink-2);max-width:none}
 .card .txt small{font-size:11.5px;color:var(--ink-3);font-weight:800}
-.card.evo{background:linear-gradient(180deg,#FFFDF6,#FFF1CC);box-shadow:0 0 0 2px var(--sun),0 12px 28px rgba(245,165,36,.3)}
+.card.evo{box-shadow:0 0 0 2px var(--sun),0 12px 28px rgba(245,165,36,.3)}
 .card.evo .flag{background:linear-gradient(90deg,var(--sun-2),var(--sun));box-shadow:0 3px 8px rgba(245,165,36,.45)}
 .card.evo::after{content:"";position:absolute;inset:0;border-radius:24px;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.8) 50%,transparent 65%);transform:translateX(-100%);animation:sheen 2.2s ease-in-out infinite}
 @keyframes sheen{60%,100%{transform:translateX(100%)}}
@@ -328,6 +328,14 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .stars{gap:3px}.stars s{width:11px;height:5px;background:rgba(255,255,255,.3)}
 .card .stars s.f{background:#fff}.card .stars s.n{background:rgba(255,255,255,.7)}
 .card.evo{--c1:#FFD66E;--c2:#E98A12;box-shadow:0 0 0 2px #FFE7A0,0 12px 26px rgba(233,138,18,.45)}
+/* an evolution card's words in deep brown on its gold, so they read (A's playthrough, 2026-10-05: pale on cream) */
+.card.evo .tab b,.card.evo .txt p,.card.evo .txt small,.card.evo .formula{color:#3E2300!important;text-shadow:none!important}
+#cards .card.evo{background:linear-gradient(180deg,#FFE08A,#F0A43A)!important}
+#cards .card.evo .formula{display:flex!important;flex-direction:row!important;flex-wrap:nowrap;align-items:center;justify-content:center;gap:4px;font-size:18px;font-weight:900}#cards .card.evo .formula img{width:28px;height:28px;margin:0!important}
+/* the sheen sweeps across inside the card instead of sliding past its edge (QA, 2026-10-05: it spilled out, and lay over
+   the words) */
+.card.evo::after{transform:none!important;animation:sheenIn 2.6s ease-in-out infinite;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.35) 50%,transparent 60%) 0 0/300% 100% no-repeat}
+@keyframes sheenIn{0%{background-position:100% 0}60%,100%{background-position:-50% 0}}
 .card .formula{flex-direction:column;gap:2px;color:#FFF6D8;font-size:10.5px}
 .card:active{transform:scale(.95)}
 .tip{background:rgba(111,242,207,.12);color:rgba(255,255,255,.82)}.tip b{color:var(--jade-hi)}
@@ -583,7 +591,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #title > .brand{position:absolute;left:0;right:0;top:calc(22px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
 #title .logo{width:min(60%,262px);filter:drop-shadow(0 6px 14px rgba(10,20,60,.45))}
 /* the cloud wordmark draws itself over the logo's place; the picture stays for reduced motion and screen readers */
-#title .logo-cloud{position:absolute;top:calc(min(64vw,280px) * -52 / 368 + 4px);left:50%;transform:translateX(-50%);width:min(64vw,280px);pointer-events:none}
+#title .logo-cloud{position:absolute;top:calc(min(64vw,280px) * -52 / 368 - 6px);left:50%;transform:translateX(-50%);width:min(64vw,280px);pointer-events:none}
 #title .brand.cloud .logo{visibility:hidden}
 #title .tag{font:800 15px var(--round);letter-spacing:.01em;color:#fff;text-shadow:0 1px 2px rgba(10,16,50,.7),0 0 18px rgba(10,16,50,.55)}
 /* one hero, one action: the art carries the screen, the level reads like a page you swipe through, Play is the
@@ -637,8 +645,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #hud .top{padding:calc(8px + env(safe-area-inset-top)) 10px 0;gap:7px;z-index:8}
 #hud .hstrip,#hud #wavePill,#hud #stoneRow,#hud #mapBtn{background:var(--glass);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 6px 18px rgba(8,10,34,.18);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4)}
 #hud .hstrip{position:relative;display:flex;align-items:center;gap:8px;height:46px;padding:0 6px;border-radius:23px;overflow:hidden}
-#hud #pauseBtn{width:34px;height:34px;background:rgba(255,255,255,.14);box-shadow:none}
-#hud #pauseBtn svg{width:15px;height:15px;filter:none}
+#hud #pauseBtn{width:40px;height:40px;background:rgba(255,255,255,.16);box-shadow:none}
+#hud #pauseBtn svg{width:17px;height:17px;filter:none}
 #hud .lvbadge{width:26px;height:26px;font-size:13.5px;color:#5A3300;text-shadow:none;background:linear-gradient(180deg,#FFF0B8,#FFD45A 55%,#F2A93B);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
 #hud .lvbadge::before,#hud .lvbadge::after{display:none}
 #hud .timer{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);margin:0;padding:0;background:none;box-shadow:none;font-size:21px;text-shadow:0 1px 6px rgba(0,0,0,.25)}
@@ -689,6 +697,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #results .chips3{gap:0}
 #results .chip3{height:auto;padding:0;background:none;box-shadow:none;font:800 14px var(--round);color:rgba(255,255,255,.72)}
 #results .chip3 + .chip3::before{content:"\00B7";margin:0 10px;color:rgba(255,255,255,.4)}
+#results #resChips{flex-direction:column;align-items:center;gap:6px}#results .crow{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 10px}
+#results .crow .chip3::before{content:none!important}#results .chip3.sub{font-size:.86em;opacity:.92}
 #results .chip3 i{width:10px;height:13px}
 #results .chip3 svg{width:14px;height:14px;opacity:.8}
 #results .chip3.evo{padding:0}#results .chip3.evo img{width:20px;height:20px;box-shadow:0 0 0 1.5px #FFE08A}
@@ -1024,6 +1034,10 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
    arena, where the boss bar would push it down over the fight */
 #ultBtn{top:9px!important;left:calc(50% - 37px);transform:scale(.6);transform-origin:50% 0;pointer-events:none;z-index:30}
 #ultBtn em,#timePill,#freedPill{display:none!important}
+/* in the top bar the companion pulses inside its own slot (design review, 2026-10-05: the old pulse reset it to full size
+   and covered the element dots) */
+@keyframes ultPulseTop{0%,100%{transform:scale(.6);filter:drop-shadow(0 0 5px var(--c))}50%{transform:scale(.66);filter:drop-shadow(0 0 14px var(--c))}}
+#ultBtn.ready{animation:ultPulseTop 1s ease-in-out infinite}#ultBtn.urge{animation:ultPulseTop .5s ease-in-out infinite}
 #hud.boss #mapBtn{display:none!important}
 #hud #pauseBtn{position:relative}#hud #pauseBtn::after{content:"";position:absolute;inset:-6px;border-radius:50%}
 #rerollBtn{min-height:48px}
@@ -1176,6 +1190,12 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .hm-qi img{width:30px;height:30px;object-fit:contain}
 .hm-qi b{font-weight:900;font-size:17px;font-variant-numeric:tabular-nums}
 .hm-qi span{font-weight:800;font-size:12px;padding:3px 8px;border-radius:99px;background:rgba(123,216,96,.25);color:#C8F5B8}
+/* the top bar always fits a phone: a gap between the pills, the name shrinks with an ellipsis, and "Grow" steps aside
+   under 400 px (design review, 2026-10-05: the gear hung 22 px off the right edge) */
+.beast .beatline{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:6px}.beast .beatline img{width:34px;height:34px;object-fit:contain}.beast .beatline i{font-style:normal;font-size:22px;font-weight:900;color:#fff;margin:0 4px}
+.hm-top{gap:8px}.hm-me{flex:1 1 auto;min-width:0}.hm-me span{min-width:0}.hm-me b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hm-right{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+@media (max-width:400px){.hm-qi span{display:none}.hm-me .grow{width:72px}}
 .hm-gear{width:48px;height:48px;border:0;padding:4px;border-radius:50%;background:rgba(12,16,44,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);cursor:pointer;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .hm-gear img{width:100%;height:100%;object-fit:contain}
 .hm-over{position:absolute;inset:0;z-index:40;background:rgba(6,8,24,.55);display:flex;align-items:flex-end}
@@ -1201,9 +1221,14 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .set-row .ibtn{width:48px;height:48px}
 /* the new-season theme sheet (A, 2026-10-05) */
 .th-sheet{display:grid;gap:14px;justify-items:center;text-align:center}
-#themeSheet .th-name{display:flex;align-items:center;gap:8px;font-family:var(--round);font-weight:900;font-size:26px;color:#FFD66E}#themeSheet .th-name svg{width:26px;height:26px}
+#themeSheet .th-name{display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 20px 6px 8px;border:0;border-radius:99px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);font-family:var(--round);font-weight:900;font-size:24px;color:#fff;cursor:pointer}
+#themeSheet .th-name svg{width:38px;height:38px;padding:9px;border-radius:50%;background:rgba(255,255,255,.18)}
+.th-reward{display:flex;align-items:center;gap:6px;font-family:var(--round);font-weight:900;font-size:30px;color:#FFD66E}.th-reward img{width:36px;height:36px}
+.th-no{min-height:44px;padding:0 18px;border:0;background:none;color:rgba(255,255,255,.75);font-weight:800;font-size:15px;cursor:pointer}
 .th-t{max-width:30ch;font-size:15px;line-height:1.45;color:rgba(255,255,255,.88)}.th-t b{color:#FFD66E}
 .set-mus{text-align:center;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.8)}.set-mus b{color:#FFD66E}
+/* past level five the Heart Spring's dots refill every five levels, in a deeper blue (design review, 2026-10-05) */
+.gr-lv .gr-n{font-style:normal;font-size:12px;font-weight:800;color:#fff;margin-right:6px}.gr-lv.deep s.on{background:#2E78D8}
 .set-grown{display:grid;gap:4px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.06);font-size:13.5px;line-height:1.4}.set-grown b{font-size:14px}
 #setDone{justify-self:center;min-width:220px}
 .qiRise{display:inline-flex!important;align-items:center;justify-content:center;gap:8px}.qiRise img{width:28px;height:28px}
@@ -1336,14 +1361,15 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <label class="set-t"><button class="ibtn voBtn" aria-label="Voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-7l-4.5 3.5V16.5H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg></button><span>Voice</span></label>
       </div>
       <p class="set-mus" id="setMus"></p>
-      <div class="set-grown"><b>For grown-ups</b><span>No ads interrupt play. Sparks are earned by playing, and a few more for playing with the music on.</span></div>
+      <div class="set-grown"><b>For grown-ups</b><span>No ads interrupt play. Sparks are earned by playing, and more for keeping the music on for weeks and months.</span></div>
       <button class="btn green" id="setDone">Done</button></div></div>
     <div class="hm-over" id="themeSheet" hidden><div class="hm-sheet th-sheet">
       <h3>A new theme song</h3>
-      <p class="th-name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/></svg><span id="thName"></span></p>
-      <p class="th-t">Turn the music on and keep it on for a whole level: <b>+300 Sparks</b>. After that, every level with music on earns <b>+10</b>.</p>
+      <button class="th-name" id="thPlay" aria-label="Listen to the new song"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span id="thName"></span></button>
+      <p class="th-reward"><img src="art4/icons/icon-spark.png?v=9" alt="">+300</p>
+      <p class="th-t">Turn the music on and keep it on for a whole level. After that, every level with music on earns <b>+10</b>.</p>
       <button class="btn green" id="thOn">Turn music on</button>
-      <button class="btn blue small" id="thNo">Not now</button></div></div>
+      <button class="th-no" id="thNo">Not now</button></div></div>
   </section>
   <section class="scr" id="map" hidden>
     <div class="mp-head"><span class="ribbon">The Five Realms</span></div>
@@ -1665,13 +1691,12 @@ const NEXT = {
   rooted:  l => l ? 'You take even less damage' : 'You take less damage',
   lungs:   l => l ? 'Every power recharges even faster' : 'Every power recharges faster'
 };
+// one short line each, so an evolution card reads at a glance (QA, 2026-10-05: the long ones were cut off)
 const EVO_DESC = {
-  tide:'Eight orbs, and a tidal wave rolls out from you.', pearl:'Four giant pearls that never fade and burst on every hit.',
-  vine:'Twelve vines, and sacred trees sprout to fight beside you.', bamboo:'Spears spiral out in every direction, split three ways when they stop, and bamboo bursts from the ground around you.',
-  ember:'Six fireballs whose blasts set the ground ablaze.', lantern:'A festival of lanterns that end in fireworks.',
-  stone:'Molten boulders that burn everything they touch.', boulder:'Flaming meteors that leave lava where they land.',
-  skip:'Heavy stones skip through six creatures and crack the ground at every hit.',
-  bell:'A vast golden field that rings out in great waves.', swords:'Swords rain from the sky around you.'
+  tide:'A tidal wave rolls out from you.', pearl:'Giant pearls that never fade.', vine:'Sacred trees fight beside you.',
+  bamboo:'Spears spiral out every way.', ember:'Blasts that set the ground ablaze.', lantern:'Lanterns that end in fireworks.',
+  stone:'Molten boulders that burn.', boulder:'Meteors that leave lava.', skip:'Stones that crack the ground.',
+  bell:'Great golden waves ring out.', swords:'Swords rain from the sky.'
 };
 
 /* ================= assets ================= */
@@ -1797,6 +1822,13 @@ const AU = (() => {
     sweep() { noise({ ft:'bandpass', f:400, f1:5000, q:3, dur:.6, vol:.12 }); tone({ f:300, f1:1200, dur:.5, vol:.06 }); },
     freeze() { noise({ ft:'highpass', f:4000, f1:12000, dur:.5, vol:.1 }); for (let i = 0; i < 5; i++) tone({ f:rnd(2000, 4000), dur:.1, vol:.03, at:i * .05 }); },
     power() { tone({ f:200, f1:800, type:'sawtooth', dur:.4, vol:.08, lp:1500 }); this.levelup(); },
+    // the genie (Ascended): out, a swirl of air rising into a warm chord with a sub underneath; in, the swirl falling
+    // back into one soft chime. Everything pitched sits at or below about 700 Hz, the air above it
+    genie(out) {
+      if (out) { noise({ ft:'bandpass', f:300, f1:4200, q:2.5, dur:.9, vol:.14 }); tone({ f:55, f1:110, dur:1.1, vol:.22 });
+        [349.23, 440, 523.25].forEach((f, i) => tone({ f, at:.35 + i * .07, dur:1.4, vol:.06, type:'triangle', att:.03 })); }
+      else { noise({ ft:'bandpass', f:4200, f1:300, q:2.5, dur:.8, vol:.12 }); tone({ f:523.25, at:.75, dur:1.2, vol:.07, type:'triangle', att:.01 }); tone({ f:110, f1:55, at:.7, dur:.6, vol:.16 }); }
+    },
     wave() { if (!gate('wave', 200)) return; noise({ f:600, f1:2400, dur:.5, vol:.14 }); },
     firework() { if (!gate('firework', 120)) return; noise({ ft:'highpass', f:3000, dur:.35, vol:.1 }); tone({ f:90, f1:50, dur:.25, vol:.2 }); },
     stomp() { tone({ f:70, f1:30, dur:.5, vol:.5 }); noise({ f:300, f1:80, dur:.4, vol:.3 }); },
@@ -2304,11 +2336,13 @@ const AU = (() => {
      its phrase with one leap and one repeated note, a surprise B flat chord at the golden point with the drums holding
      their breath, the four-part form, every pitched voice at or below about 700 Hz. */
   const HIGH = {
-    ch:[[146.83, 185, 220], [155.56, 196, 233.08], [146.83, 185, 220], [130.81, 155.56, 196]],   // D, E flat, D, C minor
+    // D, E flat, D, C minor
+    ch:[[146.83, 185, 220], [155.56, 196, 233.08], [146.83, 185, 220], [130.81, 155.56, 196]],
     root:[36.71, 38.89, 36.71, 32.7],
     hook:[[[0, 293.66], [2, 293.66], [4, 369.99], [7, 440], [10, 466.16], [12, 440], [20, 587.33], [22, 587.33], [24, 523.25], [27, 440], [29, 369.99]],
           [[0, 293.66], [2, 293.66], [4, 369.99], [7, 440], [10, 466.16], [12, 440], [20, 587.33], [22, 523.25], [24, 466.16], [26, 440], [28, 311.13], [30, 293.66]]],
-    surp:[116.54, 146.83, 174.61],   // B flat major: the lift from outside the key
+    // B flat major: the lift from outside the key
+    surp:[116.54, 146.83, 174.61],
     kicks:[[0, 3, 7, 10], [0, 6, 9, 11, 14]] };
   // a hand drum: a pitched skin that drops a little, with a slap on top
   const conga = (t, f, v) => { mv({ t, f:f * 1.25, f1:f, gl1:.05, dur:.22, vol:v, att:.002, rev:.25 }); mn({ t, f:1400, ft:'bandpass', q:1.6, dur:.025, vol:v * .5 }); };
@@ -2325,7 +2359,8 @@ const AU = (() => {
     // the drop, on the very first beat: an 808 diving in, a crash and a call
     if (s === 0) { b808(t, 36.71, SIX * 7, 73.42, .72); crash(t, .1); kick(t, .9); hey(t + SIX * 2, .07); }
     if (gold && i === 0) { keys(t, R.surp, SIX * 30, .03, 1800); b808(t, 58.27, SIX * 8, null, .6); hey(t + SIX * 4, .06); }
-    if (gold && i < 8) return;   // the drums hold their breath for two beats
+    // the drums hold their breath for two beats
+    if (gold && i < 8) return;
     if (k === 0 && !gold) { keys(t, C, SIX * 30, .022, 1600); sub(t, r * 2, SIX * 32, .06); }
     // the Haven layer: shaker on every sixteenth leaning on the offbeats, hand drums rolling, the low pluck
     shaker(t, i % 4 === 2 ? .03 : .014);
@@ -2335,7 +2370,8 @@ const AU = (() => {
       if (i === 0) b808(t, r, SIX * 14, null, .5);
       if (i === 8) clap(t, .2, .5);
       if (i === 12 && bar & 1) hey(t, .05);
-      if ((bar % 13) === 12 && i >= 8) clap(t, .08 + (i - 8) * .03, .2);   // a clap roll back in
+      // a clap roll back in
+      if ((bar % 13) === 12 && i >= 8) clap(t, .08 + (i - 8) * .03, .2);
       return;
     }
     // the hook; while it rests, "hey" on the push
@@ -2346,7 +2382,8 @@ const AU = (() => {
     if (i === 8) { clap(t, .36, .4); rim(t, .1); }
     if (i === 15 && bar & 1) clap(t, .1, .2);
     hats(t, bar, i, 2, .038);
-    if ((bar & 3) === 3 && i >= 12) for (let n = 1; n < 4; n++) hat(t + n * SIX / 4, .02 + n * .006);   // a 32nd roll into every fourth bar
+    // a 32nd roll into every fourth bar
+    if ((bar & 3) === 3 && i >= 12) for (let n = 1; n < 4; n++) hat(t + n * SIX / 4, .02 + n * .006);
   }
   /* "Blossom": the Element Bloom's own song (A, 2026-10-04: in dance mode "the world and the music has to be
      somewhat different to show that change"). The battle stops and the shore throws a party: C major, the happiest
@@ -2394,7 +2431,8 @@ const AU = (() => {
   const HAVEN = {
     ch:[[174.61, 220, 261.63, 329.63], [164.81, 196, 246.94, 293.66], [146.83, 174.61, 220, 261.63], [130.81, 164.81, 196, 246.94]],
     root:[43.65, 41.2, 36.71, 32.7],
-    bass:[0, 0, 1, 0, 0, 1, 0, 2],   // which note of the bar's riff each offbeat plays: root, octave, fifth
+    // which note of the bar's riff each offbeat plays: root, octave, fifth
+    bass:[0, 0, 1, 0, 0, 1, 0, 2],
     hook:[[[0, 440], [3, 440], [6, 523.25], [8, 493.88], [10, 440], [12, 392], [20, 587.33], [22, 587.33], [24, 523.25], [27, 440]],
           [[0, 440], [3, 440], [6, 523.25], [8, 493.88], [10, 440], [12, 392], [20, 523.25], [22, 493.88], [24, 440], [27, 392], [30, 329.63]]],
     surp:[116.54, 146.83, 174.61, 220] };
@@ -2415,13 +2453,17 @@ const AU = (() => {
   function havenStep(s, t) {
     if (!pump) { pump = c.createGain(); pump.connect(padF); }
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HAVEN, p = part(bar), hb = bar + 5, gold = golden(hb), C = R.ch[ch];
-    const intro = bar < 4, down = p === 2 && bar % 13 < 6, sw = i & 1 ? H6 * .18 : 0;   // every other sixteenth leans back a touch: the shuffle
-    if (i === 0) filt(intro ? 600 + bar * 300 : down ? 900 + (bar % 13) * 60 : 2400, t);   // the chords open through the intro and the breakdown
-    if (i === 0 && bar % 4 === 0) mn({ t, f:2600, ft:'lowpass', dur:H6 * 64, att:2, vol:.01 });   // tape hiss
+    // every other sixteenth leans back a touch: the shuffle
+    const intro = bar < 4, down = p === 2 && bar % 13 < 6, sw = i & 1 ? H6 * .18 : 0;
+    // the chords open through the intro and the breakdown
+    if (i === 0) filt(intro ? 600 + bar * 300 : down ? 900 + (bar % 13) * 60 : 2400, t);
+    // tape hiss
+    if (i === 0 && bar % 4 === 0) mn({ t, f:2600, ft:'lowpass', dur:H6 * 64, att:2, vol:.01 });
     // the beat: kick on every beat (the breakdown drops it), claps on two and four
     if (!down && i % 4 === 0) { kick(t, .8); pumpDuck(t); }
     if (!down && !intro && (i === 4 || i === 12)) clap(t, .32, .3);
-    if (down && i === 0 && (bar % 13) === 5) riser(t, H6 * 16, .07);   // six bars without the kick, then the drop
+    // six bars without the kick, then the drop
+    if (down && i === 0 && (bar % 13) === 5) riser(t, H6 * 16, .07);
     // shuffled hats, an open hat on every offbeat, a shaker, congas
     if (bar >= 1 || i % 4 === 2) { if (i % 2) hat(t + sw, .012); if (i % 4 === 2) hat(t, down ? .014 : .022, true); }
     mn({ t:t + sw, f:7400, dur:.04, att:.01, vol:i % 4 === 2 ? .022 : .01 });
@@ -2436,9 +2478,11 @@ const AU = (() => {
       if (p === 3) pluckLead(t + (st & 1 ? H6 * .18 : 0), f / 2, .04, 0);
     }
   }
-  function music(play) {
+  // music(true, true) is a listen with the music switched off (the new-song sheet's preview); it ends with music(false)
+  function music(play, listen) {
     if (!c) return;
-    if (!play) { if (M.timer) { clearInterval(M.timer); M.timer = null; } return; }
+    M.listen = !!(play && listen) || (play && M.listen);
+    if (!play) { M.listen = false; if (M.timer) { clearInterval(M.timer); M.timer = null; } return; }
     // back from a fall's slow motion
     if (musLP) { const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(20000, t); mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(MUSVOL, t); }
     mBuild(); if (M.timer) return;
@@ -2447,7 +2491,7 @@ const AU = (() => {
       if (!c) return; if (M.next < c.currentTime - .1) M.next = c.currentTime + .05;  // back from a hidden tab: skip, don't pile up
       while (M.next < c.currentTime + .2) {
         if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
-        if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, blossom:blossomStep, home:havenStep }[M.song] || pathStep)(M.step, M.next);
+        if (musOn || M.listen) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, blossom:blossomStep, home:havenStep }[M.song] || pathStep)(M.step, M.next);
         if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest' && M.song !== 'blossom') bloomLayer(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
         M.next += SIX * (TEMPO[M.song] || 1); M.step++;
@@ -2552,7 +2596,7 @@ function confetti(x, y, n, spd) { const cols = ['#FF7A2A', '#FFB347', '#FFD24A',
 // of huge embers"), and some of it answers the ground when it lands
 function shedFX(p) {
   const x = p.x + rnd(-p.s * .4, p.s * .4), z = p.z || 0;
-  if (p.shed === 'cinder') fx({ k:'cinder', x, y:p.y, z, vx:p.vx * .2 + rnd(-30, 30), vy:p.vy * .2 + rnd(-20, 20), vz:rnd(-40, 60), life:rnd(.3, .6), s:rnd(2, 3.5), c:Math.random() < .5 ? '#FFB15A' : '#FF8A2A' });
+  if (p.shed === 'cinder') fx({ k:'cinder', x, y:p.y, z, vx:p.vx * .2 + rnd(-30, 30), vy:p.vy * .2 + rnd(-20, 20), vz:rnd(-40, 60), life:rnd(.3, .6), s:rnd(2, 3.5), c:p.sc || (Math.random() < .5 ? '#FFB15A' : '#FF8A2A') });
   else if (p.shed === 'rock') fx({ k:'rock', x, y:p.y, z, vx:p.vx * .3 + rnd(-40, 40), vy:p.vy * .3 + rnd(-25, 25), vz:rnd(0, 120), rot:rnd(0, TAU), vr:rnd(-10, 10), life:rnd(.4, .8), s:rnd(2.5, 5), c:'#7A5A30' });
   else if (p.shed === 'spark') fx({ k:'spark', x, y:p.y - z, vx:rnd(-120, 120), vy:rnd(-120, 60), drag:5, life:.25, s:2, c:'#F4F7FA' });
   else if (p.shed === 'drop') fx({ k:'drop', x, y:p.y, z, vx:p.vx * .3 + rnd(-40, 40), vy:p.vy * .3 + rnd(-25, 25), vz:rnd(0, 100), life:.45, s:rnd(2, 3) });
@@ -2569,6 +2613,8 @@ function updateFX(dt) {
     if (p.vx !== undefined) { const d = p.drag ? Math.exp(-p.drag * dt) : 1; p.vx *= d; p.vy *= d; p.x += p.vx * dt; p.y += p.vy * dt; }
     if (p.vz !== undefined) { p.vz -= 900 * dt; p.z += p.vz * dt; if (p.z < 0) { p.z = 0; if (p.land && !p.landed) { p.landed = 1; landFX(p); } p.vz *= -.35; p.vx *= .6; p.vy *= .6; } }
     if (p.shed && p.t < p.life * .85 && Math.random() < dt * (p.shedR || 20)) shedFX(p);
+    // hot gas rises
+    if (p.buoy) p.vy -= p.buoy * dt;
     if (p.vr) p.rot += p.vr * dt;
   }
   for (let i = FX.length - 1; i >= 0; i--) if (FX[i].t >= FX[i].life) { FX[i] = FX[FX.length - 1]; FX.pop(); }
@@ -2650,7 +2696,8 @@ function ringPick() {
 }
 ['#year', '#bmonth', '#bday'].forEach(q => $(q).addEventListener('change', () => { ringPick(); SFX.pop(); }));
 ringPick();
-$('#playBtn').onclick = () => { if (LVL > unlocked()) return; AU.init(); SFX.select(); AU.music(true); AU.song('home'); show('pickKeeper'); };   // the menus play Haven, the home theme
+// the menus play Haven, the home theme
+$('#playBtn').onclick = () => { if (LVL > unlocked()) return; AU.init(); SFX.select(); AU.music(true); AU.song('home'); show('pickKeeper'); };
 $('#keeperNext').onclick = () => { SFX.select(); if (editingKeeper) { editingKeeper = false; saveProfile(); goTab('home'); return; } show('pickYear'); };
 $('#yearNext').onclick = () => {
   // the Chinese year begins at Lunar New Year; its stem gives the element, its branch the animal (a 2014 birthday after
@@ -2733,12 +2780,13 @@ function startRun() {
     ult:{ charge:.3, uses:0, cast:null }, ultInfo:petInfo(), ultShots:[], ultDrops:[], ultGhost:null, call:callPick && callOwned(callPick) ? newCall(callPick) : null,
     en:[], shots:[], eshots:[], hz:[], pshots:[], gems:[], txt:[], nums:[], zones:[], waves:[], lobs:[], drops:[], trees:[], crates:[], items:[], chests:[], shrines:[], elKills:{},
     lv:1, xp:0, need:need(1), skills:{ [START[keeperEl]]:1 }, gifts:{}, lode:0, lodeOff:{}, hs:{ charge:0, on:null, used:false }, qi:{}, qiStones:{}, stoneOut:{}, evo:{}, cds:{}, ang:{},
-    thawed:0, musAll:AU.musicOn, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
+    thawed:0, musAll:AU.musicOn, hard:skill().tier, falls:0, thawCells:0, awake:null, awakenings:0, awakeIdx:0, rerolls:1,
     spawnAcc:0, waveIdx:0, warn:null, lastDir:-1, queued:0, pendingLevel:false, nextHorde:16, hordes:0, ev:{}, boss:null, bossSpawned:false, arena:null,
     rises:RISES[LVL - 1], lastLight:0, lightUsed:false, grow:grown(), qiRises:0, strongT:-9, taught:{}, shake:0, buffs:{ tiger:0, ward:0 }, freeze:0, flashT:0, swords:[], pearls:[]
   };
   // the Sanctuary's growth carries into the run: Heart Spring raises health (the other plots act where they apply)
-  { const hp = Math.round(220 * (1 + .08 * (S.grow.water || 0))); S.p.hp = S.p.max = hp; }
+  // the Heart Spring: 8% a level to five, then 2 health a level to 1000
+  { const lv = S.grow.water || 0, hp = Math.round(220 * (1 + .08 * Math.min(lv, 5)) + 2 * Math.max(0, lv - 5)); S.p.hp = S.p.max = hp; }
   camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; S.cam = { x:camX, y:camY };
   paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
@@ -2832,8 +2880,9 @@ function renderSound() {
   document.querySelectorAll('.sfxBtn').forEach(b => { b.classList.toggle('off', !AU.on); b.setAttribute('aria-pressed', AU.on); });
   document.querySelectorAll('.voBtn').forEach(b => { b.classList.toggle('off', !AU.voiceOn); b.setAttribute('aria-pressed', AU.voiceOn); });
   const next = MUS_MILES.find(m => m[0] > musDays()), d = musDays();
-  $('#setMus').innerHTML = !AU.musicOn ? 'Keep the music on to earn Sparks at 1 week, 1 month, 3 months, 6 months and 1 year.'
-    : `Music on for ${d} ${d === 1 ? 'day' : 'days'}${next ? ` · ${next[2]}: <b>+${next[1].toLocaleString()} Sparks</b>` : ''}`;
+  const nw = t => `<span style="white-space:nowrap">${t}</span>`;
+  $('#setMus').innerHTML = !AU.musicOn ? `Keep the music on to earn Sparks at ${['1 week', '1 month', '3 months', '6 months', '1 year'].map(nw).join(', ')}.`
+    : `${d ? `Music on for ${d} ${d === 1 ? 'day' : 'days'}` : 'Music on today'}${next ? ` · ${nw(`${next[2]}: <b>+${next[1].toLocaleString()} Sparks</b>`)}` : ''}`;
 }
 document.querySelectorAll('.musBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleMusic(); musStreak(AU.musicOn); if (S && !S.over && !AU.musicOn) S.musAll = false; if (AU.musicOn && S && !S.over) AU.music(true); renderSound(); SFX.select(); });
 document.querySelectorAll('.sfxBtn').forEach(b => b.onclick = () => { AU.init(); AU.toggleSfx(); renderSound(); SFX.select(); });
@@ -2869,9 +2918,28 @@ const ETYPE = {
   minion:{ img:'e-critter', r:24, hp:30, sp:80, dmg:11, xp:2, size:104 }
 };
 const ELS = ['wood', 'fire', 'earth', 'metal', 'water'];
-function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.93, 1.13, 1.32, 1.43, 1.57][S.level - 1]; }   // level 1 eases you in; later levels are tougher   // toughness keeps pace with the player's growing powers
+// toughness keeps pace with the player's growing powers; level 1 eases you in, later levels are tougher, and a skilled
+// player's tier adds more
+function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.93, 1.13, 1.32, 1.43, 1.57][S.level - 1] * (1 + .12 * (S.hard || 0)); }
+/* Difficulty that follows the player (A, 2026-10-05: "adjustable to player skill based on the last 12 games. it will
+   start tracking after 3 levels you beat in 3m or less in a row and make the following level harder and it will back
+   off after 3 lives lost in the same run. we want to always keep the player feeling like a god"). Only the creatures
+   change: tougher, more of them, a little faster, a tougher boss; the player's powers never shrink. Three fast wins in
+   a row (three minutes or less each) raise the tier for the next level, and every further fast win raises it again,
+   never past what the last twelve wins support; three lives lost in one run lower it at once. */
+const HARD_MAX = 6;
+function skill() { try { return Object.assign({ tier:0, streak:0, hist:[] }, JSON.parse(store.get('morqi.skill') || '{}')); } catch (e) { return { tier:0, streak:0, hist:[] }; } }
+function skillWin(secs, falls) {
+  const k = skill(), fast = secs <= 180;
+  k.hist.push({ lv:S.level, t:Math.round(secs), falls, fast }); k.hist = k.hist.slice(-12);
+  k.streak = fast ? k.streak + 1 : 0;
+  const room = Math.max(0, k.hist.filter(h => h.fast).length - 2);   // the last twelve wins set how far it can climb
+  if (k.streak >= 3) k.tier = Math.min(HARD_MAX, k.tier + 1, room);
+  store.set('morqi.skill', JSON.stringify(k));
+}
+function skillFall() { if ((S.falls = (S.falls || 0) + 1) !== 3) return; const k = skill(); k.tier = Math.max(0, k.tier - 1); k.streak = 0; store.set('morqi.skill', JSON.stringify(k)); S.hard = k.tier; }
 function spawn(type, at, rush, el) {
-  if (S.en.length >= CAP && type !== 'golem') return null;
+  if (S.en.length >= CAP + (S.capBoost || 0) && type !== 'golem') return null;
   let T = ETYPE[type]; const sc = hpScale(); let x, y;
   if (at) { x = at.x; y = at.y; } else {
     const a = rnd(0, TAU);
@@ -2884,7 +2952,7 @@ function spawn(type, at, rush, el) {
   if (type === 'wolf' && !LEVELS[S.level - 1].allow.includes(E + '-b')) type = 'critter';   // only this level's specialists
   T = ETYPE[type];
   const kid = E + '-' + ROLE[type], K = KIND[kid];
-  const e = { type, x, y, r:T.r, hp:T.hp * sc * K.hp, max:T.hp * sc * K.hp, sp:T.sp * K.sp * rnd(.9, 1.1) * (rush || 1), dmg:T.dmg, xp:T.xp,
+  const e = { type, x, y, r:T.r, hp:T.hp * sc * K.hp, max:T.hp * sc * K.hp, sp:T.sp * K.sp * rnd(.9, 1.1) * (rush || 1) * (1 + .04 * (S.hard || 0)), dmg:T.dmg, xp:T.xp,
     el:E, kid, K, size:T.size, img:ok(IMG['e-' + kid]) ? 'e-' + kid : T.img, own:ok(IMG['e-' + kid]), hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:rnd(0, 6.28), ph:rnd(0, 6.28), frozen:0,
     heavy:K.beh === 'heavy' || type === 'golem', cd:rnd(.8, 2.4), act:null };
   S.en.push(e); return e;
@@ -2907,7 +2975,7 @@ function spawnBoss() {
   // each realm has its own boss, in its realm's element (A, 2026-10-04)
   const realm = worldOf(), B = BOSSES[realm], img = ok(IMG['bz-' + realm]) ? 'bz-' + realm : 'b-warden';
   const e = { type:'boss', boss:true, realm, x:S.p.x, y:S.p.y - 260, r:76, hp:1, max:1, sp:62, dmg:16, xp:0, el:realm, size:img === 'b-warden' ? 260 : 300, img, hitCd:{}, slow:0, kb:0, kx:0, ky:0, wob:0, phase:0, atk:3, summon:5, frozen:0 };
-  e.hp = e.max = Math.round(10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1]);   // a real fight: about a minute
+  e.hp = e.max = Math.round((1 + .15 * (S.hard || 0)) * 10500 * Math.pow(Math.max(8, S.lv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1]);   // a real fight: about a minute
   S.en.push(e); S.boss = e;
   if (eff(e.el, keeperEl) > 1) S.items.push({ x:S.p.x + 80, y:S.p.y + 40, kind:'ward', t:0, z:10, vz:260 });
   // room to dodge, so the boss can really attack; the whole arena always sits inside the world (playtest 2: a boss that
@@ -2944,7 +3012,7 @@ function hurt(e, dmg, el, o = {}) {
   const dealt = dmg * m;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
-  if (strong && e.hp <= 0 && !e.boss && !e.wise) { e.wise = 1; S.wise = (S.wise || 0) + 1; }
+  if (strong && e.hp <= 0 && !e.boss && !e.wise && !e.horde) { e.wise = 1; S.wise = (S.wise || 0) + 1; }
   if (!e.boss) {
     const P = S.p, d = Math.hypot(e.x - P.x, e.y - P.y) || 1, k = (o.kb || 5) * (e.heavy ? .25 : 1);
     if (e.heavy && o.kb) o = { ...o, kb:o.kb * .3 };
@@ -2964,14 +3032,18 @@ function kill(e) {
     const now = S.t; S.burst = (S.burst || []).filter(t => now - t < 3); S.burst.push(now);
     const n = S.burst.length, tier = n >= 100 ? 3 : n >= 50 ? 2 : n >= 25 ? 1 : 0;
     if (n < 10) S.burstTier = 0;
-    if (tier > (S.burstTier || 0)) { S.burstTier = tier; floatText(S.p.x, S.p.y - 120, ['', 'Great!', 'Amazing!', 'Unstoppable!'][tier], '#FFE14A', 30); stars(S.p.x, S.p.y - 60, 16 + tier * 8, '#FFE58A', 360); SFX.combo(tier * 3); }
+    if (tier > (S.burstTier || 0) && !hsOn()) { S.burstTier = tier; floatText(S.p.x, S.p.y - 120, ['', 'Great!', 'Amazing!', 'Unstoppable!'][tier], '#FFE14A', 30); stars(S.p.x, S.p.y - 60, 16 + tier * 8, '#FFE58A', 360); SFX.combo(tier * 3); }
     if (Math.random() < (e.type === 'golem' ? 1 / 3 : .003)) S.items.push({ x:e.x, y:e.y, kind:'heart', t:0, z:10, vz:240 }); }
   const col = EL[e.el];
   if (!e.boss) {
     shards(e.x, e.y - e.size * .25, col, e.type === 'golem' ? 16 : FX.length > 900 ? 3 : 7, e.type === 'golem' ? 320 : 220);
     flash(e.x, e.y - e.size * .3, e.size * 1.3, col, .14);
     const v = e.xp, kind = v >= 12 ? 2 : v >= 3 ? 1 : 0;
-    if (S.gems.length < 600) S.gems.push({ x:e.x, y:e.y, z:6, vz:rnd(160, 260), vx:rnd(-60, 60), vy:rnd(-60, 60), v, kind, t:0 });
+    // Ascended's summoned horde: a tenth of the XP, straight to the bar, so three hundred of them never flood the next
+    // minute with gems and level-ups (A: "let it count for the 1/10"); each counts fully as freed and ten times toward
+    // the level's Sparks (A, 2026-10-05: "lets give them 10x the points", the Sparks)
+    if (e.horde) { gainXp(v * .1); S.hordeFreed = (S.hordeFreed || 0) + 1; }
+    else if (S.gems.length < 600) S.gems.push({ x:e.x, y:e.y, z:6, vz:rnd(160, 260), vx:rnd(-60, 60), vy:rnd(-60, 60), v, kind, t:0 });
     else gainXp(v * .5);
     SFX.shatter();
   }
@@ -3047,7 +3119,7 @@ function useItem(k) {
   if (GIFT_VO.includes(k) && !S.taught['g_' + k] && !hsOn()) { S.taught['g_' + k] = 1; const m = fewTimes('_g' + k); if (m && AU.vo('vo-gift-' + k, 0, .6, false)) markSeen(m); }
   if (k === 'magnet') { for (const q of S.gems) q.pull = true; pickupPop('Gem Wind!', '#A8F4FF'); SFX.sweep(); ring(P.x, P.y, 20, 900, '#A8F4FF', .7, 12, true); }
   else if (k === 'heart' || k === 'dumpling' || k === 'peach') {
-    const h = (k === 'peach' ? P.max : P.max / 3) * (1 + .12 * (S.grow.wood || 0)); P.safe = 3; if (k !== 'peach') { pickupPop('+' + Math.round(h), '#FF7A8A'); SFX.heart(); S.hearts = (S.hearts || 0) + 1; } P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
+    const h = (k === 'peach' ? P.max : P.max / 3) * (1 + .12 * (S.grow.wood || 0)); P.safe = 3; if (k !== 'peach') { SFX.heart(); S.hearts = (S.hearts || 0) + 1; } P.hp = Math.min(P.max, P.hp + h); floatText(P.x, P.y - 80, '+' + Math.round(h), '#8FE3A0', 20);
     if (k === 'peach') pickupPop('Peach!', '#FFB0C8'); SFX.heal();
     for (let i = 0; i < 14; i++) fx({ k:'plus', x:P.x + rnd(-40, 40), y:P.y + rnd(-30, 20), vx:0, vy:-rnd(60, 120), life:rnd(.5, .9), s:rnd(7, 11), c:'#8FF0A0' });
   } else if (k === 'ward') { S.buffs.ward = 15; pickupPop('Jade Ward!', '#7FF0C0'); SFX.bell(true); ring(P.x, P.y, 20, 240, '#5FE3B4', .6, 14, true); }
@@ -3077,8 +3149,10 @@ function cool(id, t, dt) { S.cds[id] = (S.cds[id] ?? .3) - dt; if (S.cds[id] > 0
 // a blast: flash, fireballs rolling outward, sparks, smoke, a scorch mark and a ring
 function explode(x, y, r, dmg, el, big) {
   inArea(x, y, r, e => hurt(e, dmg, el, { kb:220, fx:x, fy:y }));
-  flash(x, y, r * 2.4, '#FFF1C0', .14); ring(x, y, r * .3, r * 1.15, '#FF9A3A', .3, 7, true);
-  for (let i = 0; i < (big ? 16 : 11); i++) { const a = rnd(0, TAU), s = rnd(r * 1.4, r * 3.4); fx({ k:'flame', x:x + Math.cos(a) * r * .2, y:y + Math.sin(a) * r * .2, vx:Math.cos(a) * s, vy:Math.sin(a) * s * .7 - 60, drag:5, life:rnd(.3, .6), s:rnd(r * .4, r * .75) }); }
+  // in a boss fight a blast is lighter, so the boss and its warnings stay in sight (QA, 2026-10-05)
+  const fight = S.boss && !S.boss.dead;
+  if (!fight) flash(x, y, r * 2.4, '#FFF1C0', .14); ring(x, y, r * .3, r * 1.15, '#FF9A3A', .3, 7, true);
+  for (let i = 0; i < (fight ? 5 : big ? 16 : 11); i++) { const a = rnd(0, TAU), s = rnd(r * 1.4, r * 3.4); fx({ k:'flame', x:x + Math.cos(a) * r * .2, y:y + Math.sin(a) * r * .2, vx:Math.cos(a) * s, vy:Math.sin(a) * s * .7 - 60, drag:5, life:rnd(.3, .6), s:rnd(r * .4, r * .75) * (fight ? .7 : 1) }); }
   burst(x, y, '#FFD27A', big ? 12 : 7, r * 6); smoke(x, y, big ? 6 : 3, r * .7);
   decal({ k:'scorch', x, y, r:r * .9, life:3 }); SFX.boom(big);
 }
@@ -3175,7 +3249,7 @@ function powers(dt) {
       let dir;
       if (ev.bamboo) { S.ang.bam = (S.ang.bam || 0) + .4; for (let i = 0; i < 8; i++) shoot('bamboo', S.ang.bam + i * TAU / 8, st);
         if (cool('bamgrove', 1.6, .24)) for (let i = 0; i < 10; i++) { const a = i * TAU / 10 + rnd(-.2, .2), r = rnd(110, 200), x = P.x + Math.cos(a) * r, y = P.y + Math.sin(a) * r * .8;
-          fx({ k:'spike', x, y, life:.7, s:54, c:'#6FAE3A', rot:a }); inArea(x, y, 44, e => hurt(e, st.dmg * 1.4, 'wood', { kb:220, fx:P.x, fy:P.y })); } }
+          fx({ k:'spike', x, y, life:.7, s:48, c:'#7DBF52', rot:a, tip:8 }); inArea(x, y, 44, e => hurt(e, st.dmg * 1.4, 'wood', { kb:220, fx:P.x, fy:P.y })); } }
       else {
         if (Math.hypot(P.mx, P.my) > .2) dir = Math.atan2(P.my, P.mx); else { const n = nearest(P.x, P.y, 1)[0]; dir = n ? Math.atan2(n.y - P.y, n.x - P.x) : (P.face > 0 ? 0 : Math.PI); }
         // each level a new shape: one spear, a fan of three, a guard behind, a wide fan of five, a fan behind too
@@ -3363,6 +3437,8 @@ function powers(dt) {
       if (z.festival && z.t >= z.life - .02 && !z.boomed) { z.boomed = true; explode(z.x, z.y, z.r * .9, 40, 'fire', true); const cols = ['#FF5A5A', '#FFD24A', '#7FC4FF', '#B6F07A', '#FF9AE8']; for (let i = 0; i < 24; i++) { const a = i / 24 * TAU; fx({ k:'spark', x:z.x, y:z.y - 60, vx:Math.cos(a) * 420, vy:Math.sin(a) * 420, drag:2.5, life:.8, s:4, c:cols[i % 5] }); } SFX.firework(); }
     }
   }
+  // at most fourteen pools of fire burn at once, the oldest going out first, so fire never carpets an arena (QA, 2026-10-05)
+  { const f = S.zones.filter(z => z.k === 'fire'); if (f.length > 14) { f.sort((a, b) => b.t / b.life - a.t / a.life); for (let i = 0; i < f.length - 14; i++) f[i].t = f[i].life; } }
   S.zones = S.zones.filter(z => z.t < z.life);
   // waves that belong to you stay centred on you for their whole life
   for (const w of S.waves) {
@@ -3612,6 +3688,8 @@ function luma(name, force) { if (!S || hsOn() || (S.over && !force)) return fals
 // a spoken hint for a player's first few runs: the next unused mark ('_crate1', '_crate2', …), or null once it's been said enough
 const fewTimes = (k, n = 3) => { for (let i = 1; i <= n; i++) if (!SEEN.has(k + i)) return k + i; return null; };
 function teach() {
+  // nothing is taught while Ascended, so no cards wait to stack up when it ends (QA, 2026-10-05)
+  if (hsOn()) return;
   const P = S.p, A = ANIMAL[animal], tg = S.taught;
   if (P.hp < P.max * .3 && S.items.some(it => it.kind === 'heart') && S.t - (S.heartVoT ?? -99) > 25) { S.heartVoT = S.t; luma('vo-heart-' + (Math.random() < .5 ? 1 : 2)); }
   if (!tg.c_pet && S.t > 6) note('pet', `Your ${A.y} fights beside you, firing ${ELNAME[A.e]} at the creatures ${ELNAME[A.e]} beats.`);
@@ -3623,7 +3701,7 @@ function teach() {
   if (!tg.c_item) { const it = S.items.find(it => ITEM_INFO[it.kind]); if (it) { const nm = ITEM_INFO[it.kind]; note('item', `${nm[0]}: ${nm[1]} Walk over it to use it.`); } }
   if (!tg.c_chest && S.chests.length) note('chest', 'A Spirit Chest! Walk to it for free upgrades, the best way to evolve a power.');
   for (const e of S.en) {
-    if (!e.K || e.boss || e.K.minion || tg['n_' + e.kid] || Math.abs(e.x - P.x) > VW * .4 || Math.abs(e.y - P.y) > VH * .36) continue;
+    if (!e.K || e.boss || e.horde || e.K.minion || tg['n_' + e.kid] || Math.abs(e.x - P.x) > VW * .4 || Math.abs(e.y - P.y) > VH * .36) continue;
     tg['n_' + e.kid] = 1; e.tagT = 3.5;
     if ((e.K.tip || e.type === 'golem') && !SEEN.has(e.kid)) {
       markSeen(e.kid);
@@ -3759,7 +3837,9 @@ function direct(dt) {
   teach();
   if (!S.bossSpawned) {
     // a light trickle between waves, mixed elements, growing slowly
-    const rate = Math.min(9, (1 + t * .035) * (1 + (S.lv - 1) * .05));
+    // from Level 3 the first forty seconds start busier, so a later level never opens on an empty field (A's playthrough,
+    // 2026-10-05: Level 4's first half minute was bare ground)
+    const rate = Math.min(9 + (S.hard || 0), (1 + t * .035 + (S.level >= 3 ? 1.6 * Math.max(0, 1 - t / 40) : 0)) * (1 + (S.lv - 1) * .05) * (1 + .1 * (S.hard || 0)));
     S.spawnAcc += dt * rate;
     while (S.spawnAcc > 1) { S.spawnAcc--; spawn(t > 40 && LV().allow.length && Math.random() < .18 ? 'wolf' : 'critter'); }
     const WV = LV().waves, next = WV[S.waveIdx];
@@ -3770,7 +3850,10 @@ function direct(dt) {
     }
     if (S.warn) { S.warn.t += dt; if (S.warn.t >= 2.2) { launchWave(S.warn); S.warn = null; S.waveIdx++; } }
     // the Warden comes once every stone is gathered and Ascended has had its moment
-    if (S.bossAt && t >= S.bossAt && !S.warn) spawnBoss();
+    if (S.bossAt && t >= S.bossAt && !S.warn) {
+      // level-ups held through Ascended come first, then the boss a moment after the last pick, so its card never stacks
+      // with them (A's playthrough, 2026-10-05: three cards in a row froze the fight's first fifteen seconds)
+      if (S.holdLevels && S.lvlDefer) { releaseLevels(); S.bossAt = t + .8; } else spawnBoss(); }
     // after the last scripted wave, waves of whatever is still missing, until every stone is out
     else if (!next && !S.warn && !allStones() && (S.extraT = (S.extraT ?? 2) - dt) <= 0) {
       S.extraT = STONE.extraEvery; const el = behind();
@@ -4209,16 +4292,23 @@ const HIGHEST = { life:15, R:700 };
 const ASC = ['fire', 'earth', 'metal', 'water', 'wood'];
 const ASC_COL = { fire:['#FF8A2A', '#FFD27A'], earth:['#C8913F', '#F1D49A'], metal:['#C9D3DB', '#F4F7FA'], water:['#4FB3FF', '#D8F1FF'], wood:['#5BD06A', '#D4F7B0'] };
 const hsOn = () => !!(S && S.hs && S.hs.on);
-const beatPos = () => { const b = AU.beat(); return b.n + b.ph; };   // in beats of the music, or of the clock when it is off
+// in beats of the music, or of the clock when it is off
+const beatPos = () => { const b = AU.beat(); return b.n + b.ph; };
 const rgbOf = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)).join(',');
 function hsTick(dt) {
   const H = S.hs, P = S.p;
   if (!H.on) return;
   const O = H.on; O.t += dt;
+  // the first two seconds: the horde rushes in from every side and prism fireworks break through it
+  if (O.horde > 0) { const n = Math.min(O.horde, 30); O.horde -= n; for (let i = 0; i < n; i++) { const a = rnd(0, TAU), d = rnd(320, 720);
+    const e = spawn(Math.random() < .2 ? 'wolf' : 'critter', { x:P.x + Math.cos(a) * d, y:P.y + Math.sin(a) * d * .9 }, 1.35); if (e) e.horde = 1; } }
+  if (O.t < 2.2 && (O.prismT = (O.prismT ?? 0) - dt) <= 0) { O.prismT = .065; const near = S.en.filter(e => !e.dead && !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 680);
+    const e = near[(Math.random() * near.length) | 0]; if (e) prismBurst(e.x + rnd(-30, 30), e.y + rnd(-30, 30)); else { const a = rnd(0, TAU), d = rnd(150, 420); prismBurst(P.x + Math.cos(a) * d, P.y + Math.sin(a) * d * .8); } }
   // one wave on each downbeat; after a pause the count picks up from now instead of firing every missed wave at once
   let bars = (beatPos() - O.q0) / 4; const next = O.fired + 1;
   if (next <= 5 && bars > next + 1.6) { O.q0 = beatPos() - (next + 1) * 4; bars = next + 1; }
-  const at = next < 5 ? next + 1 : 7, lead = next < 5 ? .2 : 1;   // the finale gathers for a whole bar
+  // the finale gathers for a whole bar
+  const at = next < 5 ? next + 1 : 7, lead = next < 5 ? .2 : 1;
   if (next <= 5 && bars >= at - lead && O.warn < next) { O.warn = next; O.warnT = O.t; ascGather(next < 5 ? [ASC[next]] : ASC); }
   if (next <= 5 && (bars >= at || (next === 5 && O.t > HIGHEST.life - 3.5))) { O.fired = next; if (next < 5) ascWave(ASC[next]); else ascFinale(); }
   if (O.fired >= 5 && bars >= 7.5 + (O.pulses || 0) * .5 && O.t < HIGHEST.life - .6) { O.pulses = (O.pulses || 0) + 1; ascPulse(O.pulses); }
@@ -4229,22 +4319,43 @@ function hsTick(dt) {
     for (const e of S.en) if (!e.dead && !w.hit.has(e) && Math.hypot(e.x - w.x, e.y - w.y) < w.r + e.r) { w.hit.add(e); ascHit(e, w); }
   }
   O.waves = O.waves.filter(w => w.t < 1.3);
-  if (O.fired >= 5) { O.lit = Math.min(1, O.lit + dt * 3); if (Math.random() < dt * 26) { const el = ASC[(Math.random() * 5) | 0], a = rnd(0, TAU), r = rnd(30, 260);   // balance: motes of all five drift up
+  // the genie starts home
+  if (!O.inSaid && O.t >= HIGHEST.life - .9) { O.inSaid = true; SFX.genie(false); }
+  // balance: motes of all five drift up
+  if (O.fired >= 5) { O.lit = Math.min(1, O.lit + dt * 3); if (Math.random() < dt * 26) { const el = ASC[(Math.random() * 5) | 0], a = rnd(0, TAU), r = rnd(30, 260);
     fx({ k:'glow', x:P.x + Math.cos(a) * r, y:P.y + Math.sin(a) * r * .5, vx:0, vy:-rnd(30, 70), s:rnd(16, 30), s1:4, c:ASC_COL[el][0], life:rnd(.8, 1.4) }); } }
   if (O.t >= HIGHEST.life) {
     // after the final one "Ascend" plays on until the Warden's theme lands on the next bar; otherwise the world's own song returns
+    // the genie pours back into the Keeper: a last pop of light at the body
+    flash(P.x, P.y - 40, 420, '#FFE08A', .35); ring(P.x, P.y - 30, 10, 180, '#FFE08A', .45, 14, true); SFX.ting(); S.capBoost = 0;
     const final = O.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
   }
 }
 function hsStart(final) {
   closeSeal();
-  const H = S.hs, P = S.p; H.used = true; H.on = { t:0, final, q0:0, fired:-1, warn:-1, waves:[], nodeT:[], lit:0 };
-  S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); H.on.q0 = beatPos();
+  const H = S.hs, P = S.p; H.used = true; H.on = { t:0, final, q0:0, fired:-1, warn:-1, waves:[], nodeT:[], lit:0, born:performance.now(), horde:300, gx:P.x, gy:P.y - 150 };
+  S.capBoost = 320;   // ten times the usual crowd comes for the first two seconds (A, 2026-10-05)
+  S.eshots = []; S.flashT = .12; S.flashC = '255,224,160'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); H.on.q0 = beatPos();
   // the world stops for half a second while the camera pushes in on the anthem's first hit
-  S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true); AU.vo('vo-ascended', .35, .8);
+  S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true); SFX.genie(true); AU.vo('vo-ascended', .35, .8);
   ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true);
   for (const q of S.gems) q.pull = true;
+}
+// Prism fireworks (A, 2026-10-05: "gorgeous colorful explosions like how the movie Elemental did in the scene where she
+// sees all different color fires"): fire in every colour but red (red only ever means danger): flame tongues that rise
+// as hot gas does, coloured embers that shed coloured cinders, rings and a flash in the burst's own two or three colours.
+// no gold (rewards) and no pink (too near the coral of a warning)
+const PRISM = ['#4FB3FF', '#5BE07A', '#B07CFF', '#3FE0D0', '#FF9A3A'];
+function prismBurst(x, y) {
+  const pal = [0, 1, 2].map(() => PRISM[(Math.random() * PRISM.length) | 0]), few = FX.length > 850;
+  if ((S.prismN = (S.prismN || 0) + 1) % 3 === 0) flash(x, y - 20, 260, pal[0], .12);
+  ring(x, y, 12, 210, pal[1], .45, 10, false); ring(x, y, 8, 140, pal[2], .35, 7, false);
+  for (let i = 0; i < (few ? 7 : 18); i++) { const a = rnd(0, TAU), sp = rnd(90, 320); fx({ k:'cflame', x, y, vx:Math.cos(a) * sp, vy:Math.sin(a) * sp * .7 - 40, drag:3, buoy:220, life:rnd(.6, 1.1), s:rnd(22, 42), c:pal[i % 3] }); }
+  for (let i = 0; i < (few ? 2 : 5); i++) { const a = rnd(0, TAU), c = pal[i % 3]; fx({ k:'ember', x, y, z:10, vx:Math.cos(a) * rnd(120, 260), vy:Math.sin(a) * rnd(80, 180), vz:rnd(260, 460), life:rnd(.9, 1.3), s:rnd(6, 10), c, c2:c, shed:'cinder', sc:c, shedR:22 }); }
+  burst(x, y - 10, pal[2], few ? 6 : 14, 420);
+  inArea(x, y, 160, e => hurt(e, e.boss ? 300 : 2000, ASC[(Math.random() * 5) | 0], { kb:300, fx:x, fy:y, spark:false }));
+  SFX.firework();
 }
 // the element gathers in before it breaks: motes of its colour stream to the Keeper
 function ascGather(els) {
@@ -4255,6 +4366,9 @@ function ascGather(els) {
 function ascWave(el) {
   const P = S.p, O = S.hs.on, [c1, c2] = ASC_COL[el];
   O.waves.push({ el, x:P.x, y:P.y, t:0, r:0, hit:new Set() }); O.nodeT[ASC.indexOf(el)] = O.t;
+  // an element not learned yet is a taste of what is coming (A, 2026-10-05)
+  // drawn under the wheel, clear of the genie above (design review, 2026-10-05)
+  if (!S.learned.includes(el)) floatText(P.x, P.y + 150, 'A taste of ' + ELNAME[el] + '!', ASC_COL[el][0], 24);
   S.hitstop = Math.max(S.hitstop, .06); S.shake = Math.max(S.shake, el === 'earth' ? .75 : .45); S.flashT = .1; S.flashC = rgbOf(c1);
   flash(P.x, P.y - 30, 560, c1, .3); ring(P.x, P.y, 30, 260, c2, .3, 20, true);
   ({ fire:() => { SFX.bx('ember-burst', 1, 0); SFX.boom(true); }, earth:() => { SFX.bx('earth-quake', 1, 0); SFX.stomp(); }, metal:() => { SFX.bx('call-bell', 1, 0); SFX.shing(); },
@@ -4283,7 +4397,8 @@ function ascFront(w, r0) {
   for (let i = 0; i < n; i++) {
     if (Math.random() > crowd) continue;
     const a = rnd(0, TAU), r = rnd(r0, w.r), x = w.x + Math.cos(a) * r, y = w.y + Math.sin(a) * r, ca = Math.cos(a), sa = Math.sin(a);
-    if (i === 1) shards(x, y, EL[w.el], 1, 220);   // chips of the element's own Qi Stone ride every wave
+    // chips of the element's own Qi Stone ride every wave
+    if (i === 1) shards(x, y, EL[w.el], 1, 220);
     if (w.el === 'fire') { flames(x, y, 1, 10, rnd(34, 56), 220);
       if (i % 3 === 0) fx({ k:'ember', x, y, z:10, vx:ca * rnd(90, 220), vy:sa * rnd(60, 140), vz:rnd(280, 520), life:rnd(1, 1.5), s:rnd(8, 14), shed:'cinder', shedR:24 });
       if (i === 0 && Math.random() < .3) decal({ k:'scorch', x, y, r:rnd(26, 40), life:2.5 }); }
@@ -4314,7 +4429,8 @@ function ascHit(e, w) {
   else if (el === 'metal') burst(e.x, e.y - 20, '#F4F7FA', 6, 420);
   else if (el === 'water') drops(e.x, e.y - 10, 7, 240);
   else leaves(e.x, e.y - 10, 5, 220);
-  if (eff(el, e.el) > 1) shards(e.x, e.y - 20, ASC_COL[el][0], 4, 260);   // its element beats this one: a bright crack of crystal
+  // its element beats this one: a bright crack of crystal
+  if (eff(el, e.el) > 1) shards(e.x, e.y - 20, ASC_COL[el][0], 4, 260);
 }
 /* ================= the five Qi Stones ================= */
 // The point of every level (A: "yes lets go with your recommendations"): balance. Each creature you free gives qi of its
@@ -4845,7 +4961,13 @@ function update(dt) {
     ring(P.x, P.y, 20, 360, '#FFE6A3', .6, 12, true); stars(P.x, P.y - 40, 24, '#FFE58A', 320); SFX.levelup(); luma('vo-another', true); $('#livesPill').classList.remove('bump'); void $('#livesPill').offsetWidth; $('#livesPill').classList.add('bump'); }
   if (P.hp <= 0 && !S.over) fall();
 }
-function floatText(x, y, s, c, size = 14) { if (S.txt.length > 24) S.txt.shift(); S.txt.push({ x, y, s, c, t:0, size }); }
+// a word that would land on one still showing lifts above it instead (A's playthrough, 2026-10-05: "Unstoppable!" over
+// "Ascended!", a name over "Resisted")
+function floatText(x, y, s, c, size = 14) {
+  if (S.txt.length > 24) S.txt.shift();
+  for (let n = 0; n < 4; n++) { const o = S.txt.find(o => o.t < .9 && Math.abs(o.x - x) < 90 && Math.abs(o.y - y) < (o.size + size) * .6); if (!o) break; y = o.y - (o.size + size) * .65; }
+  S.txt.push({ x, y, s, c, t:0, size });
+}
 
 /* ================= drawing ================= */
 let camX = 0, camY = 0, frozenPat = null, meadowPat = null;
@@ -5181,6 +5303,29 @@ function spr(name, x, y, s, rot, alpha) {
   g.save(); g.translate(x, y); if (rot) g.rotate(rot); if (alpha != null) g.globalAlpha = alpha; g.drawImage(im, -s / 2, -s / 2, s, s); g.restore(); return true;
 }
 function add(fn) { g.globalCompositeOperation = 'lighter'; fn(); g.globalCompositeOperation = 'source-over'; }
+// a flame tongue in any colour, made once per colour: a white-hot root, the colour, a soft tip
+const TONGUES = {};
+function tongue(col) {
+  if (TONGUES[col]) return TONGUES[col];
+  const c = document.createElement('canvas'); c.width = 32; c.height = 54; const x = c.getContext('2d');
+  x.beginPath(); x.moveTo(16, 1); x.bezierCurveTo(24, 16, 31, 30, 29, 40); x.arc(16, 40, 13, 0, Math.PI); x.bezierCurveTo(1, 30, 8, 16, 16, 1); x.closePath(); x.clip();
+  const gr = x.createRadialGradient(16, 42, 1, 16, 34, 30); gr.addColorStop(0, col + 'FF'); gr.addColorStop(.12, col); gr.addColorStop(.75, col + '88'); gr.addColorStop(1, col + '00');
+  x.fillStyle = gr; x.fillRect(0, 0, 32, 54); return TONGUES[col] = c;
+}
+// something off screen worth fetching: its own picture in a soft glow of its colour, with a small round nub on the side
+// it lies toward. A picture, so a pre-reader knows what is there; round, so it never reads as an arrowhead (design
+// review, 2026-10-05)
+function beacon(x, y, a, col, img, k) {
+  add(() => glowAt(x, y, 64 * k, col, .6));
+  g.save(); g.translate(x, y); g.scale(k, k); g.fillStyle = col; g.beginPath(); g.arc(Math.cos(a) * 19, Math.sin(a) * 19, 5, 0, TAU); g.fill();
+  if (!spr(img, 0, 0, 34)) { g.beginPath(); g.arc(0, 0, 11, 0, TAU); g.fill(); } g.restore();
+}
+// danger coming from off screen: a coral-rimmed disc with the face of what is coming, and no nub, so it never looks
+// like something to fetch
+function warnMark(x, y, img) {
+  g.save(); g.translate(x, y); g.fillStyle = 'rgba(20,24,52,.75)'; g.strokeStyle = '#FF6B5A'; g.lineWidth = 3.5; g.beginPath(); g.arc(0, 0, 17, 0, TAU); g.fill(); g.stroke();
+  if (ok(IMG[img])) { g.beginPath(); g.arc(0, 0, 15, 0, TAU); g.clip(); g.drawImage(IMG[img], -16, -17, 32, 32); } g.restore();
+}
 function glowAt(x, y, s, col, a = 1) { g.globalAlpha = a; g.drawImage(glow(col), x - s / 2, y - s / 2, s, s); g.globalAlpha = 1; }
 function tear(x, y, w, h, lean) { g.beginPath(); g.moveTo(x + lean, y - h); g.bezierCurveTo(x + w, y - h * .35, x + w, y + w * .7, x, y + w * .7); g.bezierCurveTo(x - w, y + w * .7, x - w, y - h * .35, x + lean, y - h); g.fill(); }
 function flameAt(x, y, s, k, seed, a = 1) {
@@ -5219,8 +5364,10 @@ function bloomParty(k) {
     const gr = g.createLinearGradient(0, 0, 0, H * .5); gr.addColorStop(0, `rgba(255,226,150,${.09 * k})`); gr.addColorStop(1, 'rgba(255,226,150,0)');
     g.fillStyle = gr; g.beginPath(); g.moveTo(x - w * .3, 0); g.lineTo(x + w * .3, 0); g.lineTo(x + w + 30, H * .5); g.lineTo(x - w - 30, H * .5); g.closePath(); g.fill(); }
   g.globalCompositeOperation = 'source-over';
-  const cols = [EL.water, EL.wood, EL.fire, EL.earth, '#F4F6FF'];
-  for (let i = 0; i < 34; i++) {
+  // eighteen petals, fire's in flame orange: red means danger only (A's playthrough, 2026-10-05: the confetti hid gems and
+  // small creatures)
+  const cols = [EL.water, EL.wood, '#FF9A3A', EL.earth, '#F4F6FF'];
+  for (let i = 0; i < 18; i++) {
     const h1 = hsh(i + 7), h2 = hsh(i + 77), h3 = hsh(i + 177), sp = 40 + h2 * 50;
     const x = ((h1 * W + Math.sin(T * (.8 + h3) + i) * 40) % W + W) % W, y = ((h2 * H + T * sp) % (H + 40)) - 20, r = T * (1 + h3 * 2) + i;
     g.save(); g.translate(x, y); g.rotate(r); g.globalAlpha = .85 * k; g.fillStyle = cols[i % 5];
@@ -5371,6 +5518,14 @@ function draw() {
       g.globalAlpha = 1; }
     else { g.globalAlpha = k * .8; g.fillStyle = 'rgba(60,20,10,.4)'; g.beginPath(); g.ellipse(h.x, h.y, h.r, h.r * .6, 0, 0, TAU); g.fill(); g.strokeStyle = `rgba(255,90,70,${.6 + .3 * Math.sin(S.t * 10 + h.rot)})`; g.lineWidth = 2.5; g.stroke(); const w = h.r * 1.1 * (1 + Math.sin(S.t * 18 + h.rot) * .1); g.drawImage(flameSprite(1), h.x - w / 2, h.y - w * 1.1, w, w * 1.5); g.globalAlpha = 1; }
   }
+  // burning pools (the player's own): low warm flames with no red rim, so they never read as a hazard to avoid. They
+  // burn under every danger warning, and see-through in a boss fight, so they can never hide one (A's playthrough,
+  // 2026-10-05: Lantern Festival's fire covered the Stone Matron's boulder lanes)
+  { const fight = S.boss && !S.boss.dead ? .5 : 1;
+    for (const z of S.zones) if (z.k === 'fire' && inView(z.x, z.y, z.r)) {
+      g.globalAlpha = Math.min(1, z.t * 5, (z.life - z.t) * 2.5) * fight;
+      for (const f of z.tongues) { const fl = 1 + Math.sin(S.t * f.sp + f.ph) * .16, w = f.s * fl * .75, h = w * 1.1; g.drawImage(flameSprite(Math.sin(S.t * f.sp * .7 + f.ph) > .4 ? 1 : 0), z.x + f.dx - w / 2, z.y + f.dy - h * .73, w, h); }
+      g.globalAlpha = 1; } }
   // the boss's ground attacks fill up in red first
   if (S.bossFx) for (const f of S.bossFx) if (f.t >= 0) drawBossFx(f);
   // attack warnings: a red light fills up on the ground, then the attack lands
@@ -5413,15 +5568,10 @@ function draw() {
     if (wind) { const y = e.y - s * .62 - 18 - Math.sin(S.t * 12) * 3; g.font = '900 30px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(60,10,6,.8)'; g.strokeText('!', e.x, y); g.fillStyle = '#FF4A3A'; g.fillText('!', e.x, y); g.lineWidth = 1; }
     if (e.tagT > 0) { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
       g.strokeStyle = GROUND_RING[e.el]; g.lineWidth = 4; g.beginPath(); g.ellipse(e.x, e.y + e.r * .5, e.r * 1.8 + Math.sin(S.t * 8) * 4, e.r * .8, 0, 0, TAU); g.stroke();
-      g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, e.x, y); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, e.x, y); g.globalAlpha = 1; g.lineWidth = 1; }
+      // the name stays inside the safe part of the screen, clear of the top bar and the minimap (A's playthrough, 2026-10-05)
+      const tx = clamp(e.x, cx + 74 / Z, cx + (W - 74) / Z); let ty = Math.max(y, cy + 178 / Z); if ((tx - cx) * Z > W - 160 && (ty - cy) * Z < 290) ty = cy + 290 / Z;
+      g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, tx, ty); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, tx, ty); g.globalAlpha = 1; g.lineWidth = 1; }
     if (e.type === 'golem') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(e.x - 42, e.y - s * .62 - 14, 84, 10); g.fillStyle = EL[e.el]; g.fillRect(e.x - 40, e.y - s * .62 - 12, 80 * Math.max(0, e.hp / e.max), 6); }
-  }
-  // burning pools (the player's own): low warm flames with no red rim, so they never read as a hazard to avoid
-  for (const z of S.zones) if (z.k === 'fire' && inView(z.x, z.y, z.r)) {
-    const a = Math.min(1, z.t * 5, (z.life - z.t) * 2.5);
-    g.globalAlpha = a;
-    for (const f of z.tongues) { const fl = 1 + Math.sin(S.t * f.sp + f.ph) * .16, w = f.s * fl * .75, h = w * 1.1; g.drawImage(flameSprite(Math.sin(S.t * f.sp * .7 + f.ph) > .4 ? 1 : 0), z.x + f.dx - w / 2, z.y + f.dy - h * .73, w, h); }
-    g.globalAlpha = 1;
   }
   // sacred trees (Rising Grove)
   drawFuseGround();
@@ -5550,7 +5700,8 @@ function draw() {
   const posed = S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
   // the bold look's bigger heads read best drawn a little larger
   const hs = hsOn(), hsIm = hs ? (IMG['k' + keeper + 'hs'] || load('k' + keeper + 'hs', `art4/k${keeper}-highest.png?v=8`)) : null;
-  const kName = posed || (useRun ? runName : 'k' + keeper), kim = hs && ok(hsIm) ? hsIm : IMG[kName], ks = hs ? 176 : 120;
+  // while Ascended the Keeper stays themself on the ground; the Ascended form rises out of them as a genie
+  const kName = posed || (useRun ? runName : 'k' + keeper), kim = IMG[kName], ks = 120;
   if (P.slowT > 0) { const k = Math.min(1, P.slowT * 2); g.strokeStyle = `rgba(110,190,255,${.8 * k})`; g.fillStyle = `rgba(110,190,255,${.25 * k})`; g.lineWidth = 3; g.beginPath(); g.ellipse(P.x, P.y + 26, 40, 15, 0, 0, TAU); g.fill(); g.stroke(); g.lineWidth = 1; if (Math.random() < .3) fx({ k:'drop', x:P.x + rnd(-24, 24), y:P.y + rnd(-50, 10), z:0, vx:0, vy:30, life:.5, s:3 }); }
   const run = P.moving, cyc = S.t * 13, bob = run ? (useRun ? Math.abs(Math.sin(S.t * Math.PI * 5)) * 3 : Math.abs(Math.sin(cyc)) * 6) : 0;
   const lean = (P.vx || 0) / MOVE * (useRun ? .07 : .15), ksx = run ? 1 - Math.abs(Math.cos(cyc)) * .04 : 1 - Math.sin(S.t * 2.6) * .01, ksy = run ? 1 + Math.abs(Math.cos(cyc)) * .05 : 1 + Math.sin(S.t * 2.6) * .022;
@@ -5562,16 +5713,17 @@ function draw() {
   if (S.buffs.tiger > 0) add(() => { glowAt(kx, ky - 30, 170 + Math.sin(S.t * 18) * 14, '#FF9A3A', .8); if (Math.random() < .5) flames(kx, ky - 10, 1, 20, 22, 120); });
   if (hs) {   // Ascended: a golden aura and the five Qi Stones on their wheel, floating a little above the ground
     const T = S.hs.on.t, k = Math.min(1, T / .3, (HIGHEST.life - T) / .3);
-    add(() => glowAt(kx, ky - 50, 260 + Math.sin(S.t * 6) * 20, '#FFE08A', .75 * k));
+    add(() => glowAt(kx, ky - 50, 170 + Math.sin(S.t * 6) * 14, '#FFE08A', .5 * k));
     drawAscendStones(kx, ky);
   }
-  if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob - (hs ? 18 + Math.sin(S.t * 3) * 6 : 0)); g.rotate(hs ? 0 : lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
+  if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob); g.rotate(lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
     g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1));
     // the look's signature: a soft rim of light in the Keeper's element colour
     { const rim = silhouette(kName, EL[keeperEl]); if (rim) add(() => { g.globalAlpha = .6; g.drawImage(rim, -ks * .53, -ks * .75 - 24, ks * 1.06, ks * 1.06); g.globalAlpha = 1; }); }
     g.drawImage(kim, -ks / 2, -ks * .72 - 24, ks, ks);   // feet on the shadow
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, -ks * .72 - 24, ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
+  if (hs) drawGenie(kx, ky, hsIm);
   if (S.dashCd > 0) { const k = 1 - S.dashCd / DASH_CD; g.save(); g.strokeStyle = 'rgba(111,242,207,.85)'; g.lineWidth = 4.5; g.lineCap = 'round'; g.beginPath(); g.ellipse(P.x, P.y + 28, 36, 14, 0, -Math.PI / 2, -Math.PI / 2 + k * TAU); g.stroke(); g.restore(); }
   const hb = Math.max(0, P.hp / P.max);
   // a glossy health capsule with a white rim, like the HUD
@@ -5593,15 +5745,17 @@ function draw() {
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
   if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
   drawFX(true);
-  // a waiting Qi Stone: a glowing arrow at your side points to it, small at first and growing brighter and bigger the
+  // a waiting Qi Stone: a glowing beacon at your side leans toward it, small at first and growing brighter and bigger the
   // longer it waits (A, 2026-10-05: a reminder that does not get in the way)
   { const P = S.p; let best = null, bd = 1e9; for (const it of S.items) if (it.kind === 'stone' && it.t > 1.2) { const d = Math.hypot(it.x - P.x, it.y - P.y); if (d < bd) { bd = d; best = it; } }
     if (!best && S.shrines && P.hp < P.max * .6) for (const sh of S.shrines) if (sh.charge > 0) { const d = Math.hypot(sh.x - P.x, sh.y - P.y); if (d < bd) { bd = d; best = { x:sh.x, y:sh.y, t:Math.min(13.2, sh.t), el:sh.el }; } }
     if (!best && S.call && S.call.strike && S.call.strike.warm && P.hp < P.max * .6) for (const w of S.call.strike.warm) if (S.call.strike.t - w.t < w.life - .6) { const d = Math.hypot(w.x - P.x, w.y - P.y); if (d < bd) { bd = d; best = { x:w.x, y:w.y, t:13.2, el:'fire' }; } }
+    S.ptrItem = best && bd > 120 ? best : null;
     if (best && bd > 120) { const a = Math.atan2(best.y - P.y, best.x - P.x), gr = Math.min(1, (best.t - 1.2) / 12), pulse = .5 + .5 * Math.sin(S.t * 5), s = .8 + .7 * gr, r = 74 + 14 * gr + pulse * 6, x = P.x + Math.cos(a) * r, y = P.y - 30 + Math.sin(a) * r * .8, col = GROUND_RING[best.el];
       add(() => glowAt(x, y, 90 * s, col, .5 + .35 * pulse));
       g.save(); g.translate(x, y); g.rotate(a); g.scale(s, s); g.lineJoin = 'round';
-      g.fillStyle = col; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3.5; g.beginPath(); g.moveTo(20, 0); g.lineTo(-10, -15); g.lineTo(-4, 0); g.lineTo(-10, 15); g.closePath(); g.fill(); g.stroke();
+      // a round beacon, never an arrowhead
+      g.fillStyle = col; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3.5; g.beginPath(); g.arc(14, 0, 6, 0, TAU); g.fill(); g.stroke(); g.beginPath(); g.arc(0, 0, 12, 0, TAU); g.fill(); g.stroke();
       g.restore(); } }
   // damage numbers and callouts
   g.textAlign = 'center'; g.lineJoin = 'round';
@@ -5612,32 +5766,35 @@ function draw() {
   // edge arrows never sit on the HUD's buttons, the skills bar or the top bar (QA, 2026-10-05): they slide along their
   // edge until they are clear
   const hudR = ['#ultBtn', '#callBtn', '#mapBtn', '#hud .top'].map(q => $(q)).filter(e => e && !e.hidden && e.offsetParent).map(e => { const r = e.getBoundingClientRect(), b = stage.getBoundingClientRect(); return [r.left - b.left - 20, r.top - b.top - 20, r.right - b.left + 20, r.bottom - b.top + 20]; });
+  // markers pointing the same way space out along the edge instead of stacking (QA, 2026-10-05)
+  const placed = [], spaced = ([x, y]) => { for (let i = 0; i < 8; i++) { if (!placed.some(([px, py]) => Math.hypot(px - x, py - y) < 44)) break;
+    if (x < 60 || x > W - 60) y = clamp(y + (y < H - 170 ? 46 : -46), 150, H - 120); else x = clamp(x + (x < W - 90 ? 46 : -46), 30, W - 30); } placed.push([x, y]); return [x, y]; };
   const clearOf = (x, y, side) => { for (let i = 0; i < 12; i++) { const r = hudR.find(([l, t, rr, bb]) => x > l && x < rr && y > t && y < bb); if (!r) break; if (side) y = r[3] + 2; else x = x < W / 2 ? r[2] + 2 : r[0] - 2; } return [x, y]; };
   // screen space: arrows to off-screen chests, flashes, the cold edge of low health
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
-  for (const it of S.items) if (it.kind === 'stone') {   // a stone off screen gets an arrow in its element's colour
+  for (const it of S.items) if (it.kind === 'stone' && it !== S.ptrItem) {   // a stone off screen gets an arrow in its element's colour
     const sx = (it.x - cx) * Z, sy = (it.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true), k = 1 + Math.sin(S.t * 6) * .15;
-    g.save(); g.translate(ex, ey); g.rotate(a); g.scale(k, k); g.fillStyle = GROUND_RING[it.el]; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-9, -13); g.lineTo(-9, 13); g.closePath(); g.fill(); g.stroke(); g.restore();
+    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true)), k = 1 + Math.sin(S.t * 6) * .15;
+    beacon(ex, ey, a, GROUND_RING[it.el], 'x-stone-' + it.el, k);
   }
   if (S.bloomSeed) {   // the seed off screen gets a golden arrow that pulses
     const sd = S.bloomSeed, sx = (sd.x - cx) * Z, sy = (sd.y - cy) * Z;
-    if (!(sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20)) { const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true), k = 1 + Math.sin(S.t * 6) * .15;
-      g.save(); g.translate(ex, ey); g.rotate(a); g.scale(k, k); g.fillStyle = '#FFD24A'; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(18, 0); g.lineTo(-9, -13); g.lineTo(-9, 13); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+    if (!(sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20)) { const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true)), k = 1 + Math.sin(S.t * 6) * .15;
+      beacon(ex, ey, a, '#FFD24A', 'x-bloom', k); }
   }
   for (const sh of S.shrines || []) {   // a shrine off-screen gets an arrow in its element's colour
     const sx = (sh.x - cx) * Z, sy = (sh.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true);
-    g.save(); g.translate(ex, ey); g.rotate(a); g.fillStyle = EL[sh.el]; g.strokeStyle = '#FFFFFF'; g.lineWidth = 3; g.beginPath(); g.moveTo(16, 0); g.lineTo(-8, -12); g.lineTo(-8, 12); g.closePath(); g.fill(); g.stroke(); g.restore();
+    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
+    beacon(ex, ey, a, GROUND_RING[sh.el], 'x-shrine-' + sh.el, 1);
   }
   for (const ch of S.chests) {
     const sx = (ch.x - cx) * Z, sy = (ch.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true);
-    g.save(); g.translate(ex, ey); g.rotate(a); g.fillStyle = '#FFD24A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.moveTo(16, 0); g.lineTo(-8, -12); g.lineTo(-8, 12); g.closePath(); g.fill(); g.stroke(); g.restore();
+    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
+    beacon(ex, ey, a, '#FFD24A', 'x-chest', 1);
   }
-  // an incoming wave: the edges it comes from glow in its element, with arrows pointing in
+  // an incoming wave: the edges it comes from glow in its element, with beacons facing in
   if (S.warn && !hsOn()) {   // while Ascended nothing can touch you, so the warning would only be noise
-    const wv = S.warn.w, col = wv.el === 'mix' ? '#FFD24A' : EL[wv.el], pulse = .55 + .45 * Math.sin(S.t * 14);
+    const wv = S.warn.w, col = wv.el === 'mix' ? '#FF6B5A' : EL[wv.el], pulse = .55 + .45 * Math.sin(S.t * 14);
     for (const sd of S.warn.dirs) {
       const [dx, dy] = SIDES[sd];
       const ex = dx ? (dx > 0 ? W : 0) : W / 2, ey = dy ? (dy > 0 ? H : 0) : H / 2, len = dx ? H : W;
@@ -5647,8 +5804,7 @@ function draw() {
       g.globalAlpha = 1;
       for (let k = -1; k <= 1; k++) {
         const [ax, ay] = clearOf(dx ? ex - dx * 34 : ex + k * len * .22, dy ? (dy < 0 ? 205 : H - 100) : ey + k * len * .22, !!dx), ang = Math.atan2(-dy, -dx);
-        g.save(); g.translate(ax, ay); g.rotate(ang); g.globalAlpha = pulse; g.fillStyle = col; g.strokeStyle = '#1A1206'; g.lineWidth = 3;
-        g.beginPath(); g.moveTo(16, 0); g.lineTo(-10, -14); g.lineTo(-4, 0); g.lineTo(-10, 14); g.closePath(); g.fill(); g.stroke(); g.restore(); g.globalAlpha = 1;
+        g.globalAlpha = .6 + .4 * pulse; warnMark(ax, ay, 'e-' + (wv.el === 'mix' ? 'earth' : wv.el) + '-a'); g.globalAlpha = 1;
       }
     }
   }
@@ -5680,6 +5836,32 @@ function callPhases() { const C = S.call, D = CALL[C.id], tr = C.tier, T = CALL_
    under the Keeper. The wheel's nodes are the five Qi Stones in their generating order, fire at the top and round
    clockwise; a stone lights when its wave breaks and the cycle draws on to it; at balance the star of control (each
    element keeping the one two steps on in check) draws itself across the wheel. */
+/* The Ascended self as a genie (A, 2026-10-05: "end with some cool slick genie animation effect back to the players
+   body just like one coming out and have him be a lot bigger"). The Keeper stays on the ground; the Ascended form
+   spirals up out of their heart, two and a half times their size, and floats above them, joined to them by a tail of
+   light that curls and carries the five colours along it. In the last moment it spirals back down and pours in. */
+const GENIE = { cut:{} };
+const easeBack = x => 1 + 2.7 * Math.pow(x - 1, 3) + 1.7 * Math.pow(x - 1, 2);
+function genieSprite(im) {   // the form's lower part thins away into the tail
+  const key = im.src; if (GENIE.cut[key]) return GENIE.cut[key];
+  const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+  x.globalCompositeOperation = 'destination-out'; const gr = x.createLinearGradient(0, c.height * .55, 0, c.height * .95); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,1)');
+  x.fillStyle = gr; x.fillRect(0, c.height * .55, c.width, c.height * .45); return GENIE.cut[key] = c;
+}
+function drawGenie(kx, ky, im) {
+  if (!ok(im)) return;
+  const O = S.hs.on, out = Math.min(1, (performance.now() - O.born) / 900), back = Math.max(0, Math.min(1, (O.t - (HIGHEST.life - .9)) / .9)), e = back > 0 ? 1 - back : out;
+  // the Keeper's heart
+  const bx = kx, by = ky - 46;
+  // the form trails a little, as smoke follows
+  O.gx += (kx + 26 - O.gx) * .08; O.gy += (ky - 215 + Math.sin(S.t * 2.2) * 8 - O.gy) * .08;
+  const sc = Math.max(0, easeBack(e)), spin = (1 - e) * 5 * Math.PI, gx = bx + (O.gx - bx) * e + Math.cos(spin) * 60 * (1 - e), gy = by + (O.gy - by) * e + Math.sin(spin) * 24 * (1 - e), GS = 360 * sc;
+  if (GS < 4) return;
+  add(() => { const N = 26; for (let i = 0; i <= N; i++) { const u = i / N, cx = bx + (gx - bx) * u + Math.sin(u * 7 - S.t * 6) * 64 * u * (1 - u), cy = by + (gy + GS * .28 - by) * u;
+    glowAt(cx, cy, (8 + 34 * u) * Math.max(.35, sc), ASC_COL[ASC[((u * 5 + S.t * 2) | 0) % 5]][0], .55 * Math.min(1, e * 2)); }
+    glowAt(gx, gy, GS * 1.1, '#FFE08A', .5 * e); });
+  g.save(); g.globalAlpha = Math.min(1, e * 1.6); g.translate(gx, gy); if (S.p.face < 0) g.scale(-1, 1); g.drawImage(genieSprite(im), -GS / 2, -GS * .55, GS, GS); g.restore();
+}
 const ASC_R = 172, ASC_SQ = .42;
 const ascNode = (cx, cy, i) => { const a = -Math.PI / 2 + i * TAU / 5; return [cx + Math.cos(a) * ASC_R, cy + Math.sin(a) * ASC_R * ASC_SQ]; };
 function drawAscendGround() {
@@ -6042,7 +6224,7 @@ function drawFX(top) {
       else if (p.k === 'leaf') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.globalAlpha = a; g.fillStyle = p.c; g.beginPath(); g.ellipse(0, 0, p.s, p.s * .45, 0, 0, TAU); g.fill(); g.restore(); g.globalAlpha = 1; }
       else if (p.k === 'vine') drawVine(p, k);
       // a root, spout or blade rising from the ground: it bends and ends in a round tip, so it never reads as an arrowhead
-      else if (p.k === 'spike') { const h = p.s * Math.min(1, k * 5) * (1 - Math.max(0, k - .6) * 2.5), b = Math.cos(p.rot || 0) * h * .3, tr = 4.5;
+      else if (p.k === 'spike') { const h = p.s * Math.min(1, k * 5) * (1 - Math.max(0, k - .6) * 2.5), b = Math.cos(p.rot || 0) * h * .3, tr = p.tip || 4.5;
         g.fillStyle = p.c; g.strokeStyle = '#1A2A10'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(p.x - 9, p.y);
         g.quadraticCurveTo(p.x - 6 + b * .2, p.y - h * .55, p.x + b - tr, p.y - h + tr); g.arc(p.x + b, p.y - h + tr, tr, Math.PI, 0);
         g.quadraticCurveTo(p.x + 6 + b * .2, p.y - h * .55, p.x + 9, p.y); g.closePath(); g.fill(); g.stroke(); }
@@ -6059,6 +6241,9 @@ function drawFX(top) {
     else if (p.k === 'coin') { const y = p.y - p.z, w = p.s * Math.max(.18, Math.abs(Math.cos(p.rot))), al = Math.min(1, a * 2.5);
       g.globalAlpha = al; g.fillStyle = '#D9E2EA'; g.strokeStyle = '#4A5868'; g.lineWidth = 2; g.beginPath(); g.ellipse(p.x, y, w, p.s, 0, 0, TAU); g.fill(); g.stroke();
       g.fillStyle = '#4A5868'; g.fillRect(p.x - w * .28, y - p.s * .28, w * .56, p.s * .56); g.globalAlpha = 1; }
+    // a tongue of coloured fire (Ascended's prism fireworks), painted rather than added light so the field stays
+    // readable (design review, 2026-10-05): it flickers, rises and burns out
+    else if (p.k === 'cflame') { const w = p.s * (1 - k * .5) * (1 + Math.sin(S.t * 34 + p.x) * .1), h = w * 1.7; g.globalAlpha = Math.pow(a, .7) * .9; g.drawImage(tongue(p.c), p.x - w / 2, p.y - h * .78, w, h); g.globalAlpha = 1; }
     else if (p.k === 'plus') { g.globalAlpha = a; g.fillStyle = p.c; g.fillRect(p.x - p.s / 2, p.y - p.s / 6, p.s, p.s / 3); g.fillRect(p.x - p.s / 6, p.y - p.s / 2, p.s / 3, p.s); g.globalAlpha = 1; }
     else if (p.k === 'ring' && !p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'hit') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = `rgba(255,255,255,${a})`; const s = p.s * (.6 + k * .6); g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? s * .25 : s * .6; g.lineTo(Math.cos(i * TAU / 8) * r, Math.sin(i * TAU / 8) * r); } g.closePath(); g.fill(); g.restore(); }
@@ -6070,7 +6255,8 @@ function drawFX(top) {
     if (p.k === 'glow') glowAt(p.x, p.y, p.s + ((p.s1 ?? p.s) - p.s) * k, p.c, a);
     else if (p.k === 'hit') glowAt(p.x, p.y, p.s * 1.6, p.c, a);
     else if (p.k === 'ring' && p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
-    else if (p.k === 'ember') { const y = p.y - p.z, sz = p.s * (1 - k * .35); glowAt(p.x, y, sz * 6, '#FF8A2A', a * .85); glowAt(p.x, y, sz * 2.4, '#FFD27A', a); }
+    else if (p.k === 'ember') { const y = p.y - p.z, sz = p.s * (1 - k * .35); glowAt(p.x, y, sz * 6, p.c || '#FF8A2A', a * .85); glowAt(p.x, y, sz * 2.4, p.c2 || '#FFD27A', a); }
+
     else if (p.k === 'spark') { g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.s; g.lineCap = 'round'; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x - p.vx * .04, p.y - p.vy * .04); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'star') { const s = p.s * 2.4 * (1 - k * .5); g.globalAlpha = a; g.drawImage(starSprite(p.c), p.x - s / 2, p.y - s / 2, s, s); g.globalAlpha = 1; }
     else if (p.k === 'slash') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.strokeStyle = `rgba(235,245,255,${a})`; g.lineWidth = 9 * a + 1; g.beginPath(); arc0(0, 0, p.s, -1.1, 1.1); g.stroke(); g.strokeStyle = `rgba(255,255,255,${a})`; g.lineWidth = 3; g.beginPath(); arc0(0, 0, p.s * .9, -.9, .9); g.stroke(); g.restore(); }
@@ -6171,7 +6357,10 @@ function options() {
   // the gift that will evolve a power you are building comes first, once that power has two stars
   const nG0 = Object.keys(S.gifts).length;
   if (nG0 < SLOTS.gift) { const key = Object.keys(S.skills).filter(id => !S.evo[id] && S.skills[id] >= 2 && !S.gifts[evoGift(id)] && POW[id].e !== S.apprentice).sort((a, b) => S.skills[b] - S.skills[a])[0];
-    if (key && !has('gift', evoGift(key))) opts.push({ kind:'gift', id:evoGift(key) }); }
+    // it rests too once passed on twice (A's playthrough, 2026-10-05: Deep Spring came at all seven level-ups and was never taken)
+    S.decl = S.decl || {}; const dk = key ? 'gift' + evoGift(key) : '';
+    if (key && (S.decl[dk] || 0) >= 2) S.decl[dk] -= .5;
+    else if (key && !has('gift', evoGift(key))) opts.push({ kind:'gift', id:evoGift(key) }); }
   // the Lodestone shows up once per rank; pass it by and it is gone for this run
   if (lodeDue() && opts.length < 3) { S.lodeOff[S.lode + 1] = 1; opts.push({ kind:'lode', id:'lode' }); }
   const pool = [], nA = Object.keys(S.skills).length, nG = Object.keys(S.gifts).length;
@@ -6230,7 +6419,7 @@ function renderCards(opts) {
     } else if (o.kind === 'evo') {
       const p = POW[o.id], gi = GIFT[evoGift(o.id)]; b.className = 'card evo';
       html = `<span class="tile"><img src="${icon(p.evoIcon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${p.evo}</b><span class="flag">EVOLVE!</span></span>
-        <span class="txt"><span class="formula"><img src="${icon(p.icon)}" alt="">${p.n} + <img src="${icon(gi.icon)}" alt="">${gi.n}</span><p>${EVO_DESC[o.id]}</p><small>${ELNAME[FED_BY[p.e]]} feeds ${ELNAME[p.e]}</small></span></span>`;
+        <span class="txt"><span class="formula"><img src="${icon(p.icon)}" alt="${p.n}">+<img src="${icon(gi.icon)}" alt="${gi.n}"></span><p>${EVO_DESC[o.id]}</p><small>${ELNAME[FED_BY[p.e]]} feeds ${ELNAME[p.e]}</small></span></span>`;
     } else if (o.kind === 'active') {
       const p = POW[o.id], lv = S.skills[o.id] || 0; b.className = 'card';
       html = `<span class="tile"><img src="${icon(p.icon)}" alt=""><i>${CHAR[el]}</i></span><span class="body"><span class="tab"><b>${p.n}</b>${lv ? '' : '<span class="flag">NEW!</span>'}</span>
@@ -6406,7 +6595,9 @@ function showCoach(c) {
   // enemy type"): the red-shapes warning is spoken and shown the first time only
   const redOnce = c.card && S.level <= 2 && !SEEN.has('_redtip'); if (redOnce) markSeen('_redtip');
   if (c.card) AU.vo(redOnce ? 'vo-card-beast' : 'vo-newcreature'); else if (CARD_VO[c.id]) AU.vo('vo-card-' + CARD_VO[c.id]);
-  if (c.card) { $('#beastT').textContent = c.card.endsWith('-c') ? 'Brute!' : 'New creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true) + (redOnce ? '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>' : ''); show('beastCard'); SFX.alarm(); return; }
+  // from Level 3 the card only introduces: picture, name, and what beats it (A's playthrough, 2026-10-05: Level 4 still
+  // told the player to get out of the red circle, and the card said "Brute!" while Luma said "A new creature!")
+  if (c.card) { $('#beastT').textContent = 'A new creature!'; $('#beastBody').innerHTML = beastHTML(c.card, true, S.level >= 3) + (redOnce ? '<div class="tip"><b>Red shapes</b> on the ground mean an attack is coming. Step out before they fill up.</div>' : ''); show('beastCard'); SFX.alarm(); return; }
   // every tip card shows a picture made for it, never a live snapshot of play (A, 2026-10-04: snapshots caught
   // flashes, empty ground or the wrong moment, and "I can't waste people's time with these inconsistencies")
   $('#tipT').textContent = c.title; $('#tipP').textContent = c.text; $('#tipOk').textContent = COACH.q.length ? 'Next' : 'OK';
@@ -6679,7 +6870,11 @@ const freedOf = el => { const f = FREED[el] || FREED.water; return ok(IMG[f.img]
 const CYCLE = ['wood', 'fire', 'earth', 'metal', 'water'];
 // the third star: two thirds of the creatures freed with the element that beats theirs (a share, not a count: on
 // Level 1 nearly every creature is one your Keeper beats, so the lesson lands there and becomes a real choice later)
-const WISE = 2 / 3;
+// the third star: at least half the creatures freed with an element that beats them (A's playthrough, 2026-10-05: two
+// thirds was out of reach even playing well, since each element beats only two of five). Ascended's summoned horde is
+// left out of the count, and a missed star says how close it came.
+const WISE = .5;
+const wiseShare = () => { const n = S.thawed - (S.hordeFreed || 0); return n > 0 ? Math.min(1, (S.wise || 0) / n) : 0; };
 
 // The change, about six seconds with no words: the Warden shudders as light breaks through it (two heartbeats, the
 // fear slowing), the five elements light up around it one by one in the order they feed each other, the star of how
@@ -6687,7 +6882,9 @@ const WISE = 2 / 3;
 // a dark mist drifts off, and the person it was stands there in warm light while the shore turns green and night
 // lifts into dawn. Then the Victory card.
 function win() {
-  if (S.won) return; S.won = true; S.over = true; running = false;
+  if (S.won) return; S.won = true; S.over = true; running = false; skillWin(S.t, S.falls || 0);
+  // no hurt tint frozen on the Keeper through the slow freeing (A's playthrough, 2026-10-05)
+  S.p.hitAt = -9; S.p.hurt = 0;
   AU.music(false); SFX.bossdown(); S.shake = .8;
   // the screen clears for the change, like a cut scene
   $('#hud').hidden = true;
@@ -6893,6 +7090,7 @@ function frostOf(img, fr) {
   x.globalCompositeOperation = 'source-over'; return c;
 }
 function lose(fell) {
+  skillFall();
   S.over = true; running = false; AU.music(false); if (!fell) SFX.stomp();
   const B = S.boss && !S.boss.dead ? S.boss : null, WV = LV().waves, tip = defeatTip(); let title, line, frac;
   if (B) { const left = B.hp / B.max; frac = 1 - left; const nm = bossOf(B).name; title = left < .34 ? 'So close!' : 'Keep going, Keeper!'; line = left < .34 ? `${nm} is almost free` : left < .67 ? `${nm} is half beaten` : `${nm} is still strong`; }
@@ -6923,6 +7121,8 @@ function petProgHTML(r) {
 }
 function results() {
   $('#hud').hidden = true;
+  // the home theme comes in under Victory, so the screen is never silent and it carries you home (A's playthrough, 2026-10-05)
+  if (S.won) setTimeout(() => { if (S && S.over && !$('#results').hidden) { AU.music(true); AU.song('home'); } }, 1600);
   { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
   { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `${PEOPLE[S.boss ? S.boss.realm || S.boss.el : worldOf()]} is free!`; }
   { const realm = S.boss ? S.boss.realm || S.boss.el : worldOf(), id = S.giftNew || Object.keys(CALL).find(k => CALL[k].from === realm && callOwned(k)), el = $('#resGift'); el.hidden = !id; el.classList.remove('in'); el.dataset.id = id || '';
@@ -6933,11 +7133,13 @@ function results() {
   // three stars, and each one rewards the five elements without a word: free the shore, evolve a power (the gift of the
   // element that feeds it: the feeding cycle), and free creatures with the element that beats them (the controlling cycle)
   const sec = Math.floor(S.t), evoIds = Object.keys(S.evo);
-  const goals = [[S.won, 'Freed the ' + { water:'shore', wood:'grove', fire:'ridge', earth:'hills', metal:'city' }[worldOf()]], [evoIds.length > 0, 'Evolved a power'], [S.thawed > 0 && (S.wise || 0) / S.thawed >= WISE, 'Used their weakness']];
+  const goals = [[S.won, 'Freed the ' + { water:'shore', wood:'grove', fire:'ridge', earth:'hills', metal:'city' }[worldOf()]], [evoIds.length > 0, 'Evolved a power'], [wiseShare() >= WISE, wiseShare() >= WISE ? 'Used their weakness' : 'Use their weakness', Math.min(1, wiseShare() / WISE)]];
   const star = `<path d="M50 6l12.6 27.4 29.9 3.3-22.3 20.2 6.2 29.4L50 71.2 23.6 86.3l6.2-29.4L7.5 36.7l29.9-3.3z"`;
-  $('#resStars').innerHTML = goals.map(([got, label]) => `<div class="st3${got ? ' got' : ''}"><svg viewBox="0 0 100 100" aria-hidden="true">
+  // a star not yet won fills part way to show how close it came (the weakness star), instead of a percentage
+  $('#resStars').innerHTML = goals.map(([got, label, part]) => `<div class="st3${got ? ' got' : ''}"><svg viewBox="0 0 100 100" aria-hidden="true">
     <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6C2"/><stop offset=".5" stop-color="#FFC94A"/><stop offset="1" stop-color="#EE8A14"/></linearGradient></defs>
     ${star} fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.2)" stroke-width="4" stroke-linejoin="round"/>
+    ${!got && part > 0 ? `<clipPath id="pf"><rect x="0" y="${(92 - 86 * part).toFixed(1)}" width="100" height="100"/></clipPath><g clip-path="url(#pf)" opacity=".6">${star} fill="url(#sg)"/></g>` : ''}
     ${got ? `<g class="gold">${star} fill="url(#sg)" stroke="#9A5200" stroke-width="5" stroke-linejoin="round"/><ellipse cx="40" cy="34" rx="11" ry="6" fill="#fff" opacity=".6" transform="rotate(-25 40 34)"/></g>` : ''}</svg><span>${label}</span></div>`).join('');
   { const got = goals.filter(x => x[0]).length, before = starTotal(), bl = bloomLife(before);
     if (got > starsOf(LVL)) store.set('morqi.stars.' + LVL, got);
@@ -6946,9 +7148,14 @@ function results() {
     renderLevels(); }
   [...$('#resStars').children].forEach((el, i) => { if (goals[i][0]) setTimeout(() => { el.classList.add('in'); SFX.ting(); }, reduce ? 0 : 700 + i * 380); });
   const clock = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
-  payQi(); $('#resChips').innerHTML = `<span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span><span class="chip3 qi" style="--a:#FFD66E;--b:#E09A1E"><img src="art4/icons/icon-spark.png?v=9" alt="">+${S.qiGot}</span>${S.qiMus ? `<span class="chip3" style="--a:#FFD66E;--b:#E09A1E">${S.qiMus > 10 ? 'New theme' : 'Music on'} +${S.qiMus}</span>` : ''}${S.musMile ? `<span class="chip3" style="--a:#FFD66E;--b:#E09A1E">Music ${S.musMile.label} +${S.musMile.n.toLocaleString()}</span>` : ''}`
+  // two rows: what you did (freed, time, evolutions), then what you earned, one Sparks total and the music parts of it,
+  // each with the orb (design review, 2026-10-05: the music chips read as extra on top of the total)
+  payQi(); const orb = '<img src="art4/icons/icon-spark.png?v=9" alt="">', gold = 'style="--a:#FFD66E;--b:#E09A1E"';
+  const parts = [S.qiMus > 10 ? ['New song', 300] : null, S.qiMus ? ['Music on', 10] : null, S.musMile ? [{ '1 week':'A week of music', '1 month':'A month of music', '3 months':'3 months of music', '6 months':'6 months of music', '1 year':'A year of music' }[S.musMile.label], S.musMile.n] : null].filter(Boolean);
+  $('#resChips').innerHTML = `<div class="crow"><span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span>`
     + `<span class="chip3" style="--a:#A99CFF;--b:#6F5CF0">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
-    + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('');
+    + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('') + '</div>'
+    + `<div class="crow"><span class="chip3 qi" ${gold}>${orb}+${S.qiGot.toLocaleString()}</span>${parts.map(([n, v]) => `<span class="chip3 qi sub" ${gold}>${orb}${n} +${v.toLocaleString()}</span>`).join('')}</div>`;
   $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:18 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${8 + (i * 7) % 9}px;--c:${['#FFE08A', '#7FF0C0', '#FFFFFF', '#FFB8D0'][i % 4]};--t:${5 + (i * 3) % 5}s;--d:${(i * .43) % 4}s"></i>`).join('');
   const next = S.won && LVL < LEVELS.length;
   if (next) { store.set('morqi.unlocked', Math.max(unlocked(), LVL + 1)); $('#nextLvBtn').textContent = `Level ${LVL + 1} ▶`; }
@@ -6977,11 +7184,12 @@ window.__morqi.fxProbe = (n = 8, fxOnly) => { const P = S.p; FX.length = 0;
 
 /* ================= creatures, levels and the element chart ================= */
 const chip = el => `<i class="ec" style="--c:${EL[el]}">${ELNAME[el]}</i>`;
-function beastHTML(kid, big) {
+function beastHTML(kid, big, quiet) {
   const K = KIND[kid], el = kid.split('-')[0], brute = kid.endsWith('-c');
   const what = K.tip || { weave:'Weaves side to side as it drifts in.', split:'Splits into two little sprouts when you free it.', rush:'Very fast, but fragile.', heavy:'Slow and tough. Hard to knock back.', zigzag:'Zigzags fast and erratically.' }[K.beh];
   return `<div class="beast${big ? ' big' : ''}" style="--c:${EL[el]}"><span class="pic"><img src="art4/e-${kid}.png?v=8" alt=""></span><div><b>${K.n}</b>
-    <p>${what}${brute && !SEEN.has('_chest') ? (markSeen('_chest'), ' The first brute on each shore guards a Spirit Chest.') : ''}</p><span class="chips">${chip(el)} · beat it with ${weakTo(el).map(chip).join('')}</span></div></div>`;
+    ${quiet ? '' : `<p>${what}${brute && !SEEN.has('_chest') ? (markSeen('_chest'), ' The first brute on each shore guards a Spirit Chest.') : ''}</p>`}${quiet ? `<span class="beatline" aria-label="${weakTo(el).map(k => ELNAME[k]).join(' and ')} beat ${ELNAME[el]}">${weakTo(el).map(k => `<img src="art4/props/x-stone-${k}.png?v=8" alt="">`).join('')}<i>›</i><img src="art4/props/x-stone-${el}.png?v=8" alt=""></span>`
+      : `<span class="chips">${chip(el)} · beat it with ${weakTo(el).map(chip).join('')}</span>`}</div></div>`;
 }
 // before a later level: the element the Keeper learns on this shore, then any new creature whose element beats theirs
 function intro(n) {
@@ -7089,12 +7297,17 @@ function cloudBillow() {
 function cloudBuild() {
   const im = CLOUD.img, w = 368, h = 116, c = document.createElement('canvas'); c.width = w; c.height = h;
   const x = c.getContext('2d'); x.drawImage(im, 0, 0, w, h); const d = x.getImageData(0, 0, w, h).data, solid = (i, j) => i >= 0 && j >= 0 && i < w && j < h && d[(j * w + i) * 4 + 3] > 120;
+  // puffs start a pixel or two inside each letter's edge, so letters that touch in the logo keep a gap in cloud
+  const inner = (i, j) => solid(i, j) && solid(i + 2, j) && solid(i - 2, j) && solid(i, j + 2) && solid(i, j - 2);
   const gemAt = (i, j) => { const k = (j * w + i) * 4; return d[k + 1] > d[k] + 40 && d[k + 1] > d[k + 2] - 10; };
   const pts = []; let gx = 0, gy = 0, gn = 0;
-  for (let j = 2; j < h; j += 6) for (let i = 2; i < w; i += 6) {
-    if (!solid(i, j)) continue; if (gemAt(i, j)) { gx += i; gy += j; gn++; continue; }
-    let r = 1; while (r < 14 && solid(i + r, j) && solid(i - r, j) && solid(i, j + r) && solid(i, j - r)) r++;   // how deep inside the letter
-    pts.push({ x:i + rnd(-1, 1), y:j + rnd(-1, 1), r:(2.2 + r * .62) * rnd(.75, 1.35), ph:rnd(0, TAU), top:!solid(i, j - 7) });   // never wider than its depth, so letters keep their gaps and holes
+  for (let j = 2; j < h; j += 5) for (let i = 2; i < w; i += 5) {
+    if (gemAt(i, j) && solid(i, j)) { gx += i; gy += j; gn++; continue; }
+    if (!inner(i, j)) continue;
+    // how deep inside the letter
+    let r = 1; while (r < 14 && solid(i + r, j) && solid(i - r, j) && solid(i, j + r) && solid(i, j - r)) r++;
+    // never wider than its depth, so letters keep their gaps and holes
+    pts.push({ x:i + rnd(-1, 1), y:j + rnd(-1, 1), r:(1.8 + r * .55) * rnd(.8, 1.25), ph:rnd(0, TAU), top:!solid(i, j - 7) });
   }
   pts.sort((a, b) => a.y - b.y); CLOUD.pts = pts; if (gn) CLOUD.gem = { x:gx / gn, y:gy / gn };
   CLOUD.sh = cloudPuff('#8E98CE', .35); CLOUD.body = cloudBillow(); CLOUD.wisp = cloudPuff('#F4F6FF', .2);
@@ -7112,7 +7325,8 @@ function cloudFrame(now) {
   const cv = $('#logoCloud'), D = Math.min(2, devicePixelRatio || 1); cv.style.height = cv.getBoundingClientRect().width * 190 / 368 + 'px';
   const r = cv.getBoundingClientRect();
   if (cv.width !== Math.round(r.width * D)) { cv.width = Math.round(r.width * D); cv.height = Math.round(r.height * D); }
-  const x = cv.getContext('2d'), s = r.width / 368, t = CLOUD.t, br = TAU * t / 8, oy = 52;   // the word sits low in the canvas, so wisps have room to rise
+  // the word sits low in the canvas, so wisps have room to rise
+  const x = cv.getContext('2d'), s = r.width / 368, t = CLOUD.t, br = TAU * t / 8, oy = 52;
   x.setTransform(D * s, 0, 0, D * s, 0, 0); x.clearRect(0, 0, 368, 190);
   // a breath: the whole word swells a little and lifts as it breathes in
   const inhale = Math.sin(br), sc = 1 + .022 * inhale, lift = -2.5 * inhale;
@@ -7310,7 +7524,11 @@ const PLOTS = [
   { el:'wood', n:'Deep Roots', d:'More healing', per:'12% more healing', g:'<path d="M12 21V11M12 11c0-4 3-7 7-7 0 4-3 7-7 7zM12 14c0-3-2.5-5-6-5 0 3 2.5 5 6 5z"/>' },
   { el:'fire', n:'Warm Hearth', d:'Stronger powers', per:'4% stronger', g:'<path d="M12 3l2.4 5.6 6 .5-4.6 4 1.4 5.9L12 16l-5.2 3 1.4-5.9-4.6-4 6-.5z"/>' },
   { el:'earth', n:'Stone Shelter', d:'Tougher', per:'4% less harm', g:'<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/>' } ];
-const PLOT_MAX = 5, plotCost = lv => 60 * (lv + 1); let growLock = 0;
+// the Heart Spring is the life gauge, and it grows to level 1000, bought with Sparks (A, 2026-10-05: "the max level they
+// can upgrade their life gauge is 1000. once we reach this problem i would love to face it"): the first five levels add
+// 8% each, every level after adds 2 health; the other plots stop at five
+const PLOT_MAX = 5, HEART_MAX = 1000, plotMax = el => el === 'water' ? HEART_MAX : PLOT_MAX;
+const plotCost = (lv, el) => el === 'water' && lv >= PLOT_MAX ? Math.round((300 + 4 * (lv - PLOT_MAX)) / 25) * 25 : 60 * (lv + 1); let growLock = 0;
 const CALL_UP = [150, 300, 450, 600], callLv = id => +(store.get('morqi.callTier.' + id) || 0);
 function grown() { try { return JSON.parse(store.get('morqi.grow') || '{}') || {}; } catch (e) { return {}; } }
 function qi() { return Math.max(0, +(store.get('morqi.sparks') || 0)); }
@@ -7325,15 +7543,15 @@ function musicSparks() {
   return 10;
 }
 function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; S.qiMus = musicSparks(); S.musMile = S.qiMus ? musMilestone() : null;
-  S.qiGot = Math.round(S.thawed / 8) + (S.won ? 40 : 0) + S.qiMus + (S.musMile ? S.musMile.n : 0); addQi(S.qiGot);
+  S.qiGot = Math.round((S.thawed + 9 * (S.hordeFreed || 0)) / 8) + (S.won ? 40 : 0) + S.qiMus + (S.musMile ? S.musMile.n : 0); addQi(S.qiGot);
   if (S.won && S.qiGot && !SEEN.has('_sparks')) { markSeen('_sparks'); setTimeout(() => AU.vo('vo-sparks', 0, .5), 2600); } }
 function renderGrow() {
   const g = grown(), q = qi(); $('#grQi').textContent = q.toLocaleString(); $('#hmQiN').textContent = q.toLocaleString();
-  $('#grList').innerHTML = PLOTS.map(p => { const lv = g[p.el] || 0, max = lv >= PLOT_MAX, cost = plotCost(lv), can = !max && q >= cost;
-    return `<div class="gr-row" style="--c:${EL[p.el]}"><img src="art4/icons/plot-${p.el}.png?v=9" alt=""><div class="gr-t"><b>${p.n}</b><span><svg class="gr-g" viewBox="0 0 24 24" aria-hidden="true">${p.g}</svg>${p.d}</span><i class="gr-lv">${[0, 1, 2, 3, 4].map(k => `<s class="${k < lv ? 'on' : ''}"></s>`).join('')}</i></div>
-      <button class="gr-go${can ? '' : ' off'}" data-el="${p.el}" ${max ? 'disabled' : ''} aria-label="${max ? p.n + ' is fully grown' : `Grow ${p.n} for ${cost} Sparks: ${p.per} each time`}">${max ? 'Grown' : `<img src="art4/icons/icon-spark.png?v=9" alt="">${cost}`}</button></div>`; }).join('');
-  $('#grList').querySelectorAll('.gr-go').forEach(b => b.onclick = () => { if (performance.now() < growLock) return; const el = b.dataset.el, g2 = grown(), lv = g2[el] || 0, cost = plotCost(lv);
-    if (lv >= PLOT_MAX) return; if (qi() < cost) { SFX.pop(); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); return; }
+  $('#grList').innerHTML = PLOTS.map(p => { const lv = g[p.el] || 0, max = lv >= plotMax(p.el), cost = plotCost(lv, p.el), can = !max && q >= cost, deep = p.el === 'water' && lv >= PLOT_MAX;
+    return `<div class="gr-row" style="--c:${EL[p.el]}"><img src="art4/icons/plot-${p.el}.png?v=9" alt=""><div class="gr-t"><b>${p.n}</b><span><svg class="gr-g" viewBox="0 0 24 24" aria-hidden="true">${p.g}</svg>${p.d}</span><i class="gr-lv${deep ? ' deep' : ''}">${deep ? `<em class="gr-n">Level ${lv}</em>` : ''}${[0, 1, 2, 3, 4].map(k => `<s class="${k < (deep ? lv % 5 : lv) ? 'on' : ''}"></s>`).join('')}</i></div>
+      <button class="gr-go${can ? '' : ' off'}" data-el="${p.el}" ${max ? 'disabled' : ''} aria-label="${max ? p.n + ' is fully grown' : `Grow ${p.n} for ${cost} Sparks: ${deep ? '2 more health' : p.per} each time`}">${max ? 'Grown' : `<img src="art4/icons/icon-spark.png?v=9" alt="">${cost}`}</button></div>`; }).join('');
+  $('#grList').querySelectorAll('.gr-go').forEach(b => b.onclick = () => { if (performance.now() < growLock) return; const el = b.dataset.el, g2 = grown(), lv = g2[el] || 0, cost = plotCost(lv, el);
+    if (lv >= plotMax(el)) return; if (qi() < cost) { SFX.pop(); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); return; }
     growLock = performance.now() + 600; addQi(-cost); g2[el] = lv + 1; store.set('morqi.grow', JSON.stringify(g2)); SFX.levelup(); renderGrow();
     $('#grList').querySelector(`.gr-go[data-el="${el}"]`).closest('.gr-row').classList.add('grew'); });
   // each Star Call you own grows through five tiers: harder hits and bigger, brighter landings
@@ -7351,7 +7569,9 @@ const closeSheet = o => { o.hidden = true; if (![...document.querySelectorAll('.
 $('#hmQi').onclick = () => { SFX.select(); renderGrow(); openSheet('#growSheet'); };
 $('#hmGear').onclick = () => { SFX.select(); renderSound(); openSheet('#setSheet'); };
 $('#thOn').onclick = () => { AU.init(); if (!AU.musicOn) { AU.toggleMusic(); musStreak(true); } AU.music(true); AU.song('home'); renderSound(); SFX.select(); closeSheet($('#themeSheet')); };
-$('#thNo').onclick = () => { SFX.select(); closeSheet($('#themeSheet')); };
+$('#thNo').onclick = () => { SFX.select(); if (!AU.musicOn) AU.music(false); closeSheet($('#themeSheet')); };
+// a short listen, even with the music off: Haven plays for twelve seconds, so a child can hear it before choosing
+$('#thPlay').onclick = () => { AU.init(); SFX.select(); AU.music(true, true); AU.song('home'); clearTimeout($('#thPlay').t); $('#thPlay').t = setTimeout(() => { if (!AU.musicOn) AU.music(false); }, 12000); };
 $('#setDone').onclick = () => { SFX.select(); closeSheet($('#setSheet')); };
 $('#grDone').onclick = () => { SFX.select(); closeSheet($('#growSheet')); };
 document.querySelectorAll('.hm-over').forEach(o => o.addEventListener('click', e => { if (e.target === o) closeSheet(o); }));
