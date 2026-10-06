@@ -921,6 +921,14 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 
 /* the Root Grasp card: the finger swipes down then up, flicks toward the creatures, and roots rise round them and hold
    them still (they shake in the roots instead of being swept away) */
+/* Stone Shelter's card: stones rise round the Keeper, creatures press on them, then everything bursts outward */
+.calldemo.cd-stone .cd-k{position:absolute;left:50%;top:34%;width:26%;transform:translateX(-50%)}
+.calldemo.cd-stone .sst{position:absolute;width:9%;height:14%;margin:-14% 0 0 -4.5%;border-radius:45% 45% 14% 14%;background:linear-gradient(160deg,#D2AE76,#A07A44 55%,#6E4E2A);box-shadow:inset 0 0 0 2px rgba(26,18,6,.75);transform-origin:50% 100%;transform:scaleY(0);animation:cdSst var(--d) infinite}
+.calldemo.cd-stone .sring{position:absolute;left:18%;right:18%;top:36%;height:40%;border-radius:50%;background:radial-gradient(ellipse,rgba(241,212,154,.35),rgba(241,212,154,0) 70%);opacity:0;animation:cdSring var(--d) infinite}
+.calldemo.cd-stone .cd-c{animation:cdHold var(--d) infinite}
+@keyframes cdSst{0%,18%{transform:scaleY(0);opacity:1}24%{transform:scaleY(1.1)}27%,60%{transform:scaleY(1);opacity:1}68%{transform:translate(var(--dx),var(--dy)) rotate(35deg);opacity:0}100%{opacity:0;transform:scaleY(0)}}
+@keyframes cdSring{0%,20%{opacity:0}28%,58%{opacity:1}62%{opacity:1;transform:scale(1.25)}70%,100%{opacity:0;transform:scale(1.6)}}
+@keyframes cdHold{0%,8%{opacity:0}14%,58%{opacity:1;transform:translate(0,0)}30%,34%,42%,50%{transform:translate(1%,0)}32%,38%,46%,54%{transform:translate(-1%,0)}68%{opacity:0;transform:translate(var(--kx),var(--ky)) rotate(30deg)}100%{opacity:0}}
 .calldemo.cd-root .beam{left:68%}
 .calldemo.cd-root .cd-f{animation-name:cdFingerR}
 .calldemo.cd-root .cd-c{animation-name:cdHeld}
@@ -1887,7 +1895,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=13`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2332,7 +2340,7 @@ const AU = (() => {
      and rolling hats, but with the third raised (D Phrygian dominant: D, E flat, F sharp, G, A, B flat, C), so the
      boss's threat becomes yours. On top, the rolling hand drums, shaker and hypnotic low pluck of A's own playlist
      ("The Haven", organic Afro house), and a cocky low vocal-chop hook with "hey" calls between its lines.
-     Ascended lasts twelve seconds, so it drops on its very first beat. House rules kept: the hook peaks 62% through
+     Ascended lasts fifteen seconds, so it drops on its very first beat. House rules kept: the hook peaks 62% through
      its phrase with one leap and one repeated note, a surprise B flat chord at the golden point with the drums holding
      their breath, the four-part form, every pitched voice at or below about 700 Hz. */
   const HIGH = {
@@ -4328,6 +4336,9 @@ function hsTick(dt) {
     // after the final one "Ascend" plays on until the Warden's theme lands on the next bar; otherwise the world's own song returns
     // the genie pours back into the Keeper: a last pop of light at the body
     flash(P.x, P.y - 40, 420, '#FFE08A', .35); ring(P.x, P.y - 30, 10, 180, '#FFE08A', .45, 14, true); SFX.ting(); S.capBoost = 0;
+    // and leaves the Keeper whole: the life gauge full again (A, 2026-10-05: "Ascended leaves you with full health gauge")
+    P.hp = P.max; SFX.heal(); floatText(P.x, P.y - 90, 'Full health!', '#8FE3A0', 22);
+    for (let i = 0; i < 18; i++) fx({ k:'plus', x:P.x + rnd(-50, 50), y:P.y + rnd(-40, 20), vx:0, vy:-rnd(70, 140), life:rnd(.6, 1), s:rnd(8, 12), c:'#8FF0A0' });
     const final = O.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
   }
@@ -4495,7 +4506,15 @@ const CALL = {
   // the bell ringer (grief, healed into letting go): the bell that only rang for goodbyes falls and rings for you
   bell:{ n:'Bell Strike', from:'metal', el:'metal', obj:'bell', img:'bell-star', imgA:'bell-star-awakened', seal:['up', 'down'], gift:'Her bell', giver:"The bell ringer's bell", say:'A great bell falls on the creatures.',
     R:[170, 195, 220, 245, 275], cd:[45, 42, 38, 34, 30], tolls:[1, 1, 2, 2, 3], still:[0, 0, 0, 3, 3.5],
-    card:['Bell Strike!', 'Tap the bell. It falls on the biggest crowd.'], vo:'call' } };
+    card:['Bell Strike!', 'Tap the bell. It falls on the biggest crowd.'], vo:'call' },
+  // the grandmother (worry, healed into steadiness; A, 2026-10-05: "Harvest Hills needs a Star Call"): the worry stone
+  // she rubbed through every worry. One tap and it becomes a shelter: stone slabs rise in a ring round the Keeper, nothing
+  // can hurt them inside, and creatures pressing on the walls stick there and are worn down; then it bursts outward, the
+  // slabs flying as boulders that shed pebbles, a shockwave rolling out, and a rain of boulders on the biggest crowd.
+  // Later tiers hold longer, burst wider and rain more; Awakened, the shelter warms and heals the Keeper while it stands
+  stone:{ n:'Stone Shelter', from:'earth', el:'earth', obj:'stone', img:'stone-shelter', seal:['down'], gift:'Her worry stone', giver:"The grandmother's worry stone", say:'A stone shelter rises, then bursts.',
+    R:[150, 160, 170, 180, 195], cd:[45, 42, 38, 34, 30], hold:[1.6, 2, 2.4, 2.8, 3.2], burst:[420, 470, 520, 570, 640], rain:[3, 4, 5, 6, 8], heal:[0, 0, 0, 0, 1], still:[0, 0, 0, 0, 0],
+    card:['Stone Shelter!', 'Tap the stone. A stone shelter rises around you, then bursts.'], vo:'call-stone' } };
 const SEAL_SLOW = .25;
 const callForced = () => { const m = /[?&]call=(\w+)/.exec(location.search); return m && CALL[m[1]] ? m[1] : null; };
 // a call is yours once the person who gives it is freed ("These things have to make sense")
@@ -4511,6 +4530,7 @@ function newCall(id) {
   if (id === 'tide' && !IMG.callWhale) { load('callWhale', 'art4/calls/whale-spirit.png?v=9'); load('callWhaleA', 'art4/calls/whale-spirit-awakened.png?v=9'); }
   if (id === 'root' && !IMG.callSeed) load('callSeed', 'art4/calls/seed-root.png?v=9');
   if (id === 'ember' && !IMG.callDrum) load('callDrum', 'art4/calls/drum-ember.png?v=9');
+  if (id === 'stone' && !IMG.callStone) load('callStone', 'art4/calls/stone-shelter.png?v=9');
   if (id === 'bell' && !IMG.callBell) { load('callBell', 'art4/calls/bell-star.png?v=9'); load('callBellA', 'art4/calls/bell-star-awakened.png?v=9'); }
   return { id, tier:tr, max:D.cd[tr], cd:12, seal:null, strike:null, uses:0 };
 }
@@ -4652,6 +4672,8 @@ function throwCall(dx, dy) {
   ({ x, y } = callInView(x, y, R, C.id === 'bell' ? callBellSize(R) * Z * .86 : C.id === 'root' ? (R * .55 + 110) * Z : 70));
   let Rr = null; if (C.id === 'root') ({ x, y, R:Rr } = rootPlace(x, y, R));
   if (onBoss && C.id !== 'tide') { x = onBoss.x; y = onBoss.y; }
+  // the shelter rises round the Keeper; its burst and rain find the crowd
+  if (C.id === 'stone') { x = P.x; y = P.y; }
   x = clamp(x, 60, WORLD - 60); y = clamp(y, 60, WORLD - 60);
   const K = { x, y, ax:x, ay:y, sx:P.x, sy:P.y - 40, t:0, tolls:0, hit:0, waves:[], trail:[], follow:onBoss && C.id !== 'tide' ? onBoss : null, R:onBoss ? null : Rr };
   if (C.id === 'tide') { const B = S.boss && !S.boss.dead && Math.hypot(tx - S.boss.x, ty - S.boss.y) < 2 ? S.boss : null; Object.assign(K, tideLane(P, tx, ty, C, B)); K.f = 0; K.wi = -1; K.caught = new Map();
@@ -4713,7 +4735,41 @@ function callTick(dt) {
   if (at(t0)) SFX.bx('call-beam', 1);
   const landAt = C.id === 'root' ? rootPhase(C, K).t1 : C.id === 'bell' ? CALL_T.throw + CALL_T.beam + CALL_T.fall : 0;
   if (K.follow && !K.follow.dead && K.t < landAt) { K.x = K.follow.x; K.y = K.follow.y; }
-  if (C.id === 'tide') tideTick(C, K, dt, at); else if (C.id === 'root') rootTick(C, K, dt, at); else if (C.id === 'ember') emberTick(C, K, dt, at); else bellTick(C, K, dt, at);
+  if (C.id === 'tide') tideTick(C, K, dt, at); else if (C.id === 'root') rootTick(C, K, dt, at); else if (C.id === 'ember') emberTick(C, K, dt, at); else if (C.id === 'stone') stoneTick(C, K, dt, at); else bellTick(C, K, dt, at);
+}
+// Stone Shelter's beats: the stone lands at the Keeper's feet, the slabs rise, the shelter holds, then it bursts
+const stonePhase = C => { const t1 = CALL_T.throw + .35, hold = CALL.stone.hold[C.tier]; return { rise:CALL_T.throw, t1, burst:t1 + hold, end:t1 + hold + 1.3 }; };
+function stoneTick(C, K, dt, at) {
+  const D = CALL.stone, tr = C.tier, R = D.R[tr], P = stonePhase(C), Pl = S.p;
+  // the shelter moves with the Keeper
+  if (K.t < P.burst) { K.x = Pl.x; K.y = Pl.y; }
+  const ring = e => Math.hypot(e.x - K.x, (e.y - K.y) / .55);
+  // the slabs rise: the ground shakes and anything inside is thrown out
+  if (at(P.rise)) {
+    SFX.bx('earth-quake', 0); SFX.stomp(); S.shake = Math.max(S.shake, .6); S.hitstop = Math.max(S.hitstop || 0, .06);
+    for (const e of S.en) if (!e.dead && !e.boss && ring(e) < R + e.r) hurt(e, callDmg() * .3, 'earth', { kb:520, fx:K.x, fy:K.y, gift:1 });
+    debris(K.x, K.y, 18, 420, '#9A7040'); smoke(K.x, K.y + 10, 8, R * .7, '150,120,80'); paintThaw(K.x, K.y, R * 1.2);
+  }
+  // the shelter holds: the Keeper is safe, and the walls wear down whatever presses on them
+  if (K.t > P.rise && K.t < P.burst) {
+    Pl.safe = Math.max(Pl.safe || 0, .15);
+    if (D.heal[tr]) Pl.hp = Math.min(Pl.max, Pl.hp + Pl.max * .06 * dt);
+    for (const e of S.en) { if (e.dead) continue; const q = ring(e);
+      if (q < R + e.r + 14 && q > R - 40) { if (!e.boss) e.rooted = Math.max(e.rooted || 0, .2); if ((e.hitCd.shelter || 0) <= S.t) { e.hitCd.shelter = S.t + .35; hurt(e, callDmg() * .12, 'earth', { kb:0, gift:1, spark:false }); debris(e.x, e.y, 2, 160, '#9A7040'); } }
+      else if (q < R - 40 && !e.boss) { const d = Math.hypot(e.x - K.x, e.y - K.y) || 1; e.x = K.x + (e.x - K.x) / d * (R + 10); e.y = K.y + (e.y - K.y) / d * (R + 10) * .55; } }
+  }
+  // the burst: slabs fly out as boulders, a shockwave rolls out, boulders rain on the crowd
+  if (at(P.burst)) {
+    SFX.bx('earth-quake', 0); SFX.boom(true); S.shake = Math.max(S.shake, .9); S.hitstop = Math.max(S.hitstop || 0, .12); S.flashT = .08; S.flashC = '230,178,58';
+    for (let i = 0; i < 10; i++) { const a = i * TAU / 10 + rnd(-.15, .15), x = K.x + Math.cos(a) * R, y = K.y + Math.sin(a) * R * .55;
+      fx({ k:'boulder', x, y, z:20, vx:Math.cos(a) * rnd(260, 420), vy:Math.sin(a) * rnd(160, 260), vz:rnd(260, 460), rot:rnd(0, TAU), vr:rnd(-6, 6), life:rnd(1.1, 1.5), s:rnd(18, 26), c:i % 2 ? '#8E6A3A' : '#A07A44', shed:'rock', shedR:16, land:'dust', q:Array.from({ length:7 }, () => rnd(.75, 1)) }); }
+    const B = D.burst[tr]; K.waves.push({ t:K.t, x:K.x, y:K.y, r0:R * .5, r1:B, life:.7, w:16, disc:1, earth:1 });
+    callBlast(K, 1, B * .62); callFlourish(K.x, K.y, R);
+    const tg = callTarget(0, 0);
+    for (let i = 0; i < D.rain[tr]; i++) { const a = rnd(0, TAU), d = i ? rnd(30, 120) : 0;
+      S.drops.push({ k:'boulder', x:tg.x + Math.cos(a) * d, y:tg.y + Math.sin(a) * d * .7, t:-.25 - i * .12, dur:.5, st:{ dmg:callDmg() * .7, r:80 }, L:0 }); }
+  }
+  if (K.t >= P.end) C.strike = null;
 }
 function bellTick(C, K, dt, at) {
   const D = CALL[C.id], tr = C.tier, R = D.R[tr], T = CALL_T, t0 = T.throw, t1 = t0 + T.beam, t2 = t1 + T.fall;
@@ -5944,7 +6000,7 @@ function drawFuseTop() {
     g.save(); g.translate(Ph.x, Ph.y - z); g.rotate(Ph.dir + Math.PI / 2); g.drawImage(IMG.fusePhoenix, -s / 2, -s / 2, s, s); g.restore(); }
 }
 function drawCallGround() {
-  const K = S.call && S.call.strike; if (!K) return; if (S.call.id === 'tide') { drawTideGround(K); drawCallRipples(K); return; } if (S.call.id === 'root') { drawRootGround(K); drawCallRipples(K); return; } if (S.call.id === 'ember') { drawEmberGround(K); drawCallRipples(K); return; } const { R, t0, t1, t2, end } = callPhases(), top = camY + 100 / Z;
+  const K = S.call && S.call.strike; if (!K) return; if (S.call.id === 'tide') { drawTideGround(K); drawCallRipples(K); return; } if (S.call.id === 'root') { drawRootGround(K); drawCallRipples(K); return; } if (S.call.id === 'ember') { drawEmberGround(K); drawCallRipples(K); return; } if (S.call.id === 'stone') { drawCallRipples(K); return; } const { R, t0, t1, t2, end } = callPhases(), top = camY + 100 / Z;
   if (K.t >= t0 && K.t < t2 + .2) {
     const b = K.t < t2 ? Math.min(1, (K.t - t0) / .18) : 1 - (K.t - t2) / .2, q = Math.min(1, (K.t - t0) / (t1 - t0)), w = R * (.5 - .3 * q);
     const gr = g.createLinearGradient(K.x - w, 0, K.x + w, 0); gr.addColorStop(0, 'rgba(90,104,220,0)'); gr.addColorStop(.25, `rgba(100,114,232,${(.22 + .14 * q) * b})`); gr.addColorStop(.5, `rgba(248,250,255,${(.45 + .3 * q) * b})`); gr.addColorStop(.75, `rgba(100,114,232,${(.22 + .14 * q) * b})`); gr.addColorStop(1, 'rgba(90,104,220,0)');
@@ -5974,9 +6030,33 @@ function drawCallRipples(K) {
     g.strokeStyle = `rgba(16,30,80,${.6 * a})`; g.lineWidth = v.w + 5; g.beginPath(); g.ellipse(v.x, v.y, r, r * .55, 0, 0, TAU); g.stroke();
     g.strokeStyle = `rgba(255,255,255,${.95 * a})`; g.lineWidth = v.w * .55; g.beginPath(); g.ellipse(v.x, v.y, r, r * .55, 0, 0, TAU); g.stroke(); g.restore(); }
 }
+// Stone Shelter: ten standing stones of different heights rise in a ring round the Keeper, a warm crack of light in
+// each, and a soft dome of light over them while it holds (first take, 2026-10-05: small even slabs with a rune read as
+// tombstones); the stones that fly out at the burst are boulders in the particle layer
+const STONES = Array.from({ length:10 }, (_, i) => ({ h:[1, .78, .92, .7, .98, .82, .74, .95, .8, .88][i], w:[1, .86, .94, .9, 1.04, .88, .92, .98, .86, .96][i], tilt:[-.05, .04, -.02, .06, -.04, .03, -.06, .02, .05, -.03][i] }));
+function drawStoneTop(K) {
+  const C = S.call, P = stonePhase(C), R = CALL.stone.R[C.tier], t = K.t; if (t < P.rise || t >= P.burst) return;
+  const up = Math.min(1, (t - P.rise) / .3), sh = 1 - Math.pow(1 - up, 3), quake = t > P.burst - .35 ? Math.sin(t * 60) * 2.5 : 0;
+  // the dome: a soft warm light over the ring, edged in gold
+  add(() => { g.globalAlpha = .16 * sh; g.fillStyle = '#F1D49A'; g.beginPath(); g.ellipse(K.x, K.y - R * .3, R * 1.05, R * .85, 0, Math.PI, TAU); g.ellipse(K.x, K.y, R * 1.05, R * .58, 0, 0, Math.PI); g.fill();
+    g.globalAlpha = .45 * sh; g.strokeStyle = '#F1D49A'; g.lineWidth = 3; g.beginPath(); g.ellipse(K.x, K.y - R * .3, R * 1.05, R * .85, 0, Math.PI * 1.05, Math.PI * 1.95); g.stroke(); g.globalAlpha = 1; });
+  const ring = STONES.map((st, i) => { const a = i * TAU / 10 + .16; return { st, x:K.x + Math.cos(a) * R, y:K.y + Math.sin(a) * R * .55 }; }).sort((p, q) => p.y - q.y);
+  for (const { st, x:x0, y } of ring) { const h = 96 * st.h * sh, w = 50 * st.w, x = x0 + quake;
+    g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(x, y + 4, w * .62, 10, 0, 0, TAU); g.fill();
+    g.save(); g.translate(x, y); g.rotate(st.tilt);
+    const gr = g.createLinearGradient(-w / 2, -h, w / 2, 0); gr.addColorStop(0, '#D2AE76'); gr.addColorStop(.55, '#A07A44'); gr.addColorStop(1, '#6E4E2A');
+    g.fillStyle = gr; g.strokeStyle = 'rgba(26,18,6,.85)'; g.lineWidth = 2.5; g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(-w / 2, 0); g.quadraticCurveTo(-w * .56, -h * .6, -w * .3, -h * .94); g.quadraticCurveTo(0, -h * 1.06, w * .32, -h * .9); g.quadraticCurveTo(w * .58, -h * .55, w / 2, 0); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = 'rgba(255,236,190,.28)'; g.beginPath(); g.ellipse(-w * .16, -h * .7, w * .14, h * .16, -.3, 0, TAU); g.fill();
+    // a soft upright glow inside the stone, like light through a seam (QA, 2026-10-05: a bent crack read as an arrow)
+    if (h > 30) add(() => { g.fillStyle = `rgba(255,214,128,${.7 * sh})`; g.beginPath(); g.ellipse(0, -h * .45, 3, h * .17, 0, 0, TAU); g.fill(); });
+    g.restore(); }
+  g.lineWidth = 1; g.lineJoin = 'miter';
+}
 function drawCallThrow(K) {
   const t0 = CALL_T.throw; if (K.t >= t0) return false;
   const q = K.t / t0, x = K.sx + (K.ax - K.sx) * q, y = K.sy + (K.ay - K.sy) * q - Math.sin(q * Math.PI) * 150;
+  if (S.call.id === 'stone' && ok(IMG.callStone)) { add(() => glowAt(x, y, 70, '#F1D49A', .7)); g.save(); g.translate(x, y); g.rotate(q * 5); g.drawImage(IMG.callStone, -26, -30, 52, 52); g.restore(); return true; }
   if (S.call.id === 'root' && ok(IMG.callSeed)) { add(() => glowAt(x, y, 70, '#B8F5C8', .7)); g.save(); g.translate(x, y); g.rotate(q * 6); g.drawImage(IMG.callSeed, -26, -30, 52, 52); g.restore(); return true; }
   K.trail.forEach(([tx, ty], i) => { const f = (i + 1) / K.trail.length; g.fillStyle = `rgba(70,82,200,${.5 * f})`; g.beginPath(); g.arc(tx, ty, 4 + 7 * f, 0, TAU); g.fill(); });
   add(() => glowAt(x, y, 44, '#C9D2FF', .7)); g.fillStyle = '#1B2257'; star4(x, y, 19); g.fillStyle = '#5B6BD6'; star4(x, y, 15); g.fillStyle = '#FFFFFF'; star4(x, y, 9 + Math.sin(S.t * 40) * 1.5);
@@ -6168,7 +6248,7 @@ function drawTideTop(K) {
 }
 // above the characters: the thrown star-stone, the beam's thin bright core, then the bell falling, ringing and rising away
 function drawCallTop() {
-  const K = S.call && S.call.strike; if (!K) return; if (S.call.id === 'tide') { drawCallThrow(K); drawTideTop(K); return; } if (S.call.id === 'root') { drawCallThrow(K); drawRootTop(K); return; } if (S.call.id === 'ember') { drawCallThrow(K); drawEmberTop(K); return; } const { tr, R, t0, t1, t2, rest, end } = callPhases(), top = camY + 100 / Z;
+  const K = S.call && S.call.strike; if (!K) return; if (S.call.id === 'tide') { drawCallThrow(K); drawTideTop(K); return; } if (S.call.id === 'root') { drawCallThrow(K); drawRootTop(K); return; } if (S.call.id === 'ember') { drawCallThrow(K); drawEmberTop(K); return; } if (S.call.id === 'stone') { drawCallThrow(K); drawStoneTop(K); return; } const { tr, R, t0, t1, t2, rest, end } = callPhases(), top = camY + 100 / Z;
   if (drawCallThrow(K)) return;
   if (K.t < t2 + .2) { const b = K.t < t2 ? Math.min(1, (K.t - t0) / .18) : 1 - (K.t - t2) / .2, h = K.y - top;
     const gr = g.createLinearGradient(0, top, 0, top + Math.min(160, h)); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, `rgba(255,255,255,${.85 * b})`);
@@ -6574,6 +6654,13 @@ function tipArt(id) {
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
   if (id.startsWith('call_')) { const cid = id.slice(5), D = CALL[cid], src = `art4/calls/${D.img}.png?v=9`;
+    // Stone Shelter's card shows what it does: a tap, standing stones rising round your own Keeper, creatures held at
+    // the walls, then the burst (QA, 2026-10-05: the shared picture showed a strike far away)
+    if (cid === 'stone') { const [b1, b2] = beats(D.el), st = Array.from({ length:8 }, (_, i) => { const a = i * TAU / 8 + .2, x = 50 + 30 * Math.cos(a), y = 60 + 13 * Math.sin(a);
+        return `<i class="sst" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;--dx:${(Math.cos(a) * 160).toFixed(0)}%;--dy:${(Math.sin(a) * 120).toFixed(0)}%;z-index:${Math.round(y)}"></i>`; }).join('');
+      return `<div class="calldemo cd-stone"><i class="sring"></i><img class="cd-k" src="art4/k${keeper}.png?v=8" alt="" style="z-index:60">${st}`
+        + [[b1, 'a', 14, 46, -60, -30], [b2, 'a', 76, 50, 60, -20], [b1, 'b', 44, 78, 0, 60]].map(([el, k, x, y, kx, ky], i) => `<img class="cd-c cd-s${i}" src="art4/e-${el}-${k}.png?v=8" alt="" style="left:${x}%;top:${y}%;--kx:${kx}%;--ky:${ky}%">`).join('')
+        + `<div class="cd-btn"><img src="${src}" alt=""></div><i class="cd-f"></i></div>`; }
     // the creatures in the picture are ones this call's element beats, so the card teaches the real chart
     const [b1, b2] = beats(D.el);
     return `<div class="calldemo cd-${cid}"><img class="cd-c cd-c1" src="art4/e-${b1}-a.png?v=8" alt=""><img class="cd-c cd-c2" src="art4/e-${b2}-a.png?v=8" alt=""><img class="cd-c cd-c3" src="art4/e-${b1}-b.png?v=8" alt=""><i class="beam"></i>`
@@ -6587,7 +6674,7 @@ function tipArt(id) {
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember' };
+const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
@@ -7523,7 +7610,7 @@ const PLOTS = [
   { el:'metal', n:'Swift Wind', d:'Faster feet', per:'3% faster', g:'<path d="M3 9h11a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3M3 12h8"/>' },
   { el:'wood', n:'Deep Roots', d:'More healing', per:'12% more healing', g:'<path d="M12 21V11M12 11c0-4 3-7 7-7 0 4-3 7-7 7zM12 14c0-3-2.5-5-6-5 0 3 2.5 5 6 5z"/>' },
   { el:'fire', n:'Warm Hearth', d:'Stronger powers', per:'4% stronger', g:'<path d="M12 3l2.4 5.6 6 .5-4.6 4 1.4 5.9L12 16l-5.2 3 1.4-5.9-4.6-4 6-.5z"/>' },
-  { el:'earth', n:'Stone Shelter', d:'Tougher', per:'4% less harm', g:'<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/>' } ];
+  { el:'earth', n:'Steady Ground', d:'Tougher', per:'4% less harm', g:'<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/>' } ];
 // the Heart Spring is the life gauge, and it grows to level 1000, bought with Sparks (A, 2026-10-05: "the max level they
 // can upgrade their life gauge is 1000. once we reach this problem i would love to face it"): the first five levels add
 // 8% each, every level after adds 2 health; the other plots stop at five
