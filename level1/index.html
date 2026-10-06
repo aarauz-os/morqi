@@ -1057,6 +1057,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #home::before,#map::before{content:"";position:absolute;inset:-20px;background:var(--bgi) 50% 50%/cover;filter:blur(18px) brightness(.6)}
 #home{--bgi:url(art4/home/fd-sanctuary.jpg?v=9)}#map{--bgi:url(art4/home/fd-map.jpg?v=9)}
 .hm-art{background-image:url(art4/home/fd-sanctuary.jpg?v=9)}
+/* the living Sanctuary: the painting's own loop, then the weather over it (A, 2026-10-05) */
+.hm-live,.hm-fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.hm-live{object-fit:cover;opacity:0;transition:opacity .6s}.hm-live.on{opacity:1}
 .hm-top{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 14px 0}
 .hm-me{display:flex;align-items:center;gap:10px;padding:5px 16px 5px 5px;border:0;border-radius:99px;background:rgba(12,16,44,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);cursor:pointer;min-height:52px}
 .hm-me img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#2A3270;box-shadow:0 0 0 2px #FFE6A3}
@@ -1318,7 +1320,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <button class="hm-gear" id="hmGear" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
-    <div class="art hm-art"><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa"><img class="hm-a" id="hmPet" alt=""></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
+    <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa"><img class="hm-a" id="hmPet" alt=""></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
     <button class="btn green hm-go" id="hmGo">Play</button>
     <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
       <h3>Grow your Sanctuary</h3><p class="gr-qi"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="grQi">0</b> Sparks</p><p class="gr-sub">Earn Sparks by freeing creatures</p>
@@ -7065,7 +7067,75 @@ function goTab(t) {
   if (t === 'home') renderHome(); if (t === 'map') renderMap(); if (t === 'book') { renderBook(); bookSeen(); } show(t);
 }
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { if (b.classList.contains('off')) { SFX.pop(); toast('Coming in the full app'); return; } SFX.select(); goTab(b.dataset.tab); });
+/* The living Sanctuary (A, 2026-10-05: "the home screen was alive in a perfect loop and wind water and everything had
+   their correct natural mechanics from the real world using real physics and abiding by those rules unless magical
+   rules apply"). Under it the painting itself moves: a ten-second film whose first and last frames are the painting,
+   so it loops without a seam. Over it, weather that obeys one wind: the breeze is a sum of gusts whose periods divide
+   thirty seconds, so the weather loops exactly too. Units are the painting's width (about eleven metres of scene), so
+   the numbers are real ones: gravity 9.8 m/s² is 0.9 widths/s², a petal falls at about 1.2 m/s, a breeze is 1–3 m/s.
+   Petals leave the cherry tree more in the gusts, fall under gravity against quadratic air drag, and tumble: the
+   tumble gives lift across their path, so they flutter and swing; one that reaches the pond rings a ripple and floats
+   off downwind. Snow on the winter side is lighter, so it falls slower and follows the wind more. Fireflies wander and
+   blink as real ones do, in short pulses. The portals, crystals and floating islands keep their own magic in the film. */
+const LIVE = { raf:0, last:0, t:0, P:[], rip:[], acc:0, flies:null };
+const LOOP = 30, G = .9, VT = .11, KD = G / (VT * VT);
+const breeze = t => { const s = k => Math.sin(TAU * t * k / LOOP); return .14 + .07 * s(1) + .05 * s(3) * s(2) + .06 * Math.max(0, s(5)) * Math.max(0, s(1)); };
+const inPond = (x, y) => x > .6 && x < .99 && y > .53 && y < .64;
+function liveStart() {
+  const v = $('#hmLive');
+  if (!reduce && !v.src) { v.src = 'art4/home/fd-sanctuary-live.mp4?v=1'; v.oncanplay = () => v.classList.add('on'); }
+  if (!reduce) v.play().catch(() => {});
+  if (reduce || LIVE.raf) return;
+  LIVE.last = performance.now(); LIVE.raf = requestAnimationFrame(liveFrame);
+}
+function liveFrame(now) {
+  if ($('#home').hidden) { LIVE.raf = 0; $('#hmLive').pause(); return; }
+  LIVE.raf = requestAnimationFrame(liveFrame);
+  const dt = Math.min(.05, (now - LIVE.last) / 1000); LIVE.last = now; LIVE.t = (LIVE.t + dt) % LOOP;
+  const cv = $('#hmFx'), r = cv.getBoundingClientRect(), D = Math.min(2, devicePixelRatio || 1);
+  if (cv.width !== Math.round(r.width * D)) { cv.width = Math.round(r.width * D); cv.height = Math.round(r.height * D); }
+  const W = r.width, H = r.height, A = H / W, x = cv.getContext('2d'), wind = breeze(LIVE.t);
+  // petals shaken loose, more in the gusts; snow on the winter side
+  LIVE.acc += dt * (1.2 + wind * 9);
+  while (LIVE.acc > 1 && LIVE.P.length < 60) { LIVE.acc--; LIVE.P.push({ k:'petal', x:rnd(.56, .98), y:rnd(.07, .32) * A, vx:0, vy:0, th:rnd(0, TAU), om:rnd(-6, 6), s:rnd(4, 7.5), land:rnd(.45, .92) * A, t:0 }); }
+  if (Math.random() < dt * 5 && LIVE.P.length < 60) LIVE.P.push({ k:'snow', x:rnd(-.05, .45), y:-.02, vx:0, vy:0, s:rnd(1.2, 2.6), land:rnd(.42, .78) * A, t:0, ph:rnd(0, TAU) });
+  const step = dt / 2;
+  for (const p of LIVE.P) for (let n = 0; n < 2; n++) {
+    p.t += step;
+    if (p.rest != null) { p.rest += step; if (p.float) { p.x += wind * .25 * step; p.y += Math.sin(p.rest * 1.3 + p.th) * .0004; } continue; }
+    // air drag against the wind, gravity, and for a petal the tumble's lift across its path
+    const rx = p.vx - wind * (p.k === 'snow' ? 1 : .85), ry = p.vy, sp = Math.hypot(rx, ry) || 1e-6, kd = p.k === 'snow' ? KD * 4 : KD;
+    let ax = -kd * sp * rx, ay = G - kd * sp * ry;
+    if (p.k === 'petal') { const lift = kd * .55 * sp * sp * Math.sin(2 * p.th); ax += -ry / sp * lift; ay += rx / sp * lift; p.om += (Math.sign(p.om || 1) * (3 + sp * 40) - p.om) * step * 2; p.th += p.om * step; }
+    else ax += Math.cos(p.t * 2.1 + p.ph) * .02;
+    p.vx += ax * step; p.vy += ay * step; p.x += p.vx * step; p.y += p.vy * step;
+    if (p.y >= p.land) { p.rest = 0; p.float = p.k === 'petal' && inPond(p.x, p.y / A); if (p.float) LIVE.rip.push({ x:p.x, y:p.y, t:0 }); }
+  }
+  LIVE.P = LIVE.P.filter(p => p.x > -.1 && p.x < 1.1 && (p.rest == null || p.rest < (p.float ? 5 : 1.6)));
+  for (const q of LIVE.rip) q.t += dt; LIVE.rip = LIVE.rip.filter(q => q.t < 1.6);
+  // draw, in CSS pixels
+  x.setTransform(D, 0, 0, D, 0, 0); x.clearRect(0, 0, W, H);
+  for (const q of LIVE.rip) { const k = q.t / 1.6, rr = 4 + k * 26; x.strokeStyle = `rgba(214,240,255,${.55 * (1 - k)})`; x.lineWidth = 1.2; x.beginPath(); x.ellipse(q.x * W, q.y * W, rr, rr * .32, 0, 0, TAU); x.stroke(); }
+  for (const p of LIVE.P) {
+    const fade = p.rest == null ? Math.min(1, p.t * 3) : 1 - p.rest / (p.float ? 5 : 1.6), px = p.x * W, py = p.y * W;
+    if (p.k === 'snow') { x.fillStyle = `rgba(236,244,255,${.8 * fade})`; x.beginPath(); x.arc(px, py, p.s, 0, TAU); x.fill(); continue; }
+    // a petal seen turning: it narrows as it turns edge-on, and shows its darker underside half the time
+    x.save(); x.translate(px, py); x.rotate(Math.atan2(p.vy, p.vx) + p.th * .25); x.globalAlpha = fade;
+    x.fillStyle = Math.cos(p.th) > 0 ? '#FFC2D6' : '#F49AB8'; x.beginPath(); x.ellipse(0, 0, p.s, p.s * (.15 + .5 * Math.abs(Math.cos(p.th))), 0, 0, TAU); x.fill(); x.restore();
+  }
+  // fireflies: each wanders on its own slow curve and flashes on a period that divides the loop
+  if (!LIVE.flies) LIVE.flies = Array.from({ length:12 }, (_, i) => ({ x:rnd(.5, .95), y:rnd(.45, .8), a:rnd(.01, .03), b:rnd(.008, .02), f:1 + (i % 3), per:[3, 5, 6, 7.5][i % 4], off:rnd(0, 7) }));
+  x.globalCompositeOperation = 'lighter';
+  for (const f of LIVE.flies) {
+    const u = TAU * LIVE.t / LOOP, fx = (f.x + f.a * Math.sin(u * f.f + f.off) + f.b * Math.sin(u * (f.f + 2) * 2)) * W, fy = (f.y * A + f.b * Math.cos(u * f.f * 1.5 + f.off)) * W;
+    const ph = ((LIVE.t + f.off) % f.per) / f.per, glowA = .18 + .82 * Math.exp(-Math.pow((ph - .5) / .05, 2));
+    const gr = x.createRadialGradient(fx, fy, 0, fx, fy, 9); gr.addColorStop(0, `rgba(232,255,150,${glowA})`); gr.addColorStop(1, 'rgba(232,255,150,0)');
+    x.fillStyle = gr; x.beginPath(); x.arc(fx, fy, 9, 0, TAU); x.fill();
+  }
+  x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
+}
 function renderHome() {
+  liveStart();
   const K = KEEPER_INFO[keeper - 1] || KEEPER_INFO[0];
   const I = petInfo(); $('#hmFace').src = `art4/k${keeper}-face.png?v=8`; $('#hmName').textContent = `${K.n} & ${ANIMAL[animal].y}`;
   $('#hmGrow b').style.width = Math.round(I.into / I.need * 100) + '%'; $('#hmMe').setAttribute('aria-label', `${K.n} and ${ANIMAL[animal].y}, level ${I.lv}`);
