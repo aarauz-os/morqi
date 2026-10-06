@@ -1924,7 +1924,8 @@ const AU = (() => {
     if (o.vib) { const l = c.createOscillator(), lg = c.createGain(); l.frequency.value = o.vib; lg.gain.value = o.vibD || 14; l.connect(lg).connect(os.detune); l.start(t); l.stop(t + dur + .1); }
     g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + a); if (o.hold) g.gain.setValueAtTime(v, t + a + o.hold); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
     let n = os; if (o.lp) { const f = c.createBiquadFilter(); f.type = o.ft || 'lowpass'; f.frequency.value = o.lp; f.Q.value = o.q || .7; n.connect(f); n = f; }
-    n.connect(g).connect(o.to || mBus); sends(g, o); os.start(t); os.stop(t + dur + .05);
+    n.connect(g); if (o.pan) { const pn = c.createStereoPanner(); pn.pan.value = o.pan; g.connect(pn).connect(o.to || mBus); } else g.connect(o.to || mBus);
+    sends(g, o); os.start(t); os.stop(t + dur + .05);
   }
   function mn(o) {  // one noise hit
     const t = o.t, dur = o.dur, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); s.buffer = noiseBuf;
@@ -2375,50 +2376,59 @@ const AU = (() => {
     // a clap roll into each fourth bar
     if ((bar & 3) === 3 && i >= 12) clap(t, .1 + (i - 12) * .04, .2);
   }
-  /* "Haven": the home screen's own song (A, 2026-10-05: "more chill vibe with a slow bop", the moody late-night R&B
-     feel; the artist reference stays in the wiki). Named for A's playlist and the Sanctuary it plays in. Lush electric
-     piano chords (D minor 9, B flat major 7, G minor 9, A suspended), a smooth sub that glides, sparse swung drums
-     with a soft rim and snap on three and lazy hats sitting behind the beat, a little tape hiss, and an electric-piano
-     hook in the middle register (no sung or horn-like voice: A heard both as trumpets). The last part switches the beat. House rules
-     kept: the hook rests 5 bars in 13, peaks 62% through with one leap and one repeated note, a quiet E flat major 7 at
-     the golden point (the same E flat the Warden and Ascend lean on, so home still sounds like MorQi), every pitched
-     voice at or below about 700 Hz. */
+  /* "Haven", the home screen's song (A, 2026-10-05). After four versions of a late-night R&B take sounded like "a
+     practice version", A pointed at a sunny, groove-led house record from the Haven playlist's world (the reference
+     stays in the wiki). So Haven is bright house at 122 (its own tempo; every other song keeps the shared half-time
+     one): a round four-on-the-floor kick, a rolling bassline that bounces on the offbeats, claps on two and four,
+     shuffled hats and an open hat on every offbeat, congas and a shaker, warm chords that pump against the kick, and
+     a hook on a struck pluck that rings and dies away (no sustained or gliding lead: A heard those as horns).
+     F major 7, E minor 7, D minor 7, C major 7, a descending turn that never quite lands; B flat major 7 lifts it at
+     the golden point. Four bars of drums and percussion first, then the bass, then the hook; a six-bar breakdown without
+     the kick, and a drop back in. Hook 8 bars on / 5 off, peaking 62% through; pitched voices at or below about 700 Hz. */
+  const TEMPO = { home:144 / 122 }, H6 = SIX * TEMPO.home;
   const HAVEN = {
-    ch:[[146.83, 174.61, 220, 261.63, 329.63], [116.54, 146.83, 174.61, 220], [98, 116.54, 146.83, 174.61, 220], [110, 146.83, 164.81, 196]],
-    root:[36.71, 29.14, 49, 55],
-    hook:[[[0, 440], [3, 392], [6, 349.23], [10, 293.66], [12, 349.23], [20, 523.25], [22, 523.25], [24, 440], [27, 392], [30, 349.23]],
-          [[0, 440], [3, 392], [6, 349.23], [10, 293.66], [12, 349.23], [20, 523.25], [22, 466.16], [24, 440], [26, 392], [29, 329.63]]],
-    surp:[155.56, 196, 233.08, 293.66],
-    kicks:[[0, 7, 10], [0, 3, 10]], flip:[[0, 6, 11], [0, 2, 8, 11]] };
-  const THIRD = { 440:349.23, 392:329.63, 349.23:293.66, 293.66:233.08, 523.25:440, 466.16:392, 329.63:261.63 };   // a third below, in D minor
-  const swing = (i, t) => t + (i & 1 ? SIX * .28 : 0);   // every other sixteenth leans back
-  const soft = (t, f, dur, from) => mv({ t, f, f0:from, gl:.2, dur, vol:.32, att:.02, hold:Math.max(.01, dur * .6) });   // a round sub, no grit
-  const snap = (t, v) => { mn({ t, f:1800, ft:'bandpass', q:2, dur:.06, vol:v, rev:.5 }); mn({ t:t + .008, f:3200, ft:'bandpass', q:2.5, dur:.03, vol:v * .5 }); };
-  // the hook's voice: an electric piano played as a lead, a soft bell-like strike that blooms and fades (A, 2026-10-05:
-  // the sung voices before it, a buzzy chop and then a gliding croon, both sounded like "horns or trumpets")
-  const lead = (t, f, len, v) => { mv({ t, f, dur:len * 1.6, vol:v, att:.006, hold:len * .3, lp:1400, rev:.45, dly:.25 }); mv({ t, f:f * 2, dur:.4, vol:v * .22, att:.004, lp:1800 }); mv({ t, f:f * 3.01, dur:.12, vol:v * .05 }); };
+    ch:[[174.61, 220, 261.63, 329.63], [164.81, 196, 246.94, 293.66], [146.83, 174.61, 220, 261.63], [130.81, 164.81, 196, 246.94]],
+    root:[43.65, 41.2, 36.71, 32.7],
+    bass:[0, 0, 1, 0, 0, 1, 0, 2],   // which note of the bar's riff each offbeat plays: root, octave, fifth
+    hook:[[[0, 440], [3, 440], [6, 523.25], [8, 493.88], [10, 440], [12, 392], [20, 587.33], [22, 587.33], [24, 523.25], [27, 440]],
+          [[0, 440], [3, 440], [6, 523.25], [8, 493.88], [10, 440], [12, 392], [20, 523.25], [22, 493.88], [24, 440], [27, 392], [30, 329.63]]],
+    surp:[116.54, 146.83, 174.61, 220] };
+  let pump = null;
+  const pumpDuck = t => { pump.gain.cancelScheduledValues(t); pump.gain.setValueAtTime(.25, t); pump.gain.linearRampToValueAtTime(1, t + H6 * 3.4); };
+  // warm chords, three detuned saws spread across the stereo field, breathing with the kick
+  const chords = (t, notes, dur, v) => { for (const f of notes) for (const [d, pn] of [[-10, -.6], [0, 0], [10, .6]]) mv({ t, f, det:d, type:'sawtooth', dur, vol:v, att:.04, hold:Math.max(.01, dur - .4), to:pump, pan:pn }); };
+  // the hook's voice: a saw struck through a filter that closes fast, a round body under it, echoing out to the sides
+  const pluckLead = (t, f, v, pn) => {
+    const o = c.createOscillator(), b = c.createBiquadFilter(), gn = c.createGain(), sp = c.createStereoPanner();
+    o.type = 'sawtooth'; o.frequency.value = f; b.type = 'lowpass'; b.Q.value = 3; b.frequency.setValueAtTime(3200, t); b.frequency.exponentialRampToValueAtTime(420, t + .28);
+    gn.gain.setValueAtTime(.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + .004); gn.gain.exponentialRampToValueAtTime(.0001, t + .9); sp.pan.value = pn;
+    o.connect(b).connect(gn).connect(sp).connect(mBus); sends(gn, { dly:.4, rev:.25 }); o.start(t); o.stop(t + 1);
+    mv({ t, f, type:'triangle', dur:.6, vol:v * .45, att:.004, pan:pn });
+  };
+  // the rolling bass: short and round, a little bite from the filter
+  const houseBass = (t, f, v) => mv({ t, f, type:'sawtooth', dur:H6 * 1.6, vol:v, att:.005, hold:H6 * .6, lp:520, q:2 });
   function havenStep(s, t) {
-    // the hook's cycle runs five bars behind the song, so it opens on five bars of piano, sub and drums alone
-    const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HAVEN, hb = bar + 8, gold = bar > 0 && golden(hb), p = part(bar), C = R.ch[ch], tt = swing(i, t);
-    if (s === 0) filt(1400, t);
-    if (i === 0 && bar % 4 === 0) mn({ t, f:2600, ft:'lowpass', dur:SIX * 64, att:2, vol:.012 });   // tape hiss under it all
-    if (k === 0) keys(t, gold ? R.surp : C, SIX * 31, gold ? .03 : .024, p === 3 ? 2200 : 1500);
-    if (k === 16 && !gold) keys(t, C.slice(1, 3), SIX * 14, .012, 1300);   // the piano answers itself halfway
-    if (gold && i < 8) { if (i === 0) soft(t, 38.89, SIX * 8); return; }   // the drums hold their breath
-    const pat = p === 3 ? R.flip : R.kicks, ks = pat[bar & 1];
-    if (ks.includes(i)) { kick(t, .42); const nx = ks[ks.indexOf(i) + 1] ?? 16; soft(t, R.root[ch] * (p === 3 && i ? 2 : 1), SIX * (nx - i) + .1, i === 0 && bar & 1 ? R.root[(ch + 3) & 3] : null); }
-    if (i === 8) { snap(tt, .16); rim(tt, .07); }
-    if (p !== 2 && i % 2 === 0) hat(tt, i % 4 ? .012 : .02);
-    if (p === 3 && (i === 6 || i === 14)) hat(tt, .016, true);
-    if ((bar & 3) === 3 && i >= 13) hat(t + (i - 13) * SIX * 2 / 3, .012);   // a lazy triplet into every fourth bar
-    if (p === 2) return;   // the breakdown: piano, sub and a lighter beat   // the breakdown: piano, sub, one long "ooh"
-    // the hook, always played tight: the second part adds a harmony a third below, the last part doubles it an octave
-    // down (A, 2026-10-05: the shared variation, notes pushed late plus random grace notes, sounded "like an amateur
-    // playing the instruments")
-    if (hookOn(hb)) for (const [st, f] of R.hook[(hb >> 1) & 1]) if (st === k) {
-      lead(swing(k, t), f, SIX * 4, .05);
-      if (p === 1) lead(swing(k, t), THIRD[f], SIX * 4, .026);
-      if (p === 3) lead(swing(k, t), f / 2, SIX * 4, .024);
+    if (!pump) { pump = c.createGain(); pump.connect(padF); }
+    const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HAVEN, p = part(bar), hb = bar + 5, gold = golden(hb), C = R.ch[ch];
+    const intro = bar < 4, down = p === 2 && bar % 13 < 6, sw = i & 1 ? H6 * .18 : 0;   // every other sixteenth leans back a touch: the shuffle
+    if (i === 0) filt(intro ? 600 + bar * 300 : down ? 900 + (bar % 13) * 60 : 2400, t);   // the chords open through the intro and the breakdown
+    if (i === 0 && bar % 4 === 0) mn({ t, f:2600, ft:'lowpass', dur:H6 * 64, att:2, vol:.01 });   // tape hiss
+    // the beat: kick on every beat (the breakdown drops it), claps on two and four
+    if (!down && i % 4 === 0) { kick(t, .8); pumpDuck(t); }
+    if (!down && !intro && (i === 4 || i === 12)) clap(t, .32, .3);
+    if (down && i === 0 && (bar % 13) === 5) riser(t, H6 * 16, .07);   // six bars without the kick, then the drop
+    // shuffled hats, an open hat on every offbeat, a shaker, congas
+    if (bar >= 1 || i % 4 === 2) { if (i % 2) hat(t + sw, .012); if (i % 4 === 2) hat(t, down ? .014 : .022, true); }
+    mn({ t:t + sw, f:7400, dur:.04, att:.01, vol:i % 4 === 2 ? .022 : .01 });
+    if (bar >= 2) for (const [st, f] of [[3, 220], [6, 293.66], [10, 220], [11, 261.63], [14, 196]]) if (st === i) mv({ t:t + sw, f:f * 1.25, f1:f, gl1:.05, dur:.2, vol:.05, att:.002, rev:.2, pan:st % 2 ? .35 : -.35 });
+    // chords: struck on the one and the push of each two-beat, pumping under the kick
+    if (bar >= 2 && (i === 0 || i === 6 || i === 10)) chords(t, gold ? R.surp : C, H6 * (i === 0 ? 5 : 3), .013);
+    // the bass rolls in on bar 4: offbeat sixteenths, root, octave, fifth
+    if (bar >= 4 && !down && (i % 4 === 2 || i === 7 || i === 15)) { const n = R.bass[(i >> 1) & 7], f = R.root[ch] * [1, 2, 1.5][n]; houseBass(t + sw, f, .28); }
+    // the hook
+    if (!intro && !down && hookOn(hb)) for (const [st, f] of R.hook[(hb >> 1) & 1]) if (st === k) {
+      pluckLead(t + (st & 1 ? H6 * .18 : 0), f, .1, st % 4 ? .3 : -.3);
+      if (p === 3) pluckLead(t + (st & 1 ? H6 * .18 : 0), f / 2, .04, 0);
     }
   }
   function music(play) {
@@ -2435,7 +2445,7 @@ const AU = (() => {
         if (musOn) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, blossom:blossomStep, home:havenStep }[M.song] || pathStep)(M.step, M.next);
         if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest' && M.song !== 'blossom') bloomLayer(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
-        M.next += SIX; M.step++;
+        M.next += SIX * (TEMPO[M.song] || 1); M.step++;
       }
     }, 25);
   }
