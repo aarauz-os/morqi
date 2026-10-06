@@ -582,6 +582,9 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 /* the title: the logo as its own layer over the key art, with the line that sums the game up under it */
 #title > .brand{position:absolute;left:0;right:0;top:calc(22px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none}
 #title .logo{width:min(60%,262px);filter:drop-shadow(0 6px 14px rgba(10,20,60,.45))}
+/* the cloud wordmark draws itself over the logo's place; the picture stays for reduced motion and screen readers */
+#title .logo-cloud{position:absolute;top:calc(min(64vw,280px) * -52 / 368 + 4px);left:50%;transform:translateX(-50%);width:min(64vw,280px);pointer-events:none}
+#title .brand.cloud .logo{visibility:hidden}
 #title .tag{font:800 15px var(--round);letter-spacing:.01em;color:#fff;text-shadow:0 1px 2px rgba(10,16,50,.7),0 0 18px rgba(10,16,50,.55)}
 /* one hero, one action: the art carries the screen, the level reads like a page you swipe through, Play is the
    only loud thing, and sound sits quietly in the corner */
@@ -1293,7 +1296,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   </div>
 
   <section class="scr" id="title">
-    <div class="brand"><img class="logo" src="art4/logo-morqi.png?v=8" alt="MorQi"><span class="tag">Balance is your superpower</span></div>
+    <div class="brand"><canvas class="logo-cloud" id="logoCloud" aria-hidden="true"></canvas><img class="logo" src="art4/logo-morqi.png?v=8" alt="MorQi"><span class="tag">Balance is your superpower</span></div>
     <div class="tsound">
       <label class="set-t"><button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg></button>
       <button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
@@ -7060,6 +7063,73 @@ function applyProfile(p) { keeper = p.keeper; animal = p.animal; keeperEl = p.el
     [...$('#ldBar').children].forEach((s, i) => s.classList.toggle('on', i < (done ? 5 : lit))); $('#ldBar').setAttribute('aria-valuenow', Math.round((done ? 1 : p) * 100));
     if (done) { $('#ldT').textContent = 'The world is awake'; $('#ldGo').hidden = false; return; } setTimeout(tick, 120); };
   tick(); }
+/* MorQi as a living cloud (A, 2026-10-05: "MorQi in a shape of living breathing clouds. No faces just moving and
+   'breathing' clouds as live animation"). The word is built from soft cloud puffs sampled from the logo itself: big
+   puffs deep inside each letter, small ones at the edges, so it billows like a cumulus and still reads. It breathes in
+   and out over eight seconds, the breath rippling across the word from the M to the i, each puff swelling a little out
+   of step the way a cloud's surface churns. Wisps lift off the tops, rise, spread as they rise (rising air expands and
+   thins) and drift off on a light breeze. Shaded like a real cloud: a lavender underside, a white body, lit tops. The
+   emerald on the i stays, the brand's one jewel, bobbing gently. Every motion's period divides the eight-second breath,
+   so it loops exactly. */
+const CLOUD = { raf:0, pts:null, wisps:[], t:0, last:0, gem:null, img:null };
+function cloudPuff(col, edge) {   // one soft puff, drawn once per colour
+  const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, col + 'FF'); gr.addColorStop(edge, col + 'E6'); gr.addColorStop(1, col + '00'); x.fillStyle = gr; x.fillRect(0, 0, 64, 64); return c;
+}
+// a billow: lit from the upper left, white in the light, cool grey-lavender where it turns away, so where billows
+// overlap the cauliflower texture of a cumulus shows
+function cloudBillow() {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  x.beginPath(); x.arc(32, 32, 30, 0, TAU); x.clip();
+  const gr = x.createRadialGradient(24, 22, 2, 32, 32, 31); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.5, '#FBFCFF'); gr.addColorStop(.85, '#E7EAF7'); gr.addColorStop(1, '#D6DBF0');
+  x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+  const c2 = document.createElement('canvas'); c2.width = c2.height = 64; const y = c2.getContext('2d'), m = y.createRadialGradient(32, 32, 14, 32, 32, 32);
+  m.addColorStop(0, '#000F'); m.addColorStop(1, '#0000'); y.fillStyle = m; y.fillRect(0, 0, 64, 64); y.globalCompositeOperation = 'source-in'; y.drawImage(c, 0, 0); return c2;
+}
+function cloudBuild() {
+  const im = CLOUD.img, w = 368, h = 116, c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'); x.drawImage(im, 0, 0, w, h); const d = x.getImageData(0, 0, w, h).data, solid = (i, j) => i >= 0 && j >= 0 && i < w && j < h && d[(j * w + i) * 4 + 3] > 120;
+  const gemAt = (i, j) => { const k = (j * w + i) * 4; return d[k + 1] > d[k] + 40 && d[k + 1] > d[k + 2] - 10; };
+  const pts = []; let gx = 0, gy = 0, gn = 0;
+  for (let j = 2; j < h; j += 6) for (let i = 2; i < w; i += 6) {
+    if (!solid(i, j)) continue; if (gemAt(i, j)) { gx += i; gy += j; gn++; continue; }
+    let r = 1; while (r < 14 && solid(i + r, j) && solid(i - r, j) && solid(i, j + r) && solid(i, j - r)) r++;   // how deep inside the letter
+    pts.push({ x:i + rnd(-1, 1), y:j + rnd(-1, 1), r:(2.2 + r * .62) * rnd(.75, 1.35), ph:rnd(0, TAU), top:!solid(i, j - 7) });   // never wider than its depth, so letters keep their gaps and holes
+  }
+  pts.sort((a, b) => a.y - b.y); CLOUD.pts = pts; if (gn) CLOUD.gem = { x:gx / gn, y:gy / gn };
+  CLOUD.sh = cloudPuff('#8E98CE', .35); CLOUD.body = cloudBillow(); CLOUD.wisp = cloudPuff('#F4F6FF', .2);
+}
+function cloudStart() {
+  if (reduce || CLOUD.raf || $('#title').hidden) return;
+  if (!CLOUD.img) { CLOUD.img = new Image(); CLOUD.img.onload = () => { cloudBuild(); $('#title .brand').classList.add('cloud'); cloudStart(); }; CLOUD.img.src = 'art4/logo-morqi.png?v=8'; return; }
+  if (!CLOUD.pts) return;
+  CLOUD.last = performance.now(); CLOUD.raf = requestAnimationFrame(cloudFrame);
+}
+function cloudFrame(now) {
+  if ($('#title').hidden) { CLOUD.raf = 0; return; }
+  CLOUD.raf = requestAnimationFrame(cloudFrame);
+  const dt = Math.min(.05, (now - CLOUD.last) / 1000); CLOUD.last = now; CLOUD.t = (CLOUD.t + dt) % 8;
+  const cv = $('#logoCloud'), D = Math.min(2, devicePixelRatio || 1); cv.style.height = cv.getBoundingClientRect().width * 190 / 368 + 'px';
+  const r = cv.getBoundingClientRect();
+  if (cv.width !== Math.round(r.width * D)) { cv.width = Math.round(r.width * D); cv.height = Math.round(r.height * D); }
+  const x = cv.getContext('2d'), s = r.width / 368, t = CLOUD.t, br = TAU * t / 8, oy = 52;   // the word sits low in the canvas, so wisps have room to rise
+  x.setTransform(D * s, 0, 0, D * s, 0, 0); x.clearRect(0, 0, 368, 190);
+  // a breath: the whole word swells a little and lifts as it breathes in
+  const inhale = Math.sin(br), sc = 1 + .022 * inhale, lift = -2.5 * inhale;
+  x.translate(184, oy + 58 + lift); x.scale(sc, sc); x.translate(-184, -58);
+  const R = p => p.r * (1 + .1 * Math.sin(br - p.x * .018) + .05 * Math.sin(br * 2 + p.ph));   // the breath ripples from the M to the i
+  for (const [spr, dx, dy, k, a] of [[CLOUD.sh, 0, 6, 1.15, .5], [CLOUD.body, 0, 0, 1, 1]]) {
+    x.globalAlpha = a; for (const p of CLOUD.pts) { const rr = R(p) * k * 2.5; x.drawImage(spr, p.x + dx - rr / 2, p.y + dy - rr / 2, rr, rr); } }
+  x.globalAlpha = 1;
+  // wisps: they lift off the tops, rise, spread and thin, and drift downwind
+  if (Math.random() < dt * 4) { const tops = CLOUD.pts.filter(p => p.top), p = tops[(Math.random() * tops.length) | 0]; if (p) CLOUD.wisps.push({ x:p.x, y:p.y - p.r * .5, r:p.r * .7, t:0, life:rnd(2.2, 3.4) }); }
+  for (const w of CLOUD.wisps) { w.t += dt; w.y -= dt * 9; w.x += dt * (5 + 4 * Math.sin(br)); w.r += dt * 3.2;
+    x.globalAlpha = .4 * Math.sin(Math.PI * Math.min(1, w.t / w.life)); const rr = w.r * 2.2; x.drawImage(CLOUD.wisp, w.x - rr, w.y - rr * .3, rr * 2, rr * .6); }
+  CLOUD.wisps = CLOUD.wisps.filter(w => w.t < w.life); x.globalAlpha = 1;
+  // the emerald, bobbing on its own small breath
+  if (CLOUD.gem && ok(CLOUD.img)) { const g = CLOUD.gem, gs = 30, by = Math.sin(br * 2) * 1.5;
+    x.drawImage(CLOUD.img, (g.x - gs / 2) / 368 * CLOUD.img.naturalWidth, (g.y - gs / 2) / 116 * CLOUD.img.naturalHeight, gs / 368 * CLOUD.img.naturalWidth, gs / 116 * CLOUD.img.naturalHeight, g.x - gs / 2, g.y - gs / 2 + by, gs, gs); }
+}
 $('#ldGo').onclick = () => { AU.init(); SFX.select(); AU.music(true); AU.song('home'); let p = profile(); if (!p && PITCH) p = { keeper:1, animal:'goat', el:'wood' }; if (p) { applyProfile(p); goTab('home'); } else show('pickKeeper'); };
 function goTab(t) {
   if (t === 'keepers') { editingKeeper = true; $('#keeperNext').textContent = 'Done'; pickKeeper(keeper); show('pickKeeper'); return; }
@@ -7274,6 +7344,7 @@ function openReveal(id) { const D = CALL[id]; if (!D || !S) return; S.revealed =
   $('#crvArt').closest('.crv').querySelector('.crv-k').textContent = S.giftNew === id ? 'New Star Call!' : 'Star Call'; show('callReveal'); SFX.bx('call-seal', 1, 0); }
 $('#crvGo').onclick = () => { SFX.select(); show('results'); };
 $('#resGift').addEventListener('click', () => { const id = $('#resGift').dataset.id; if (S && id) openReveal(id); });
+cloudStart();
 })();
 </script>
 </body></html>
