@@ -2484,7 +2484,7 @@ const AU = (() => {
   }
   // where the beat is right now, for scenery that dances: how far through the current beat (0..1) and which beat.
   // With the music off or the audio not running, the same tempo comes from the clock, so the world still moves together.
-  function beat() { const live = c && c.state === 'running' && M.timer && M.t0 !== undefined, s = (live ? c.currentTime - M.t0 : performance.now() / 1000) / (SIX * 4); return { ph:s - Math.floor(s), n:Math.floor(s) }; }
+  function beat() { const live = c && c.state === 'running' && M.timer && M.t0 !== undefined, s = (live ? c.currentTime - M.t0 : performance.now() / 1000) / (SIX * 4 * (TEMPO[M.song] || 1)); return { ph:s - Math.floor(s), n:Math.floor(s) }; }
   // which world is playing and how restored it is (0..1); the game calls it every frame during a level
   function world(w, r) { M.world = w; M.rest = Math.max(0, Math.min(1, r)); }
   // the Element Bloom: the theme jumps to full power and a low chant joins on the backbeat, with a four-on-the-floor kick
@@ -7161,6 +7161,7 @@ function liveStart() {
 function liveFrame(now) {
   if ($('#home').hidden) { LIVE.raf = 0; $('#hmLive').pause(); return; }
   LIVE.raf = requestAnimationFrame(liveFrame);
+  if (!$('#home').hidden && LIVE.crewFor !== store.get('morqi.book')) { LIVE.crew = null; LIVE.crewFor = store.get('morqi.book'); }
   const dt = Math.min(.05, (now - LIVE.last) / 1000); LIVE.last = now; LIVE.t = (LIVE.t + dt) % LOOP;
   const cv = $('#hmFx'), r = cv.getBoundingClientRect(), D = Math.min(2, devicePixelRatio || 1);
   if (cv.width !== Math.round(r.width * D)) { cv.width = Math.round(r.width * D); cv.height = Math.round(r.height * D); }
@@ -7185,6 +7186,7 @@ function liveFrame(now) {
   for (const q of LIVE.rip) q.t += dt; LIVE.rip = LIVE.rip.filter(q => q.t < 1.6);
   // draw, in CSS pixels
   x.setTransform(D, 0, 0, D, 0, 0); x.clearRect(0, 0, W, H);
+  liveDancers(x, W, A);
   for (const q of LIVE.rip) { const k = q.t / 1.6, rr = 4 + k * 26; x.strokeStyle = `rgba(214,240,255,${.55 * (1 - k)})`; x.lineWidth = 1.2; x.beginPath(); x.ellipse(q.x * W, q.y * W, rr, rr * .32, 0, 0, TAU); x.stroke(); }
   for (const p of LIVE.P) {
     const fade = p.rest == null ? Math.min(1, p.t * 3) : 1 - p.rest / (p.float ? 5 : 1.6), px = p.x * W, py = p.y * W;
@@ -7203,6 +7205,31 @@ function liveFrame(now) {
     x.fillStyle = gr; x.beginPath(); x.arc(fx, fy, 9, 0, TAU); x.fill();
   }
   x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
+}
+// The freed live here, and they dance (A, 2026-10-05: "some critters or something to breathe and move in rhythm with the
+// current home theme song"). Up to four creatures from the Freed Book (the ones freed most), each with its own move on
+// the beat of the home theme: one bounces on every kick, one nods on the claps (two and four), one sways across two
+// beats, one hops on the offbeats. All of them breathe. The Keeper and the companion nod along a little.
+const DANCE = [[.25, .705, 'bounce'], [.83, .735, 'clap'], [.39, .585, 'sway'], [.71, .515, 'off']];
+function liveDancers(x, W, A) {
+  if (!LIVE.crew) { const b = bookOf(), got = Object.keys(b).filter(k => KIND[k] && !KIND[k].minion).sort((p, q) => b[q] - b[p]);
+    LIVE.crew = (got.length ? got : ['water-a', 'wood-a', 'fire-a', 'earth-a']).slice(0, 4); }
+  const bt = AU.beat(), ph = bt.ph, n = bt.n, breath = Math.sin(TAU * (n + ph) / 8);
+  LIVE.crew.forEach((k, i) => {
+    const im = IMG['e-' + k + '-happy'] || IMG['e-' + k]; if (!ok(im)) return;
+    const [fx, fy, mv] = DANCE[i], s = W * .13, px = fx * W, py = fy * A * W; let h = 0, sx = 1, sy = 1, rot = 0, dx = 0;
+    const land = Math.exp(-ph * 14);
+    if (mv === 'bounce') { h = 4 * ph * (1 - ph) * s * .22; sx = 1 + .1 * land; sy = 1 - .12 * land; }
+    else if (mv === 'clap') { const on = n % 2 === 1, d = on ? Math.exp(-ph * 8) : 0; sy = 1 - .1 * d; sx = 1 + .05 * d; rot = .08 * d; }
+    else if (mv === 'sway') { const u = (n % 2 + ph) / 2; rot = .13 * Math.sin(TAU * u); dx = s * .06 * Math.sin(TAU * u); }
+    else { const q = ph >= .5 ? (ph - .5) * 2 : 0; h = 4 * q * (1 - q) * s * .14; sy = 1 - .08 * Math.exp(-((ph + .5) % 1) * 14); }
+    sx *= 1 + .02 * breath; sy *= 1 + .025 * breath;
+    x.fillStyle = 'rgba(10,14,30,.32)'; x.beginPath(); x.ellipse(px + dx, py, s * .32 * (1 - h / s * .8), s * .09, 0, 0, TAU); x.fill();
+    x.save(); x.translate(px + dx, py - h); x.rotate(rot); x.scale(sx * (i % 2 ? -1 : 1), sy); x.drawImage(im, -s / 2, -s * .92, s, s); x.restore();
+  });
+  // the Keeper and the companion nod on every beat
+  const nod = Math.exp(-ph * 9);
+  $('#hmKeeper').style.transform = `translateY(${nod * 3}px) scaleY(${1 - nod * .03})`; $('#hmPet').style.transform = `translateY(${-4 * ph * (1 - ph) * 10}px)`;
 }
 function renderHome() {
   liveStart();
