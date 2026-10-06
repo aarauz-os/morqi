@@ -71,12 +71,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .rb.red .ribbon{color:var(--coral-2)}
 .fbdemo{position:absolute;inset:0;display:grid;place-items:center;background:#22252E}.fbdemo img{width:100%!important;height:100%!important;max-width:none;object-fit:contain}
 .lu-pips[hidden]{display:none}
-.still-sky{position:absolute;left:50%;aspect-ratio:690/210;translate:-50% 0;pointer-events:none;z-index:0;filter:saturate(.55);
-  -webkit-mask:radial-gradient(ellipse 48% 34% at 50% 42%,#000 30%,transparent 100%);mask:radial-gradient(ellipse 48% 34% at 50% 42%,#000 30%,transparent 100%);animation:stillOpen 2.6s ease-out both,stillDrift 11s 2.6s ease-in-out infinite}
+.still-sky{position:absolute;left:50%;aspect-ratio:1200/346;translate:-50% 0;pointer-events:none;z-index:0;filter:saturate(.55);
+  -webkit-mask:radial-gradient(ellipse 50% 50% at 50% 48%,#000 45%,transparent 100%);mask:radial-gradient(ellipse 50% 50% at 50% 48%,#000 45%,transparent 100%);animation:stillOpen 2.6s ease-out both,stillDrift 11s 2.6s ease-in-out infinite}
 .still-sky::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 50% 50%,rgba(6,8,22,.6),rgba(6,8,22,0) 75%)}
-.still-sky i{position:absolute;inset:0;background:url(art4/still/eyes.png?v=1) center/100% 100% no-repeat}
-.still-sky.t{top:calc(134px + env(safe-area-inset-top));width:min(92vw,420px);--o:.42}
-.still-sky.h{top:calc(92px + env(safe-area-inset-top));width:min(66vw,260px);--o:.08}.met-still .still-sky.h{--o:.22}
+.still-sky i{position:absolute;inset:0;background:url(art4/still/eyes.png?v=2) center/100% 100% no-repeat}
+.still-sky.t{top:calc(78px + env(safe-area-inset-top));width:min(96vw,440px);--o:.42}
+.still-sky.h{top:calc(92px + env(safe-area-inset-top));width:min(86vw,338px);--o:.08}.met-still .still-sky.h{--o:.22}
 @keyframes stillOpen{from{opacity:0}to{opacity:var(--o)}}@keyframes stillDrift{0%,100%{opacity:var(--o);translate:-50% 0}50%{opacity:var(--o);translate:-50% 6px}}
 @media (prefers-reduced-motion:reduce){.still-sky{animation:none;opacity:var(--o)}}
 #still{background:#04050A;overflow:hidden}#still .st-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter 4s ease}
@@ -2971,7 +2971,7 @@ function scatterProps(w) {
     out.push({ x, y, n:kinds[(Math.random() * kinds.length) | 0], s:rnd(62, 84), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 });
   }
   // each element tower's district grows its own element's plants and things, frozen until its stone is taken
-  if (LVL === 5) for (const Sh of SHRINES) { const k2 = PROPS[Sh.el]; k2.forEach(n => IMG[n] || load(n, `art4/props/${n}.png?v=8`)); IMG['x-temple-' + Sh.el] || load('x-temple-' + Sh.el, `art4/props/x-temple-${Sh.el}.png?v=10`);
+  if (LVL === 5) for (const Sh of SHRINES) { const k2 = PROPS[Sh.el]; k2.forEach(n => IMG[n] || load(n, `art4/props/${n}.png?v=8`)); IMG['x-temple-' + Sh.el] || load('x-temple-' + Sh.el, `art4/props/x-temple-${Sh.el}.png?v=11`);
     for (let i = 0; i < 16; i++) { const a = rnd(0, TAU), d = rnd(170, Sh.R - 40); out.push({ x:Sh.x + Math.cos(a) * d, y:Sh.y + Math.sin(a) * d * .8, n:k2[i % 2], s:rnd(66, 90), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 }); } }
   return out.sort((a, b) => a.y - b.y);
 }
@@ -4790,7 +4790,7 @@ const towersOn = () => /[?&]towers=1/.test(location.search);
 function makeOutposts() {
   const els = ['wood', 'water', 'fire'], hub = { hub:true, el:'wood', x:1800, y:1500, h:560, rx:160, ry:60 };
   const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / 3; return { el, x:Math.round(1800 + Math.cos(a) * 1000), y:Math.round(1500 + Math.sin(a) * 900), h:340, rx:128, ry:54 }; });
-  els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=10`));
+  els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=11`));
   return { hub, towers, els, need:240, march:[] };
 }
 const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? [S.out.hub, ...S.out.towers] : [];
