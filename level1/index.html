@@ -1844,6 +1844,7 @@ const KIND = {
 };
 Object.keys(KIND).forEach(k => { load('e-' + k, `art4/e-${k}.png?v=8`); if (!KIND[k].minion) load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=8`); });
 const lookSrc = p => p;   // the bold look is the only look now; kept so image paths have one place to change
+if (/[?&]towers=1/.test(location.search)) { ['wood', 'fire', 'earth', 'water'].forEach(el => load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`)); ['wood', 'fire'].forEach(r => load('sf-' + r, `art4/story/story-frost-${r}.jpg?v=8`)); }
 ['x-stone-wood','x-stone-fire','x-stone-earth','x-stone-metal','x-stone-water','x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water','x-tower-metal'].forEach(n => load(n, `art4/props/${n}.png?v=8`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=8'), texM = load('tm', 'art4/t-meadow.jpg?v=8');
 // the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
@@ -1929,6 +1930,7 @@ const AU = (() => {
     freeze() { noise({ ft:'highpass', f:4000, f1:12000, dur:.5, vol:.1 }); for (let i = 0; i < 5; i++) tone({ f:rnd(2000, 4000), dur:.1, vol:.03, at:i * .05 }); },
     // the Silver City's ending (A, 2026-10-06): a cold drone under the float and the trap, a pull as each power leaves the
     // Keeper, a crystal note as it lands in its own stone, the dark gathering into him, and each stone taken into his bell
+    tshot() { if (!gate('tshot', 90)) return; tone({ f:330, f1:196, type:'triangle', dur:.12, vol:.05 }); noise({ ft:'bandpass', f:500, q:2, dur:.06, vol:.03 }); },
     dread(d = 5) { tone({ f:55, dur:d, vol:.08, type:'sawtooth', att:1.2, lp:260 }); tone({ f:58.27, dur:d, vol:.06, type:'sawtooth', att:1.6, lp:220 }); noise({ f:160, dur:d, vol:.05, att:1.4 }); },
     trap() { this.boom(true); tone({ f:46, f1:28, dur:1.4, vol:.32, att:.004 }); noise({ ft:'highpass', f:3000, f1:9000, dur:.9, vol:.08 }); for (let i = 0; i < 7; i++) tone({ f:rnd(420, 680), dur:.12, vol:.03, at:.05 + i * .07 }); },
     pull(i = 0) { noise({ ft:'bandpass', f:1500, f1:260, q:3, dur:.55, vol:.07, att:.25 }); tone({ f:PENTA[(i * 3) % 5], f1:PENTA[(i * 3) % 5] / 2, dur:.5, vol:.035, att:.2 }); },
@@ -2006,8 +2008,8 @@ const AU = (() => {
   }
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
-    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=15`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=16`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2910,9 +2912,11 @@ function renderStory() {
     // the Silver City's own last page (A, 2026-10-06, taking up the design review's line): the forge that still glows
     realm === 'metal' ? { img:'story-stones', t:'The old forge still glows', p:`Under the frozen city, the old forge still glows. Free creatures, and its five temples will give up their stones. Bring them to the Great Tower, and ${B.name.replace(/^The /, 'the ')} will rise.`,
       alt:'Five glowing Qi Stones above a frozen city.', over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } :
+    towersLevel(LVL) ? { pic:templeStory(realm, HOLD_ELS[LVL][0]), img:realm === 'water' ? 'story-frost' : 'story-frost-' + realm, t:LVL === 2 ? 'The temple has gone cold' : 'The temples have gone cold', p:`${LVL === 2 ? 'A temple' : 'Three temples'} kept ${place} warm. Now ${LVL === 2 ? 'it stands' : 'they stand'} frozen, and ${LVL === 2 ? 'its guardians serve' : 'their guardians serve'} ${B.name.replace(/^The /, 'the ')}. Wake ${LVL === 2 ? 'it' : 'them'}, and ${B.name.replace(/^The /, 'the ')} will have to face you.`, alt:'A frozen temple standing cold in the realm, its boss rising behind it.',
+      over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } :
     { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn ${LVL === 1 ? 'two' : 'the five'} Qi Stones. Gather ${LVL === 1 ? 'both' : 'them all'}, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
       over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } ];
-  const pg = pages[storyPg], src = pg.img === 'luma' ? 'art4/luma.jpg?v=8' : `art4/story/${pg.img}.jpg?v=8`;
+  const pg = pages[storyPg], src = pg.pic || (pg.img === 'luma' ? 'art4/luma.jpg?v=8' : `art4/story/${pg.img}.jpg?v=8`);
   art.innerHTML = `<img class="sbg" src="${src}" alt="${pg.alt}">${pg.over || ''}`; art.className = 'story pg' + storyPg;
   $('#storyT').textContent = pg.t; $('#storyP').textContent = pg.p;
   [...$('#storyDots').children].forEach((d, i) => d.classList.toggle('on', i === storyPg));
@@ -2980,8 +2984,9 @@ function startRun() {
   S.props = scatterProps(worldOf()); loadBoss(worldOf());
   // the Silver City starts at the foot of the Great Tower, in the middle of the map (A, 2026-10-06)
   if (LVL === 5) { S.p.x = L5_START.x; S.p.y = L5_START.y; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
-  S.out = LVL === 2 && towersOn() ? makeOutposts() : null;
-  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); renderSkills(); startLoop();
+  S.out = towersLevel(LVL) ? makeOutposts(LVL) : null;
+  if (S.out) { S.p.x = S.out.start.x; S.p.y = S.out.start.y; S.pet.x = S.p.x - 40; S.pet.y = S.p.y + 30; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
+  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=1`; new Image().src = `art4/k${keeper}-hurt.png?v=8`; } renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -3170,7 +3175,7 @@ function spawnBoss() {
   // Level 5's swarms carry the Keeper past level 40, but a maxed Keeper hits no harder past about 28, so the boss stops
   // growing there (the long Level 5 left a boss that took two and a half minutes to reach half its life)
   const blv = S.level === 5 ? Math.min(S.lv, 28) : S.lv;
-  e.hp = e.max = Math.round((1 + .15 * (S.hard || 0)) * 10500 * Math.pow(Math.max(8, blv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1]);   // a real fight: about a minute
+  e.hp = e.max = Math.round((1 + .15 * (S.hard || 0)) * 10500 * Math.pow(Math.max(8, blv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1] * (S.out ? 1.8 : 1));   // a real fight: about a minute
   S.en.push(e); S.boss = e;
   if (eff(e.el, keeperEl) > 1) S.items.push({ x:S.p.x + 80, y:S.p.y + 40, kind:'ward', t:0, z:10, vz:260 });
   // room to dodge, so the boss can really attack; the whole arena always sits inside the world (playtest 2: a boss that
@@ -3178,7 +3183,7 @@ function spawnBoss() {
   // the arena should not feel congested or make attacks hard to evade, so it is about a third wider than the Warden's was.
   { const r = Math.max(580, Math.min(VW, VH) * .82), m = r + 90;   // extra room above for the HUD and below for the power row
     // the Silver City's boss rises in the square in front of the Great Tower, clear of every tower
-    S.arena = S.out ? { x:1800, y:clamp(2420, r + 330, WORLD - r - 200), r } : S.level === 5 ? { x:TOWER.x, y:clamp(TOWER.y + r + 90, r + 330, WORLD - r - 200), r } : { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
+    S.arena = S.out ? { x:S.out.hub.x, y:S.out.hub.y, r } : S.level === 5 ? { x:TOWER.x, y:clamp(TOWER.y + r + 90, r + 330, WORLD - r - 200), r } : { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
     const A = S.arena; e.x = A.x; e.y = A.y - 280;
     if (Math.hypot(S.p.x - A.x, S.p.y - A.y) > r - 80) { S.p.x = A.x; S.p.y = A.y + 180; ring(S.p.x, S.p.y, 20, 260, '#FFE6A3', .5, 12, true); } }
   e.pat = 0; e.atk = 2.6; S.bossFx = []; S.heartT = 3;
@@ -4809,46 +4814,102 @@ function spikeTick(dt) {
       if (Math.hypot(S.p.x - T.x, (S.p.y - T.y) / .7) < T.r) ouch(16, T.x, T.y, { src:'spikes', el:'metal' }); } }
   S.traps = S.traps.filter(T => T.t < T.wind + .4);
 }
-/* Tower capture, a prototype on Level 2 behind ?towers=1 (A, 2026-10-06: "Tower War - Tactical Conquest ... you have to
-   make sure you take over all towers ... the lanes connecting the towers cant be destroyed by the players or enemies but
-   you can still destroy the enemies who are outside of it. maybe we can see the lanes be transparent tubes where you can
-   see the freed fighting to get the frozen freed. each freed that yields one element goes into the ones they need and
-   whatever i free from the outside goes to that group and the game ... goes into boss mode once all elemental towers
-   have been taken over ... the middle of the map ... ONE giantic and impressive tower with 3 small towers"). A hub
-   tower stands north of the start, with three of the realm's element temples round it, each joined to it by a glass
-   tube. Every creature the Keeper frees joins its element's group (or, from another element, the group that needs it
-   most), walks out through the tube and frees one of that temple's frozen garrison; when a garrison is all freed the
-   temple is taken. All three taken: Ascended, then the boss. One thumb as ever: the freed march on their own. */
+/* Hold the temple (A, 2026-10-06, Option A, after playing the first tower prototype: "nothing visually is telling me my
+   progress on freeing a certain amount of elementals and i feel like if im freeing them i must stand near their towers";
+   "option A for sure!"). Behind ?towers=1 while A tries it, following the agreed rollout: Level 2 has one temple, Level 3
+   three (the Level 3–4 version, with the tubes and the boss at the hearth). Each temple has a ring on the ground before
+   its door:
+   - standing in the ring wakes the temple: its own guardians pour out of its door at the Keeper;
+   - every guardian freed, wherever it is chased to, sends its light home and fills the ring (double when freed with the
+     element that beats it); any other creature freed inside the ring helps a little. The band fills from the bottom up
+     both sides, as the temple's colour climbs from its base, so the two read as one;
+   - a taken temple is yours: it heals the Keeper in its ring, fires its element at creatures near it, and sends squads of
+     its freed down the glass tubes to fill the next temple's ring;
+   - all taken: Ascended, then the boss rises at the hearth in the middle and every temple fires on it.
+   An arrow at the screen's edge shows each temple off screen, its ring filling round it (design review, 2026-10-06). */
 const towersOn = () => /[?&]towers=1/.test(location.search);
-function makeOutposts() {
-  const els = ['wood', 'water', 'fire'], hub = { hub:true, el:'wood', x:1800, y:1500, h:560, rx:160, ry:60 };
-  const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / 3; return { el, x:Math.round(1800 + Math.cos(a) * 1000), y:Math.round(1500 + Math.sin(a) * 900), h:340, rx:128, ry:54 }; });
+const towersLevel = lv => towersOn() && (lv === 2 || lv === 3);
+const HOLD = { need:260, R:230, front:180, wake:.7, pack:2, cap:32, heal:.02, fire:.8, bossFire:1.5, reach:650, dmg:(lv) => 16 + 4 * lv, ally:12, squad:5, help:1.2 };
+const HOLD_ELS = { 2:['wood'], 3:['wood', 'fire', 'earth'] };
+function makeOutposts(lv) {
+  // the hearth in the middle (where the Keeper starts and the boss rises); the first temple stands north, its ring in view
+  const els = HOLD_ELS[lv] || HOLD_ELS[3], hub = { hub:true, x:1800, y:1800 };
+  // (design review, 2026-10-06: Level 2's one temple sits close, so its ring is a home base inside the boss arena; Level 3's
+  // three sit far enough that their rings stay clear of it)
+  const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / els.length, d = els.length === 1 ? 380 : 950, x = Math.round(hub.x + Math.cos(a) * d), y = Math.round(hub.y + Math.sin(a) * d);
+    return { el, x, y, h:340, rx:128, ry:54, cx:x, cy:y + HOLD.front, fill:0, held:false, cd:0, wake:0, souls:[], fireCd:0, allyCd:4, flare:0 }; });
   els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`));
-  return { hub, towers, els, need:240, march:[] };
+  // one temple on its own takes longer, so Level 2 is as long as a level should be
+  // the Keeper starts just below the first temple's ring, so the ring and the temple's door are on screen under the HUD
+  return { hub, towers, els, need:els.length === 1 ? 430 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy + 200 } };
 }
-const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? [S.out.hub, ...S.out.towers] : [];
+const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? S.out.towers : [];
+const inRing = (T, x, y) => Math.hypot(x - T.cx, (y - T.cy) * 1.6) < HOLD.R;
+// a temple's own guardians fill it wherever they are freed; any other creature only when freed inside an open ring
 function outpostKill(e) {
-  const O = S.out, open = O.els.filter(k => !S.qiStones[k]); if (!open.length) return;
-  // a creature of a temple's own element joins that temple; any other goes to the open temple nearest where it was freed,
-  // so where the Keeper fights decides which temple falls next
-  const near = O.towers.filter(t => open.includes(t.el)).sort((p, q) => Math.hypot(p.x - e.x, p.y - e.y) - Math.hypot(q.x - e.x, q.y - e.y))[0];
-  const el = open.includes(e.el) ? e.el : near.el, T = O.towers.find(t => t.el === el);
-  S.qi[el] = (S.qi[el] || 0) + 1;
-  if (O.march.length < 48) O.march.push({ el, img:e.img, own:e.own, t:0, dur:3.4, T, ph:Math.random() * TAU });
-  if (S.qi[el] >= O.need) captureOutpost(T);
+  const O = S.out; let T = e.from && !e.from.held ? e.from : null, n;
+  if (T) n = e.wise ? 2 : 1;
+  else { T = O.towers.find(t => !t.held && inRing(t, e.x, e.y)); if (!T) return; n = e.el === T.el ? .5 : .2; }
+  T.fill = Math.min(S.out.need, T.fill + n); S.qi[T.el] = Math.floor(T.fill);
+  if (n >= 1 || Math.random() < .3) T.souls.push({ x:e.x, y:e.y - 20, t:0, n:Math.max(1, n) });
+  if (T.fill >= S.out.need) captureOutpost(T);
 }
 function captureOutpost(T) {
-  // the fanfare first, then Luma names the temple a moment later (never under it, and every one, not only the first);
-  // the last capture starts Ascended, which has its own voice
-  S.qiStones[T.el] = true; S.shake = Math.max(S.shake, .4); SFX.fanfare(false); if (!allStones()) AU.vo('vo-stone-' + T.el, 1.1, .5, false);
-  paintThaw(T.x, T.y, 640); ring(T.x, T.y - 80, 20, 760, EL[T.el], 1.1, 20, true); stars(T.x, T.y - 160, 44, EL[T.el], 560);
-  if (allStones() && !S.hs.used) hsStart(true);
+  // the first temple taken: Luma teaches that its ring heals; after that she just cheers. The last one starts Ascended,
+  // which is its own fanfare and voice, so nothing else plays over it (design review, 2026-10-06)
+  if (T.held) return; T.held = true; T.fill = S.out.need; S.qi[T.el] = S.out.need; S.qiStones[T.el] = true; S.shake = Math.max(S.shake, .4);
+  const O = S.out, last = allStones(); O.won++;
+  const solo = O.towers.length === 1;
+  if (!last || solo) { SFX.fanfare(false); AU.vo(O.won === 1 ? 'vo-temple-won' : 'vo-temple-won2', 1.1, .5, false); }
+  // everything its door sent out is freed with it
+  for (const e of S.en) if (!e.dead && e.from === T) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, GROUND_RING[T.el], 160); }
+  paintThaw(T.x, T.y, 640); ring(T.cx, T.cy, 20, 760, GROUND_RING[T.el], 1.1, 20, true); stars(T.x, T.y - 160, 44, GROUND_RING[T.el], 560);
+  // a level with one temple still teaches its heal: Luma speaks, then Ascended comes (design review, 2026-10-06)
+  if (last && !S.hs.used) { if (solo) O.ascAt = S.t + 5.9; else hsStart(true); }
 }
 function outpostTick(dt) {
-  const O = S.out;
-  // the first time: a card shows the hub, the tubes and the temples, and Luma explains it
-  if (!O.taught && S.t > 3) { O.taught = true; coach('outposts', 'Take the temples!', 'Free creatures and they march through the glass to free each temple. Take all three.', () => ({ sx:W / 2, sy:H * .45 })); } for (const m of O.march) { m.t += dt; if (m.t >= m.dur && !m.done) { m.done = true; const T = m.T; stars(T.x + rnd(-50, 50), T.y + 50, 6, EL[m.el], 160); } }
-  O.march = O.march.filter(m => m.t < m.dur + .2);
+  const O = S.out, P = S.p;
+  // the first time: a card shows the ring, and Luma explains it
+  if (!O.taught && S.t > 3) { O.taught = true; const T0 = O.towers.slice().sort((p, q) => Math.hypot(p.cx - P.x, p.cy - P.y) - Math.hypot(q.cx - P.x, q.cy - P.y))[0];
+    coach('outposts', 'Wake the temple!', 'Stand in the temple\'s ring and free its creatures. Fill the ring and the temple is yours, and it fights for you.', () => ({ sx:(T0.cx - camX) * Z, sy:(T0.cy - camY) * Z })); }
+  if (O.ascAt && S.t >= O.ascAt) { O.ascAt = 0; if (!S.hs.used) hsStart(true); }
+  const open = O.towers.filter(t => !t.held), fight = !S.bossSpawned && !S.over;
+  for (const T of O.towers) {
+    // the light of each creature freed in the ring flies into the temple
+    for (const s of T.souls) { s.t += dt; if (s.t >= .7 && !s.home) { s.home = true; T.flare = 1; } } T.souls = T.souls.filter(s => s.t < .7); T.flare = Math.max(0, T.flare - dt * 3);
+    if (!T.held) {
+      // standing in the ring wakes the temple: its own element pours out of its door at the Keeper
+      const inside = fight && inRing(T, P.x, P.y); T.wake = Math.max(0, Math.min(1, T.wake + (inside ? dt * 2 : -dt)));
+      if (inside && !hsOn() && (T.cd -= dt) <= 0) { T.cd = HOLD.wake;
+        for (let i = 0; i < HOLD.pack; i++) if (S.en.filter(e => !e.dead && e.from === T).length < HOLD.cap) { const e = spawn(Math.random() < .25 ? 'wolf' : 'critter', { x:T.x + rnd(-70, 70), y:T.y + 115 + rnd(0, 30) }, 1.15, T.el); if (e) e.from = T; } }
+      continue; }
+    // a taken temple heals the Keeper in its ring
+    if (inRing(T, P.x, P.y) && P.hp > 0) { P.hp = Math.min(P.max, P.hp + P.max * HOLD.heal * dt); if (Math.random() < dt * 6) fx({ k:'plus', x:P.x + rnd(-20, 20), y:P.y - 10, vx:0, vy:-60, life:.6, s:8, c:'#8FF0A0' }); }
+    // and fires its element at creatures near it; when the boss comes, at the boss and its crowd from anywhere
+    if ((T.fireCd -= dt) <= 0 && !S.over) { T.fireCd = S.bossSpawned ? HOLD.bossFire : HOLD.fire;
+      const reach = S.bossSpawned ? 2600 : HOLD.reach; let best = null, bd = reach;
+      for (const e of S.en) { if (e.dead) continue; const d = Math.hypot(e.x - T.x, e.y - (T.y - 160)) - (e.boss ? 400 : 0); if (d < bd) { bd = d; best = e; } }
+      if (best) { O.bolts.push({ x:T.x, y:T.y - 200, e:best, el:T.el, sp:S.bossSpawned ? 1300 : 900 }); SFX.tshot(); } }
+    // and sends its freed down the tubes to help take the next temple
+    if (open.length && fight && (T.allyCd -= dt) <= 0) { T.allyCd = HOLD.ally;
+      const to = open.slice().sort((p, q) => q.fill - p.fill || Math.hypot(p.x - T.x, p.y - T.y) - Math.hypot(q.x - T.x, q.y - T.y))[0];
+      if (O.march.length < 40) for (let i = 0; i < HOLD.squad; i++) O.march.push({ from:T, to, el:T.el, img:'e-' + T.el + '-' + 'abc'[i % 3], t:-i * .3, sp:300, ph:Math.random() * TAU }); }
+  }
+  // the marchers go temple, hub, temple along the tubes; each one that arrives frees one of its target's garrison
+  const H = O.hub;
+  for (const m of O.march) { m.t += dt; if (m.t < 0) { m.x = null; continue; } const a = { x:m.from.x, y:m.from.y + 40 }, h = { x:H.x, y:H.y + 20 }, b = { x:m.to.x, y:m.to.y + 40 };
+    const L1 = Math.hypot(h.x - a.x, h.y - a.y), L2 = Math.hypot(b.x - h.x, b.y - h.y), d = m.t * m.sp;
+    if (Math.random() < dt * 8) fx({ k:'star', x:(m.x ?? a.x) + rnd(-10, 10), y:(m.y ?? a.y) - 30, vx:rnd(-20, 20), vy:rnd(-50, -20), drag:.3, life:.6, s:rnd(6, 10), c:GROUND_RING[m.el] });
+    if (d < L1) { const k = d / L1; m.x = a.x + (h.x - a.x) * k; m.y = a.y + (h.y - a.y) * k; }
+    else if (d < L1 + L2) { const k = (d - L1) / L2; m.x = h.x + (b.x - h.x) * k; m.y = h.y + (b.y - h.y) * k; }
+    else if (!m.done) { m.done = true; const T = m.to; if (!T.held) { T.fill = Math.min(S.out.need, T.fill + HOLD.help); S.qi[T.el] = Math.floor(T.fill); T.souls.push({ x:b.x, y:b.y, t:0, n:1 }); stars(b.x, b.y - 30, 10, GROUND_RING[m.el], 240); ring(b.x, b.y, 8, 140, GROUND_RING[m.el], .4, 8, true); if (T.fill >= S.out.need) captureOutpost(T); } } }
+  O.march = O.march.filter(m => !m.done);
+  // the temples' shots
+  for (const B of O.bolts) { const e = B.e; if (e.dead) { B.done = true; continue; }
+    const dx = e.x - B.x, dy = e.y - e.size * .3 - B.y, d = Math.hypot(dx, dy) || 1, st = B.sp * dt;
+    if (d <= st + e.r) { B.done = true; hurt(e, HOLD.dmg(S.lv), B.el, { kb:30, fx:B.x, fy:B.y }); ring(e.x, e.y - e.size * .3, 6, 70, GROUND_RING[B.el], .3, 6, true); }
+    else { B.x += dx / d * st; B.y += dy / d * st; } }
+  O.bolts = O.bolts.filter(B => !B.done);
 }
 /* The temple traps (A, 2026-10-06: "it should have traps coming out of it like how traps work in Indiana Jones movies
    with caves and hidden temples"): each element tower guards its district with its own trap, firing while the Keeper is
@@ -6309,6 +6370,7 @@ function draw() {
   for (const s of S.eshots) { if (!inView(s.x, s.y, 40)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.k] || SHOT_COL[s.el] || '#7FC4FF', s.boss ? 18 : 14, true, s.k === 'bubble'); }
   g.lineWidth = 1;
   if (!S.noKeeper && !S.p.float) drawFuseTop();
+  if (S.out) drawOutpostsTop();
   if (S.call) drawCallTop();
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
@@ -6342,7 +6404,7 @@ function draw() {
   // screen space: arrows to off-screen chests, flashes, the cold edge of low health
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
   for (const it of S.items) if (it.kind === 'stone' && it !== S.ptrItem) {   // a stone off screen gets an arrow in its element's colour
-    const sx = (it.x - cx) * Z, sy = (it.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
+    const sx = (it.x - cx) * Z, sy = (it.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 120 && sy < H - 110) continue;
     const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true)), k = 1 + Math.sin(S.t * 6) * .15;
     beacon(ex, ey, a, GROUND_RING[it.el], 'x-stone-' + it.el, k);
   }
@@ -6352,12 +6414,19 @@ function draw() {
       beacon(ex, ey, a, '#FFD24A', 'x-bloom', k); }
   }
   for (const sh of S.shrines || []) {   // a shrine off-screen gets an arrow in its element's colour
-    const sx = (sh.x - cx) * Z, sy = (sh.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
+    const sx = (sh.x - cx) * Z, sy = (sh.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 120 && sy < H - 110) continue;
     const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
     beacon(ex, ey, a, GROUND_RING[sh.el], 'x-shrine-' + sh.el, 1);
   }
+  if (S.out && !S.bossSpawned) for (const T of S.out.towers) {   // each temple off screen: an arrow with its ring filling round it
+    if (T.held) continue; const sx = (T.cx - cx) * Z, sy = (T.cy - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 120 && sy < H - 110) continue;
+    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true)), f = T.fill / S.out.need;
+    beacon(ex, ey, a, GROUND_RING[T.el], 'x-temple-' + T.el, 1);
+    g.lineWidth = 4; g.strokeStyle = 'rgba(14,20,40,.7)'; g.beginPath(); g.arc(ex, ey, 22, 0, TAU); g.stroke();
+    if (f > 0) { g.strokeStyle = GROUND_RING[T.el]; g.lineCap = 'round'; for (const [s0, s1] of [[Math.PI / 2, Math.PI / 2 + Math.PI * f], [Math.PI / 2 - Math.PI * f, Math.PI / 2]]) { g.beginPath(); g.arc(ex, ey, 22, s0, s1); g.stroke(); } g.lineCap = 'butt'; } g.lineWidth = 1;
+  }
   for (const ch of S.chests) {
-    const sx = (ch.x - cx) * Z, sy = (ch.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20) continue;
+    const sx = (ch.x - cx) * Z, sy = (ch.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 120 && sy < H - 110) continue;
     const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
     beacon(ex, ey, a, '#FFD24A', 'x-chest', 1);
   }
@@ -6372,7 +6441,7 @@ function draw() {
       if (dx) g.fillRect(dx > 0 ? W - 70 : 0, 0, 70, H); else g.fillRect(0, dy > 0 ? H - 70 : 0, W, 70);
       g.globalAlpha = 1;
       for (let k = -1; k <= 1; k++) {
-        const [ax, ay] = clearOf(dx ? ex - dx * 34 : ex + k * len * .22, dy ? (dy < 0 ? 205 : H - 100) : ey + k * len * .22, !!dx), ang = Math.atan2(-dy, -dx);
+        const [ax, ay] = spaced(clearOf(dx ? ex - dx * 34 : ex + k * len * .22, dy ? (dy < 0 ? 205 : H - 100) : ey + k * len * .22, !!dx)), ang = Math.atan2(-dy, -dx);
         g.globalAlpha = .6 + .4 * pulse; warnMark(ax, ay, 'e-' + (wv.el === 'mix' ? 'earth' : wv.el) + '-a'); g.globalAlpha = 1;
       }
     }
@@ -6710,42 +6779,82 @@ function drawAura(kx, ky) {
       if (!spr('x-boulder', x, y, 70, a)) { g.fillStyle = '#8E6A3A'; g.beginPath(); g.arc(x, y, 18, 0, TAU); g.fill(); } } }
   g.restore(); g.lineWidth = 1; g.lineCap = 'butt';
 }
-// the tower-capture card's picture, drawn from the game's own pieces: the hub, three temples, the glass tubes, and the
-// freed marching out to a temple's frozen garrison
-let OUTPOST_PIC = null;
-function outpostPic() {
-  if (OUTPOST_PIC) return OUTPOST_PIC;
-  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d');
-  c.fillStyle = '#3A4A3A'; c.fillRect(0, 0, 480, 320);
-  // the hub in the middle, three temples clear of it in a ring (two above, one below), a tube to each, the freed marching
-  // down to the water temple's frozen garrison
-  const hx = 240, hy = 190, spots = [[85, 140, 'wood'], [395, 140, 'fire'], [240, 312, 'water']];
-  for (const [x, y] of spots) { c.lineCap = 'round'; c.strokeStyle = 'rgba(20,30,50,.4)'; c.lineWidth = 30; c.beginPath(); c.moveTo(hx, hy - 6); c.lineTo(x, y - 18); c.stroke(); c.strokeStyle = 'rgba(190,225,255,.32)'; c.lineWidth = 22; c.stroke(); }
-  const im = IMG['x-tower-metal']; if (ok(im)) { const h = 140, w = h * im.naturalWidth / im.naturalHeight; c.drawImage(towerNight(im), hx - w / 2, hy - h, w, h); }
-  for (const [x, y, el] of spots) { const t = IMG['x-temple-' + el]; if (ok(t)) c.drawImage(t, x - 50, y - 98, 100, 100); }
-  const mw = IMG['e-water-a']; if (ok(mw)) for (let i = 0; i < 3; i++) c.drawImage(mw, 240 - 13, 200 + i * 24, 26, 26);
-  const fz = tinted('e-water-a', EL.water); if (fz) for (let i = 0; i < 3; i++) c.drawImage(fz, 290 + i * 30, 284, 28, 28);
-  return OUTPOST_PIC = cv.toDataURL('image/png');
+// the temple-mode story page: the cold temple standing in its realm's own painted scene (design review, 2026-10-06: the
+// Qi Stones picture taught the wrong goal)
+const TEMPLE_STORY = {};
+function templeStory(realm, el) {
+  const k = realm + el; if (TEMPLE_STORY[k]) return TEMPLE_STORY[k];
+  const bg = IMG['sf-' + realm], t = IMG['x-temple-' + el]; if (!ok(bg) || !ok(t)) return null;
+  const cv = document.createElement('canvas'); cv.width = 800; cv.height = 600; const c = cv.getContext('2d');
+  c.drawImage(bg, 0, 0, 800, 600); c.fillStyle = 'rgba(12,18,40,.35)'; c.fillRect(0, 0, 800, 600);
+  const h = 390, w = h * t.naturalWidth / t.naturalHeight, x = 330 - w / 2, y = 600 - h - 40;
+  c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(330, 562, w * .46, 30, 0, 0, TAU); c.fill();
+  c.drawImage(frozenArt(t, el), x, y, w, h);
+  const gr = c.createRadialGradient(330, 300, 40, 330, 300, 420); gr.addColorStop(0, 'rgba(200,225,255,0)'); gr.addColorStop(1, 'rgba(160,200,245,.28)'); c.fillStyle = gr; c.fillRect(0, 0, 800, 600);
+  return TEMPLE_STORY[k] = cv.toDataURL('image/jpeg', .9);
+}
+// the Hold the temple card's (and story page's) picture, drawn from the game's own pieces: a temple lit up from its base,
+// its ring's band two thirds risen, the Keeper standing in it, its guardians pouring out, and freed light flying home
+const OUTPOST_PIC = {};
+function outpostPic(el = 'wood') {
+  if (OUTPOST_PIC[el]) return OUTPOST_PIC[el];
+  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d'), col = GROUND_RING[el], t = IMG['x-temple-' + el], mw = IMG['e-' + el + '-a'], k = IMG['k' + keeper];
+  c.fillStyle = '#2E3A48'; c.fillRect(0, 0, 480, 320);
+  const rx = 150, ry = 52, cx = 240, cy = 238;
+  c.fillStyle = 'rgba(10,16,32,.4)'; c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, 0, TAU); c.fill();
+  c.strokeStyle = 'rgba(14,20,40,.7)'; c.lineWidth = 14; c.stroke(); c.globalAlpha = .25; c.strokeStyle = col; c.lineWidth = 10; c.stroke(); c.globalAlpha = 1;
+  c.strokeStyle = col; c.lineWidth = 10; c.lineCap = 'round'; for (const [s0, s1] of [[Math.PI / 2, Math.PI / 2 + Math.PI * .66], [Math.PI / 2 - Math.PI * .66, Math.PI / 2]]) { c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, s0, s1); c.stroke(); }
+  if (ok(t)) { const h = 170, w = h * t.naturalWidth / t.naturalHeight, x = 240 - w / 2, y = 18; c.drawImage(frozenArt(t, el), x, y, w, h);
+    c.save(); c.beginPath(); c.rect(x, y + h * .45, w, h * .55); c.clip(); c.drawImage(t, x, y, w, h); c.restore(); }
+  if (ok(mw)) for (const [x, y] of [[200, 196], [292, 204], [168, 236]]) c.drawImage(mw, x - 16, y - 16, 32, 32);
+  for (const [x, y, r] of [[300, 170, 7], [272, 140, 5], [256, 116, 4]]) { const gr = c.createRadialGradient(x, y, 0, x, y, r * 3); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.35, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = gr; c.beginPath(); c.arc(x, y, r * 3, 0, TAU); c.fill(); }
+  if (ok(k)) c.drawImage(k, 240 - 34, 200, 68, 68);
+  const url = cv.toDataURL('image/png'); if (ok(t) && ok(mw) && ok(k)) OUTPOST_PIC[el] = url; return url;
 }
 // the tower-capture prototype's ground: the glass tubes from the hub to each temple, the freed marching through them,
 // and each temple's frozen garrison waiting at its door (fewer as they are freed)
 function drawOutposts(inView) {
-  const O = S.out, H = O.hub;
-  for (const T of O.towers) { const x1 = H.x, y1 = H.y + 20, x2 = T.x, y2 = T.y + 40, won = S.qiStones[T.el], col = EL[T.el];
+  const O = S.out, H = O.hub, many = O.towers.length > 1, pu = .5 + .5 * Math.sin(S.t * 6), P = S.p;
+  // the glass tubes from the hearth to each temple (only where there are temples to join): frosted, then lit in its colour
+  if (many) for (const T of O.towers) { const x1 = H.x, y1 = H.y, x2 = T.x, y2 = T.y + 40, col = GROUND_RING[T.el];
     g.lineCap = 'round';
     g.strokeStyle = 'rgba(20,30,50,.35)'; g.lineWidth = 58; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
-    g.strokeStyle = won ? col + '55' : 'rgba(190,225,255,.18)'; g.lineWidth = 46; g.stroke();
-    g.strokeStyle = 'rgba(230,245,255,.45)'; g.lineWidth = 3; const nx = -(y2 - y1), ny = x2 - x1, nm = Math.hypot(nx, ny) || 1;
+    g.strokeStyle = T.held && !S.bossSpawned ? col + '66' : 'rgba(190,225,255,.18)'; g.lineWidth = 46; g.stroke();
+    g.strokeStyle = T.held ? col + 'CC' : 'rgba(230,245,255,.45)'; g.lineWidth = 3; const nx = -(y2 - y1), ny = x2 - x1, nm = Math.hypot(nx, ny) || 1;
     for (const o of [-21, 21]) { g.beginPath(); g.moveTo(x1 + nx / nm * o, y1 + ny / nm * o); g.lineTo(x2 + nx / nm * o, y2 + ny / nm * o); g.stroke(); }
-    if (won) { g.strokeStyle = col; g.lineWidth = 8; g.setLineDash([24, 60]); g.lineDashOffset = -S.t * 120; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.setLineDash([]); }
-    g.lineCap = 'butt'; g.lineWidth = 1;
-    // the garrison: frozen creatures of the temple's element in a ring before its door, one fewer for every few freed
-    if (!won && inView(T.x, T.y, 400)) { const left = Math.ceil(8 * (1 - (S.qi[T.el] || 0) / O.need)), im = tinted(`e-${T.el}-a`, EL[T.el]);
-      for (let i = 0; i < left; i++) { const a = Math.PI * (.15 + .7 * i / 7), x = T.x + Math.cos(a) * 190, y = T.y + 30 + Math.sin(a) * 70; if (im) g.drawImage(im, x - 24, y - 40, 48, 48); } } }
-  // the freed, marching out through the tubes to free the garrison
-  for (const m of O.march) { const q = Math.min(1, m.t / m.dur), T = m.T, x = H.x + (T.x - H.x) * q, y = H.y + 20 + (T.y + 40 - H.y - 20) * q, hop = Math.abs(Math.sin(m.t * 9 + m.ph)) * 8;
-    if (!inView(x, y, 60)) continue; const im = m.own && ok(IMG[m.img + '-happy']) ? IMG[m.img + '-happy'] : IMG[m.img];
-    if (im && ok(im)) g.drawImage(im, x - 18, y - 34 - hop, 36, 36); }
+    g.lineCap = 'butt'; g.lineWidth = 1; }
+  // the hearth in the middle: a ring of warm stones round a small fire, where the Keeper starts and the boss will rise
+  if (inView(H.x, H.y, 160)) { g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(H.x, H.y + 8, 130, 70, 0, 0, TAU); g.fill();
+    g.fillStyle = '#4A3C30'; g.beginPath(); g.ellipse(H.x, H.y, 118, 62, 0, 0, TAU); g.fill();
+    for (let i = 0; i < 14; i++) { const a = i / 14 * TAU; g.fillStyle = i % 2 ? '#8A7A68' : '#9C8B76'; g.beginPath(); g.ellipse(H.x + Math.cos(a) * 112, H.y + Math.sin(a) * 58, 18, 11, 0, 0, TAU); g.fill(); }
+    add(() => glowAt(H.x, H.y - 10, 170, '#FFB060', .45 + .08 * Math.sin(S.t * 5))); flameAt(H.x, H.y + 6, 46, .1, 7); }
+  for (const T of O.towers) {
+    if (!inView(T.cx, T.cy, HOLD.R + 40)) continue;
+    // the ring before its door: the band rises from the bottom up both sides, as the temple's colour climbs from its base
+    const R = HOLD.R, ry = R / 1.6, f = T.fill / S.out.need, here = inRing(T, P.x, P.y), col = GROUND_RING[T.el];
+    g.save();
+    g.fillStyle = T.held ? col + '2E' : `rgba(10,16,32,${.3 + .1 * T.wake})`; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, 0, TAU); g.fill();
+    if (!T.held && T.wake > 0) { g.globalAlpha = .16 * T.wake * (.6 + .4 * pu); g.fillStyle = col; g.fill(); g.globalAlpha = 1; }
+    g.strokeStyle = 'rgba(14,20,40,.65)'; g.lineWidth = 36; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, 0, TAU); g.stroke();
+    if (!T.held) { g.globalAlpha = .22; g.strokeStyle = col; g.lineWidth = 28; g.stroke(); g.globalAlpha = 1; }
+    g.strokeStyle = T.held ? col : `rgba(220,236,255,${.35 + .3 * (here ? pu : 0)})`; g.lineWidth = T.held ? 8 : 4; g.stroke();
+    if (!T.held && f > 0) { const up = Math.PI * f; g.lineCap = 'round';
+      for (const [s0, s1] of [[Math.PI / 2, Math.PI / 2 + up], [Math.PI / 2 - up, Math.PI / 2]]) { g.strokeStyle = col; g.lineWidth = 28; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, s0, s1); g.stroke(); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 7; g.stroke(); }
+      g.lineCap = 'butt'; for (const a of [Math.PI / 2 + up, Math.PI / 2 - up]) add(() => glowAt(T.cx + Math.cos(a) * R, T.cy + Math.sin(a) * ry, 80, col, .6 + .3 * T.flare)); }
+    if (T.held) add(() => glowAt(T.cx, T.cy, R * 1.1, col, .25 + .1 * pu));
+    g.restore(); g.lineWidth = 1;
+  }
+  // the freed marching down the tubes to help, in squads, happy and haloed in their temple's light
+  for (const m of O.march) { if (m.x == null || !inView(m.x, m.y, 60)) continue; const hop = Math.abs(Math.sin(m.t * 9 + m.ph)) * 10, im = ok(IMG[m.img + '-happy']) ? IMG[m.img + '-happy'] : IMG[m.img], col = GROUND_RING[m.el];
+    g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(m.x, m.y + 4, 22, 7, 0, 0, TAU); g.fill();
+    add(() => glowAt(m.x, m.y - 26, 70, col, .7)); if (im && ok(im)) g.drawImage(im, m.x - 32, m.y - 60 - hop, 64, 64); }
+}
+// over everything: the light of each freed creature flying into its temple, and the temples' shots
+function drawOutpostsTop() {
+  const O = S.out;
+  for (const T of O.towers) for (const s of T.souls) { const k = Math.min(1, s.t / .7), e = k * k, tx = T.x, ty = T.y - T.h * .45, x = s.x + (tx - s.x) * e, y = s.y + (ty - s.y) * e - Math.sin(k * Math.PI) * 80, col = GROUND_RING[T.el];
+    add(() => glowAt(x, y, 46 * s.n, col, .9 * (1 - k * .5))); g.fillStyle = '#FFFFFF'; g.beginPath(); g.arc(x, y, 5 + 2 * s.n, 0, TAU); g.fill(); }
+  for (const B of O.bolts) { const e = B.e, dx = e.x - B.x, dy = e.y - B.y; energy(B.x, B.y, dx, dy, GROUND_RING[B.el], 14, false); }
 }
 // a tower, standing: the Great Tower with its five sockets, or an element tower in its element's colours. While its stone
 // waits, an element tower sends up a column of its light; once its stone is home, a steady crown of it. A tower the
@@ -6797,7 +6906,12 @@ function drawTowerAt(T, cx, cy) {
     const home = S.qiStones[T.el], out = S.stoneOut[T.el] && !home;
     if (out) { const gr = g.createLinearGradient(0, top - 500, 0, top + 40); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, T.el === 'fire' ? 'rgba(255,154,74,.45)' : EL[T.el] + '73');
       g.fillStyle = gr; g.fillRect(T.x - 26 - Math.sin(S.t * 4) * 4, top - 500, 52 + Math.sin(S.t * 4) * 8, 540); }
-    g.drawImage(art || shrineNight(im, T.el), T.x - tw / 2, top, tw, th);
+    const OT = S.out && art && S.out.towers.includes(T) && !T.held ? T.fill / S.out.need : null;
+    if (OT != null) { g.drawImage(frozenArt(art, T.el), T.x - tw / 2, top, tw, th);
+      if (OT > 0) { const cy0 = top + th * (1 - OT); g.save(); g.beginPath(); g.rect(T.x - tw / 2, cy0, tw, top + th - cy0); g.clip(); g.drawImage(art, T.x - tw / 2, top, tw, th); g.restore();
+        add(() => glowAt(T.x, cy0, tw * .5, GROUND_RING[T.el], .55 + .4 * T.flare)); } }
+    else g.drawImage(art || shrineNight(im, T.el), T.x - tw / 2, top, tw, th);
+    if (S.out && T.held) add(() => glowAt(T.x, top + th * .25, th * .35, GROUND_RING[T.el], .45 + .1 * Math.sin(S.t * 3)));
     // the trap winding up glows in the painted mouth; while the boulder rolls, the earth temple's doorway stands empty
     for (const Tr of S.ttraps || []) if (Tr.sh === T) { if (Tr.t < Tr.wind) trapMouth(Tr, Tr.t / Tr.wind, { flood:'#5FB0FF', flame:'#FF8A2A', boulder:'#FFC870', darts:'#DDE6F4' }[Tr.k]);
       else if (Tr.k === 'boulder' && art) { const y = T.y - T.h + 40 + MOUTH.earth * T.h; g.fillStyle = '#1A140E'; g.beginPath(); g.ellipse(T.x, y, 38, 42, 0, 0, TAU); g.fill(); } }
@@ -6808,6 +6922,19 @@ function drawTowerAt(T, cx, cy) {
   // a dark outline with a light core, so it reads on the pale temples and the dark tower alike (QA, 2026-10-06)
   if (behind) { const dk = silhouette('k' + keeper, '#141A3A'), lt = silhouette('k' + keeper, '#DDE8FF'); if (dk && lt) { const ks = 120; g.save(); g.translate(P.x, P.y + 30); if (P.face < 0) g.scale(-1, 1);
     g.globalAlpha = .8; for (const [dx, dy] of [[-3, 0], [3, 0], [0, -3], [0, 3]]) g.drawImage(dk, -ks / 2 + dx, -ks * .72 - 24 + dy, ks, ks); g.globalAlpha = .7; g.drawImage(lt, -ks / 2, -ks * .72 - 24, ks, ks); g.restore(); } }
+}
+// a temple still frozen: dark slate under a white frost crust, so its own colour coming back reads on every temple
+// (design review, 2026-10-06: frost-blue hid the water temple's climb)
+const FROZEN_ART = {};
+function frozenArt(im, el) {
+  if (FROZEN_ART[el] && FROZEN_ART[el].src === im) return FROZEN_ART[el].cv;
+  const cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight; const c = cv.getContext('2d');
+  c.drawImage(im, 0, 0); c.globalCompositeOperation = 'saturation'; c.fillStyle = 'rgba(128,128,128,1)'; c.fillRect(0, 0, cv.width, cv.height);
+  c.globalCompositeOperation = 'multiply'; c.fillStyle = '#727986'; c.fillRect(0, 0, cv.width, cv.height);
+  const fr = c.createLinearGradient(0, 0, 0, cv.height); fr.addColorStop(0, 'rgba(255,255,255,.34)'); fr.addColorStop(.5, 'rgba(255,255,255,.1)'); fr.addColorStop(1, 'rgba(255,255,255,.04)');
+  c.globalCompositeOperation = 'screen'; c.fillStyle = fr; c.fillRect(0, 0, cv.width, cv.height);
+  c.globalCompositeOperation = 'destination-in'; c.drawImage(im, 0, 0);
+  FROZEN_ART[el] = { src:im, cv }; return cv;
 }
 // the tower in the forge's night: its daylight colours (blossom, shrubs) drained to iron, so it belongs to the city
 let TOWER_NIGHT = null;
@@ -7649,7 +7776,7 @@ const TIP_ART = { enemy:'tip-rings', bloom:'tip-bloom' };
 function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'firebar') return `<div class="fbdemo"><img src="${firebarPic()}" alt=""></div>`;
-  if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic()}" alt=""></div>`;
+  if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic(S && S.out ? S.out.els[0] : 'wood')}" alt=""></div>`;
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
   if (id.startsWith('call_')) { const cid = id.slice(5), D = CALL[cid], src = `art4/calls/${D.img}.png?v=9`;
@@ -8196,6 +8323,9 @@ function lose(fell) {
   S.over = true; running = false; AU.music(false); if (!fell) SFX.stomp();
   const B = S.boss && !S.boss.dead ? S.boss : null, WV = LV().waves, tip = defeatTip(); let title, line, frac;
   if (B) { const left = B.hp / B.max; frac = 1 - left; const nm = bossOf(B).name; title = left < .34 ? 'So close!' : 'Keep going, Keeper!'; line = left < .34 ? `${nm} is almost free` : left < .67 ? `${nm} is half beaten` : `${nm} is still strong`; }
+  // Hold the temple: how far the temples were woken, not waves (QA, 2026-10-06)
+  else if (S.out) { const T = S.out.towers, woke = T.filter(t => t.held).length, f = T.reduce((a, t) => a + t.fill / S.out.need, 0) / T.length; frac = f;
+    title = f > .66 ? 'Almost there!' : 'Keep going, Keeper!'; line = T.length === 1 ? (f > .66 ? 'The temple was almost awake' : f > .33 ? 'The temple was half awake' : 'The temple is still cold') : `You woke ${woke} of ${T.length} temples`; }
   else if (S.waveIdx) { frac = S.waveIdx / (WV.length + 1); title = S.waveIdx >= WV.length ? 'Almost there!' : 'Keep going, Keeper!'; line = `You reached wave ${Math.min(S.waveIdx, WV.length)} of ${WV.length}`; }
   else { frac = Math.min(1, S.t / 120) * .2; title = 'Keep going, Keeper!'; line = `You held on for ${Math.floor(S.t / 60)}:${String(Math.floor(S.t % 60)).padStart(2, '0')}`; }
   $('#riseImg').src = `art4/rise/k${keeper}.jpg?v=8`; $('#riseT').textContent = title; $('#riseProg').textContent = line;
@@ -8447,7 +8577,7 @@ function stillScene(fromFloat) {
   sc.onclick = () => { if (sc.classList.contains('done')) { sc.onclick = null; SFX.select(); goHome(); } else if (seen) toEnd(); };
 
   // the moving parts (powers, stones) live in one frame loop, positioned in the scene's own pixels
-  const chest = { x:Hk.x + Hk.s / 2, y:Hk.y + Hk.s * .55 }, Rx = Math.max(44, Hk.s * .9), Ry = Rx * .36, t0 = performance.now(), box = $('#stOrbs');
+  const chest = { x:Hk.x + Hk.s / 2, y:Hk.y + Hk.s * .78 }, Rx = Math.max(50, Hk.s * 1.05), Ry = Rx * .36, t0 = performance.now(), box = $('#stOrbs');
   const orbs = [], stones = [], node = (cls, src, col) => { const el = document.createElement('i'); el.className = cls; el.style.setProperty('--c', col); el.innerHTML = src ? `<img src="${src}" alt="">` : ''; box.appendChild(el); return el; };
   const sm = k => k * k * (3 - 2 * k), at = (el, x, y, s = 1, o = 1, z) => { el.style.transform = `translate(${x}px,${y}px) scale(${s})`; el.style.opacity = o; if (z != null) el.style.zIndex = z; };
   const bell = () => { const b = $('#stBell').getBoundingClientRect(), o = sc.getBoundingClientRect(); return { x:ox + (b.left + b.width / 2 - o.left - ox) / PUSH, y:oy + (b.top + b.height / 2 - o.top - oy) / PUSH }; };
@@ -8486,9 +8616,10 @@ function stillScene(fromFloat) {
 
   // 0: the trap. The room goes dark round them and the frost closes at their feet; they start in shock
   later(60, () => { sc.classList.add('dim', 'trap'); SFX.trap(); });
-  // their eyes stay open on him (A: "the player is looking at him in shock"); the pained face comes only when the powers are
+  // their eyes stay open on him (A: "the player is looking at him in shock"; Codex's shock poses, brief 4, take A, whose eyes look
+// up and right, so the mirrored Keeper looks up and left at him); the pained face comes only when the powers are
   // torn out of them (design review, 2026-10-06: the hurt pose has its eyes shut)
-  later(380, () => { kim.src = `art4/k${keeper}-reach.png?v=8`; kim.animate([{ translate:'0 0', scale:1 }, { translate:'4px 2px', scale:'1.04 .96' }, { translate:'-2px -1px', scale:1 }, { translate:'0 0', scale:1 }], { duration:420, easing:'ease-out' }); });
+  later(380, () => { kim.src = `art4/k${keeper}-shock.png?v=1`; kim.animate([{ translate:'0 0', scale:1 }, { translate:'4px 2px', scale:'1.04 .96' }, { translate:'-2px -1px', scale:1 }, { translate:'0 0', scale:1 }], { duration:420, easing:'ease-out' }); });
   later(4300, () => kim.animate([{ translate:'0 0' }, { translate:'3px 1px' }, { translate:'0 0' }], { duration:300 }));
   later(700, () => SFX.heartbeat()); later(1600, () => SFX.heartbeat());
   // 1.7 s: every power pulls out of them and circles them: theirs, but out of reach. An element they hold nothing of
