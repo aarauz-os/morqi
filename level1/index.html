@@ -70,7 +70,26 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .ribbon{display:inline-block;font-family:var(--round);font-weight:900;font-size:27px;letter-spacing:-.015em;color:var(--ink);white-space:nowrap}
 .rb.red .ribbon{color:var(--coral-2)}
 .fbdemo{position:absolute;inset:0;display:grid;place-items:center;background:#22252E}.fbdemo img{width:100%!important;height:100%!important;max-width:none;object-fit:contain}
-.lu-pips[hidden]{display:none}#cards.two{grid-template-columns:repeat(2,minmax(0,1fr));width:68%;margin:0 auto}#loadout{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:30px}.lu-pips{display:flex;justify-content:center;gap:6px;margin-top:4px}.lu-pips i{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px rgba(20,24,60,.35)}
+.lu-pips[hidden]{display:none}
+#still{background:#04050A;overflow:hidden}#still .st-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter 4s ease}
+#still.dim .st-bg{filter:saturate(.3) brightness(.45)}#still.ice .st-bg{filter:saturate(0) brightness(.7) sepia(.3) hue-rotate(170deg)}
+#still .st-dark{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(20,24,60,.1),rgba(2,3,10,.88) 75%);opacity:0;transition:opacity 2s}#still.dim .st-dark{opacity:1}
+#still .st-frost{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 6s ease;background:radial-gradient(ellipse at 50% 50%,transparent 48%,rgba(90,140,200,.3) 78%,rgba(130,175,225,.5) 100%)}#still.dim .st-frost{opacity:.7}#still.ice .st-frost{opacity:1;transition-duration:.25s}
+#still .st-fig{position:absolute;left:50%;top:4%;width:min(96vw,440px);aspect-ratio:1;translate:-50% -120%;opacity:0;transition:translate 3.2s cubic-bezier(.2,.7,.2,1),opacity 2s;filter:drop-shadow(0 0 26px rgba(40,30,110,.9)) drop-shadow(0 0 60px rgba(20,16,70,.8))}
+#still.come .st-fig{translate:-50% 0;opacity:1}#still.go .st-fig{opacity:0;translate:-50% -6%;transition-duration:2.4s}
+#still .st-fig img{width:100%;height:100%}
+#still .st-bell{position:absolute;left:42.3%;top:57%;width:14%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(170,210,255,.35),transparent 65%);opacity:0;transition:opacity .5s}#still.ring .st-bell{opacity:1;animation:stShim 1.6s ease-in-out infinite}@keyframes stShim{50%{opacity:.35}}
+#still .st-toll{position:absolute;left:42.3%;top:57%;width:14%;aspect-ratio:1;margin:-7% 0 0 -7%;border-radius:50%;border:3px solid rgba(170,210,255,.8);pointer-events:none}
+#still .st-keeper{position:absolute;left:50%;bottom:9%;height:150px;translate:-50% 0;transition:filter 3.5s}#still.drain .st-keeper{filter:saturate(.15) brightness(.8)}#still.ice .st-keeper,#still.ice .st-pet{filter:grayscale(1) brightness(1.15) sepia(.35) hue-rotate(170deg) saturate(1.6);transition-duration:.25s}
+#still .st-pet{position:absolute;left:31%;bottom:9.5%;height:70px;translate:-50% 0;transition:filter 3.5s}
+#still .st-socks i{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#0A0C14;box-shadow:inset 0 0 6px #000}
+#still .st-orbs i{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(10,12,24,.5);display:grid;place-items:center;box-shadow:0 0 0 3px var(--c),0 0 18px 4px var(--c)}#still .st-orbs img{width:46px;height:46px;border-radius:50%;object-fit:cover}
+#still .st-white{position:absolute;inset:0;background:rgb(110,160,220);opacity:0;pointer-events:none;transition:opacity .2s}#still.flash .st-white{opacity:.4}#still.black .st-white{background:#03040A;opacity:1;transition:opacity 1.6s}
+#still .st-end{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:26px;opacity:0;pointer-events:none;transition:opacity 1.8s}#still.end .st-end{opacity:1;pointer-events:auto}
+#still .st-tbc{font-family:var(--round);font-weight:900;font-size:40px;color:#FFFFFF;letter-spacing:.01em;text-align:center;margin:0}#still .st-end .btn{opacity:0;transition:opacity 1s 3.6s}#still.end .st-end .btn{opacity:1}
+#still .st-stare{width:min(80vw,360px);aspect-ratio:5/1;background:url(art4/still/stillmaker.png?v=9) 52% 25.4%/640% auto no-repeat;opacity:0;transition:opacity 2.4s 1.6s;-webkit-mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 40%,transparent 100%);mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 40%,transparent 100%);filter:brightness(1.1) contrast(1.1)}#still.end .st-stare{opacity:1}
+#still.ice .st-fig img{animation:stQuake .5s ease-out}@keyframes stQuake{0%,100%{translate:0 0}20%{translate:-8px 3px}40%{translate:7px -4px}60%{translate:-5px 2px}80%{translate:3px -1px}}
+@media (prefers-reduced-motion:reduce){#still .st-fig{transition:opacity 1s}}#cards.two{grid-template-columns:repeat(2,minmax(0,1fr));width:68%;margin:0 auto}#loadout{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:30px}.lu-pips{display:flex;justify-content:center;gap:6px;margin-top:4px}.lu-pips i{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px rgba(20,24,60,.35)}
 .pop{animation:pop .5s var(--spring) both}
 @keyframes pop{from{transform:translateY(24px) scale(.94);opacity:0}}
 
@@ -831,7 +850,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #thanks .thx-sky{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,16,48,.35),rgba(11,16,48,.82) 55%,rgba(11,16,48,.95))}
 #thanks .thx-body{position:relative;display:grid;gap:12px;justify-items:center;text-align:center;padding:24px 16px calc(28px + env(safe-area-inset-bottom))}
 .thx-t{font-family:var(--round);font-weight:900;font-size:clamp(28px,8vw,40px);color:#fff;text-shadow:0 3px 12px rgba(0,0,0,.6);animation:thxIn .8s ease-out both}
-.thx-p,.thx-more{font-size:16px;font-weight:800;color:rgba(255,255,255,.88);max-width:34ch}.thx-mus{display:block;margin-top:6px;color:#FFD66E;font-size:14.5px}.thx-mus img{width:20px;height:20px;vertical-align:-4px;margin:0 3px}
+.thx-p,.thx-more{font-size:16px;font-weight:800;color:rgba(255,255,255,.88);max-width:34ch;text-wrap:balance}.thx-mus{display:block;margin-top:6px;color:#FFD66E;font-size:14.5px}.thx-mus img{width:20px;height:20px;vertical-align:-4px;margin:0 3px}
 #thxHome{display:inline-flex;align-items:center;gap:8px}.thx-ic{width:28px;height:28px;object-fit:contain}
 .thx-people{position:relative;width:min(100%,420px);height:170px}
 .thx-people img{position:absolute;bottom:0;height:120px;width:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));animation:thxBob 2.4s ease-in-out infinite;animation-delay:calc(var(--i) * -.35s)}
@@ -1516,6 +1535,18 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     </div>
   </section>
 
+  <section class="scr" id="still" hidden aria-label="The Stillmaker arrives">
+    <img class="st-bg" id="stBg" alt="">
+    <div class="st-dark"></div>
+    <div class="st-frost"></div>
+    <div class="st-socks" id="stSocks"></div>
+    <div class="st-fig" id="stFig"><img src="art4/still/stillmaker.png?v=9" alt="The Stillmaker, in his dark coat, holding his bell."><i class="st-bell" id="stBell"></i></div>
+    <img class="st-pet" id="stPet" alt="">
+    <img class="st-keeper" id="stKeeper" alt="">
+    <div class="st-orbs" id="stOrbs"></div>
+    <div class="st-white"></div>
+    <div class="st-end"><div class="st-stare" aria-hidden="true"></div><h1 class="st-tbc">To be continued…</h1><button class="btn green" id="stNext">Next</button></div>
+  </section>
   <section class="scr" id="thanks" hidden>
     <div class="thx-sky" aria-hidden="true"></div>
     <div class="thx-body">
@@ -1933,7 +1964,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=13`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2473,7 +2504,7 @@ const AU = (() => {
      F major 7, E minor 7, D minor 7, C major 7, a descending turn that never quite lands; B flat major 7 lifts it at
      the golden point. Four bars of drums and percussion first, then the bass, then the hook; a six-bar breakdown without
      the kick, and a drop back in. Hook 8 bars on / 5 off, peaking 62% through; pitched voices at or below about 700 Hz. */
-  const TEMPO = { home:144 / 122 }, H6 = SIX * TEMPO.home;
+  const TEMPO = { home:144 / 122, still:144 / 66 }, H6 = SIX * TEMPO.home;
   const HAVEN = {
     ch:[[174.61, 220, 261.63, 329.63], [164.81, 196, 246.94, 293.66], [146.83, 174.61, 220, 261.63], [130.81, 164.81, 196, 246.94]],
     root:[43.65, 41.2, 36.71, 32.7],
@@ -2496,6 +2527,27 @@ const AU = (() => {
   };
   // the rolling bass: short and round, a little bite from the filter
   const houseBass = (t, f, v) => mv({ t, f, type:'sawtooth', dur:H6 * 1.6, vol:v, att:.005, hold:H6 * .6, lp:520, q:2 });
+  /* "The Stillmaker" (A, 2026-10-06: his debut "with his own new music"): slow and cold, at 66. A low D drone that never
+     moves, a heartbeat, his own bell every two bars (struck, inharmonic, ringing long), a music-box motif that falls a
+     half step at a time as if it were freezing, and from the third bar a hushed choir on D minor, B flat, G minor and a
+     dark A. Ice crackles in the air. Everything stays under 700 Hz */
+  const STILL = { box:[[[0, 587.33], [4, 554.37], [8, 440], [14, 466.16]], [[0, 440], [6, 392], [8, 349.23], [12, 329.63]]],
+    ch:[[146.83, 174.61, 220, 329.63], [116.54, 146.83, 174.61, 220], [98, 116.54, 146.83, 164.81], [110, 138.59, 164.81, 233.08]] };
+  function stillStep(s, t) {
+    const bar = s >> 4, i = s & 15, L = SIX * TEMPO.still, B = L * 16;
+    if (i === 0) { mv({ t, f:36.71, dur:B + .6, vol:.16, att:.8 }); mv({ t, f:55, dur:B + .6, vol:.05, att:1 }); mv({ t, f:73.42, dur:B + .4, vol:.03, att:1.2, type:'sawtooth', lp:140 }); }
+    // the heartbeat: lub-dub on the one
+    if (i === 0 || i === 2) mv({ t, f:i ? 52 : 64, f1:34, gl1:.18, dur:.3, vol:i ? .22 : .34, att:.004 });
+    // his bell, every other bar
+    if (i === 0 && bar % 2 === 0) for (const [m, v] of [[1, .12], [2.76, .045], [4.2, .02], [.5, .05]]) mv({ t, f:146.83 * m, dur:5.5, vol:v, att:.003, rev:.6 });
+    // the music box, freezing
+    if (bar >= 1) for (const [st, f] of STILL.box[(bar - 1) & 1]) if (st === i) { mv({ t, f, dur:2.4, vol:.05, att:.003, type:'triangle', det:-14, rev:.7 }); mv({ t:t + .012, f:f / 2, dur:1.6, vol:.016, att:.003, det:9, rev:.7 }); }
+    // the choir
+    if (bar >= 2 && i === 0) for (const f of STILL.ch[bar & 3]) mv({ t, f, dur:B + .3, vol:.014, att:1.4, type:'sawtooth', lp:820, vib:4.5, vibD:9, rev:.5 });
+    // ice in the air, and every fourth bar a cold swell into the next
+    if ((s * 7 + bar) % 5 === 0) mn({ t:t + Math.random() * L, f:6200, dur:.05, att:.002, vol:.008 });
+    if (bar % 4 === 3 && i === 8) mn({ t, f:240, f1:1800, ft:'lowpass', dur:L * 8, att:L * 6, vol:.04 });
+  }
   function havenStep(s, t) {
     if (!pump) { pump = c.createGain(); pump.connect(padF); }
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HAVEN, p = part(bar), hb = bar + 5, gold = golden(hb), C = R.ch[ch];
@@ -2537,7 +2589,7 @@ const AU = (() => {
       if (!c) return; if (M.next < c.currentTime - .1) M.next = c.currentTime + .05;  // back from a hidden tab: skip, don't pile up
       while (M.next < c.currentTime + .2) {
         if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
-        if (musOn || M.listen) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, blossom:blossomStep, home:havenStep }[M.song] || pathStep)(M.step, M.next);
+        if (musOn || M.listen) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, blossom:blossomStep, home:havenStep, still:stillStep }[M.song] || pathStep)(M.step, M.next);
         if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest' && M.song !== 'blossom') bloomLayer(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
         M.next += SIX * (TEMPO[M.song] || 1); M.step++;
@@ -2775,6 +2827,9 @@ function renderStory() {
       alt:{ water:'A storm of frost sweeps over a lantern-lit seaside village and freezes its people mid-moment.', wood:'A storm of frost sweeps through a woodcarvers\' village in the bamboo and freezes its people mid-moment.', fire:'A storm of frost sweeps over a lantern festival on a mountain ridge and freezes its people mid-moment.', earth:'A storm of frost sweeps over terraced harvest hills and freezes the farmers mid-moment.', metal:'A storm of frost sweeps through a silver city of bell towers and freezes its people mid-moment.' }[realm] },
     { img:'luma', t:'Luma sends you out', p:`Luma, the fox spirit of your hearth, sends you and your ${A.y} to bring ${place} back to life.`, alt:'Luma, the little fox spirit of the hearth, beside the fire.',
       over:`<img class="st-k" src="art4/run/k${keeper}-r2.png?v=8" alt=""><img class="st-a" src="art4/a-${animal}-y.png?v=8" alt="">` },
+    // the Silver City's own last page (A, 2026-10-06, taking up the design review's line): the forge that still glows
+    realm === 'metal' ? { img:'story-stones', t:'The old forge still glows', p:`Under the frozen city, the old forge still glows. Free creatures, and its five towers will give up their stones. Bring them to the Great Tower, and ${B.name.replace(/^The /, 'the ')} will rise.`,
+      alt:'Five glowing Qi Stones above a frozen city.', over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } :
     { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn ${LVL === 1 ? 'two' : 'the five'} Qi Stones. Gather ${LVL === 1 ? 'both' : 'them all'}, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
       over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } ];
   const pg = pages[storyPg], src = pg.img === 'luma' ? 'art4/luma.jpg?v=8' : `art4/story/${pg.img}.jpg?v=8`;
@@ -2843,6 +2898,8 @@ function startRun() {
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   // Afterglow opens, then the level themes take turns; every realm boss shares the one boss theme
   S.props = scatterProps(worldOf()); loadBoss(worldOf());
+  // the Silver City starts at the foot of the Great Tower, in the middle of the map (A, 2026-10-06)
+  if (LVL === 5) { S.p.x = L5_START.x; S.p.y = L5_START.y; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
   AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
@@ -2862,8 +2919,12 @@ function scatterProps(w) {
     const x = (gx + rnd(.15, .85)) * cell, y = (gy + rnd(.15, .85)) * cell;
     if (Math.hypot(x - WORLD / 2, y - WORLD / 2) < 220) continue;
     if (w === 'water' && y < seaLine(x) + 60) continue;
+    if (LVL === 5 && (Math.hypot(x - TOWER.x, y - TOWER.y) < 380 || SHRINES.some(Sh => Math.hypot(x - Sh.x, y - Sh.y) < Sh.R))) continue;
     out.push({ x, y, n:kinds[(Math.random() * kinds.length) | 0], s:rnd(62, 84), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 });
   }
+  // each element tower's district grows its own element's plants and things, frozen until its stone is taken
+  if (LVL === 5) for (const Sh of SHRINES) { const k2 = PROPS[Sh.el]; k2.forEach(n => IMG[n] || load(n, `art4/props/${n}.png?v=8`));
+    for (let i = 0; i < 16; i++) { const a = rnd(0, TAU), d = rnd(170, Sh.R - 40); out.push({ x:Sh.x + Math.cos(a) * d, y:Sh.y + Math.sin(a) * d * .8, n:k2[i % 2], s:rnd(66, 90), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 }); } }
   return out.sort((a, b) => a.y - b.y);
 }
 // each level's world, and the theme that belongs to it; ?world=earth (or water, wood, fire, metal) plays any world's music
@@ -3035,7 +3096,8 @@ function spawnBoss() {
   // arrived near the world's edge left half its arena off the map, and the camera could not follow there). A, 2026-10-04:
   // the arena should not feel congested or make attacks hard to evade, so it is about a third wider than the Warden's was.
   { const r = Math.max(580, Math.min(VW, VH) * .82), m = r + 90;   // extra room above for the HUD and below for the power row
-    S.arena = { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
+    // the Silver City's boss rises in the square in front of the Great Tower, clear of every tower
+    S.arena = S.level === 5 ? { x:TOWER.x, y:clamp(TOWER.y + r + 90, r + 330, WORLD - r - 200), r } : { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
     const A = S.arena; e.x = A.x; e.y = A.y - 280;
     if (Math.hypot(S.p.x - A.x, S.p.y - A.y) > r - 80) { S.p.x = A.x; S.p.y = A.y + 180; ring(S.p.x, S.p.y, 20, 260, '#FFE6A3', .5, 12, true); } }
   e.pat = 0; e.atk = 2.6; S.bossFx = []; S.heartT = 3;
@@ -3166,7 +3228,7 @@ function crates(dt) {
     // a Qi Stone waits for you to collect it, with a glowing arrow at your side that grows the longer it waits (A,
     // 2026-10-05); after 20 s it flies to you, so a level can never stall on one (Gene's ran ten minutes on a lost stone)
     if (it.kind === 'stone' && it.t > 8 && !it.told) { it.told = true; luma('vo-wait-' + (Math.random() < .5 ? 1 : 2)); }
-    if (it.kind === 'stone' && it.t > 20) { if (!it.flying) { it.flying = true; SFX.sweep(); ring(it.x, it.y, 10, 120, EL[it.el], .4, 10, true); } const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1400, 700 + (it.t - 20) * 1400) * dt;
+    if (it.kind === 'stone' && it.t > (it.tower ? 40 : 20)) { if (!it.flying) { it.flying = true; SFX.sweep(); ring(it.x, it.y, 10, 120, EL[it.el], .4, 10, true); } const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1400, 700 + (it.t - (it.tower ? 40 : 20)) * 1400) * dt;
       it.x += (P.x - it.x) / d * Math.min(d, v); it.y += (P.y - it.y) / d * Math.min(d, v); if (Math.random() < .6) fx({ k:'glow', x:it.x, y:it.y - 20, s:40, s1:6, c:EL[it.el], life:.35 }); }
     // the reach covers the item as drawn (it floats above its spot), not only its spot on the ground (A, 2026-10-05)
     if (Math.hypot(it.x - P.x, it.y - 18 - P.y) < 84) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
@@ -3890,7 +3952,8 @@ function launchWave(plan) {
   const w = plan.w, P = S.p, grow = 1 + (S.lv - 1) * .06, D = Math.hypot(VW, VH) / 2 + 60, at = (x, y) => ({ x, y });
   const pool = mixPool(), pick = el => el === 'mix' ? pool[(Math.random() * pool.length) | 0] : el;
   // swarm creatures in front, specialists behind them, so each wave reads as a shape
-  const list = []; for (const [type, n0] of w.mix) { const n = type === 'golem' ? n0 : Math.round(n0 * grow); for (let i = 0; i < n; i++) list.push(type); }
+  // the Silver City's waves come four tenths bigger (A, 2026-10-06: "i would love it if there were just more enemies")
+  const list = []; for (const [type, n0] of w.mix) { const n = type === 'golem' ? n0 : Math.round(n0 * grow * (S.level === 5 ? 1.4 : 1)); for (let i = 0; i < n; i++) list.push(type); }
   const brutes = list.filter(t => t === 'golem'), rest = list.filter(t => t !== 'golem');
   if (w.form === 'ring' || w.form === 'storm') {
     rest.forEach((type, i) => { const a = i / rest.length * TAU, r = D * (type === 'wolf' ? .98 : .85); spawn(type, at(P.x + Math.cos(a) * r, P.y + Math.sin(a) * r), w.form === 'storm' ? 1.1 : .85, w.el === 'mix' ? pool[i % pool.length] : w.el); });
@@ -3923,7 +3986,7 @@ function direct(dt) {
     // a light trickle between waves, mixed elements, growing slowly
     // from Level 3 the first forty seconds start busier, so a later level never opens on an empty field (A's playthrough,
     // 2026-10-05: Level 4's first half minute was bare ground)
-    const rate = Math.min(9 + (S.hard || 0), (1 + t * .035 + (S.level >= 3 ? 1.6 * Math.max(0, 1 - t / 40) : 0)) * (1 + (S.lv - 1) * .05) * (1 + .1 * (S.hard || 0)));
+    const rate = Math.min((S.level === 5 ? 13 : 9) + (S.hard || 0), (1 + t * .035 + (S.level >= 3 ? 1.6 * Math.max(0, 1 - t / 40) : 0)) * (1 + (S.lv - 1) * .05) * (1 + .1 * (S.hard || 0)) * (S.level === 5 ? 1.35 : 1));
     S.spawnAcc += dt * rate;
     while (S.spawnAcc > 1) { S.spawnAcc--; spawn(t > 40 && LV().allow.length && Math.random() < .18 ? 'wolf' : 'critter'); }
     const WV = LV().waves, next = WV[S.waveIdx];
@@ -4220,7 +4283,7 @@ function ouch(dmg, fx, fy, o = {}) {
 // after Ascended a shield holds for six seconds, full at first and thinning evenly to nothing, so the player can find
 // their feet again (A, 2026-10-05: "another 6s of having 100% shield and diminishes evenly throughout the 6s")
 const AFTER_SHIELD = 6, afterShield = () => S.shieldT != null ? Math.max(0, 1 - (S.t - S.shieldT) / AFTER_SHIELD) : 0;
-function armourVs(el) { let m = (1 - (S.gifts.rooted || 0) * .08) * (1 - .04 * (S.grow.earth || 0)) * (1 - afterShield()); if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
+function armourVs(el) { let m = auraGuard() * (1 - (S.gifts.rooted || 0) * .08) * (1 - .04 * (S.grow.earth || 0)) * (1 - afterShield()); if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
 const SHOT_HIT = { bubble:'#7FC4FF', thorn:'#7FCF4A', ember:'#FFB050', pebble:'#C8A060', blade:'#E6EEF4' };
 function hazard(k, x, y, r, life, dmg) { if (S.hz.length < 60) S.hz.push({ k, x, y, r, life, t:0, dmg, tick:0, rot:rnd(0, TAU) }); }
 function brain(e, P, d, dt, s) {
@@ -4587,7 +4650,8 @@ function qiKill(e) {
   S.qi[el] = (S.qi[el] || 0) + 1;
   if (stoneEls().includes(el) && !S.qiStones[el] && !S.stoneOut[el] && S.qi[el] >= stoneNeed(el)) {
     S.stoneOut[el] = true;
-    if (S.level === 5) { const k = TOWER.order.indexOf(el); S.items.push({ x:TOWER.x + (k - 2) * 52, y:TOWER.y + 90, kind:'stone', el, t:0, z:60, vz:200, tower:1 }); }
+    // Level 5: the stone appears at its own element's tower, and the Keeper goes into that district to take it
+    if (S.level === 5) { const Sh = SHRINES[TOWER.order.indexOf(el)]; S.items.push({ x:Sh.x, y:Sh.y + 80, kind:'stone', el, t:0, z:60, vz:200, tower:1 }); }
     else S.items.push({ x:e.x, y:e.y, kind:'stone', el, t:0, z:30, vz:320 });
     // the first stone ever gets its card (which Luma reads); after that she just names the stone
     if (SEEN.has('_stone')) luma('vo-stone-' + el);
@@ -4601,6 +4665,8 @@ function collectStone(el) {
   ring(P.x, P.y, 20, 560, EL[el], .9, 20, true); stars(P.x, P.y - 50, 34, EL[el], 520);
   // Level 5: each stone from the tower brings a stronger Ascended (tier 1 to 4); the fifth wakes the boss, and at half
   // the boss's life the full Ascended is offered to finish it (A, 2026-10-05)
+  // the stone's district thaws: its plants and lights come back to life
+  if (S.level === 5) { const Sh = SHRINES[TOWER.order.indexOf(el)]; paintThaw(Sh.x, Sh.y, Sh.R + 60); }
   if (S.level === 5) { const n = stoneEls().filter(k => S.qiStones[k]).length;
     if (n < 5) { if (hsOn()) (S.ascQ = S.ascQ || []).push(n); else hsStart(false, n); }
     else if (hsOn()) S.towerDone = 1; else { S.towerDone = 2; towerFinish(); }
@@ -4608,7 +4674,25 @@ function collectStone(el) {
   if (allStones() && !S.hs.used) hsStart(true);
 }
 // the Silver City's tower: its five sockets hold the stones in the order of the realms, water at the bottom, metal on top
-const TOWER = { x:3600 / 2, y:3600 / 2 - 640, h:640, order:['water', 'wood', 'fire', 'earth', 'metal'], sock:[.768, .629, .479, .352, .221], need:[600, 1500, 1700, 1900, 2100] };
+// (A, 2026-10-06: "we started in the middle of the map which is also where the tower should be. and i or no one should
+// be able to just go through it"; "maybe even having 5 connecting small towers each with its respective area that aligns
+// and makes sense with their element"): the Great Tower stands at the heart of the city where the Keeper starts, and five
+// element towers stand round it in the order of the generating cycle, each in a district of its own element, joined to
+// the Great Tower by the forge's molten channels. Every tower is solid.
+const TOWER = { x:1800, y:1760, h:640, rx:172, ry:62, order:['water', 'wood', 'fire', 'earth', 'metal'], sock:[.768, .629, .479, .352, .221], need:[700, 1700, 1950, 2200, 2400] };
+const SHRINES = TOWER.order.map((el, i) => { const a = -Math.PI / 2 + i * TAU / 5; return { el, i, x:Math.round(1800 + Math.cos(a) * 1150), y:Math.round(1800 + Math.sin(a) * 1150), h:330, rx:92, ry:38, R:500, cd:1.5 }; });
+const L5_START = { x:1800, y:1960 };
+// the wood tower's thorn slots: fixed holes in its floor, in three rings that fire in turn, so the pattern can be learned
+// (design review, 2026-10-06: traps that followed the Keeper made no sense)
+const THORN_SLOTS = (() => { const Sh = SHRINES[1], out = []; [[200, 7, 0], [300, 10, 1], [400, 13, 2]].forEach(([r, n, ring]) => { for (let i = 0; i < n; i++) { const a = i * TAU / n + ring * .3; out.push({ x:Sh.x + Math.cos(a) * r, y:Sh.y + Math.sin(a) * r * .8, ring }); } }); return out; })();
+const inDistrict = (Sh, x, y) => Math.hypot((x - Sh.x) / Sh.R, (y - Sh.y) / (Sh.R * .8)) < 1;
+// nothing walks through a tower: anything inside its footprint is set back on its edge
+function solidOut(o, r) {
+  for (const T of [TOWER, ...SHRINES]) { const cx = T.x, cy = T.y - 14, ax = T.rx + r, ay = T.ry + r * .55, dx = (o.x - cx) / ax, dy = (o.y - cy) / ay, q = Math.hypot(dx, dy);
+    if (q >= 1) continue; if (q < .001) { o.y = cy + ay; continue; } o.x = cx + dx / q * ax; o.y = cy + dy / q * ay; }
+}
+const inTower = (x, y, r, skip) => [TOWER, ...SHRINES].some(T => T !== skip && Math.hypot((x - T.x) / (T.rx + r), (y - T.y + 14) / (T.ry + r * .55)) < 1);
+function towerSolid() { solidOut(S.p, S.p.r); for (const e of S.en) if (!e.dead) solidOut(e, e.r * .8); }
 function towerFinish() { stoneBurst(); S.bossAt = S.t + 1.2; SFX.fanfare(true); }
 // the finishing Ascended: offered once at half the Level 5 boss's life
 function finisherTick() {
@@ -4620,6 +4704,7 @@ function finisherTick() {
 // the traps are the city's own floor grates (design review, 2026-10-05: traps that followed the Keeper made no sense):
 // each grate fires every fourth bar of the music, the grates taking turns, and they rest once the boss is up
 function spikeTick(dt) {
+  if (S.level === 5) { towerSolid(); templeTraps(dt); }
   // the fire bars sweep while the city is awake, and draw their fireballs back into the posts while Ascended or its
   // after-shield holds and once the boss is up; a fireball burns, with a moment's grace before the next can
   if (S.level === 5) { forgeTick(dt); S.barHit = Math.max(0, (S.barHit || 0) - dt);
@@ -4638,6 +4723,56 @@ function spikeTick(dt) {
       for (let i = 0; i < 7; i++) { const a = i * TAU / 7; fx({ k:'spike', x:T.x + Math.cos(a) * T.r * .55, y:T.y + Math.sin(a) * T.r * .35, life:.6, s:52, c:'#C9D3DB', edge:'#2A3346', rot:a, tip:7 }); }
       if (Math.hypot(S.p.x - T.x, (S.p.y - T.y) / .7) < T.r) ouch(16, T.x, T.y, { src:'spikes', el:'metal' }); } }
   S.traps = S.traps.filter(T => T.t < T.wind + .4);
+}
+/* The temple traps (A, 2026-10-06: "it should have traps coming out of it like how traps work in Indiana Jones movies
+   with caves and hidden temples"): each element tower guards its district with its own trap, firing while the Keeper is
+   inside it. Water opens a flood gate, and a wall of water rushes down a lane; wood bursts thorn spears out of the floor
+   under and ahead of the Keeper; fire breathes a jet of flame; earth lets loose the great rolling boulder; metal fires
+   darts from slits in its walls. Every one warns in the game's own danger language first (a red circle, a red lane, or a
+   glint and darts with the coral rim), none fires during Ascended, its after-shield or the boss, and the flood, thorns,
+   flame and boulder hit creatures too, so a clever Keeper leads the crowd into them. */
+const TRAP = { water:{ every:6.5, wind:1.2, len:1000, w:200, dmg:12 }, wood:{ every:4.5, wind:1, r:72, dmg:12 }, fire:{ every:5.5, wind:1, len:540, w:130, burn:1.5, dmg:9 },
+  earth:{ every:8, wind:1.5, len:1500, w:170, r:82, dmg:20 }, metal:{ every:3.2, wind:1, n:5, dmg:7 } };
+function templeTraps(dt) {
+  const P = S.p, live = !hsOn() && afterShield() <= 0 && !S.bossSpawned && !S.over && S.t > 6; S.ttraps = S.ttraps || [];
+  if (!live) S.ttraps = S.ttraps.filter(T => T.t >= T.wind);
+  for (const Sh of SHRINES) {
+    if (!live || !inDistrict(Sh, P.x, P.y)) { Sh.cd = Math.max(Sh.cd, 1.2); continue; }
+    if ((Sh.cd -= dt) > 0) continue;
+    const D = TRAP[Sh.el]; Sh.cd = D.every; const ux0 = P.x - Sh.x, uy0 = P.y - Sh.y, m = Math.hypot(ux0, uy0) || 1, ux = ux0 / m, uy = uy0 / m, ox = Sh.x + ux * (Sh.rx + 30), oy = Sh.y + uy * (Sh.ry + 30);
+    if (!SEEN.has('_temple') && luma('vo-temple')) markSeen('_temple');
+    if (Sh.el === 'wood') { Sh.ring = ((Sh.ring ?? -1) + 1) % 3; for (const o of THORN_SLOTS) if (o.ring === Sh.ring) S.ttraps.push({ k:'thorns', x:o.x, y:o.y, r:D.r, t:0, wind:D.wind, life:D.wind + .5 }); }
+    else if (Sh.el === 'metal') { const sx = (ox - camX) * Z, sy = (oy - 40 - camY) * Z; if (sx < 20 || sx > W - 20 || sy < 120 || sy > H - 120) { Sh.cd = .5; continue; }
+      S.ttraps.push({ k:'darts', x:ox, y:oy - 40, ux, uy, sh:Sh, t:0, wind:D.wind, life:D.wind + .05 }); }
+    // a lane stops where it meets another tower or the edge of the world (QA, 2026-10-06: the boulder rolled through the
+    // Great Tower and off the map)
+    else { let len = D.len; for (let d = 40; d <= D.len; d += 20) { const x = ox + ux * d, y = oy + uy * d; if (x < 60 || x > WORLD - 60 || y < 60 || y > WORLD - 60 || inTower(x, y, Sh.el === 'earth' ? TRAP.earth.r : 30, Sh)) { len = d - 20; break; } }
+      S.ttraps.push({ k:{ water:'flood', fire:'flame', earth:'boulder' }[Sh.el], x:ox, y:oy, ux, uy, len, w:D.w, t:0, wind:D.wind, life:D.wind + (Sh.el === 'fire' ? D.burn : len / (Sh.el === 'earth' ? 760 : 680)), f:0, hit:new Set() }); }
+    if (Sh.el === 'earth') SFX.bx('earth-quake', 2, 400); }
+  for (const T of S.ttraps) { const was = T.t; T.t += dt; const go = T.t >= T.wind, a0 = was < T.wind && go;
+    const inLane = (x, y, pad) => { const a = (x - T.x) * T.ux + (y - T.y) * T.uy, l = (x - T.x) * -T.uy + (y - T.y) * T.ux; return { a, l, inside:Math.abs(l) < T.w / 2 + pad && a > -pad && a < T.len + pad }; };
+    if (T.k === 'thorns' && a0) { SFX.spikes && SFX.spikes(); paintThaw(T.x, T.y, T.r);
+      for (let i = 0; i < 8; i++) { const a = i * TAU / 8; fx({ k:'spike', x:T.x + Math.cos(a) * T.r * .5, y:T.y + Math.sin(a) * T.r * .3, life:.6, s:58, c:'#7FBF5A', edge:'#2E4A1E', rot:a, tip:7 }); }
+      if (Math.hypot(P.x - T.x, (P.y - T.y) / .7) < T.r) ouch(TRAP.wood.dmg, T.x, T.y, { src:'thorns', el:'wood' });
+      for (const e of S.en) if (!e.dead && !e.boss && Math.hypot(e.x - T.x, (e.y - T.y) / .7) < T.r + e.r) hurt(e, 160, 'wood', { kb:220, fx:T.x, fy:T.y }); }
+    if (T.k === 'darts' && a0) { SFX.bx('ember-tap', 2, 0);
+      for (let i = 0; i < TRAP.metal.n; i++) { const an = Math.atan2(T.uy, T.ux) + (i - (TRAP.metal.n - 1) / 2) * .16; S.eshots.push({ k:'dart', x:T.x, y:T.y, vx:Math.cos(an) * 560, vy:Math.sin(an) * 560, life:2.2, rot:an, el:'metal', dmg:TRAP.metal.dmg, src:'darts' }); } }
+    if ((T.k === 'flood' || T.k === 'boulder') && go) { const sp = T.k === 'boulder' ? 760 : 680; T.f = Math.min(T.len, (T.t - T.wind) * sp);
+      const fx0 = T.x + T.ux * T.f, fy0 = T.y + T.uy * T.f;
+      if (a0) { if (T.k === 'flood') SFX.bx('tide-roll', 1); else { SFX.boom(true); S.shake = Math.max(S.shake, .5); } }
+      if (T.k === 'boulder') { if (Math.hypot(P.x - fx0, P.y - fy0) < 900) S.shake = Math.max(S.shake, .25 * (1 - Math.hypot(P.x - fx0, P.y - fy0) / 900));
+        if (Math.random() < .5) fx({ k:'smoke', x:fx0 + rnd(-40, 40), y:fy0 + rnd(-10, 20), vx:-T.ux * 60, vy:-T.uy * 60 - 20, drag:2, life:.8, s:rnd(22, 34), c:'120,110,100' });
+        if (Math.hypot(P.x - fx0, P.y - fy0) < TRAP.earth.r + P.r) ouch(TRAP.earth.dmg, fx0 - T.ux * 30, fy0 - T.uy * 30, { src:'boulder', el:'earth', push:170, shake:.6 });
+        for (const e of S.en) if (!e.dead && !e.boss && Math.hypot(e.x - fx0, e.y - fy0) < TRAP.earth.r + e.r) { debris(e.x, e.y, 6, 260, '#8E6A3A'); kill(e); } }
+      else { const L = inLane(P.x, P.y, P.r);
+        if (L.inside && Math.abs(L.a - T.f) < 46) ouch(TRAP.water.dmg, P.x - T.ux * 60, P.y - T.uy * 60, { src:'flood', el:'water', push:150, slow:1 });
+        for (const e of S.en) { if (e.dead || e.boss || T.hit.has(e)) continue; const Le = inLane(e.x, e.y, e.r); if (Le.inside && Math.abs(Le.a - T.f) < 50) { T.hit.add(e); hurt(e, 140, 'water', { kb:360, fx:e.x - T.ux * 60, fy:e.y - T.uy * 60 }); } }
+        if (Math.random() < .6) { const l = rnd(-T.w / 2, T.w / 2); fx({ k:'drop', x:fx0 - T.uy * l, y:fy0 + T.ux * l, z:30, vx:T.ux * rnd(200, 360), vy:T.uy * rnd(200, 360), vz:rnd(160, 360), life:.6, s:rnd(4, 7) }); } } }
+    if (T.k === 'flame' && go) { if (a0) SFX.bx('ember-burst', 1, 0);
+      if (Math.random() < .9) { const q = Math.random(), l = rnd(-T.w / 2, T.w / 2) * q; fx({ k:'cinder', x:T.x + T.ux * T.len * q - T.uy * l, y:T.y + T.uy * T.len * q + T.ux * l - 20, vx:T.ux * 260, vy:T.uy * 260 - 40, life:.5, s:rnd(6, 10), c:'#FF9A4A', rim:'#B4461A' }); }
+      if ((T.burnT = (T.burnT || 0) - dt) <= 0) { T.burnT = .45; const L = inLane(P.x, P.y, P.r * .6); if (L.inside) ouch(TRAP.fire.dmg, T.x, T.y, { src:'flames', el:'fire' });
+        for (const e of S.en) if (!e.dead && !e.boss && inLane(e.x, e.y, e.r).inside) hurt(e, 70, 'fire', { kb:0 }); } } }
+  S.ttraps = S.ttraps.filter(T => T.t < T.life);
 }
 // the end of Ascended after the stones: every element at once, a held breath, and the shore cleared
 function stoneBurst() {
@@ -4873,6 +5008,7 @@ function throwCall(dx, dy) {
       if ((a > -30 && a < K.len + 30 && Math.abs(l) < K.w / 2 + e.r) || K.spots.some(s => Math.hypot(e.x - s.x, e.y - s.y) < r * 3.2)) { e.dance = 8; K.dancers.push(e); } } }
   } else SFX.bx(C.id === 'root' ? 'root-seed' : 'call-throw', 2);
   C.cd = C.max; C.uses++; C.strike = K; P.cheerAt = S.t;
+  S.aura = { id:C.id, el:D.el, tier:C.tier, t:0, life:AURA_LIFE, beat:.6 };
   return K;
 }
 function quickCall() { const C = S.call; if (!C || (!C.seal && !callReady())) return false; throwCall(0, 0); return true; }
@@ -4897,6 +5033,7 @@ function callTick(dt) {
   // level-ups held while the call was drawn and landed come now, one after another
   if (!C.seal && !C.strike && S.lvlDefer && !S.bloom && !hsOn() && !S.holdLevels && running) flushLevels();
   if (!C.strike && C.cd > 0) { const was = C.cd; C.cd = Math.max(0, C.cd - dt); if (was > 0 && C.cd <= 0) { SFX.ting(); C.readyAt = S.t; } }
+  auraTick(dt);
   const K = C.strike; if (!K) return;
   const was = K.t; K.t += dt; const at = x => was < x && K.t >= x, t0 = CALL_T.throw;
   if (K.t < t0) { const q = K.t / t0; K.trail.push([K.sx + (K.ax - K.sx) * q, K.sy + (K.ay - K.sy) * q - Math.sin(q * Math.PI) * 150]); if (K.trail.length > 7) K.trail.shift(); }
@@ -4904,6 +5041,49 @@ function callTick(dt) {
   const landAt = C.id === 'root' ? rootPhase(C, K).t1 : C.id === 'bell' ? CALL_T.throw + CALL_T.beam + CALL_T.fall : 0;
   if (K.follow && !K.follow.dead && K.t < landAt) { K.x = K.follow.x; K.y = K.follow.y; }
   if (C.id === 'tide') tideTick(C, K, dt, at); else if (C.id === 'root') rootTick(C, K, dt, at); else if (C.id === 'ember') emberTick(C, K, dt, at); else if (C.id === 'stone') stoneTick(C, K, dt, at); else bellTick(C, K, dt, at);
+}
+/* Every Star Call lasts twelve seconds and both strikes and shields (A, 2026-10-06: "all star calls should last 12s.
+   anything below that feels pointless and each star call should have a offensive and defensive mechanism"). The call's
+   own great moment opens it; then for the rest of the twelve seconds its giver stays with the Keeper:
+   Tide Call   the spirit whale circles you inside a bubble that halves every hit and pops shots, and every second and a
+               half it dives on the nearest crowd in a splash
+   Root Grasp  a ring of thorns turns round you: you heal steadily and anything that touches you is hurt; every second a
+               root bursts up under a creature near you and holds it
+   Ember Rain  a ring of flames circles you and burns and throws back anything that comes close; on the beat an ember
+               falls on a creature near you
+   Bell Strike a small bell hangs over you: shots that come near are rung away and hits are softened; every second and a
+               half it tolls, a ring of sound that strikes all around you
+   Stone Shelter four stone slabs circle you, blocking shots and halving hits; every second and a half one flies off as a
+               boulder onto the nearest crowd and grows back */
+const AURA_LIFE = 12;
+const AURA_GUARD = { tide:.5, root:1, ember:.8, bell:.6, stone:.5 };
+const auraGuard = () => S && S.aura ? AURA_GUARD[S.aura.id] : 1;
+function auraHit(e, mul, el, kb, fx0, fy0) { if (e.boss) hurt(e, e.max * .006 * (1 + .25 * S.aura.tier), el, { kb:0, gift:1 }); else hurt(e, callDmg() * mul, el, { kb, fx:fx0, fy:fy0, gift:1 }); }
+function auraTick(dt) {
+  const A = S.aura; if (!A) return; A.t += dt; if (A.t >= A.life || S.over) { S.aura = null; return; }
+  // the call's own great moment plays first; its giver stays on after it, to the end of the twelve seconds (design review,
+  // 2026-10-06: two whales and two bells at once)
+  if (S.call && S.call.strike) return;
+  const P = S.p, near = (R, n) => nearest(P.x, P.y, n, R);
+  // the shields: shots that come near are stopped
+  const stopR = { tide:110, bell:150, stone:120 }[A.id];
+  if (stopR) for (const s of S.eshots) if (s.life > 0 && Math.hypot(s.x - P.x, s.y - P.y) < stopR) { s.life = 0; stars(s.x, s.y, 6, A.id === 'tide' ? '#BFE8FF' : A.id === 'bell' ? '#F4F8FF' : '#C8A060', 180); if (A.id === 'bell') SFX.bx('call-toll', 2, 300); }
+  if (A.id === 'root') { if (P.hp > 0) P.hp = Math.min(P.max, P.hp + P.max * .025 * dt);
+    for (const e of S.en) if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) < e.r + P.r + 30 && (e.hitCd.thorn || 0) <= S.t) { e.hitCd.thorn = S.t + .5; auraHit(e, .15, 'wood', 160, P.x, P.y); leaves(e.x, e.y - 20, 2, 60); } }
+  if (A.id === 'ember') for (const e of S.en) if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) < 130 + e.r && (e.hitCd.ward || 0) <= S.t) { e.hitCd.ward = S.t + .5; auraHit(e, .18, 'fire', 300, P.x, P.y); cinders(e.x, e.y - 20, 5, 160); }
+  // the strikes
+  if ((A.beat -= dt) > 0) return;
+  A.beat = { tide:1.5, root:1, ember:AU.beatLen ? AU.beatLen * 2 : .8, bell:1.5, stone:1.5 }[A.id];
+  if (A.id === 'tide') { const c = crowdAt(520); if (!c) return; SFX.bx('tide-crash', 2, 300); ring(c.x, c.y, 20, 170, '#7FC4FF', .5, 10, true);
+    for (let j = 0; j < 14; j++) fx({ k:'drop', x:c.x + rnd(-40, 40), y:c.y, z:20, vx:rnd(-200, 200), vy:rnd(-140, 140), vz:rnd(260, 480), life:.7, s:rnd(4, 7) });
+    inArea(c.x, c.y, 170, e => auraHit(e, .35, 'water', 300, c.x, c.y)); A.dive = { x:c.x, y:c.y, t:S.t }; paintThaw(c.x, c.y, 150); }
+  else if (A.id === 'root') { const t = near(420, 4).filter(e => !(e.rooted > 0))[0]; if (!t) return; SFX.bx('root-burst', 2, 300);
+    if (!t.boss) t.rooted = Math.max(t.rooted || 0, 1.5); auraHit(t, .3, 'wood', 0); debris(t.x, t.y, 6, 220, '#5A3E22'); leaves(t.x, t.y - 20, 5, 90); (A.roots = A.roots || []).push({ x:t.x, y:t.y, t:S.t }); }
+  else if (A.id === 'ember') { const t = near(460, 6); const e = t[(Math.random() * t.length) | 0]; if (!e) return;
+    S.drops.push({ k:'meteor', x:e.x, y:e.y, t:0, dur:.4, st:{ dmg:callDmg() * .3, r:80 }, L:0 }); SFX.bx('ember-fall', 2, 0); }
+  else if (A.id === 'bell') { SFX.bx('call-toll', 1, 300); A.toll = S.t; ring(P.x, P.y, 30, 280, '#E4EAFF', .6, 12, false); inArea(P.x, P.y, 280, e => auraHit(e, .3, 'metal', 260, P.x, P.y)); }
+  else if (A.id === 'stone') { const c = crowdAt(520); if (!c) return; A.thrown = S.t; SFX.bx('earth-boulder', 2, 300);
+    S.drops.push({ k:'boulder', x:c.x, y:c.y, t:-.15, dur:.5, st:{ dmg:callDmg() * .45, r:90 }, L:0 }); }
 }
 // Stone Shelter's beats: the stone lands at the Keeper's feet, the slabs rise, the shelter holds, then it bursts
 const stonePhase = C => { const t1 = CALL_T.throw + .35, hold = CALL.stone.hold[C.tier]; return { rise:CALL_T.throw, t1, burst:t1 + hold, end:t1 + hold + 1.3 }; };
@@ -5135,18 +5315,22 @@ function update(dt) {
   const vx0 = P.vx || 0, vy0 = P.vy || 0, ease = 1 - Math.exp(-(m > .1 ? 18 : 9) * dt);
   if (m > .1 && vx0 * mx + vy0 * my < -.5 * spd && (S.skidT = (S.skidT || 0) - dt) <= 0) { S.skidT = .35; for (let i = 0; i < 3; i++) fx({ k:'smoke', x:P.x + rnd(-10, 10), y:P.y + 28, vx:vx0 * .25 + rnd(-30, 30), vy:-rnd(10, 30), drag:3, life:.5, s:rnd(10, 15), c:'200,190,170' }); }
   P.vx = vx0 + (mx * spd - vx0) * ease; P.vy = vy0 + (my * spd - vy0) * ease;
+  const px0 = P.x, py0 = P.y;
   P.x = clamp(P.x + P.vx * dt, 30, WORLD - 30); P.y = clamp(P.y + P.vy * dt, 30, WORLD - 30);
   if (m > .1) S.lastMove = { x:mx, y:my };
   if (S.dashCd > 0 && (S.dashCd -= dt) <= 0) { S.dashCd = 0; ring(P.x, P.y, 10, 70, '#6FF2CF', .3, 5, true); }   // ready again
   if (S.dash) { const Dh = S.dash, k = Math.min(dt, Dh.dur - Dh.t); Dh.t += dt;
     P.x = clamp(P.x + Dh.dx * Dh.dist / Dh.dur * k, 30, WORLD - 30); P.y = clamp(P.y + Dh.dy * Dh.dist / Dh.dur * k, 30, WORLD - 30);
     fx({ k:'glow', x:P.x, y:P.y - 20, s:70, s1:6, c:EL[keeperEl], life:.3 }); if (Dh.t >= Dh.dur) S.dash = null; }
+  // a dash on a slow frame can jump further than a tower is deep: the path is walked in steps and stops at the first tower
+  // it would enter (QA, 2026-10-06: a 20 fps dash came out the other side of the water and fire towers)
+  if (S.level === 5 && Math.hypot(P.x - px0, P.y - py0) > 30) for (let i = 1; i <= 8; i++) { const x = px0 + (P.x - px0) * i / 8, y = py0 + (P.y - py0) * i / 8; if (inTower(x, y, P.r)) { P.x = px0 + (P.x - px0) * (i - 1) / 8; P.y = py0 + (P.y - py0) * (i - 1) / 8; if (S.dash) S.dash = null; break; } }
   if (S.arena) { const A = S.arena, d = Math.hypot(P.x - A.x, P.y - A.y), lim = A.r - 34; if (d > lim) { P.x = A.x + (P.x - A.x) / d * lim; P.y = A.y + (P.y - A.y) / d * lim; } }
   if (Math.abs(mx) > .1) P.face = mx > 0 ? 1 : -1;
   P.moving = m > .1; P.mx = mx; P.my = my;
   if (P.moving) S.moved = (S.moved || 0) + Math.hypot(P.vx, P.vy) * dt;
   if (P.moving && (S.dustT = (S.dustT || 0) - dt) <= 0) { S.dustT = .12; fx({ k:'smoke', x:P.x - mx * 14, y:P.y + 28, vx:-mx * 30, vy:-10, drag:3, life:.45, s:12, c:'200,190,170' }); }
-  P.hp = Math.min(P.max, P.hp + (S.gifts.spring || 0) * .6 * dt);   // no free healing, as the horde-survival genre does it: hearts, peaches and the Deep Spring gift do it
+  if (P.hp > 0) P.hp = Math.min(P.max, P.hp + (S.gifts.spring || 0) * .6 * dt);   // no free healing, as the horde-survival genre does it: hearts, peaches and the Deep Spring gift do it
   if (S.comboT > 0 && (S.comboT -= dt) <= 0) S.combo = 0;
   { // how dangerous this moment is, for the score: crowding, big creatures, a wave coming in, health, how far in we are
     let near = 0, big = 0; for (const e of S.en) if (!e.dead && !e.boss && Math.abs(e.x - P.x) < 650 && Math.abs(e.y - P.y) < 650) { near++; if (e.heavy) big++; }
@@ -5711,14 +5895,8 @@ function draw() {
     g.restore();
   }
   if (S.level === 5) drawForgeGround();
-  // the Silver City's tower: a socket glows in its element while its stone waits, and holds the stone once it is taken
-  if (S.level === 5 && ok(IMG['x-tower-metal']) && inView(TOWER.x, TOWER.y - TOWER.h / 2, TOWER.h)) { const im = IMG['x-tower-metal'], th = TOWER.h, tw = th * im.naturalWidth / im.naturalHeight, top = TOWER.y - th;
-    g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(TOWER.x, TOWER.y - 6, tw * .42, 34, 0, 0, TAU); g.fill();
-    g.drawImage(towerNight(im), TOWER.x - tw / 2, top, tw, th);
-    TOWER.order.forEach((el, i) => { const sx = TOWER.x, sy = top + th * TOWER.sock[i], r = th * .05;
-      if (S.qiStones[el]) { add(() => glowAt(sx, sy, r * 4, EL[el], .7)); spr('x-stone-' + el, sx, sy, r * 2.4); }
-      else if (S.stoneOut[el] && el === 'metal') { g.strokeStyle = '#8E9AA6'; g.lineWidth = 6 + Math.sin(S.t * 6) * 2; g.beginPath(); g.arc(sx, sy, r * 1.2, 0, TAU); g.stroke(); g.strokeStyle = '#2A3346'; g.lineWidth = 2; g.stroke(); g.lineWidth = 1; }
-      else if (S.stoneOut[el]) add(() => glowAt(sx, sy, r * (4 + Math.sin(S.t * 6)), EL[el], .9)); }); }
+  // the towers' shadows lie on the ground; the towers themselves stand among the creatures, drawn in depth order
+  if (S.level === 5) for (const T of [TOWER, ...SHRINES]) if (inView(T.x, T.y, 300)) { g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(T.x, T.y - 6, T.rx * 1.25, T.ry * 1.1, 0, 0, TAU); g.fill(); }
   for (const it of S.items) if (inView(it.x, it.y, 40)) drawItem(it);
   // healing shrines: a glowing circle to stand in, the shrine, a heart above it and how much healing is left
   for (const sh of S.shrines || []) {
@@ -5764,6 +5942,7 @@ function draw() {
   if (S.bossFx) for (const f of S.bossFx) if (f.t >= 0) drawBossFx(f);
   // attack warnings: a red light fills up on the ground, then the attack lands
   for (const T of S.traps || []) if (!T.done) warnCircle(T.x, T.y, T.r, Math.min(1, T.t / T.wind));
+  if (S.level === 5) drawTempleWarn();
   for (const e of S.en) { const a = e.act; if (!a || a.ph !== 0 || e.dead) continue; const p = Math.min(1, a.t / a.wind);
     if (a.k === 'circle') warnCircle(a.x, a.y, a.r, p);
     else if (a.k === 'lane') { g.save(); g.translate(e.x, e.y); g.rotate(Math.atan2(a.dy, a.dx)); warnLane(a.len + e.r, a.w, p); g.restore(); } }
@@ -5773,7 +5952,11 @@ function draw() {
   const list = S.en.filter(e => inView(e.x, e.y, e.size)).sort((a, b) => a.y - b.y);
   for (const e of list) { const w = e.r * 2.3; g.drawImage(ringSprite(GROUND_RING[e.el]), e.x - w / 2, e.y + e.r * .7 - w * .23, w, w * .46); }
   g.lineWidth = 1;
+  // the Silver City's towers stand among the creatures: each is drawn when the sorted crowd reaches its foot
+  const TW = S.level === 5 ? [TOWER, ...SHRINES].slice().sort((p, q) => p.y - q.y) : [], tagsLater = []; let twi = 0;
+  const towersTo = y => { while (twi < TW.length && TW[twi].y <= y) drawTowerAt(TW[twi++], cx, cy); };
   for (const e of list) {
+    towersTo(e.y);
     // during a Bloom the creatures wear their happy faces, freed of the spell for a moment
     const art = S.bloom && !e.boss && e.own && ok(IMG[e.img + '-happy']) ? e.img + '-happy' : e.img;
     const im = e.boss ? (ok(IMG[e.img]) ? IMG[e.img] : null) : e.own ? tinted(art, '#000', 0) : tinted(art, EL[e.el]), s = e.size, wind = e.act && e.act.ph === 0 ? Math.min(1, e.act.t / e.act.wind) : 0, rolling = e.act && e.act.ph === 1 && e.act.k === 'lane';
@@ -5801,16 +5984,17 @@ function draw() {
     if (wind) { const rd = silhouette(art, '#FF3A2A'); if (rd) { g.globalAlpha = wind * .45 * (.6 + .4 * Math.sin(S.t * 30)); g.drawImage(rd, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
     g.restore();
     if (wind) { const y = e.y - s * .62 - 18 - Math.sin(S.t * 12) * 3; g.font = '900 30px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(60,10,6,.8)'; g.strokeText('!', e.x, y); g.fillStyle = '#FF4A3A'; g.fillText('!', e.x, y); g.lineWidth = 1; }
-    if (e.tagT > 0) { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
+    // name tags are drawn after everything standing, so no tower covers them (QA, 2026-10-06)
+    if (e.tagT > 0) tagsLater.push(() => { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
       g.strokeStyle = GROUND_RING[e.el]; g.lineWidth = 4; g.beginPath(); g.ellipse(e.x, e.y + e.r * .5, e.r * 1.8 + Math.sin(S.t * 8) * 4, e.r * .8, 0, 0, TAU); g.stroke();
       // the name stays inside the safe part of the screen, clear of the top bar and the minimap (A's playthrough, 2026-10-05)
       const tx = clamp(e.x, cx + 74 / Z, cx + (W - 74) / Z); let ty = Math.max(y, cy + 178 / Z); if ((tx - cx) * Z > W - 160 && (ty - cy) * Z < 290) ty = cy + 290 / Z;
-      g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, tx, ty); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, tx, ty); g.globalAlpha = 1; g.lineWidth = 1; }
+      g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, tx, ty); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, tx, ty); g.globalAlpha = 1; g.lineWidth = 1; });
     if (e.type === 'golem') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(e.x - 42, e.y - s * .62 - 14, 84, 10); g.fillStyle = EL[e.el]; g.fillRect(e.x - 40, e.y - s * .62 - 12, 80 * Math.max(0, e.hp / e.max), 6); }
   }
+  towersTo(P.y);
   // sacred trees (Rising Grove)
-  drawFuseGround();
-  drawAscendGround();
+  if (!S.noKeeper) { drawFuseGround(); drawAscendGround(); }
   for (const tr of S.trees) { const k = Math.min(1, tr.t / .4) * Math.min(1, (tr.life - tr.t) / .4), sw = Math.sin(S.t * 3 + tr.x) * .05;
     g.save(); g.translate(tr.x, tr.y); g.rotate(sw); g.scale(k, k);
     g.fillStyle = '#5A3A1A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.roundRect(-9, -70, 18, 72, 6); g.fill(); g.stroke();
@@ -5889,7 +6073,7 @@ function draw() {
     g.globalAlpha = 1;
     add(() => glowAt(w.x, w.y, s * 1.7, EL[A.e], .9));
     if (ok(im)) { g.save(); g.translate(w.x, w.y); g.rotate(bank); if (FACE[animal] && flip !== FACE[animal]) g.scale(-1, 1); g.scale(1 + Math.sin(S.t * 10) * .02, 1 - Math.sin(S.t * 10) * .02); g.globalAlpha = Math.min(1, .3 + k); g.drawImage(im, -s / 2, -s * .6, s, s); g.restore(); g.globalAlpha = 1; }
-  } else {
+  } else if (!S.noKeeper) {
     const petImg = IMG[animal + 'y'], UC = S.ult && S.ult.cast, s = UC ? 100 : 78, pz = pet.z || 0;
     if (UC) add(() => glowAt(pet.x, pet.y - 20 - pz, 200 + Math.sin(S.t * 20) * 16, EL[A.e], .85));
     const hk = Math.max(0, 1 - (S.t - (pet.hitAt ?? -9)) / .3), lk = Math.max(0, 1 - (S.t - (pet.landAt ?? -9)) / .18);
@@ -5929,7 +6113,7 @@ function draw() {
   // running uses a real run cycle (stride, pass, stride, pass); standing uses the idle pose
   // and, when the art has them, poses that say what is happening: a stretched dash, a flinch when hit, a cheer after a level up
   // when the Keeper falls, the fall draws them instead (over the drained world, in full colour)
-  if (!S.fall) {
+  if (!S.fall && !S.noKeeper) {
   const runName = `k${keeper}r${[1, 2, 3, 2][Math.floor(S.t * 10) % 4]}`, useRun = P.moving && ok(IMG[runName]), hk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .28);
   const pose = n => ok(IMG['k' + keeper + n]) ? 'k' + keeper + n : null;
   const posed = S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
@@ -5963,6 +6147,7 @@ function draw() {
   { const f = afterShield(); if (f > 0 && !hs) { g.save(); g.globalAlpha = .25 + .6 * f; g.fillStyle = `rgba(255,224,138,${.12 * f})`; g.strokeStyle = 'rgba(255,224,138,.8)'; g.lineWidth = 3;
     g.beginPath(); g.ellipse(kx, ky - 44, 62, 72, 0, 0, TAU); g.fill(); g.stroke(); g.lineWidth = 5; g.lineCap = 'round'; g.strokeStyle = '#FFE08A';
     g.beginPath(); g.ellipse(kx, ky + 28, 40, 15, 0, -Math.PI / 2, -Math.PI / 2 + TAU * f); g.stroke(); g.restore(); g.lineWidth = 1; g.lineCap = 'butt'; } }
+  if (S.aura) drawAura(kx, ky);
   if (S.dashCd > 0) { const k = 1 - S.dashCd / DASH_CD; g.save(); g.strokeStyle = 'rgba(111,242,207,.85)'; g.lineWidth = 4.5; g.lineCap = 'round'; g.beginPath(); g.ellipse(P.x, P.y + 28, 36, 14, 0, -Math.PI / 2, -Math.PI / 2 + k * TAU); g.stroke(); g.restore(); }
   const hb = Math.max(0, P.hp / P.max);
   // a glossy health capsule with a white rim, like the HUD
@@ -5972,14 +6157,18 @@ function draw() {
     g.fillStyle = gr; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, Math.max(10, 78 * hb), 10, 5); g.fill();
     g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.roundRect(P.x - 36, P.y + 44.5, Math.max(4, 78 * hb - 6), 3, 2); g.fill(); }
   }
-  if (S.level === 5) { forgeAir(cx, cy); world(g); drawFireBalls(); }
+  // a tower the Keeper stands behind, drawn early for a creature in front of it, is drawn again over the Keeper (QA,
+  // 2026-10-06: with a crowd about, the Keeper painted over the tower)
+  for (let i = 0; i < twi; i++) if (TW[i].y > P.y) drawTowerAt(TW[i], cx, cy);
+  towersTo(Infinity); for (const f of tagsLater) f(); g.globalAlpha = 1; g.lineWidth = 1;
+  if (S.level === 5) { forgeAir(cx, cy); world(g); drawFireBalls(); drawTempleTraps(); }
   // projectiles are light, not objects (A, 2026-10-04: "a lighter energy type" instead of the hard shapes): a white
   // core, a halo in the element's colour and a short comet tail. Enemy and boss shots are larger and carry a pulsing
   // coral-red rim, so they read as danger beside your own; a bubble that slows you keeps an inner ring.
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.el] || '#C9D3DB', 9, false); }
   for (const s of S.eshots) { if (!inView(s.x, s.y, 40)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.k] || SHOT_COL[s.el] || '#7FC4FF', s.boss ? 18 : 14, true, s.k === 'bubble'); }
   g.lineWidth = 1;
-  drawFuseTop();
+  if (!S.noKeeper) drawFuseTop();
   if (S.call) drawCallTop();
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
@@ -6259,36 +6448,41 @@ function drawStoneTop(K) {
    relight, more gears turn, two more fire bars wake and the dark pulls back a step, so the level grows harder while the
    light grows. The fifth stone wakes the boss, so its lights come on quietly under the fight. */
 const BAR_GAP = 44;
-const FORGE = (() => { let t = 7; const r = () => (t = (t * 16807) % 2147483647) / 2147483647, c = 1800, T = [c, c - 640];
+const FORGE = (() => { let t = 7; const r = () => (t = (t * 16807) % 2147483647) / 2147483647, c = 1800, st = [L5_START.x, L5_START.y];
   const d2 = (x, y, X, Y) => Math.hypot(x - X, y - Y);
   const segD = ([x1, y1, x2, y2], x, y) => { const dx = x2 - x1, dy = y2 - y1, q = clamp(((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy || 1), 0, 1); return d2(x, y, x1 + dx * q, y1 + dy * q); };
-  const side = (ax, ay, bx, by, px, py) => Math.sign((bx - ax) * (py - ay) - (by - ay) * (px - ax));
-  const cross = (p, q) => side(p[0], p[1], p[2], p[3], q[0], q[1]) !== side(p[0], p[1], p[2], p[3], q[2], q[3]) && side(q[0], q[1], q[2], q[3], p[0], p[1]) !== side(q[0], q[1], q[2], q[3], p[2], p[3]);
-  const segGap = (p, q) => cross(p, q) ? 0 : Math.min(segD(p, q[0], q[1]), segD(p, q[2], q[3]), segD(q, p[0], p[1]), segD(q, p[2], p[3]));
-  const gears = Array.from({ length:18 }, () => ({ x:c + (r() - .5) * 3000, y:c + (r() - .5) * 3000, r:60 + r() * 90, sp:(r() < .5 ? -1 : 1) * (.3 + r() * .5), n:8 + ((r() * 6) | 0), rot:0, on:0 }));
-  const vents = Array.from({ length:14 }, () => ({ x:c + (r() - .5) * 3000, y:c + (r() - .5) * 3000, ph:(r() * 4) | 0 }));
-  // no grate sits on a gear (design review, 2026-10-06)
-  const grates = []; for (let k = 0; k < 2000 && grates.length < 26; k++) { const x = c + (r() - .5) * 3000, y = c + (r() - .5) * 3000; if (!gears.some(G => d2(x, y, G.x, G.y) < G.r + 70)) grates.push({ x, y, ph:grates.length % 4 }); }
-  // the channels make one network that never crosses itself, a grate, the tower or the start; each runs from a mouth in
-  // the floor to an iron plate (design review: tubes that crossed read as glowing beams)
-  const flows = [];
-  for (let k = 0; k < 3000 && flows.length < 13; k++) { const f = { x:c + (r() - .5) * 2900, y:c + (r() - .5) * 2900, a:r() * TAU, len:420 + r() * 520, ph:r() * TAU, on:0 };
-    const s = f.s = [f.x, f.y, f.x + Math.cos(f.a) * f.len, f.y + Math.sin(f.a) * f.len * .55];
-    if (Math.min(s[2], s[3]) < 160 || Math.max(s[2], s[3]) > 3440 || segD(s, c, c) < 260 || segD(s, T[0], T[1]) < 340) continue;
-    if (grates.some(G => segD(s, G.x, G.y) < 120) || gears.some(G => segD(s, G.x, G.y) < G.r + 60) || flows.some(o => segGap(s, o.s) < 160)) continue;
-    flows.push(f); }
+  // the towers' own ground: nothing else is built on it
+  const towers = [{ x:TOWER.x, y:TOWER.y, R:330 }, ...SHRINES.map(Sh => ({ x:Sh.x, y:Sh.y, R:210 }))], onTower = (x, y, pad) => towers.some(o => d2(x, y, o.x, o.y) < o.R + pad);
+  // the channels are the city's conduits (A, 2026-10-06: "5 connecting small towers"): one from each element tower to the
+  // Great Tower, and one between each tower and the next in the generating cycle, so the five make a ring and a star
+  const mk = (x1, y1, x2, y2) => ({ s:[x1, y1, x2, y2], x:x1, y:y1, len:d2(x1, y1, x2, y2), ph:r() * TAU, on:0 });
+  const flows = SHRINES.map(Sh => { const m = d2(Sh.x, Sh.y, TOWER.x, TOWER.y), ux = (TOWER.x - Sh.x) / m, uy = (TOWER.y - Sh.y) / m; return mk(Sh.x + ux * 150, Sh.y + uy * 90, TOWER.x - ux * 270, TOWER.y - uy * 130); });
+  SHRINES.forEach((Sh, i) => { const N = SHRINES[(i + 1) % 5], m = d2(Sh.x, Sh.y, N.x, N.y), ux = (N.x - Sh.x) / m, uy = (N.y - Sh.y) / m; flows.push(mk(Sh.x + ux * 170, Sh.y + uy * 100, N.x - ux * 170, N.y - uy * 100)); });
+  const gears = []; for (let k = 0; k < 3000 && gears.length < 18; k++) { const G = { x:c + (r() - .5) * 3000, y:c + (r() - .5) * 3000, r:60 + r() * 90, sp:(r() < .5 ? -1 : 1) * (.3 + r() * .5), n:8 + ((r() * 6) | 0), rot:0, on:0 };
+    if (!onTower(G.x, G.y, G.r + 40) && d2(G.x, G.y, st[0], st[1]) > 260 && !flows.some(f => segD(f.s, G.x, G.y) < G.r + 60)) gears.push(G); }
+  const vents = []; for (let k = 0; k < 2000 && vents.length < 14; k++) { const x = c + (r() - .5) * 3000, y = c + (r() - .5) * 3000, ph = (r() * 4) | 0; if (!onTower(x, y, 60) && !flows.some(f => segD(f.s, x, y) < 80)) vents.push({ x, y, ph }); }
+  // no grate sits on a gear, a channel or a tower (design review, 2026-10-06)
+  const grates = []; for (let k = 0; k < 3000 && grates.length < 26; k++) { const x = c + (r() - .5) * 3000, y = c + (r() - .5) * 3000;
+    if (!gears.some(G => d2(x, y, G.x, G.y) < G.r + 70) && !onTower(x, y, 80) && !flows.some(f => segD(f.s, x, y) < 120) && d2(x, y, st[0], st[1]) > 220) grates.push({ x, y, ph:grates.length % 4 }); }
+  // each district's own ground, laid out once: pools by the water tower, moss and roots by the wood tower, lava pools
+  // by the fire tower, sand and rocks by the earth tower, silver plates by the metal tower
+  const decor = SHRINES.map(Sh => Array.from({ length:{ water:5, wood:9, fire:4, earth:12, metal:7 }[Sh.el] }, () => { const a = r() * TAU, d = 190 + r() * (Sh.R - 230);
+    return { x:Sh.x + Math.cos(a) * d, y:Sh.y + Math.sin(a) * d * .8, s:.6 + r() * .6, a:r() * TAU, ph:r() * TAU }; }).filter(o => !flows.some(f => segD(f.s, o.x, o.y) < 70)));
   // fire bars, the castle hazard every child knows: a round iron pillar with a chain of four to six fireballs sweeping
   // round it. Fair by placement (design review, 2026-10-06): no two sweeps overlap, none sweeps a grate or a channel, and
   // the outer fireball never moves faster than about three quarters of the Keeper's speed
   const bars = [];
   for (let k = 0; k < 6000 && bars.length < 12; k++) { const x = c + (r() - .5) * 3000, y = c + (r() - .5) * 3000, n = 4 + ((r() * 3) | 0), R = n * BAR_GAP, sp = (bars.length % 2 ? -1 : 1) * Math.min(.9 + r() * .5, 220 / R);
-    if (x < R + 120 || x > 3600 - R - 120 || y < R + 120 || y > 3600 - R - 120 || d2(x, y, c, c) < R + 300 || d2(x, y, T[0], T[1]) < R + 420) continue;
+    if (x < R + 120 || x > 3600 - R - 120 || y < R + 120 || y > 3600 - R - 120 || d2(x, y, st[0], st[1]) < R + 300 || d2(x, y, TOWER.x, TOWER.y) < R + 420 || SHRINES.some(Sh => d2(x, y, Sh.x, Sh.y) < R + Sh.R + 40)) continue;
     if (bars.some(B => d2(x, y, B.x, B.y) < R + B.n * BAR_GAP + 150) || grates.some(G => d2(x, y, G.x, G.y) < R + 120) || flows.some(f => segD(f.s, x, y) < R + 120)) continue;
     bars.push({ x, y, n, sp, a0:r() * TAU, a:0, k:0 }); }
   // nearest first: the four bars awake from the start are the ones the Keeper meets first
-  bars.sort((A, B) => d2(A.x, A.y, c, c) - d2(B.x, B.y, c, c));
-  return { gears, vents, flows, grates, bars, run:null, wake:0, wakeT:-99, banks:Array.from({ length:7 }, () => ({ x:r(), y:r(), s:.5 + r() * .5, sp:.008 + r() * .012 })) }; })();
+  bars.sort((A, B) => d2(A.x, A.y, st[0], st[1]) - d2(B.x, B.y, st[0], st[1]));
+  return { gears, vents, flows, grates, bars, decor, run:null, wake:0, wakeT:-99, banks:Array.from({ length:7 }, () => ({ x:r(), y:r(), s:.5 + r() * .5, sp:.008 + r() * .012 })) }; })();
 const forgeWake = () => TOWER.order.filter(el => S.qiStones[el]).length;
+// a conduit is lit once its towers' stones are home: a spoke when its own tower's stone is taken, a ring channel once both
+// towers it joins have given theirs
+const flowLit = (i, W) => i < 5 ? i < W : Math.max(i - 5, (i - 4) % 5) < W;
 // a stone wakes the forge once Ascended and its after-shield are over, in one beat the player can watch (design review,
 // 2026-10-06: it had woken during Ascended, unseen): a rumble and an orange pulse, the new channels fill, the new gears
 // clank on one after another, and last the new fire bars spin up
@@ -6300,10 +6494,10 @@ function forgeTick(dt) {
   // one stone, one beat: a second waiting stone waits for the first beat to finish. The fifth wakes the boss, so its
   // forge lights come on quietly under the fight, never stacked on the boss's entrance
   if (calm && forgeWake() > FORGE.wake && S.t - FORGE.wakeT > 1.8) { FORGE.wake++; FORGE.wakeT = S.t;
-    if (!S.bossSpawned && !S.towerDone) { SFX.anvil(); S.shake = Math.max(S.shake, .2); ring(TOWER.x, TOWER.y - 60, 30, 900, '#FF8A2A', 1.2, 20, false); } else FORGE.wakeT -= 3; }
+    if (!S.bossSpawned && !S.towerDone) { const Sh = SHRINES[FORGE.wake - 1]; SFX.anvil(); S.shake = Math.max(S.shake, .2); ring(Sh.x, Sh.y - 60, 30, 700, EL[Sh.el], 1, 18, false); ring(TOWER.x, TOWER.y - 60, 30, 900, '#FF8A2A', 1.2, 20, false); } else FORGE.wakeT -= 3; }
   FORGE.bars.forEach((B, i) => { B.k = clamp(B.k + ((live && woke('bar', i, 2, 4)) ? dt * 1.5 : -dt * 2), 0, 1); B.a += dt * B.sp; });
   FORGE.gears.forEach((G, i) => { const on = woke('gear', i, 3, 4); if (on && G.on === 0 && S.t - FORGE.wakeT < 3 && FORGE.wake) SFX.clank(); G.on = clamp(G.on + (on ? dt * 1.5 : -dt * .5), 0, 1); G.rot += dt * G.sp * G.on; });
-  FORGE.flows.forEach((f, i) => { f.on = clamp(f.on + (woke('flow', i, 2, 3) ? dt : -dt * .5), 0, 1); });
+  FORGE.flows.forEach((f, i) => { f.on = clamp(f.on + (flowLit(i, FORGE.wake) ? dt : -dt * .5), 0, 1); });
 }
 // the fireballs of one bar, on the ground plane (flattened as the gears are), drawn back into the pillar while it rests
 function barBalls(B) { const k = B.k; return Array.from({ length:B.n }, (_, i) => { const d = (i + 1) * BAR_GAP * k; return { x:B.x + Math.cos(B.a) * d, y:B.y + Math.sin(B.a) * d * .55 }; }); }
@@ -6334,7 +6528,82 @@ function ironTile() {
       c.fillStyle = '#6A6E7C'; c.beginPath(); c.arc(x + dx, y + dy, 8, 0, TAU); c.fill(); c.fillStyle = 'rgba(200,204,214,.6)'; c.beginPath(); c.arc(x + dx - 2, y + dy - 2, 3, 0, TAU); c.fill(); } }
   return IRON = c.createPattern(cv, 'repeat');
 }
+// each district's floor tile, in its element's stone, and a frozen copy of it (frost-pale and colourless)
+const ELEM_TILE = {};
+function elemTile(el, live) {
+  const key = el + (live ? 1 : 0); if (ELEM_TILE[key]) return ELEM_TILE[key];
+  const P = 160, cv = document.createElement('canvas'); cv.width = cv.height = P * 2; const c = cv.getContext('2d');
+  let t = 31 + el.length; const r = () => (t = (t * 16807) % 2147483647) / 2147483647;
+  const base = { water:[46, 92, 120], wood:[66, 92, 56], fire:[38, 28, 28], earth:[168, 134, 88], metal:[132, 140, 158] }[el];
+  for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) { const x = i * P, y = j * P, v = (r() - .5) * 18;
+    c.fillStyle = `rgb(${base[0] + v},${base[1] + v},${base[2] + v})`; c.fillRect(x, y, P, P);
+    if (el === 'water') { for (let k = 0; k < 3; k++) { c.fillStyle = 'rgba(150,210,240,.18)'; c.beginPath(); c.ellipse(x + r() * P, y + r() * P, 20 + r() * 30, 8 + r() * 10, 0, 0, TAU); c.fill(); } }
+    if (el === 'wood') { c.strokeStyle = 'rgba(120,180,80,.45)'; c.lineWidth = 6; for (let k = 0; k < 3; k++) { c.beginPath(); c.moveTo(x + r() * P, y + r() * P); c.quadraticCurveTo(x + r() * P, y + r() * P, x + r() * P, y + r() * P); c.stroke(); } }
+    if (el === 'fire') { c.strokeStyle = 'rgba(255,120,40,.85)'; c.lineWidth = 3; c.beginPath(); let px = x + r() * P, py = y; c.moveTo(px, py); for (let k = 0; k < 5; k++) { px += (r() - .5) * 60; py += P / 5; c.lineTo(px, py); } c.stroke(); }
+    if (el === 'earth') { c.fillStyle = 'rgba(90,60,30,.25)'; for (let k = 0; k < 6; k++) { c.beginPath(); c.arc(x + r() * P, y + r() * P, 3 + r() * 5, 0, TAU); c.fill(); } }
+    if (el === 'metal') { const gr = c.createLinearGradient(x, y, x + P, y + P); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.5, 'rgba(255,255,255,.22)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = gr; c.fillRect(x, y, P, P); }
+    c.fillStyle = 'rgba(10,10,14,.55)'; c.fillRect(x, y, P, 5); c.fillRect(x, y, 5, P); c.fillStyle = 'rgba(255,255,255,.12)'; c.fillRect(x + 5, y + 5, P - 5, 2); c.fillRect(x + 5, y + 5, 2, P - 5); }
+  if (!live) { c.globalCompositeOperation = 'saturation'; c.fillStyle = 'rgba(128,128,128,.85)'; c.fillRect(0, 0, P * 2, P * 2); c.globalCompositeOperation = 'source-over'; c.fillStyle = 'rgba(205,225,240,.28)'; c.fillRect(0, 0, P * 2, P * 2); }
+  return ELEM_TILE[key] = c.createPattern(cv, 'repeat');
+}
 function forgeFloor(cx, cy) { g.fillStyle = ironTile(); g.fillRect(cx, cy, VW, VH); }
+// a Star Call's twelve seconds round the Keeper: its giver's shield, its strike, and a ring in its colour that empties
+function drawAura(kx, ky) {
+  if (S.call && S.call.strike) return;
+  const A = S.aura, f = 1 - A.t / A.life, k = Math.min(1, A.t * 4, (A.life - A.t) * 2), col = A.el === 'fire' ? '#FF9A4A' : EL[A.el];
+  g.save(); g.globalAlpha = k;
+  g.strokeStyle = col; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.ellipse(kx, ky + 30, 52, 19, 0, -Math.PI / 2, -Math.PI / 2 + TAU * f); g.stroke();
+  if (A.id === 'tide') { g.fillStyle = 'rgba(127,196,255,.14)'; g.strokeStyle = 'rgba(190,232,255,.75)'; g.lineWidth = 3; g.beginPath(); g.ellipse(kx, ky - 40, 70, 84, 0, 0, TAU); g.fill(); g.stroke();
+    const im = IMG.callWhale, dive = A.dive && S.t - A.dive.t < .35, a = S.t * 2.2, wx = dive ? A.dive.x : kx + Math.cos(a) * 120, wy = dive ? A.dive.y - 40 : ky - 40 + Math.sin(a) * 60;
+    if (im && ok(im)) { const w = 130, h = w * im.naturalHeight / im.naturalWidth; g.save(); g.translate(wx, wy); if (Math.sin(a) > 0) g.scale(-1, 1); g.drawImage(im, -w / 2, -h / 2, w, h); g.restore(); } }
+  else if (A.id === 'root') { const a0 = S.t * .8; g.strokeStyle = '#2E2216'; g.lineWidth = 13; g.beginPath(); g.ellipse(kx, ky + 6, 92, 36, 0, 0, TAU); g.stroke(); g.strokeStyle = '#6A4A2A'; g.lineWidth = 7; g.stroke();
+    g.fillStyle = '#7FBF5A'; for (let i = 0; i < 10; i++) { const a = a0 + i * TAU / 10, x = kx + Math.cos(a) * 92, y = ky + 6 + Math.sin(a) * 36; g.beginPath(); g.ellipse(x, y - 8, 15, 8, a, 0, TAU); g.fill(); g.strokeStyle = '#2E5A1E'; g.lineWidth = 2; g.stroke(); }
+    g.strokeStyle = '#5A3E22'; g.lineWidth = 8; for (const r of A.roots || []) { const q = (S.t - r.t) / 1.5; if (q > 1) continue; const h = 70 * Math.sin(Math.min(1, q * 3) * Math.PI / 2) * (1 - Math.max(0, q - .7) / .3);
+      for (const dx of [-16, 0, 16]) { g.beginPath(); g.moveTo(r.x + dx, r.y + 6); g.quadraticCurveTo(r.x + dx * 2, r.y - h * .5, r.x + dx * .5, r.y - h); g.stroke(); } } }
+  else if (A.id === 'ember') { for (let i = 0; i < 6; i++) { const a = S.t * 2.6 + i * TAU / 6, x = kx + Math.cos(a) * 112, y = ky - 10 + Math.sin(a) * 44, fl = 1 + .2 * Math.sin(S.t * 18 + i);
+      g.fillStyle = '#FF9A4A'; g.strokeStyle = '#7A3A14'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(x, y - 12 * fl, 16, 25 * fl, 0, 0, TAU); g.fill(); g.stroke(); g.fillStyle = '#FFF0C8'; g.beginPath(); g.ellipse(x, y - 4, 7, 10 * fl, 0, 0, TAU); g.fill(); } }
+  else if (A.id === 'bell') { const im = IMG.callBell, sw = Math.sin((S.t - (A.toll || -9)) * 10) * Math.max(0, 1 - (S.t - (A.toll || -9)) / 1.2) * .5;
+    if (im && ok(im)) { g.save(); g.translate(kx, ky - 175); g.rotate(sw); g.drawImage(im, -46, 0, 92, 92 * im.naturalHeight / im.naturalWidth); g.restore(); }
+    g.fillStyle = 'rgba(200,210,255,.1)'; g.strokeStyle = 'rgba(228,234,255,.8)'; g.lineWidth = 3; g.beginPath(); g.ellipse(kx, ky - 40, 105, 82, 0, 0, TAU); g.fill(); g.stroke(); }
+  else if (A.id === 'stone') { const gone = A.thrown && S.t - A.thrown < .6 ? 1 : 0;
+    for (let i = gone; i < 4; i++) { const a = S.t * 1.8 + i * TAU / 4, x = kx + Math.cos(a) * 110, y = ky - 20 + Math.sin(a) * 44; g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(x, y + 40, 26, 8, 0, 0, TAU); g.fill();
+      if (!spr('x-boulder', x, y, 70, a)) { g.fillStyle = '#8E6A3A'; g.beginPath(); g.arc(x, y, 18, 0, TAU); g.fill(); } } }
+  g.restore(); g.lineWidth = 1; g.lineCap = 'butt';
+}
+// a tower, standing: the Great Tower with its five sockets, or an element tower in its element's colours. While its stone
+// waits, an element tower sends up a column of its light; once its stone is home, a steady crown of it. A tower the
+// Keeper is behind turns see-through, so the Keeper is never lost
+const SHRINE_IM = {};
+function shrineNight(im, el) {
+  if (SHRINE_IM[el]) return SHRINE_IM[el];
+  const cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight; const c = cv.getContext('2d');
+  c.drawImage(im, 0, 0); c.globalCompositeOperation = 'saturation'; c.fillStyle = 'rgba(128,128,128,.9)'; c.fillRect(0, 0, cv.width, cv.height);
+  // each tower in its own element's colour: fire a true red-orange and earth a warm gold, never clay or olive
+  c.globalCompositeOperation = 'color'; c.globalAlpha = .7; c.fillStyle = { water:'#3E8EE0', wood:'#4FB04A', fire:'#FF4A1A', earth:'#E8A830', metal:'#B8C4D8' }[el]; c.fillRect(0, 0, cv.width, cv.height); c.globalAlpha = 1;
+  c.globalCompositeOperation = 'multiply'; c.fillStyle = '#B4B4C0'; c.fillRect(0, 0, cv.width, cv.height);
+  c.globalCompositeOperation = 'destination-in'; c.drawImage(im, 0, 0);
+  return SHRINE_IM[el] = cv;
+}
+function drawTowerAt(T, cx, cy) {
+  const im = IMG['x-tower-metal']; if (!ok(im)) return; const th = T.h, tw = th * im.naturalWidth / im.naturalHeight, top = T.y - th, P = S.p;
+  if (T.x + tw / 2 < cx || T.x - tw / 2 > cx + VW || T.y < cy || top > cy + VH) return;
+  const behind = P.y < T.y - 10 && P.y > top + 40 && Math.abs(P.x - T.x) < tw * .42;
+  g.save();
+  if (T === TOWER) {
+    g.drawImage(towerNight(im), T.x - tw / 2, top, tw, th);
+    TOWER.order.forEach((el, i) => { const sx = T.x, sy = top + th * TOWER.sock[i], r = th * .05;
+      if (S.qiStones[el]) { add(() => glowAt(sx, sy, r * 4, EL[el], .7)); spr('x-stone-' + el, sx, sy, r * 2.4); } });
+  } else {
+    const home = S.qiStones[T.el], out = S.stoneOut[T.el] && !home;
+    if (out) { const gr = g.createLinearGradient(0, top - 500, 0, top + 40); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, T.el === 'fire' ? 'rgba(255,154,74,.45)' : EL[T.el] + '73');
+      g.fillStyle = gr; g.fillRect(T.x - 26 - Math.sin(S.t * 4) * 4, top - 500, 52 + Math.sin(S.t * 4) * 8, 540); }
+    g.drawImage(shrineNight(im, T.el), T.x - tw / 2, top, tw, th);
+    if (home || out) add(() => glowAt(T.x, top + th * .2, th * (home ? .32 : .26 + .04 * Math.sin(S.t * 6)), T.el === 'fire' ? '#FF9A4A' : EL[T.el], home ? .55 : .8));
+  }
+  g.restore();
+  // the tower stays solid; a Keeper behind it shows through as a soft outline, so they are never lost
+  if (behind) { const sil = silhouette('k' + keeper, '#BFD4FF'); if (sil) { const ks = 120; g.save(); g.globalAlpha = .55; g.translate(P.x, P.y + 30); if (P.face < 0) g.scale(-1, 1); g.drawImage(sil, -ks / 2, -ks * .72 - 24, ks, ks); g.restore(); } }
+}
 // the tower in the forge's night: its daylight colours (blossom, shrubs) drained to iron, so it belongs to the city
 let TOWER_NIGHT = null;
 function towerNight(im) {
@@ -6347,6 +6616,17 @@ function towerNight(im) {
 }
 function drawForgeGround() {
   const b = AU.beat(), inView = (x, y, r) => x + r > camX && x - r < camX + W / Z && y + r > camY && y - r < camY + H / Z;
+  // each element tower's district: a wash of its colour over the iron, brighter once its stone is home, and its own ground
+  SHRINES.forEach((Sh, k) => { if (!inView(Sh.x, Sh.y, Sh.R)) return; const home = !!S.qiStones[Sh.el], col = Sh.el === 'fire' ? '#FF7A3A' : EL[Sh.el];
+    // its own floor, laid inside a kerb of its own stone: frost-pale until the stone is home (A, 2026-10-06: "each with
+    // its respective area that aligns and makes sense with their element")
+    const disc = () => { g.beginPath(); g.ellipse(Sh.x, Sh.y, Sh.R, Sh.R * .8, 0, 0, TAU); };
+    g.save(); disc(); g.clip(); g.fillStyle = elemTile(Sh.el, home); g.fillRect(Sh.x - Sh.R, Sh.y - Sh.R, Sh.R * 2, Sh.R * 2);
+    const gr = g.createRadialGradient(Sh.x, Sh.y, Sh.R * .4, Sh.x, Sh.y, Sh.R); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(10,10,16,.45)'); g.fillStyle = gr; g.fillRect(Sh.x - Sh.R, Sh.y - Sh.R, Sh.R * 2, Sh.R * 2); g.restore();
+    g.strokeStyle = '#121318'; g.lineWidth = 16; disc(); g.stroke(); g.strokeStyle = home ? col : '#6A7080'; g.lineWidth = 6; g.setLineDash([46, 10]); disc(); g.stroke(); g.setLineDash([]); g.lineWidth = 1;
+    for (const o of FORGE.decor[k]) drawDecor(Sh.el, o, home);
+    // the wood tower's thorn slots: dark holes in the floor, so the player can see where thorns can come up
+    if (Sh.el === 'wood') for (const o of THORN_SLOTS) { g.fillStyle = '#1A1410'; g.beginPath(); g.ellipse(o.x, o.y, 30, 16, 0, 0, TAU); g.fill(); g.strokeStyle = '#4A3A22'; g.lineWidth = 3; g.stroke(); g.lineWidth = 1; } });
   for (const f of FORGE.flows) { const [x1, y1, ex, ey] = f.s; if (!inView((x1 + ex) / 2, (y1 + ey) / 2, f.len)) continue;
     const path = () => { g.beginPath(); g.moveTo(x1, y1); g.quadraticCurveTo((x1 + ex) / 2 + 60, (y1 + ey) / 2 - 40, ex, ey); }, on = f.on;
     // a trench with rough iron lips, the metal molten when the channel is awake and a crusted dark red while it sleeps,
@@ -6365,7 +6645,7 @@ function drawForgeGround() {
       g.strokeStyle = '#2A2D36'; g.lineWidth = 4; g.beginPath(); g.moveTo(x - 26, y); g.lineTo(x + 26, y); g.moveTo(x, y - 16); g.lineTo(x, y + 16); g.stroke(); }
     g.lineWidth = 1;
     // the wake: a bright pulse runs along each newly woken channel, from its mouth to its drain
-    { const i = FORGE.flows.indexOf(f), W = FORGE.wake, q = (S.t - FORGE.wakeT) / 1.2; if (W && q >= 0 && q <= 1 && i >= 3 + 2 * (W - 1) && i < 3 + 2 * W) { const u = 1 - q, mx = (x1 + ex) / 2 + 60, my = (y1 + ey) / 2 - 40, px = u * u * x1 + 2 * u * q * mx + q * q * ex, py = u * u * y1 + 2 * u * q * my + q * q * ey;
+    { const i = FORGE.flows.indexOf(f), W = FORGE.wake, q = (S.t - FORGE.wakeT) / 1.2; if (W && q >= 0 && q <= 1 && flowLit(i, W) && !flowLit(i, W - 1)) { const u = 1 - q, mx = (x1 + ex) / 2 + 60, my = (y1 + ey) / 2 - 40, px = u * u * x1 + 2 * u * q * mx + q * q * ex, py = u * u * y1 + 2 * u * q * my + q * q * ey;
       g.fillStyle = 'rgba(255,177,90,.85)'; g.beginPath(); g.ellipse(px, py, 26, 15, 0, 0, TAU); g.fill(); add(() => glowAt(px, py, 90, '#FF8A2A', .5)); } }
     if (on > .5 && Math.random() < .1) { const q = Math.random(); fx({ k:'spark', x:x1 + (ex - x1) * q, y:y1 + (ey - y1) * q, vx:rnd(-30, 30), vy:-rnd(80, 200), drag:2, life:rnd(.5, 1), s:2.5, c:'#FF9A4A' }); } }
   for (const G of FORGE.gears) if (inView(G.x, G.y, G.r * 1.2)) drawGear(G.x, G.y, G.r, G.n, G.rot, G.on);
@@ -6385,6 +6665,65 @@ function drawForgeGround() {
     g.fillStyle = '#5A6070'; g.beginPath(); g.ellipse(B.x, B.y - 40, 30, 16, 0, 0, TAU); g.fill(); g.stroke(); g.fillStyle = '#1A1C24'; g.beginPath(); g.ellipse(B.x, B.y - 40, 12, 6.5, 0, 0, TAU); g.fill();
     if (B.k > .05) { g.strokeStyle = `rgba(255,140,60,${.7 * B.k})`; g.lineWidth = 3; g.beginPath(); g.ellipse(B.x, B.y, 30, 16, 0, .1 * Math.PI, .9 * Math.PI); g.stroke(); }
     g.lineWidth = 1; }
+}
+// one piece of a district's ground: a still pool that ripples, moss and a root, a lava pool that bubbles, a rock on sand,
+// a silver plate with a little bell. Frozen pale until the district's stone is home
+function drawDecor(el, o, home) {
+  const x = o.x, y = o.y, s = o.s;
+  if (el === 'water') { g.fillStyle = home ? 'rgba(46,120,190,.75)' : 'rgba(120,150,180,.5)'; g.beginPath(); g.ellipse(x, y, 90 * s, 46 * s, o.a * .2, 0, TAU); g.fill();
+    g.strokeStyle = home ? 'rgba(170,220,255,.6)' : 'rgba(200,215,230,.35)'; g.lineWidth = 3; const q = (S.t * .5 + o.ph) % 1; g.beginPath(); g.ellipse(x, y, 90 * s * q, 46 * s * q, o.a * .2, 0, TAU); g.stroke(); g.lineWidth = 1; }
+  else if (el === 'wood') { g.fillStyle = home ? 'rgba(80,150,60,.6)' : 'rgba(110,130,110,.4)'; g.beginPath(); g.ellipse(x, y, 70 * s, 38 * s, o.a, 0, TAU); g.fill();
+    g.strokeStyle = home ? '#5A3E22' : '#4A4A50'; g.lineWidth = 7 * s; g.lineCap = 'round'; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(o.a) * 60, y + Math.sin(o.a) * 20 - 20, x + Math.cos(o.a) * 120 * s, y + Math.sin(o.a) * 50 * s); g.stroke(); g.lineCap = 'butt'; g.lineWidth = 1; }
+  else if (el === 'fire') { const p = .5 + .5 * Math.sin(S.t * 2 + o.ph); g.fillStyle = '#2A1410'; g.beginPath(); g.ellipse(x, y, 80 * s, 42 * s, 0, 0, TAU); g.fill();
+    g.fillStyle = home ? `rgba(255,${120 + 40 * p | 0},40,.9)` : 'rgba(90,40,30,.8)'; g.beginPath(); g.ellipse(x, y, 64 * s, 32 * s, 0, 0, TAU); g.fill();
+    if (home) { add(() => glowAt(x, y, 120 * s, '#FF8A2A', .35)); if (Math.random() < .03) fx({ k:'spark', x:x + rnd(-40, 40) * s, y, vx:rnd(-20, 20), vy:-rnd(60, 140), drag:2, life:.7, s:3, c:'#FF9A4A' }); } }
+  else if (el === 'earth') { g.fillStyle = home ? 'rgba(200,160,90,.4)' : 'rgba(150,140,125,.3)'; g.beginPath(); g.ellipse(x, y + 8, 60 * s, 26 * s, 0, 0, TAU); g.fill();
+    g.fillStyle = home ? '#8E6A3A' : '#6A6460'; g.strokeStyle = '#2A2018'; g.lineWidth = 3; g.beginPath(); g.ellipse(x, y - 8 * s, 30 * s, 20 * s, o.a * .3, 0, TAU); g.fill(); g.stroke(); g.lineWidth = 1; }
+  else { g.fillStyle = home ? '#9AA4B8' : '#5A606C'; g.strokeStyle = '#2A2F3A'; g.lineWidth = 3; g.beginPath(); g.ellipse(x, y, 54 * s, 28 * s, 0, 0, TAU); g.fill(); g.stroke();
+    // a little silver bell standing on its plate: a round shoulder, a flared lip and its clapper
+    const b = 16 * s; g.fillStyle = home ? '#D8DEE8' : '#7A808C'; g.beginPath(); g.moveTo(x - b * 1.2, y - 4); g.bezierCurveTo(x - b * 1.1, y - b * 1.4, x - b * .8, y - b * 2.3, x, y - b * 2.3); g.bezierCurveTo(x + b * .8, y - b * 2.3, x + b * 1.1, y - b * 1.4, x + b * 1.2, y - 4); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#2A2F3A'; g.beginPath(); g.arc(x, y - 2, b * .25, 0, TAU); g.fill(); g.lineWidth = 1; }
+}
+// the temple traps' warnings, on the ground under everything: the red circle or lane of the danger language, and for the
+// darts a red glint at the slits
+function drawTempleWarn() {
+  for (const T of S.ttraps || []) { if (T.t >= T.wind) continue; const p = Math.min(1, T.t / T.wind);
+    if (T.k === 'thorns') warnCircle(T.x, T.y, T.r, p);
+    else if (T.k === 'darts') { trapMouth(T, p, '#B8C4D8'); for (let i = -1; i <= 1; i++) { const x = T.x - T.uy * i * 22, y = T.y + T.ux * i * 10; g.fillStyle = `rgba(255,60,40,${.6 + .4 * Math.sin(S.t * 12)})`; g.beginPath(); g.ellipse(x, y, 9, 5, 0, 0, TAU); g.fill(); } }
+    else { g.save(); g.translate(T.x, T.y); g.rotate(Math.atan2(T.uy, T.ux)); warnLane(T.len, T.w, p); g.restore(); trapMouth(T, p, { flood:'#3E8EE0', flame:'#FF6A2A', boulder:'#E8A830' }[T.k]); } }
+}
+// the tower's trap mouth opening in its wall where the trap will come out: a dark arch that widens, its element glowing
+// deep inside (design review, 2026-10-06: the trap should be seen coming out of the tower)
+function trapMouth(T, p, col) {
+  const x = T.x - T.ux * 20, y = T.y - T.uy * 14 - 18, w = 18 + 26 * p, h = 26 + 30 * p;
+  g.fillStyle = '#0C0D12'; g.beginPath(); g.moveTo(x - w, y + 10); g.lineTo(x - w, y - h * .4); g.quadraticCurveTo(x, y - h * 1.3, x + w, y - h * .4); g.lineTo(x + w, y + 10); g.closePath(); g.fill();
+  g.strokeStyle = '#3A3E4A'; g.lineWidth = 4; g.stroke(); g.lineWidth = 1;
+  const gr = g.createRadialGradient(x, y - h * .2, 2, x, y - h * .2, w); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.globalAlpha = .3 + .6 * p; g.fillStyle = gr; g.fillRect(x - w, y - h, w * 2, h + 10); g.globalAlpha = 1;
+}
+// the temple traps at work: the wall of water, the jet of flame and the great iron boulder
+function drawTempleTraps() {
+  for (const T of S.ttraps || []) { if (T.t < T.wind) continue; const ang = Math.atan2(T.uy, T.ux);
+    // the wall of water: a painted, curling crest with a frill of foam, edged in the danger coral (design review: a flat
+    // bar read as a button)
+    if (T.k === 'flood') { const f = T.f, h = T.w / 2, pulse = .5 + .5 * Math.sin(S.t * 8); g.save(); g.translate(T.x, T.y); g.rotate(ang);
+      const gr = g.createLinearGradient(0, 0, f, 0); gr.addColorStop(0, 'rgba(40,110,180,0)'); gr.addColorStop(.45, 'rgba(40,110,180,.45)'); gr.addColorStop(1, 'rgba(46,120,200,.85)'); g.fillStyle = gr; g.fillRect(0, -h, f, T.w);
+      g.strokeStyle = 'rgba(170,215,250,.35)'; g.lineWidth = 3; for (let k = 0; k < 4; k++) { const y = -h * .8 + T.w * .8 * k / 3; g.beginPath(); for (let x = Math.max(0, f - 260); x < f - 40; x += 20) g.lineTo(x, y + Math.sin(x * .05 + S.t * 8 + k) * 6); g.stroke(); } g.lineWidth = 1;
+      const crest = () => { g.beginPath(); g.moveTo(f - 50, -h - 6); for (let k = 0; k <= 8; k++) { const y = -h - 6 + (T.w + 12) * k / 8; g.quadraticCurveTo(f + 22 + Math.sin(S.t * 9 + k) * 6, y - (T.w + 12) / 16, f + 4, y); } g.lineTo(f - 50, h + 6); g.closePath(); };
+      g.fillStyle = '#2E78C8'; crest(); g.fill(); g.strokeStyle = `rgba(255,70,50,${.7 + .3 * pulse})`; g.lineWidth = 3; crest(); g.stroke();
+      // the foam: froth of every size, tumbling along the crest, never an even row
+      for (let k = 0; k < 16; k++) { const q = (k * .618 + .13) % 1, y = -h + T.w * q, r = 4 + ((k * 37) % 9), x = f - 8 + ((k * 53) % 30) + Math.sin(S.t * 11 + k * 1.7) * 5; g.fillStyle = k % 3 ? 'rgba(220,240,255,.9)' : 'rgba(170,215,250,.85)'; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); } g.restore(); }
+    // the jet of flame: a stream of fireballs pouring out along the lane, each with the danger rim and a tail
+    else if (T.k === 'flame') { const k = Math.min(1, (T.t - T.wind) * 5, (T.life - T.t) * 4), pulse = .5 + .5 * Math.sin(S.t * 14); g.save(); g.globalAlpha = k;
+      for (let i = 0; i < 10; i++) { const q = ((T.t * 1.6 + i / 10) % 1), x = T.x + T.ux * T.len * q, y = T.y + T.uy * T.len * q - 22, side = Math.sin(i * 2.3 + T.t * 3) * T.w * .3 * q;
+        fireBall(g, x - T.uy * side, y + T.ux * side, 12 + 10 * q, -T.ux, -T.uy * .55, pulse, S.t + i); } g.restore(); }
+    else if (T.k === 'boulder') { const x = T.x + T.ux * T.f, y = T.y + T.uy * T.f, R = TRAP.earth.r, rot = T.f / R;
+      g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(x, y + 6, R * 1.05, R * .4, 0, 0, TAU); g.fill();
+      const gr = g.createRadialGradient(x - R * .35, y - R - R * .35, R * .1, x, y - R, R); gr.addColorStop(0, '#E2C48A'); gr.addColorStop(.6, '#B08A52'); gr.addColorStop(1, '#5A4024');
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y - R, R, 0, TAU); g.fill(); g.strokeStyle = '#2A1E10'; g.lineWidth = 4; g.stroke();
+      g.save(); g.beginPath(); g.arc(x, y - R, R, 0, TAU); g.clip(); g.strokeStyle = 'rgba(70,46,20,.6)'; g.lineWidth = 5;
+      for (let i = 0; i < 3; i++) { const a = rot + i * Math.PI / 3; g.beginPath(); g.ellipse(x, y - R, R * Math.abs(Math.cos(a)), R, ang, 0, TAU); g.stroke(); } g.restore();
+      g.fillStyle = 'rgba(90,62,30,.55)'; for (let i = 0; i < 6; i++) { const a = rot + i * TAU / 6, px = x + Math.cos(a) * R * .6, py = y - R + Math.sin(a) * R * .6; g.beginPath(); g.ellipse(px, py, 9, 5, a, 0, TAU); g.fill(); } g.lineWidth = 1;
+      if (Math.random() < .5) fx({ k:'smoke', x:x + rnd(-30, 30), y:y + 4, vx:-T.ux * 50, vy:-T.uy * 50 - 15, drag:2, life:.7, s:rnd(20, 30), c:'170,140,100' }); } }
 }
 // the fireballs: a white core, a deep flame body and the pulsing coral-red rim every danger wears, each over a dark
 // shadow on the exact spot it burns (design review, 2026-10-06)
@@ -6430,6 +6769,22 @@ function firebarPic() {
   c.fillStyle = 'rgba(190,196,210,.35)'; for (const [dx, rx] of [[30, 13], [50, 9]]) { c.beginPath(); c.ellipse(kx + dx, ky - 2, rx, 4, 0, 0, TAU); c.fill(); }
   const kim = IMG['k' + keeper + 'dash'] || IMG['k' + keeper]; if (kim && ok(kim)) { const h = 100, w = h * kim.naturalWidth / kim.naturalHeight; c.save(); c.translate(kx, ky + 4); c.scale(-1, 1); c.drawImage(kim, -w / 2, -h, w, h); c.restore(); }
   return FIREBAR_PIC = cv.toDataURL('image/png');
+}
+// a temple trap's lesson picture, drawn once from the game's own pieces: the element tower, its red warning, and the
+// Keeper already stepping clear of it (design review, 2026-10-06: every lesson needs a picture a pre-reader can act on)
+const TRAP_PIC = {};
+function trapPic(k) {
+  if (TRAP_PIC[k]) return TRAP_PIC[k];
+  const el = { flood:'water', thorns:'wood', flames:'fire', boulder:'earth', darts:'metal' }[k], cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d');
+  c.fillStyle = elemTile(el, true); c.fillRect(0, 0, 480, 320); c.fillStyle = 'rgba(10,10,16,.25)'; c.fillRect(0, 0, 480, 320);
+  const im = IMG['x-tower-metal']; if (im && ok(im)) { const th = 230, tw = th * im.naturalWidth / im.naturalHeight; c.drawImage(shrineNight(im, el), 20, 250 - th, tw, th); }
+  const red = (a, f) => { c.fillStyle = `rgba(255,40,30,${a})`; f(); c.fill(); c.strokeStyle = 'rgba(255,40,30,.6)'; c.lineWidth = 6; c.stroke(); };
+  if (k === 'thorns') for (const [x, y] of [[230, 250], [330, 270], [430, 245]]) red(.25, () => { c.beginPath(); c.ellipse(x, y, 46, 26, 0, 0, TAU); });
+  else if (k === 'darts') for (let i = -2; i <= 2; i++) { c.save(); c.translate(150, 200); c.rotate(i * .12); c.fillStyle = '#E8EEF4'; c.strokeStyle = 'rgba(255,70,50,.9)'; c.lineWidth = 3; for (let j = 0; j < 3; j++) { c.beginPath(); c.arc(80 + j * 90, 0, 8, 0, TAU); c.fill(); c.stroke(); } c.restore(); }
+  else red(.2, () => { c.beginPath(); c.roundRect(150, 205, 330, 70, 35); });
+  const kim = IMG['k' + keeper + 'dash'] || IMG['k' + keeper]; if (kim && ok(kim)) { const h = 104, w = h * kim.naturalWidth / kim.naturalHeight, ky = k === 'thorns' ? 190 : 175;
+    c.fillStyle = 'rgba(0,0,0,.4)'; c.beginPath(); c.ellipse(390, ky, 34, 10, 0, 0, TAU); c.fill(); c.drawImage(kim, 390 - w / 2, ky + 4 - h, w, h); }
+  return TRAP_PIC[k] = cv.toDataURL('image/png');
 }
 // the dark, in two passes (design review, 2026-10-06: drawn over everything, it dimmed warnings, words and danger).
 // The ground pass is the deep one: it comes down over the floor, the tower and the forge before any warning or creature
@@ -7503,6 +7858,10 @@ function defeatTip() {
   // the Silver City's floor grates (not the boss): the same lesson as the boss's spikes
   if (H.src === 'spikes') return { img:null, t:BOSS.spikes[0], p:BOSS.spikes[1] };
   // the fire bars teach their own way past, never an element lesson (design review, 2026-10-06)
+  // the Silver City's temple traps all speak the danger language the game already teaches
+  if (H.src === 'boulder' || H.src === 'flood' || H.src === 'flames') return { img:trapPic(H.src), t:'Step out of the red lane', p:'The tower warns you first. Leave the red lane before it fires.' };
+  if (H.src === 'thorns') return { img:trapPic('thorns'), t:'Step off the thorn holes', p:'Thorns spring up from the holes where the red circles show. Keep moving.' };
+  if (H.src === 'darts') return { img:trapPic('darts'), t:'Watch the tower\'s slits', p:'When they glint red, step sideways out of the darts\' path.' };
   if (H.src === 'fire bar') return { img:firebarPic(), t:'Fire bars spin', p:'Wait for the fire to pass, then run in behind it.' };
   if (H.el && eff(H.el, keeperEl) > 1) {
     const cs = weakTo(H.el), pw = Object.keys(POW).filter(id => cs.includes(POW[id].e)).slice(0, 2);
@@ -7689,7 +8048,7 @@ function results() {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
@@ -7779,21 +8138,90 @@ function renderLevels() {
 function pickLevel(n) { if (n < 1 || n > LEVELS.length || n === LVL) return; LVL = n; SFX.select(); renderLevels(); }
 $('#lvPrev').onclick = () => pickLevel(LVL - 1); $('#lvNext').onclick = () => pickLevel(LVL + 1);
 renderLevels();
-$('#nextLvBtn').onclick = () => { SFX.select(); if (LVL === LEVELS.length) { showThanks(); return; } LVL++; renderLevels(); intro(LVL); };
+$('#nextLvBtn').onclick = () => { SFX.select(); if (LVL === LEVELS.length) { stillScene(); return; } LVL++; renderLevels(); intro(LVL); };
 // The end of the demo (A, 2026-10-05: "some type of exit scene where we thank them for playing the demo … i want to
 // leave them with wanting to come back"): the Keeper and their companion among the five people they freed, Luma's thanks,
 // the home theme, and what is waiting for them at home
-function showThanks() {
+/* The Stillmaker's debut (A, 2026-10-06: "right after you beat silver city's warden. The stillmaker has his debut and
+   dramatic entrance with his own new music and takes all our power and then the story ends with 'to be continued' ...
+   the cliffhanger makes you feel like 'woah, this enemy is THAT strong'"). About seventeen seconds, no words on screen
+   but the last: the city drains and frost creeps in from the edges, his theme starts, he descends out of the dark with
+   his bell, his eyes light, and he speaks. He lifts the bell and everything the Keeper earned is pulled out of them into
+   it, one light at a time: every power, every gift, every fusion, the companion, the Star Call, and last the five Qi
+   Stones. "Be still." The bell rings, the world freezes white, the Keeper is frozen where they stand, and he is gone.
+   Black. "To be continued…". It is the story only: the Sanctuary and everything earned are kept. */
+let STILL_T = [];
+function stillScene() {
+  // the story keeps its time with reduced motion too; only the movement is cut (design review, 2026-10-06)
+  const sc = $('#still'), later = (ms, fn) => STILL_T.push(setTimeout(fn, ms));
+  STILL_T.forEach(clearTimeout); STILL_T = []; sc.className = 'scr';
+  // the city behind him is the last frame of the run, with the Keeper and companion lifted out: they are in the scene
+  // the frame behind him is the Great Tower with its five stones, and nothing of play: the camera settles on the tower,
+  // left of centre, the Keeper, companion, words and effects are lifted out, then everything is put back (design review,
+  // 2026-10-06: the stones must leave real sockets)
+  let socks = [];
+  try { if (S) { const keep = { x:S.p.x, y:S.p.y, arena:S.arena, txt:S.txt, nums:S.nums, pshots:S.pshots, eshots:S.eshots, drops:S.drops, shots:S.shots, lobs:S.lobs, pearls:S.pearls, cx:camX, cy:camY }, fx0 = FX.splice(0), tags = S.en.map(e => e.tagT);
+      S.noKeeper = true; S.arena = null; S.txt = []; S.nums = []; S.pshots = []; S.eshots = []; S.drops = []; S.shots = []; S.lobs = []; S.pearls = []; S.en.forEach(e => { e.tagT = 0; }); S.p.x = TOWER.x + .24 * VW; S.p.y = TOWER.y - TOWER.h + .35 * VH;
+      for (let i = 0; i < 40; i++) draw();
+      const top = TOWER.y - TOWER.h; socks = TOWER.order.map((el, i) => [(TOWER.x - camX) * Z, (top + TOWER.h * TOWER.sock[i] - camY) * Z]);
+      $('#stBg').src = $('#cv').toDataURL('image/jpeg', .85);
+      S.noKeeper = false; S.p.x = keep.x; S.p.y = keep.y; S.arena = keep.arena; S.txt = keep.txt; S.nums = keep.nums; S.pshots = keep.pshots; S.eshots = keep.eshots; S.drops = keep.drops; S.shots = keep.shots; S.lobs = keep.lobs; S.pearls = keep.pearls; S.en.forEach((e, i) => { e.tagT = tags[i]; }); FX.push(...fx0); camX = keep.cx; camY = keep.cy; } } catch (e) {}
+  $('#stKeeper').src = `art4/k${keeper}-breath.png?v=8`; $('#stPet').src = lookSrc(`art4/a-${animal}-y.png?v=8`); $('#stOrbs').innerHTML = ''; $('#stSocks').innerHTML = '';
+  show('still'); AU.music(false);
+  const seen = SEEN.has('_stillmaker'); markSeen('_stillmaker');
+  sc.onclick = seen ? () => { STILL_T.forEach(clearTimeout); STILL_T = []; sc.classList.add('black', 'end'); AU.music(true); AU.song('still'); } : null;
+  later(60, () => { sc.classList.add('dim'); SFX.boom(true); });
+  later(1500, () => { AU.music(true); AU.song('still'); });
+  later(2000, () => sc.classList.add('come'));
+  later(4300, () => SFX.bx('call-toll', 2, 0));
+  later(4900, () => { AU.vo('vo-still-1', 0, .3); $('#stKeeper').src = `art4/k${keeper}-hurt.png?v=8`; });
+  // his bell: each toll sends a ring of cold out from it that grows and fades, never a ring that stands
+  const toll = () => { const r = document.createElement('i'); r.className = 'st-toll'; $('#stFig').appendChild(r); r.animate([{ scale:.3, opacity:.9 }, { scale:3.2, opacity:0 }], { duration:1400, easing:'cubic-bezier(.2,.6,.3,1)', fill:'forwards' }); later(1450, () => r.remove()); };
+  later(8200, () => { AU.vo('vo-still-2', 0, .3); sc.classList.add('ring'); toll(); later(300, toll); });
+  // everything the Keeper earned leaves them for his bell, one light after another, and last the five stones are torn
+  // from the Great Tower's sockets; the companion stays at the Keeper's side and freezes with them
+  later(9600, () => {
+    const lights = [];
+    for (const id in S.skills) lights.push([icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon), EL[POW[id].e]]);
+    for (const el in S.fuse || {}) lights.push([icon(FUSE[el].icon), EL[FEEDS[el]]]);
+    for (const id in S.gifts) lights.push([icon(GIFT[id].icon), EL[GIFT[id].e]]);
+    if (S.call) lights.push([`art4/calls/${CALL[S.call.id].img}.png?v=9`, '#E4EAFF']);
+    TOWER.order.forEach((el, i) => lights.push([`art4/props/x-stone-${el}.png?v=8`, EL[el], socks[i], i]));
+    const box = $('#stOrbs'), k = $('#stKeeper').getBoundingClientRect(), b = $('#stBell').getBoundingClientRect(), o = sc.getBoundingClientRect();
+    const kx = k.left + k.width / 2 - o.left, ky = k.top + k.height * .62 - o.top, x1 = b.left + b.width / 2 - o.left, y1 = b.top + b.height / 2 - o.top;
+    sc.classList.add('drain');
+    lights.forEach(([src, col, from, si], n) => later(n * 230, () => {
+      const [x0, y0] = from || [kx, ky], el = document.createElement('i'); el.style.setProperty('--c', col); el.innerHTML = `<img src="${src}" alt="">`; box.appendChild(el);
+      if (from) { const d = document.createElement('i'); d.style.left = x0 + 'px'; d.style.top = y0 + 'px'; $('#stSocks').appendChild(d); }
+      const side = (n % 2 ? 1 : -1) * (70 + (n * 37) % 90), mx = (x0 + x1) / 2 + side, my = (y0 + y1) / 2 + 30;
+      el.animate([{ left:x0 + 'px', top:y0 + 'px', scale:.4, opacity:0 }, { left:x0 + side * .3 + 'px', top:y0 - 30 + 'px', scale:1.1, opacity:1, offset:.18 }, { left:mx + 'px', top:my + 'px', scale:1, opacity:1, offset:.6 }, { left:x1 + 'px', top:y1 + 'px', scale:.2, opacity:0 }],
+        { duration:reduce ? 900 : 1300, easing:'cubic-bezier(.5,0,.6,1)', fill:'forwards' });
+      SFX.sweep(); later(1250, () => el.remove()); }));
+  });
+  later(14200, () => AU.vo('vo-still-3', 0, .2));
+  later(14900, () => { toll(); later(250, toll); sc.classList.add('ice', 'flash'); SFX.bx('call-bell', 0); SFX.boom(true); later(260, () => sc.classList.remove('flash')); });
+  later(16400, () => sc.classList.add('go'));
+  later(18600, () => sc.classList.add('black'));
+  // the last beat: "To be continued", and then, in the black, his eyes open
+  later(20000, () => sc.classList.add('end'));
+  later(21800, () => SFX.bx('call-toll', 2, 0));
+}
+$('#stNext').onclick = e => { e.stopPropagation(); STILL_T.forEach(clearTimeout); STILL_T = []; SFX.select(); showThanks(true); };
+// the thank-you screen's own timers, cleared the moment the player leaves it (QA, 2026-10-06: Haven started inside a new run)
+let THX_T = [];
+function showThanks(afterStill) {
   const ppl = [['b-fisher', 0], ['b-free-wood', 1], ['b-free-fire', 2], [`k${keeper}`, 3, 'k'], ['b-free-earth', 4], ['b-free-metal', 5]];
   $('#thxPeople').innerHTML = ppl.map(([n, i, c], j) => `<img class="${c || ''}" src="art4/${n}.png?v=8" alt="" style="--i:${i};left:${[8, 23, 37, 50, 64, 79][j]}%;translate:-50% 0">`).join('')
     + `<img src="${lookSrc(`art4/a-${animal}-y.png?v=8`)}" alt="" style="--i:6;left:43%;translate:-50% 0;height:66px;z-index:3">`;
   const d = musDays(), next = MUS_MILES.find(m => m[0] > d);
   // what is waiting at home, in a kid's words, with the Sparks orb on the reward (design review, 2026-10-05)
   $('#thxMore').innerHTML = 'Your Sanctuary is waiting for you.' + (AU.musicOn && next ? `<span class="thx-mus">Keep the music on for ${{ '1 week':'a week', '1 month':'a month', '3 months':'three months', '6 months':'six months', '1 year':'a year' }[next[2]]} to earn <img src="art4/icons/icon-spark.png?v=9" alt="">${next[1].toLocaleString()} Sparks.</span>` : '');
-  show('thanks'); AU.music(true); AU.song('home'); setTimeout(() => AU.vo('vo-thanks-demo', 0, .6), 700);
+  // after the cliffhanger his theme rings out a moment before Haven comes back in (design review, 2026-10-06)
+  $('.thx-p').textContent = afterStill ? 'You freed all five realms. The story continues soon.' : 'You freed all five realms.';
+  THX_T.forEach(clearTimeout); show('thanks'); AU.music(true); if (afterStill) THX_T.push(setTimeout(() => AU.song('home'), 2500)); else AU.song('home'); THX_T.push(setTimeout(() => AU.vo('vo-thanks-demo', 0, .6), afterStill ? 2200 : 700));
 }
-$('#thxHome').onclick = () => { SFX.select(); goHome(); };
-$('#thxAgain').onclick = () => { SFX.select(); show(null); startRun(); };
+$('#thxHome').onclick = () => { THX_T.forEach(clearTimeout); SFX.select(); goHome(); };
+$('#thxAgain').onclick = () => { THX_T.forEach(clearTimeout); SFX.select(); show(null); startRun(); };
 
 /* ================= the front door ================= */
 // A, 2026-10-05 ("lets go with the front door"): the title becomes the loading screen, its five Qi Stones lighting as
