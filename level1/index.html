@@ -4141,7 +4141,10 @@ function ouch(dmg, fx, fy, o = {}) {
   return true;
 }
 // your Keeper has your spirit animal's element: creatures whose element beats yours hit harder, the rest hit softer
-function armourVs(el) { let m = (1 - (S.gifts.rooted || 0) * .08) * (1 - .04 * (S.grow.earth || 0)); if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
+// after Ascended a shield holds for six seconds, full at first and thinning evenly to nothing, so the player can find
+// their feet again (A, 2026-10-05: "another 6s of having 100% shield and diminishes evenly throughout the 6s")
+const AFTER_SHIELD = 6, afterShield = () => S.shieldT != null ? Math.max(0, 1 - (S.t - S.shieldT) / AFTER_SHIELD) : 0;
+function armourVs(el) { let m = (1 - (S.gifts.rooted || 0) * .08) * (1 - .04 * (S.grow.earth || 0)) * (1 - afterShield()); if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
 const SHOT_HIT = { bubble:'#7FC4FF', thorn:'#7FCF4A', ember:'#FFB050', pebble:'#C8A060', blade:'#E6EEF4' };
 function hazard(k, x, y, r, life, dmg) { if (S.hz.length < 60) S.hz.push({ k, x, y, r, life, t:0, dmg, tick:0, rot:rnd(0, TAU) }); }
 function brain(e, P, d, dt, s) {
@@ -4337,7 +4340,7 @@ function hsTick(dt) {
     // the genie pours back into the Keeper: a last pop of light at the body
     flash(P.x, P.y - 40, 420, '#FFE08A', .35); ring(P.x, P.y - 30, 10, 180, '#FFE08A', .45, 14, true); SFX.ting(); S.capBoost = 0;
     // and leaves the Keeper whole: the life gauge full again (A, 2026-10-05: "Ascended leaves you with full health gauge")
-    P.hp = P.max; SFX.heal(); floatText(P.x, P.y - 90, 'Full health!', '#8FE3A0', 22);
+    P.hp = P.max; SFX.heal(); floatText(P.x, P.y - 90, 'Full health!', '#8FE3A0', 22); S.shieldT = S.t; P.safe = Math.max(P.safe || 0, .3);
     for (let i = 0; i < 18; i++) fx({ k:'plus', x:P.x + rnd(-50, 50), y:P.y + rnd(-40, 20), vx:0, vy:-rnd(70, 140), life:rnd(.6, 1), s:rnd(8, 12), c:'#8FF0A0' });
     const final = O.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
@@ -5780,6 +5783,10 @@ function draw() {
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, -ks * .72 - 24, ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
   if (hs) drawGenie(kx, ky, hsIm);
+  // the shield left by Ascended: a golden bubble that thins as its ring empties over six seconds
+  { const f = afterShield(); if (f > 0 && !hs) { g.save(); g.globalAlpha = .25 + .6 * f; g.fillStyle = `rgba(255,224,138,${.12 * f})`; g.strokeStyle = 'rgba(255,224,138,.8)'; g.lineWidth = 3;
+    g.beginPath(); g.ellipse(kx, ky - 44, 62, 72, 0, 0, TAU); g.fill(); g.stroke(); g.lineWidth = 5; g.lineCap = 'round'; g.strokeStyle = '#FFE08A';
+    g.beginPath(); g.ellipse(kx, ky + 28, 40, 15, 0, -Math.PI / 2, -Math.PI / 2 + TAU * f); g.stroke(); g.restore(); g.lineWidth = 1; g.lineCap = 'butt'; } }
   if (S.dashCd > 0) { const k = 1 - S.dashCd / DASH_CD; g.save(); g.strokeStyle = 'rgba(111,242,207,.85)'; g.lineWidth = 4.5; g.lineCap = 'round'; g.beginPath(); g.ellipse(P.x, P.y + 28, 36, 14, 0, -Math.PI / 2, -Math.PI / 2 + k * TAU); g.stroke(); g.restore(); }
   const hb = Math.max(0, P.hp / P.max);
   // a glossy health capsule with a white rim, like the HUD
