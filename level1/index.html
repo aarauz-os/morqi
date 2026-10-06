@@ -44,6 +44,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
   transition:transform .35s var(--spring),box-shadow .2s,filter .2s}
 .btn:active,.btn.press{transform:scale(.95);filter:brightness(1.05);transition-duration:.08s}
 .btn.green{}
+.btn.diff{flex-direction:column;gap:0;line-height:1.05}
+.btn.diff:not(.calm){background:linear-gradient(180deg,var(--d0),var(--d1) 55%,var(--d2));box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.14),0 8px 20px color-mix(in srgb,var(--d1) 45%,transparent),0 2px 4px color-mix(in srgb,var(--d1) 30%,transparent);text-shadow:0 2px 0 rgba(0,0,0,.22)}
+.btn.diff small{font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-top:3px;padding:1px 9px;border-radius:999px;background:rgba(10,12,40,.32);text-shadow:0 1px 1px rgba(0,0,0,.45)}
+.btn.diff.legend{background:radial-gradient(120% 80% at 25% 0%,rgba(255,90,220,.55),transparent 60%),radial-gradient(110% 90% at 85% 15%,rgba(80,230,255,.45),transparent 55%),linear-gradient(180deg,#3A2F7A,#1A1446 55%,#07061A)}.btn.diff.legend small::before{content:'\2726  ';color:#fff}
 .btn.blue{color:var(--ink);background:rgba(27,34,50,.07);box-shadow:inset 0 0 0 1px rgba(27,34,50,.06)}
 .scr:not(.popup) .btn.blue{color:#fff;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .btn.small{min-width:0;font-size:16px;padding:10px 18px 11px}
@@ -1326,6 +1330,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 
 /* Sanctuary review round: Sparks in gold, glass price buttons, glyphs, sheets above the tabs, toast above everything */
 #toast{z-index:60}
+#mpName{white-space:nowrap}#mpName .mpsay{display:inline-block;max-width:100%;font-size:clamp(14px,4.6vw,20px);color:#fff;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 .tabs.under{display:none!important}
 .hm-sheet{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
 #grDone{justify-self:center;min-width:220px}
@@ -1861,20 +1866,39 @@ const AU = (() => {
   // music and sound effects switch on their own; music starts off, sound effects on, and the choice is remembered
   const pref = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v === '1'; } catch (e) { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) {} };
-  let c = null, comp, sfx, mus, musLP, noiseBuf, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music2', true);
+  let c = null, comp, sfx, mus, musLP, noiseBuf, outNode, sfxSpeech, sfxOn = pref('morqi.sfx', true), musOn = pref('morqi.music2', true);
   // voices (A, 2026-10-05): Luma's short reminders and the spirit voice's "Ascended!", on their own bus and switch
   let vox, voSrc, voOn = pref('morqi.voice', true), voEnd = 0;
   const last = {};
-  const MUSVOL = .15;   // music at about 5 out of 10 (A, 2026-10-04; it was 4)
+  const MUSVOL = .15, SFXVOL = .42;   // effects a touch lower than before (QA, 2026-10-06: a crowded Star Call level ran -12 LUFS)   // music at about 5 out of 10 (A, 2026-10-04; it was 4)
   function init() {
     if (c) { if (c.state === 'suspended') c.resume(); return c; }
     try { c = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
     setTimeout(loadSamples, 0);
-    comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 14; comp.ratio.value = 5; comp.attack.value = .002; comp.release.value = .18;
-    const master = c.createGain(); master.gain.value = .95; comp.connect(master).connect(c.destination);
-    sfx = c.createGain(); sfx.gain.value = .47; sfx.connect(comp);
-    vox = c.createGain(); vox.gain.value = .9; vox.connect(comp);   // effects sit under the music: measured in play, about 4 dB below it on average, and even their peaks stay below the music's (A, 2026-10-04)
-    mus = c.createGain(); mus.gain.value = MUSVOL; musLP = c.createBiquadFilter(); musLP.type = 'lowpass'; musLP.frequency.value = 20000; mus.connect(musLP).connect(comp);
+    // the mix, mastered (A, 2026-10-06: "with headphone everything sounds muddied and fighting for space and its clipping in my
+    // ears"; measured: the 250-500 Hz band was the loudest in the whole mix and hits spiked ~24 dB over the bed, LRA 20 LU).
+    // Each bus is cleaned on its own, then a gentle glue compressor, then a brick-wall limiter so nothing passes -1 dB
+    const bq = (type, f, g = 0, q = .8) => { const b = c.createBiquadFilter(); b.type = type; b.frequency.value = f; b.gain.value = g; b.Q.value = q; return b; };
+    const chain = (...n) => { for (let i = 0; i < n.length - 1; i++) n[i].connect(n[i + 1]); return n[0]; };
+    const glue = c.createDynamicsCompressor(); glue.threshold.value = -20; glue.knee.value = 8; glue.ratio.value = 2.5; glue.attack.value = .008; glue.release.value = .25;
+    // (QA, 2026-10-06: the first pass pushed the master +8 dB into compressors that add their own makeup gain, so real play ran
+    // about -10 LUFS with peaks over full scale; measured again in live play, not a paused game.) Now: a modest master gain, a
+    // limiter that rides the peaks, and a soft-clip ceiling last that cannot pass -1 dB however much the screen throws at it
+    const lim = c.createDynamicsCompressor(); lim.threshold.value = -8; lim.knee.value = 2; lim.ratio.value = 12; lim.attack.value = .002; lim.release.value = .12;
+    const master = c.createGain(); master.gain.value = 1.3;
+    const ceil = c.createWaveShaper(), n = 2048, cv = new Float32Array(n), top = .891; for (let i = 0; i < n; i++) { const x = (i / (n - 1)) * 2 - 1, a = Math.abs(x); cv[i] = Math.sign(x) * (a < .6 ? a : .6 + (top - .6) * Math.tanh((a - .6) / (top - .6))); } ceil.curve = cv; ceil.oversample = '4x';
+    const trim = c.createGain(); trim.gain.value = .7;   // the compressors' own makeup gain, taken back out before the ceiling
+    comp = bq('highpass', 28, 0, .7); chain(comp, bq('highshelf', 7000, 2), glue, master, lim, trim, ceil, c.destination); outNode = ceil;
+    // effects: their own fast compressor tames the spikes, the boxy low-mids are carved out, the sub below the booms trimmed
+    sfx = c.createGain(); sfx.gain.value = SFXVOL;
+    const sfxComp = c.createDynamicsCompressor(); sfxComp.threshold.value = -24; sfxComp.knee.value = 6; sfxComp.ratio.value = 4; sfxComp.attack.value = .003; sfxComp.release.value = .12;
+    // sfxSpeech carves the effects out of the speech band while a voice line plays (QA, 2026-10-06: in a crowd the voice sat under the action)
+    sfxSpeech = bq('peaking', 2000, 0, .6);
+    chain(sfx, bq('highpass', 45, 0, .7), bq('peaking', 340, -4.5, .9), bq('peaking', 2600, 1.5, .8), sfxSpeech, sfxComp, comp);
+    // voices: no rumble, a touch of presence, clear over the music but no longer ~20 dB above it (they were what spiked)
+    vox = c.createGain(); vox.gain.value = .36; chain(vox, bq('highpass', 110, 0, .7), bq('peaking', 300, -2, 1), bq('peaking', 3200, 2.5, .9), comp);   // effects sit under the music: measured in play, about 4 dB below it on average, and even their peaks stay below the music's (A, 2026-10-04)
+    // music: the same low-mid carve, so the bass and the effects each have their own room
+    mus = c.createGain(); mus.gain.value = MUSVOL; musLP = c.createBiquadFilter(); musLP.type = 'lowpass'; musLP.frequency.value = 20000; chain(mus, musLP, bq('peaking', 320, -3.5, .9), comp);
     noiseBuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     return c;
   }
@@ -1993,7 +2017,7 @@ const AU = (() => {
   const level = n => Math.min(1.4, Math.max(.3, Math.pow(10, (-18 - (LOUD[n] ?? -18)) / 20)));
   const MINOR = [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24, 27, 29, 31, 34];   // minor pentatonic steps, in semitones
   const SMP = {}, SVAR = { shatter:['shatter1', 'shatter2'] }, lastRate = {};
-  const SFILES = ['gem','shatter1','shatter2','splash','bloop','dart','boom','boom-big','whip','thwip','thud','stomp','bell','ting','shing','levelup','select','cardin','reveal','victory','chestdrop','roar','alarm','hurt','crackle','firecrackers','heal','sweep','freeze','power','wave','firework','pop','bossroar','jackpot','heart','heartbeat','charge','spikes','combo','bossdown',
+  const SFILES = ['omni-vox', 'omni-male', 'omni-choir', 'gem','shatter1','shatter2','splash','bloop','dart','boom','boom-big','whip','thwip','thud','stomp','bell','ting','shing','levelup','select','cardin','reveal','victory','chestdrop','roar','alarm','hurt','crackle','firecrackers','heal','sweep','freeze','power','wave','firework','pop','bossroar','jackpot','heart','heartbeat','charge','spikes','combo','bossdown',
     'earth-boulder','earth-quake','earth-roar','fire-dash','fire-drum','fire-mortar','fire-roar','m-earth','m-fire','m-metal','m-water','m-wood','metal-blades','metal-blink','metal-roar','metal-toll','water-cast','water-pull','water-roar','water-wall','wood-axe','wood-roar','wood-roots','call-beam','call-bell','call-seal','call-throw','call-toll','tide-swell','tide-roll','tide-crash','tide-conch','root-burst','root-hold','root-seed','root-sink','ember-drum','ember-fall','ember-burst','ember-tap'];
   // [file, rung]: 0 hero, 1 big event, 2 regular combat, 3 constant
   const SMAP = { dart:['dart', 3], boom:a => a[0] ? ['boom-big', 1] : ['boom', 2], splash:['splash', 2], bloop:['bloop', 3], whip:['whip', 2], thwip:['thwip', 3],
@@ -2008,8 +2032,8 @@ const AU = (() => {
   }
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
-    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=16`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=17`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2017,6 +2041,9 @@ const AU = (() => {
     if (t < voEnd) { if (!cut) return false; try { voSrc.stop(t); } catch (e) {} }
     const src = voSrc = c.createBufferSource(); src.buffer = SMP[name]; src.connect(vox); src.start(t); voEnd = t + src.buffer.duration;
     if (mus) { mus.gain.cancelScheduledValues(t); mus.gain.setTargetAtTime(MUSVOL * dip, t, .06); mus.gain.setTargetAtTime(MUSVOL, voEnd, .35); }
+    // the effects step back under a voice too, so a line is heard over a crowd and a Star Call (QA, 2026-10-06)
+    if (sfx) { sfx.gain.cancelScheduledValues(t); sfx.gain.setTargetAtTime(SFXVOL * .4, t, .05); sfx.gain.setTargetAtTime(SFXVOL, voEnd, .3);
+      sfxSpeech.gain.cancelScheduledValues(t); sfxSpeech.gain.setTargetAtTime(-8, t, .05); sfxSpeech.gain.setTargetAtTime(0, voEnd, .3); }
     return true;
   }
   function smp(name, rung, rate) {
@@ -2475,6 +2502,36 @@ const AU = (() => {
   const swag = (t, f, len, v) => { chop(t, f, v, len); mv({ t, f:f / 2, f0:f * .45, gl:.05, type:'sawtooth', dur:len, vol:v * .4, att:.01, hold:len * .4, lp:700, to:drv }); };
   const hey = (t, v = .06) => { chop(t, 220, v, SIX * 1.3); mn({ t, f:900, ft:'bandpass', q:2, dur:.09, vol:v * .5, rev:.4 }); };
   const CONGA = [[2, 196], [5, 261.63], [8, 196], [10, 261.63], [13, 220], [15, 196]];
+  /* The Elemental forms' theme (song `omni` for now; A, 2026-10-06: Omni, the all-five form, keeps the approved Ascended anthem,
+     and this track goes to the one-element forms, Nova, Tidal, Wild, Titan and Chrome, when they are built). Take 3. A on take 1: "it is annoying hearing her repeat the same note over and over. maybe more bass and
+     faster? ... a chorus of voices male and female"; on take 2 (128 BPM house, a chord progression, pitched choir): too housey and
+     fast, the choir sounded off, the chords felt wrong; start from take 1, upgraded. So: take 1's half-time sway, a little quicker
+     (160 BPM played as 80; one musical bar is two engine bars, so the beat clock stays near Ascended's old pace), a 3-3-2 kick, a
+     long-tailed clap on 2 and 4, shakers that thicken; a heavier F minor sub in octave 1 with an overdriven octave so phones feel
+     it, the harmony held on a dark drone, movement from the bass walking up into each phrase and a G flat rubbing the F (A's
+     semitone rub); handpan notes; and only natural voices, never pitch-shifted: her held F4 "aah" and a male F3 under it, taking
+     turns and sometimes singing together, so no note repeats the same way twice in a row. */
+  const OMNI = { walk:[43.65, 43.65, 43.65, 43.65, 46.25, 51.91, 58.27, 65.41],   // F F F F, then G flat, A flat, B flat, C into the phrase
+    voices:[['omni-vox', .6, -.15], ['omni-male', .62, .15], ['both'], ['omni-vox', .5, .25], ['omni-male', .55, -.25], ['both']],
+    pan:[[0, 349.23], [6, 415.3], [12, 523.25], [20, 466.16], [22, 369.99], [26, 415.3]], pan2:[[0, 523.25], [8, 466.16], [14, 415.3], [22, 349.23], [28, 311.13]] };
+  const hang = (t, f, v) => { mv({ t, f, dur:1.5, vol:v, att:.004, rev:.45, dly:.22 }); mv({ t, f:f * 2, dur:.6, vol:v * .32, att:.003, rev:.45 }); mv({ t, f:f * 2.76, dur:.22, vol:v * .1, att:.002 }); };
+  function vocal(t, name, v, pan, len) { const b = SMP[name]; if (!b) return; const s = c.createBufferSource(), g = c.createGain(), p = c.createStereoPanner(); s.buffer = b; if (name === 'omni-male') s.playbackRate.value = 1.0134;   // his F3 sits 23 cents flat
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .35); g.gain.setValueAtTime(v, t + Math.max(.4, len - .6)); g.gain.exponentialRampToValueAtTime(.0001, t + len + .5); p.pan.value = pan;
+    s.connect(g).connect(p).connect(mBus); sends(g, { rev:.65 }); s.start(t); s.stop(t + len + .6); }
+  function omniStep(s, t) {
+    const k = s & 31, hb = s >> 5, st = SIX * TEMPO.omni, sw = k & 2 ? st * .1 : 0, bar = st * 32, r = OMNI.walk[hb & 7];
+    if (s === 0) { crash(t, .12); mv({ t, f:120, f1:r, gl1:.45, dur:1.3, vol:.48, att:.004, to:drv }); }   // the transformation lands: the sub slams in
+    if (k === 0) { sub(t, r, bar + .3, .11); mv({ t, f:r * 2, type:'sawtooth', dur:bar, vol:.045, att:.25, hold:bar * .6, lp:380, to:drv }); mv({ t, f:r * 2, dur:bar, vol:.07, att:.3, hold:bar * .6 });
+      pad(t, [174.61, 261.63, 349.23], bar + .8, .016, 'triangle');
+      const V = OMNI.voices[hb % OMNI.voices.length];
+      if (V[0] === 'both') { vocal(t, 'omni-vox', .5, -.25, bar * 1.1); vocal(t + .06, 'omni-male', .55, .25, bar * 1.1); } else vocal(t, V[0], V[1], V[2], bar * 1.1); }
+    if (k === 28 && (hb & 1)) mv({ t, f:r * 1.0595, f0:r, gl:.06, dur:st * 3, vol:.09, att:.004, to:drv });   // the half-step rub, a pickup into the next bar
+    if ([0, 6, 12, 16, 22].includes(k)) kick(t, k === 0 ? .78 : .6);
+    if (k === 8 || k === 24) { clap(t, .3, .72); mn({ t, f:3000, ft:'bandpass', q:.9, dur:.09, vol:.055, rev:.6 }); }
+    if (k % 2 === 0 ? 'x.xxx.x.x.x.x...'[k / 2] === 'x' : hb >= 2) shaker(t + sw, .045 + .012 * Math.min(hb, 3));
+    if ((hb & 7) === 7 && k === 0) riser(t, bar, .06);
+    for (const [at, f] of (hb & 1 ? OMNI.pan2 : OMNI.pan)) if (at === k) hang(t + sw, f, .1);
+  }
   function highestStep(s, t) {
     const bar = s >> 4, i = s & 15, k = s & 31, ch = (bar >> 1) & 3, R = HIGH, gold = golden(bar), p = part(bar);
     const C = R.ch[ch], r = R.root[ch];
@@ -2549,7 +2606,7 @@ const AU = (() => {
      F major 7, E minor 7, D minor 7, C major 7, a descending turn that never quite lands; B flat major 7 lifts it at
      the golden point. Four bars of drums and percussion first, then the bass, then the hook; a six-bar breakdown without
      the kick, and a drop back in. Hook 8 bars on / 5 off, peaking 62% through; pitched voices at or below about 700 Hz. */
-  const TEMPO = { home:144 / 122 }, H6 = SIX * TEMPO.home;
+  const TEMPO = { home:144 / 122, omni:144 / 160 }, H6 = SIX * TEMPO.home;
   const HAVEN = {
     ch:[[174.61, 220, 261.63, 329.63], [164.81, 196, 246.94, 293.66], [146.83, 174.61, 220, 261.63], [130.81, 164.81, 196, 246.94]],
     root:[43.65, 41.2, 36.71, 32.7],
@@ -2664,8 +2721,8 @@ const AU = (() => {
       if (!c) return; if (M.next < c.currentTime - .1) M.next = c.currentTime + .05;  // back from a hidden tab: skip, don't pile up
       while (M.next < c.currentTime + .2) {
         if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
-        if (musOn || M.listen) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, blossom:blossomStep, home:havenStep, still:stillStep }[M.song] || pathStep)(M.step, M.next);
-        if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest' && M.song !== 'blossom') bloomLayer(M.step, M.next);
+        if (musOn || M.listen) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, omni:omniStep, blossom:blossomStep, home:havenStep, still:stillStep }[M.song] || pathStep)(M.step, M.next);
+        if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest' && M.song !== 'omni' && M.song !== 'blossom') bloomLayer(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
         M.next += SIX * (TEMPO[M.song] || 1); M.step++;
       }
@@ -2714,7 +2771,7 @@ const AU = (() => {
   }
   // jump the playing song to a bar: a skipped Stillmaker scene goes straight to his peace (QA, 2026-10-06)
   function songAt(name, bar) { if (M.song !== name || !M.timer) song(name); M.step = bar * 16; }
-  return { init, S, music, song, songAt, threat, world, beat, bloom, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; },
+  return { init, S, music, song, songAt, threat, world, beat, bloom, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; }, recAll() { const d = c.createMediaStreamDestination(); outNode.connect(d); return d.stream; },
     meter() {   // test hook: the loudness of the effects and the music right now, in dB
       if (!c) return null; if (!this._m) { const m = n => { const a = c.createAnalyser(); a.fftSize = 2048; n.connect(a); return a; }; this._m = { s:m(sfx), u:m(mus), b:new Float32Array(2048) }; }
       const db = a => { a.getFloatTimeDomainData(this._m.b); let e = 0; for (const x of this._m.b) e += x * x; return 10 * Math.log10(e / this._m.b.length + 1e-12); };
@@ -2842,7 +2899,7 @@ const KEEPER_INFO = [
   { n:'Amara', l:'Brave, and quick to laugh.', c:'#FFB54A' }, { n:'Kai', l:'Calm when it counts.', c:'#6FB8FF' },
   { n:'Priya', l:'Thinks three moves ahead.', c:'#B98AFF' }, { n:'Mateo', l:'Never gives up on a friend.', c:'#6FDB8F' },
   { n:'Ruby', l:'All heart, all speed.', c:'#FF7A5C' }, { n:'Malik', l:'Steady as a mountain.', c:'#4FD3C4' },
-  { n:'Freya', l:'Kind to every creature.', c:'#FFD45A' }];
+  { n:'Sina', l:'Kind to every creature.', c:'#FFD45A' }];
 function pickKeeper(k, dir) {
   keeper = ((k - 1 + KEEPERS) % KEEPERS) + 1;
   { const I = KEEPER_INFO[keeper - 1]; $('#ksName').textContent = I.n; $('#ksLine').textContent = I.l; $('#pickKeeper').style.setProperty('--kc', I.c); }
@@ -2910,8 +2967,8 @@ function renderStory() {
     { img:'luma', t:'Luma sends you out', p:`Luma, the fox spirit of your hearth, sends you and your ${A.y} to bring ${place} back to life.`, alt:'Luma, the little fox spirit of the hearth, beside the fire.',
       over:`<img class="st-k" src="art4/run/k${keeper}-r2.png?v=8" alt=""><img class="st-a" src="art4/a-${animal}-y.png?v=8" alt="">` },
     // the Silver City's own last page (A, 2026-10-06, taking up the design review's line): the forge that still glows
-    realm === 'metal' ? { img:'story-stones', t:'The old forge still glows', p:`Under the frozen city, the old forge still glows. Free creatures, and its five temples will give up their stones. Bring them to the Great Tower, and ${B.name.replace(/^The /, 'the ')} will rise.`,
-      alt:'Five glowing Qi Stones above a frozen city.', over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } :
+    realm === 'metal' ? { img:'story-forge', t:'The old forge still glows', p:`Under the frozen city, the old forge still glows. Free creatures, and its five temples will give up their stones. Bring them to the Great Tower, and ${B.name.replace(/^The /, 'the ')} will rise.`,
+      alt:'The frozen Silver City at night: the Great Tower with five empty sockets, the five temples round it, and the old forge glowing under the streets.' } :
     towersLevel(LVL) ? { pic:templeStory(realm, HOLD_ELS[LVL][0]), img:realm === 'water' ? 'story-frost' : 'story-frost-' + realm, t:LVL === 2 ? 'The temple has gone cold' : 'The temples have gone cold', p:`${LVL === 2 ? 'A temple' : 'Three temples'} kept ${place} warm. Now ${LVL === 2 ? 'it stands' : 'they stand'} frozen, and ${LVL === 2 ? 'its guardians serve' : 'their guardians serve'} ${B.name.replace(/^The /, 'the ')}. Wake ${LVL === 2 ? 'it' : 'them'}, and ${B.name.replace(/^The /, 'the ')} will have to face you.`, alt:'A frozen temple standing cold in the realm, its boss rising behind it.',
       over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } :
     { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn ${LVL === 1 ? 'two' : 'the five'} Qi Stones. Gather ${LVL === 1 ? 'both' : 'them all'}, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
@@ -2977,7 +3034,7 @@ function startRun() {
   // the Heart Spring: 8% a level to five, then 2 health a level to 1000
   { const lv = S.grow.water || 0, hp = Math.round(220 * (1 + .08 * Math.min(lv, 5)) + 2 * Math.max(0, lv - 5)); S.p.hp = S.p.max = hp; }
   camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; S.cam = { x:camX, y:camY };
-  paintThaw(S.p.x, S.p.y, 150);
+  if (!towersLevel(LVL)) paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = '';
   // Afterglow opens, then the level themes take turns; every realm boss shares the one boss theme
@@ -3094,6 +3151,7 @@ $('#retryBtn').onclick = e => { const b = e.currentTarget; if (S && S.rises <= 0
 $('#riseBtn').onclick = () => {
   if (!S || S.rises <= 0) return; S.rises--;
   S.over = false; S.fall = null; $('#hud').hidden = false; S.p.hp = S.p.max; S.p.hurt = 2; S.p.safe = 3; AU.music(true);
+  if (S.storm) { S.storm.out = 0; if (Math.hypot(S.p.x - S.storm.x, S.p.y - S.storm.y) > S.storm.r - 60) { S.p.x = S.storm.x; S.p.y = S.storm.y + 40; } }
   for (const e of S.en) if (!e.boss) { const d = Math.hypot(e.x - S.p.x, e.y - S.p.y) || 1; e.kx = (e.x - S.p.x) / d * 700; e.ky = (e.y - S.p.y) / d * 700; e.kb = .5; }
   ring(S.p.x, S.p.y, 20, 520, '#FFE6A3', .6, 14, true); stars(S.p.x, S.p.y, 30, '#FFE58A', 400); SFX.levelup(); resume();
   if (S.rises === 0 && !S.lightUsed) setTimeout(() => luma('vo-lastrise', true), 900);
@@ -3140,8 +3198,11 @@ function spawn(type, at, rush, el) {
   let T = ETYPE[type]; const sc = hpScale(); let x, y;
   if (at) { x = at.x; y = at.y; } else {
     const a = rnd(0, TAU);
-    if (S.arena) { x = S.arena.x + Math.cos(a) * (S.arena.r - 30); y = S.arena.y + Math.sin(a) * (S.arena.r - 30); }
-    else { const d = Math.hypot(VW, VH) / 2 + 50; x = S.p.x + Math.cos(a) * d; y = S.p.y + Math.sin(a) * d; }
+    // while the frost closes in, creatures come out of the frost beyond the screen, never on the wall beside the Keeper (QA)
+    if (S.arena && !S.storm) { x = S.arena.x + Math.cos(a) * (S.arena.r - 30); y = S.arena.y + Math.sin(a) * (S.arena.r - 30); }
+    // off screen round the Keeper, at a point inside the world (QA, 2026-10-06: clamping a point beyond the edge pulled it back on screen)
+    else { const d = Math.hypot(VW, VH) / 2 + 50; let b = a; for (let k = 0; k < 10; k++) { const tx = S.p.x + Math.cos(b) * d, ty = S.p.y + Math.sin(b) * d; if (tx > 30 && tx < WORLD - 30 && ty > 30 && ty < WORLD - 30) break; b = rnd(0, TAU); }
+      x = S.p.x + Math.cos(b) * d; y = S.p.y + Math.sin(b) * d; }
   }
   x = clamp(x, 30, WORLD - 30); y = clamp(y, 30, WORLD - 30);
   // the trickle leans toward the element you are furthest behind on, so every stone stays within reach
@@ -3163,7 +3224,7 @@ function horde() {
   SFX.alarm();
 }
 function ring2(n) {
-  const c = S.arena || S.p, d = S.arena ? S.arena.r - 30 : Math.hypot(VW, VH) / 2 + 30;
+  const A = S.storm ? null : S.arena, c = A || S.p, d = A ? A.r - 30 : Math.hypot(VW, VH) / 2 + 30;
   for (let i = 0; i < n; i++) { const a = i / n * TAU; spawn(i % 4 ? 'critter' : 'wolf', { x:c.x + Math.cos(a) * d, y:c.y + Math.sin(a) * d }); }
   SFX.alarm();
 }
@@ -3183,9 +3244,14 @@ function spawnBoss() {
   // the arena should not feel congested or make attacks hard to evade, so it is about a third wider than the Warden's was.
   { const r = Math.max(580, Math.min(VW, VH) * .82), m = r + 90;   // extra room above for the HUD and below for the power row
     // the Silver City's boss rises in the square in front of the Great Tower, clear of every tower
-    S.arena = S.out ? { x:S.out.hub.x, y:S.out.hub.y, r } : S.level === 5 ? { x:TOWER.x, y:clamp(TOWER.y + r + 90, r + 330, WORLD - r - 200), r } : { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
+    const ST = S.out && S.out.towers.slice().sort((p, q) => Math.hypot(p.x - S.p.x, p.y - S.p.y) - Math.hypot(q.x - S.p.x, q.y - S.p.y))[0];
+    S.arena = S.out ? { x:ST.x, y:ST.y + 60, r:diffOf(S.level).storm + 450 } : S.level === 5 ? { x:TOWER.x, y:clamp(TOWER.y + r + 90, r + 330, WORLD - r - 200), r } : { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
     const A = S.arena; e.x = A.x; e.y = A.y - 280;
-    if (Math.hypot(S.p.x - A.x, S.p.y - A.y) > r - 80) { S.p.x = A.x; S.p.y = A.y + 180; ring(S.p.x, S.p.y, 20, 260, '#FFE6A3', .5, 12, true); } }
+    // the boss rises on screen, ~450 from the Keeper on the side away from the temple, inside the warm light (design review,
+    // 2026-10-06: behind the temple it rose unseen and attacked out of the temple)
+    if (S.out) { stormStart(ST); const St = S.storm, a = Math.atan2(S.p.y - ST.y, S.p.x - ST.x) || Math.PI / 2; let bx = S.p.x + Math.cos(a) * 450, by = S.p.y + Math.sin(a) * 450 * .8;
+      const q = Math.hypot(bx - St.x, by - St.y), lim = St.r * .8; if (q > lim) { bx = St.x + (bx - St.x) / q * lim; by = St.y + (by - St.y) / q * lim; } e.x = bx; e.y = by; }
+    if (!S.out && Math.hypot(S.p.x - A.x, S.p.y - A.y) > r - 80) { S.p.x = A.x; S.p.y = A.y + 180; ring(S.p.x, S.p.y, 20, 260, '#FFE6A3', .5, 12, true); } }
   e.pat = 0; e.atk = 2.6; S.bossFx = []; S.heartT = 3;
   for (const m of S.en) if (!m.boss && Math.hypot(m.x - S.arena.x, m.y - S.arena.y) > S.arena.r) m.dead = true;
   $('#bossWrap').classList.add('on');
@@ -4358,7 +4424,7 @@ function ouch(dmg, fx, fy, o = {}) {
   const hit = dmg * armourVs(o.el) * (BOSS_SRC.has(o.src) ? bossHit() : lvHit());
   P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1; P.rx = (P.x - fx) / d * 14; P.ry = (P.y - fy) / d * 14;
   if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30);
-    if (S.arena) { const A = S.arena, q = Math.hypot(P.x - A.x, P.y - A.y), lim = A.r - 34; if (q > lim) { P.x = A.x + (P.x - A.x) / q * lim; P.y = A.y + (P.y - A.y) / q * lim; } } }
+    if (S.arena) { const A = S.arena, q = Math.hypot(P.x - A.x, P.y - A.y), lim = (S.storm ? S.storm.r0 + 400 : A.r) - 34; if (q > lim) { P.x = A.x + (P.x - A.x) / q * lim; P.y = A.y + (P.y - A.y) / q * lim; } } }
   if (o.slow) P.slowT = Math.max(P.slowT || 0, o.slow);
   P.hp -= hit; S.shake = Math.max(S.shake, o.shake || .12); S.pet.hitAt = S.t; S.lastHit = { src:o.src || 'trap', el:o.el, kid:o.kid };
   SFX.hurt();
@@ -4598,7 +4664,7 @@ function hsStart(final, tier = 5, finisher = false) {
   // never in how long they last (A, 2026-10-06: "ascended feels shorter to use when it's supposed to be 15s each time")
   H.on = { t:0, final, tier:ti + 1, finisher, life:15, q0:0, fired:-1, warn:-1, waves:[], nodeT:[], lit:0, born:performance.now(), horde:300, gx:P.x, gy:P.y - 150 };
   S.capBoost = H.on.horde + 20;   // ten times the usual crowd comes for the first two seconds (A, 2026-10-05)
-  S.eshots = []; S.flashT = .12; S.flashC = '255,224,160'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); H.on.q0 = beatPos();
+  S.eshots = []; S.flashT = .12; S.flashC = '255,224,160'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); H.on.q0 = beatPos();   // Omni (all five elements) keeps the approved anthem; the `omni` song is the Elemental forms' theme (A, 2026-10-06)
   // the world stops for half a second while the camera pushes in on the anthem's first hit
   S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true); SFX.genie(true); SFX.tier(H.on.tier); AU.vo('vo-ascended', .35, .8);
   ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true);
@@ -4794,7 +4860,7 @@ function finisherTick() {
 // each grate fires every fourth bar of the music, the grates taking turns, and they rest once the boss is up
 function spikeTick(dt) {
   if (S.level === 5) { towerSolid(); templeTraps(dt); }
-  if (S.out) { towerSolid(); outpostTick(dt); }
+  if (S.out) { towerSolid(); outpostTick(dt); stormTick(dt); }
   // the fire bars sweep while the city is awake, and draw their fireballs back into the posts while Ascended or its
   // after-shield holds and once the boss is up; a fireball burns, with a moment's grace before the next can
   if (S.level === 5) { forgeTick(dt); S.barHit = Math.max(0, (S.barHit || 0) - dt);
@@ -4819,7 +4885,8 @@ function spikeTick(dt) {
    "option A for sure!"). Behind ?towers=1 while A tries it, following the agreed rollout: Level 2 has one temple, Level 3
    three (the Level 3–4 version, with the tubes and the boss at the hearth). Each temple has a ring on the ground before
    its door:
-   - standing in the ring wakes the temple: its own guardians pour out of its door at the Keeper;
+   - standing in the ring wakes the temple: its guardians come back in from the realm round it to drive the Keeper out
+     (A, 2026-10-06: coming out of the temple felt off);
    - every guardian freed, wherever it is chased to, sends its light home and fills the ring (double when freed with the
      element that beats it); any other creature freed inside the ring helps a little. The band fills from the bottom up
      both sides, as the temple's colour climbs from its base, so the two read as one;
@@ -4829,21 +4896,56 @@ function spikeTick(dt) {
    An arrow at the screen's edge shows each temple off screen, its ring filling round it (design review, 2026-10-06). */
 const towersOn = () => /[?&]towers=1/.test(location.search);
 const towersLevel = lv => towersOn() && (lv === 2 || lv === 3);
-const HOLD = { need:260, R:230, front:180, wake:.7, pack:2, cap:32, heal:.02, fire:.8, bossFire:1.5, reach:650, dmg:(lv) => 16 + 4 * lv, ally:12, squad:5, help:1.2 };
+const HOLD = { need:215, R:230, front:180, wake:.7, pack:2, cap:32, heal:.02, fire:.8, bossFire:1.5, reach:650, dmg:(lv) => 16 + 4 * lv, ally:12, squad:5, help:1.2 };
 const HOLD_ELS = { 2:['wood'], 3:['wood', 'fire', 'earth'] };
 function makeOutposts(lv) {
   // the hearth in the middle (where the Keeper starts and the boss rises); the first temple stands north, its ring in view
-  const els = HOLD_ELS[lv] || HOLD_ELS[3], hub = { hub:true, x:1800, y:1800 };
+  const els = HOLD_ELS[lv] || HOLD_ELS[3], hub = { hub:true, x:1800, y:els.length === 1 ? 1880 : 1800 };
   // (design review, 2026-10-06: Level 2's one temple sits close, so its ring is a home base inside the boss arena; Level 3's
   // three sit far enough that their rings stay clear of it)
-  const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / els.length, d = els.length === 1 ? 380 : 950, x = Math.round(hub.x + Math.cos(a) * d), y = Math.round(hub.y + Math.sin(a) * d);
+  const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / els.length, d = els.length === 1 ? 420 : 950, x = Math.round(hub.x + Math.cos(a) * d), y = Math.round(hub.y + Math.sin(a) * d);
     return { el, x, y, h:340, rx:128, ry:54, cx:x, cy:y + HOLD.front, fill:0, held:false, cd:0, wake:0, souls:[], fireCd:0, allyCd:4, flare:0 }; });
   els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`));
   // one temple on its own takes longer, so Level 2 is as long as a level should be
-  // the Keeper starts just below the first temple's ring, so the ring and the temple's door are on screen under the HUD
-  return { hub, towers, els, need:els.length === 1 ? 430 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy + 200 } };
+  // the Keeper starts in the middle of the first temple's ring, so the whole temple stands on screen under the HUD
+  return { hub, towers, els, need:els.length === 1 ? 430 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy } };
 }
 const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? S.out.towers : [];
+/* Difficulty (A, 2026-10-06: "the 'play' button to start the run should be color coded by how difficult it is"): four
+   tiers, named to say easily and coloured without red (red is danger): Calm, Brave, Fierce, Legend. */
+// (design review, 2026-10-06: no element colour and no reward gold: Calm keeps the standard green, then indigo, violet and a night aurora)
+// (design review: Calm is the game's own green button; the rest spread by lightness as well as hue so a child tells them apart)
+const DIFF = [{ id:'calm', n:'Calm', c:[], storm:1350, min:720 }, { id:'brave', n:'Brave', c:['#D2D8FF', '#9CA7FF', '#6E78E8'], storm:1150, min:680 },
+  { id:'fierce', n:'Fierce', c:['#D79BFF', '#9B30FF', '#6A00D9'], storm:1000, min:630 }, { id:'legend', n:'Legend', c:['#3A2F7A', '#1A1446', '#07061A'], storm:880, min:580 }];
+const LEVEL_DIFF = [0, 0, 1, 2, 3], diffOf = lv => DIFF[LEVEL_DIFF[lv - 1] ?? 0];
+/* The Still closes in (A, 2026-10-06: a shrinking circle "like how Fortnite uses that mechanism for its storms", centred on the
+   temple, widest on easy levels and smaller on hard ones, six seconds to get back in, "with a logical and thoughtful reason
+   that perfectly fits this world"). The reason: when its boss rises, the Still comes back for the realm. Only the woken
+   temple's warmth holds it off, and that warmth is a circle round the temple that the Still pushes in on as the fight goes.
+   Outside it the frost takes the Keeper: six seconds of ice creeping over them, then they freeze and fall. Step back into the
+   warmth and the ice melts off. At the end the circle is the temple's own healing ring. */
+const STORM = { shrink:70, out:6 };
+// centred on the temple itself, never shrinking below a roomy arena round it (design review: the boss, the Keeper, the ring and
+// the seal must all fit; A, 2026-10-04: the arena must not feel congested)
+function stormStart(T) { const D = diffOf(S.level); S.storm = { x:T.x, y:T.y + 60, r0:D.storm, r:D.storm, min:D.min, t:0, out:0, beat:0, el:T.el }; }
+function stormTick(dt) {
+  const St = S.storm; if (!St || S.over || (S.boss && S.boss.dead)) return; St.t += dt;
+  St.r = Math.max(St.min, St.r0 - (St.r0 - St.min) * Math.min(1, St.t / STORM.shrink));
+  // the boss keeps to the warmth: the arena follows the circle in (the Keeper's own fence stays the realm's edge); the other
+  // creatures belong to the frost and may walk it
+  if (S.arena) S.arena.r = St.r + 30;
+  const P = S.p, outside = Math.hypot(P.x - St.x, P.y - St.y) > St.r;
+  if (outside && !hsOn() && P.hp > 0) { St.out += dt;
+    // six heartbeats, one a second, one for each frost mark; at the sixth the Keeper freezes and falls
+    if ((St.beat -= dt) <= 0) { St.beat = 1; SFX.heartbeat(); }
+    if (St.out >= STORM.out) { St.out = 0; S.lastHit = { src:'still' }; P.hp = 0; SFX.freeze(); } }
+  else { St.out = Math.max(0, St.out - dt * 2.5); St.beat = 0; }
+  // taught once, on the game's clock: after the boss has settled in, when the frost wall first comes into view or the Keeper
+  // first steps out (design review, 2026-10-06), pointing at the wall itself
+  const wallSeen = St.r - Math.hypot(P.x - St.x, P.y - St.y) < Math.hypot(VW, VH) / 2;
+  if (!SEEN.has('_storm') && St.t > 8 && (wallSeen || St.out > 0) && !COACH.cur) { markSeen('_storm'); const a = Math.atan2(P.y - St.y, P.x - St.x), wx = St.x + Math.cos(a) * St.r, wy = St.y + Math.sin(a) * St.r;
+    coach('storm', 'Stay in the warm light!', 'The frost is closing in. Stay in the temple\'s warm light. Outside it, you freeze.', () => ({ sx:clamp((wx - camX) * Z, 40, W - 40), sy:clamp((wy - camY) * Z, 160, H - 140) })); }
+}
 const inRing = (T, x, y) => Math.hypot(x - T.cx, (y - T.cy) * 1.6) < HOLD.R;
 // a temple's own guardians fill it wherever they are freed; any other creature only when freed inside an open ring
 function outpostKill(e) {
@@ -4857,15 +4959,15 @@ function outpostKill(e) {
 function captureOutpost(T) {
   // the first temple taken: Luma teaches that its ring heals; after that she just cheers. The last one starts Ascended,
   // which is its own fanfare and voice, so nothing else plays over it (design review, 2026-10-06)
-  if (T.held) return; T.held = true; T.fill = S.out.need; S.qi[T.el] = S.out.need; S.qiStones[T.el] = true; S.shake = Math.max(S.shake, .4);
+  if (T.held) return; T.held = true; T.heldAt = S.t; T.fill = S.out.need; S.qi[T.el] = S.out.need; S.qiStones[T.el] = true; S.shake = Math.max(S.shake, .4);
   const O = S.out, last = allStones(); O.won++;
   const solo = O.towers.length === 1;
   if (!last || solo) { SFX.fanfare(false); AU.vo(O.won === 1 ? 'vo-temple-won' : 'vo-temple-won2', 1.1, .5, false); }
   // everything its door sent out is freed with it
   for (const e of S.en) if (!e.dead && e.from === T) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, GROUND_RING[T.el], 160); }
-  paintThaw(T.x, T.y, 640); ring(T.cx, T.cy, 20, 760, GROUND_RING[T.el], 1.1, 20, true); stars(T.x, T.y - 160, 44, GROUND_RING[T.el], 560);
+  T.thawAt = S.t + 2.6; ring(T.cx, T.cy, 20, 760, GROUND_RING[T.el], 1.1, 20, true); stars(T.x, T.y - 160, 44, GROUND_RING[T.el], 560);
   // a level with one temple still teaches its heal: Luma speaks, then Ascended comes (design review, 2026-10-06)
-  if (last && !S.hs.used) { if (solo) O.ascAt = S.t + 5.9; else hsStart(true); }
+  if (last && !S.hs.used) O.ascAt = S.t + (solo ? 5.9 : 5);
 }
 function outpostTick(dt) {
   const O = S.out, P = S.p;
@@ -4873,6 +4975,11 @@ function outpostTick(dt) {
   if (!O.taught && S.t > 3) { O.taught = true; const T0 = O.towers.slice().sort((p, q) => Math.hypot(p.cx - P.x, p.cy - P.y) - Math.hypot(q.cx - P.x, q.cy - P.y))[0];
     coach('outposts', 'Wake the temple!', 'Stand in the temple\'s ring and free its creatures. Fill the ring and the temple is yours, and it fights for you.', () => ({ sx:(T0.cx - camX) * Z, sy:(T0.cy - camY) * Z })); }
   if (O.ascAt && S.t >= O.ascAt) { O.ascAt = 0; if (!S.hs.used) hsStart(true); }
+  // every temple awake: the thaw sweeps the whole realm from the seal outward, and the land comes fully alive
+  if (O.towers.every(t => t.held)) { if (O.wonderR == null) O.wonderR = 200; if (O.wonderR < 2900) { O.wonderR += dt * 900; if ((O.wPaint = (O.wPaint || 0) - dt) <= 0) { O.wPaint = .08; paintThaw(O.hub.x, O.hub.y, O.wonderR); } } }
+  // fireflies and blossoms drift over every thawed patch near the Keeper
+  if (Math.random() < dt * 9) { const x = S.p.x + rnd(-VW * .6, VW * .6), y = S.p.y + rnd(-VH * .5, VH * .5); if (thawGrid[((clamp(y, 0, WORLD - 1) / 60) | 0) * gridN + ((clamp(x, 0, WORLD - 1) / 60) | 0)])
+    fx({ k:'star', x, y, vx:rnd(-20, 20), vy:rnd(-30, -8), drag:.1, life:rnd(1.6, 2.8), s:rnd(6, 11), c:['#FFF3A0', '#C8FF9A', '#FFC8E8', '#A8E8FF'][(Math.random() * 4) | 0] }); }
   const open = O.towers.filter(t => !t.held), fight = !S.bossSpawned && !S.over;
   for (const T of O.towers) {
     // the light of each creature freed in the ring flies into the temple
@@ -4881,8 +4988,17 @@ function outpostTick(dt) {
       // standing in the ring wakes the temple: its own element pours out of its door at the Keeper
       const inside = fight && inRing(T, P.x, P.y); T.wake = Math.max(0, Math.min(1, T.wake + (inside ? dt * 2 : -dt)));
       if (inside && !hsOn() && (T.cd -= dt) <= 0) { T.cd = HOLD.wake;
-        for (let i = 0; i < HOLD.pack; i++) if (S.en.filter(e => !e.dead && e.from === T).length < HOLD.cap) { const e = spawn(Math.random() < .25 ? 'wolf' : 'critter', { x:T.x + rnd(-70, 70), y:T.y + 115 + rnd(0, 30) }, 1.15, T.el); if (e) e.from = T; } }
+        for (let i = 0; i < HOLD.pack; i++) if (S.en.filter(e => !e.dead && e.from === T).length < HOLD.cap) { const away = Math.atan2(P.y - T.y, P.x - T.x), a = away + rnd(-1, 1), d = Math.hypot(VW, VH) / 2 + 60; const e = spawn(Math.random() < .25 ? 'wolf' : 'critter', { x:P.x + Math.cos(a) * d, y:P.y + Math.sin(a) * d }, 1.15, T.el); if (e) e.from = T; } }
       continue; }
+    // its part of the realm thaws in a wave rolling out from it, and comes alive (A, 2026-10-06: "each tower activated clears
+    // up their section of the frost and getting all of them will clear all the frost ... alive ... like Super Mario Wonder")
+    const reach = O.towers.length === 1 ? 1500 : 1000;
+    if (T.thawR == null && T.thawAt && S.t >= T.thawAt) T.thawR = 120;
+    // the temple's revival: rounded ice chips fall off it as the frost cracks (A: "coming back to life")
+    if (T.heldAt != null && S.t - T.heldAt < 1.6 && Math.random() < dt * 30) fx({ k:'star', x:T.x + rnd(-120, 120), y:T.y - rnd(80, 320), vx:rnd(-60, 60), vy:rnd(40, 160), drag:.1, life:rnd(.6, 1), s:rnd(10, 16), c:'#E8F4FF' });
+    if (T.thawR != null && T.thawR < reach) { T.thawR = Math.min(reach, T.thawR + dt * 650); if ((T.paintCd = (T.paintCd || 0) - dt) <= 0) { T.paintCd = .08; paintThaw(T.x, T.y, T.thawR); } }
+    // alive again: its element's light drifts up off it
+    if (Math.random() < dt * 5) fx({ k:'star', x:T.x + rnd(-110, 110), y:T.y - rnd(40, 300), vx:rnd(-15, 15), vy:rnd(-60, -30), drag:.2, life:rnd(1, 1.8), s:rnd(8, 14), c:GROUND_RING[T.el] });
     // a taken temple heals the Keeper in its ring
     if (inRing(T, P.x, P.y) && P.hp > 0) { P.hp = Math.min(P.max, P.hp + P.max * HOLD.heal * dt); if (Math.random() < dt * 6) fx({ k:'plus', x:P.x + rnd(-20, 20), y:P.y - 10, vx:0, vy:-60, life:.6, s:8, c:'#8FF0A0' }); }
     // and fires its element at creatures near it; when the boss comes, at the boss and its crowd from anywhere
@@ -5517,7 +5633,7 @@ function update(dt) {
   // a dash on a slow frame can jump further than a tower is deep: the path is walked in steps and stops at the first tower
   // it would enter (QA, 2026-10-06: a 20 fps dash came out the other side of the water and fire towers)
   if (S.level === 5 && Math.hypot(P.x - px0, P.y - py0) > 30) for (let i = 1; i <= 8; i++) { const x = px0 + (P.x - px0) * i / 8, y = py0 + (P.y - py0) * i / 8; if (inTower(x, y + 30, P.r * .7)) { P.x = px0 + (P.x - px0) * (i - 1) / 8; P.y = py0 + (P.y - py0) * (i - 1) / 8; if (S.dash) S.dash = null; break; } }
-  if (S.arena) { const A = S.arena, d = Math.hypot(P.x - A.x, P.y - A.y), lim = A.r - 34; if (d > lim) { P.x = A.x + (P.x - A.x) / d * lim; P.y = A.y + (P.y - A.y) / d * lim; } }
+  if (S.arena) { const A = S.arena, d = Math.hypot(P.x - A.x, P.y - A.y), lim = (S.storm ? S.storm.r0 + 400 : A.r) - 34; if (d > lim) { P.x = A.x + (P.x - A.x) / d * lim; P.y = A.y + (P.y - A.y) / d * lim; } }
   if (Math.abs(mx) > .1) P.face = mx > 0 ? 1 : -1;
   P.moving = m > .1; P.mx = mx; P.my = my;
   if (P.moving) S.moved = (S.moved || 0) + Math.hypot(P.vx, P.vy) * dt;
@@ -5546,7 +5662,7 @@ function update(dt) {
     if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
     if (d < e.r + P.r && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
       const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el); P.hp -= hit; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
-      if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? A.r - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
+      if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? (S.storm ? S.storm.r0 + 400 : A.r) - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
@@ -5701,7 +5817,8 @@ function drawNight(cx, cy) {
   // to indigo only outside its ring (A, 2026-10-04: the old grade, centred on the Keeper and dark 200 px away,
   // left the fight "muddled in fog")
   const mix = (a, b) => `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * n)).join(',')})`, wt = [255, 255, 255];
-  const AR = S.arena, ax = AR ? (AR.x - cx) * Z : px, ay = AR ? (AR.y - cy) * Z : py, ar = AR ? AR.r * Z : 220, R = Math.max(ar * 1.35, 260);
+  // while the frost closes in, the warm light itself is the lit area: no night inside it, only the frost outside
+  const AR = S.storm ? { x:S.storm.x, y:S.storm.y, r:S.storm.r * 1.4 } : S.arena, ax = AR ? (AR.x - cx) * Z : px, ay = AR ? (AR.y - cy) * Z : py, ar = AR ? AR.r * Z : 220, R = Math.max(ar * 1.35, 260);
   const v = g.createRadialGradient(ax, ay, 0, ax, ay, R);
   v.addColorStop(0, mix(wt, [240, 238, 255])); v.addColorStop(ar / R * .9, mix(wt, [214, 212, 248]));
   v.addColorStop(Math.min(.99, ar / R * 1.12), mix(wt, [118, 122, 196])); v.addColorStop(1, mix(wt, [40, 44, 112]));
@@ -6026,7 +6143,8 @@ function draw() {
   const P = S.p;
   // in the boss arena the camera follows you, held within the arena so its edge stays in view
   // (playtest 1: with the camera locked to the arena's centre, its top hid under the HUD and so did the player)
-  const AR = S.arena, fxp = AR ? clamp(P.x, AR.x - AR.r * .6, AR.x + AR.r * .6) : P.x, fyp = AR ? clamp(P.y, AR.y - AR.r * .6, AR.y + AR.r * .6) : P.y;
+  // (while the Still closes in, the camera follows the Keeper wherever they are, even out in the frost)
+  const AR = S.storm ? null : S.arena, fxp = AR ? clamp(P.x, AR.x - AR.r * .6, AR.x + AR.r * .6) : P.x, fyp = AR ? clamp(P.y, AR.y - AR.r * .6, AR.y + AR.r * .6) : P.y;
   // during a boss's change the camera glides to it instead
   const TF = S.tf, tx = TF ? (TF.cam ? TF.cam.x + VW / 2 : TF.x) : fxp, ty = TF ? (TF.cam ? TF.cam.y + VH * .45 : TF.y - TF.s * .3) : fyp, ease = TF ? .06 : .2;
   camX += (tx - VW / 2 - camX) * ease; camY += (ty - VH * .45 - camY) * ease;
@@ -6052,8 +6170,8 @@ function draw() {
     const a = Math.min(1, z.t * 4, (z.life - z.t) * 2);
     g.globalAlpha = a; g.drawImage(fireFloor(), z.x - z.r, z.y - z.r * .7, z.r * 2, z.r * 1.4); g.globalAlpha = 1;
   }
-  // the boss arena
-  if (S.arena) {
+  // the boss arena (while the Still closes in, its frost wall is the arena's edge instead)
+  if (S.arena && !S.storm) {
     const A = S.arena;
     g.fillStyle = 'rgba(8,16,24,.5)'; g.beginPath(); g.rect(cx, cy, VW, VH); g.arc(A.x, A.y, A.r, 0, TAU); g.fill('evenodd');
     // its rim of crystals takes the realm boss's colours
@@ -6340,6 +6458,7 @@ function draw() {
     { const rim = silhouette(kName, EL[keeperEl]); if (rim) add(() => { g.globalAlpha = .6; g.drawImage(rim, -ks * .53, -ks * .75 - 24, ks * 1.06, ks * 1.06); g.globalAlpha = 1; }); }
     g.drawImage(kim, -ks / 2, -ks * .72 - 24, ks, ks);   // feet on the shadow
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, -ks * .72 - 24, ks, ks); g.globalAlpha = 1; } }
+    if (S.storm && S.storm.out > 0) { const ic = silhouette(kName, '#DCEEFF'); if (ic) { g.globalAlpha = Math.min(.85, S.storm.out / STORM.out); g.drawImage(ic, -ks / 2, -ks * .72 - 24, ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
   if (hs) drawGenie(kx, ky, hsIm);
   // the shield left by Ascended: a golden bubble that thins as its ring empties over six seconds
@@ -6430,6 +6549,12 @@ function draw() {
     const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
     beacon(ex, ey, a, '#FFD24A', 'x-chest', 1);
   }
+  // out in the frost: ice creeps in from the screen's edges over the six seconds, and a warm beacon points back to the light
+  if (S.storm && S.storm.out > 0) { const k = Math.min(1, S.storm.out / STORM.out), vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * (.62 - .3 * k), W / 2, H / 2, Math.max(W, H) * .75);
+    vg.addColorStop(0, 'rgba(225,240,255,0)'); vg.addColorStop(1, `rgba(225,240,255,${.75 * k})`); g.fillStyle = vg; g.fillRect(0, 0, W, H);
+    const St = S.storm, a = Math.atan2(St.y - S.p.y, St.x - S.p.x), d = Math.hypot(St.x - S.p.x, St.y - S.p.y) - St.r, tx = S.p.x + Math.cos(a) * (d + 40), ty = S.p.y + Math.sin(a) * (d + 40);
+    let sx = (tx - cx) * Z, sy = (ty - cy) * Z; if (sx < 30 || sx > W - 30 || sy < 150 || sy > H - 120) [sx, sy] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
+    beacon(sx, sy, a, '#FFC870', 'x-temple-' + (St.el || 'wood'), 1 + Math.sin(S.t * 8) * .15); }
   // an incoming wave: the edges it comes from glow in its element, with beacons facing in
   if (S.warn && !hsOn()) {   // while Ascended nothing can touch you, so the warning would only be noise
     const wv = S.warn.w, col = wv.el === 'mix' ? '#FF6B5A' : EL[wv.el], pulse = .55 + .45 * Math.sin(S.t * 14);
@@ -6793,8 +6918,22 @@ function templeStory(realm, el) {
   const gr = c.createRadialGradient(330, 300, 40, 330, 300, 420); gr.addColorStop(0, 'rgba(200,225,255,0)'); gr.addColorStop(1, 'rgba(160,200,245,.28)'); c.fillStyle = gr; c.fillRect(0, 0, 800, 600);
   return TEMPLE_STORY[k] = cv.toDataURL('image/jpeg', .9);
 }
-// the Hold the temple card's (and story page's) picture, drawn from the game's own pieces: a temple lit up from its base,
-// its ring's band two thirds risen, the Keeper standing in it, its guardians pouring out, and freed light flying home
+// the warm-light card's (and the frozen defeat's) picture: the Keeper safe in the temple's warm light, the land beyond it
+// frosted, the white frost wall, and a ghost of the Keeper outside with its six frost marks filling
+let STORM_PIC = null;
+function stormPic() {
+  if (STORM_PIC) return STORM_PIC; const t = IMG['x-temple-wood'], k = IMG['k' + keeper];
+  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d');
+  c.fillStyle = '#C9D6E4'; c.fillRect(0, 0, 480, 320);
+  const gr = c.createRadialGradient(200, 200, 30, 200, 200, 175); gr.addColorStop(0, '#8FD46A'); gr.addColorStop(.75, '#6FB956'); gr.addColorStop(1, '#F2D79A'); c.fillStyle = gr; c.beginPath(); c.arc(200, 200, 170, 0, TAU); c.fill();
+  c.strokeStyle = 'rgba(245,250,255,.95)'; c.lineWidth = 8; c.stroke(); c.strokeStyle = 'rgba(150,195,255,.5)'; c.lineWidth = 20; c.globalAlpha = .4; c.stroke(); c.globalAlpha = 1;
+  if (ok(t)) c.drawImage(t, 120, 30, 160, 170 * t.naturalHeight / t.naturalWidth * .9);
+  if (ok(k)) { c.drawImage(k, 165, 200, 70, 70); c.globalAlpha = .55; c.drawImage(k, 380, 200, 70, 70); c.globalAlpha = 1; }
+  for (let i = 0; i < 6; i++) { const a0 = -Math.PI / 2 + i * TAU / 6 + .08; c.strokeStyle = i < 4 ? '#FFFFFF' : 'rgba(150,190,240,.5)'; c.lineWidth = 5; c.lineCap = 'round'; c.beginPath(); c.ellipse(415, 272, 34, 12, 0, a0, a0 + TAU / 6 - .16); c.stroke(); }
+  const ok2 = ok(t) && ok(k); const url = cv.toDataURL('image/png'); if (ok2) STORM_PIC = url; return url;
+}
+// the Hold the temple card's picture, drawn from the game's own pieces: the frozen temple, its ring's band two thirds
+// risen (the temple wakes only when the ring is whole), the Keeper standing in it, its guardians pouring out, and freed light flying home
 const OUTPOST_PIC = {};
 function outpostPic(el = 'wood') {
   if (OUTPOST_PIC[el]) return OUTPOST_PIC[el];
@@ -6804,8 +6943,7 @@ function outpostPic(el = 'wood') {
   c.fillStyle = 'rgba(10,16,32,.4)'; c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, 0, TAU); c.fill();
   c.strokeStyle = 'rgba(14,20,40,.7)'; c.lineWidth = 14; c.stroke(); c.globalAlpha = .25; c.strokeStyle = col; c.lineWidth = 10; c.stroke(); c.globalAlpha = 1;
   c.strokeStyle = col; c.lineWidth = 10; c.lineCap = 'round'; for (const [s0, s1] of [[Math.PI / 2, Math.PI / 2 + Math.PI * .66], [Math.PI / 2 - Math.PI * .66, Math.PI / 2]]) { c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, s0, s1); c.stroke(); }
-  if (ok(t)) { const h = 170, w = h * t.naturalWidth / t.naturalHeight, x = 240 - w / 2, y = 18; c.drawImage(frozenArt(t, el), x, y, w, h);
-    c.save(); c.beginPath(); c.rect(x, y + h * .45, w, h * .55); c.clip(); c.drawImage(t, x, y, w, h); c.restore(); }
+  if (ok(t)) { const h = 170, w = h * t.naturalWidth / t.naturalHeight, x = 240 - w / 2, y = 18; c.drawImage(frozenArt(t, el), x, y, w, h); }
   if (ok(mw)) for (const [x, y] of [[200, 196], [292, 204], [168, 236]]) c.drawImage(mw, x - 16, y - 16, 32, 32);
   for (const [x, y, r] of [[300, 170, 7], [272, 140, 5], [256, 116, 4]]) { const gr = c.createRadialGradient(x, y, 0, x, y, r * 3); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(.35, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = gr; c.beginPath(); c.arc(x, y, r * 3, 0, TAU); c.fill(); }
   if (ok(k)) c.drawImage(k, 240 - 34, 200, 68, 68);
@@ -6823,11 +6961,18 @@ function drawOutposts(inView) {
     g.strokeStyle = T.held ? col + 'CC' : 'rgba(230,245,255,.45)'; g.lineWidth = 3; const nx = -(y2 - y1), ny = x2 - x1, nm = Math.hypot(nx, ny) || 1;
     for (const o of [-21, 21]) { g.beginPath(); g.moveTo(x1 + nx / nm * o, y1 + ny / nm * o); g.lineTo(x2 + nx / nm * o, y2 + ny / nm * o); g.stroke(); }
     g.lineCap = 'butt'; g.lineWidth = 1; }
-  // the hearth in the middle: a ring of warm stones round a small fire, where the Keeper starts and the boss will rise
-  if (inView(H.x, H.y, 160)) { g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(H.x, H.y + 8, 130, 70, 0, 0, TAU); g.fill();
-    g.fillStyle = '#4A3C30'; g.beginPath(); g.ellipse(H.x, H.y, 118, 62, 0, 0, TAU); g.fill();
-    for (let i = 0; i < 14; i++) { const a = i / 14 * TAU; g.fillStyle = i % 2 ? '#8A7A68' : '#9C8B76'; g.beginPath(); g.ellipse(H.x + Math.cos(a) * 112, H.y + Math.sin(a) * 58, 18, 11, 0, 0, TAU); g.fill(); }
-    add(() => glowAt(H.x, H.y - 10, 170, '#FFB060', .45 + .08 * Math.sin(S.t * 5))); flameAt(H.x, H.y + 6, 46, .1, 7); }
+  // the realm's seal in the middle (A, 2026-10-06: the campfire made no sense; it should be the sign for the element): a
+  // carved stone disc with a socket for each temple's Qi Stone, dark and frosted until that temple is woken, then lit. The
+  // tubes carry each woken temple's light into it
+  if (inView(H.x, H.y, 180)) { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(H.x, H.y + 10, 138, 74, 0, 0, TAU); g.fill();
+    const sg = g.createRadialGradient(H.x, H.y - 20, 10, H.x, H.y, 130); sg.addColorStop(0, '#9AA3B4'); sg.addColorStop(1, '#5D6577'); g.fillStyle = sg; g.beginPath(); g.ellipse(H.x, H.y, 124, 66, 0, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(230,240,255,.5)'; g.lineWidth = 3; g.beginPath(); g.ellipse(H.x, H.y, 104, 54, 0, 0, TAU); g.stroke(); g.lineWidth = 1;
+    const n = O.towers.length;
+    O.towers.forEach((T, i) => { const a = n === 1 ? -Math.PI / 2 : -Math.PI / 2 + i * TAU / n, sx = H.x + (n === 1 ? 0 : Math.cos(a) * 56), sy = H.y + (n === 1 ? 0 : Math.sin(a) * 28) - 6, col = GROUND_RING[T.el];
+      g.fillStyle = 'rgba(20,26,40,.7)'; g.beginPath(); g.ellipse(sx, sy + 6, 26, 14, 0, 0, TAU); g.fill();
+      if (T.held) { add(() => glowAt(sx, sy - 6, 90, col, .7 + .15 * Math.sin(S.t * 3 + i))); spr('x-stone-' + T.el, sx, sy - 8, 44); }
+      else { g.globalAlpha = .45; spr('x-stone-' + T.el, sx, sy - 6, 40); g.globalAlpha = 1; } });
+    g.lineWidth = 1; }
   for (const T of O.towers) {
     if (!inView(T.cx, T.cy, HOLD.R + 40)) continue;
     // the ring before its door: the band rises from the bottom up both sides, as the temple's colour climbs from its base
@@ -6838,16 +6983,45 @@ function drawOutposts(inView) {
     g.strokeStyle = 'rgba(14,20,40,.65)'; g.lineWidth = 36; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, 0, TAU); g.stroke();
     if (!T.held) { g.globalAlpha = .22; g.strokeStyle = col; g.lineWidth = 28; g.stroke(); g.globalAlpha = 1; }
     g.strokeStyle = T.held ? col : `rgba(220,236,255,${.35 + .3 * (here ? pu : 0)})`; g.lineWidth = T.held ? 8 : 4; g.stroke();
+    if (T.held) { g.globalAlpha = .75 + .25 * pu; g.strokeStyle = col; g.lineWidth = 28; g.stroke(); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 7; g.stroke(); g.globalAlpha = 1; }
     if (!T.held && f > 0) { const up = Math.PI * f; g.lineCap = 'round';
       for (const [s0, s1] of [[Math.PI / 2, Math.PI / 2 + up], [Math.PI / 2 - up, Math.PI / 2]]) { g.strokeStyle = col; g.lineWidth = 28; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, s0, s1); g.stroke(); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 7; g.stroke(); }
       g.lineCap = 'butt'; for (const a of [Math.PI / 2 + up, Math.PI / 2 - up]) add(() => glowAt(T.cx + Math.cos(a) * R, T.cy + Math.sin(a) * ry, 80, col, .6 + .3 * T.flare)); }
     if (T.held) add(() => glowAt(T.cx, T.cy, R * 1.1, col, .25 + .1 * pu));
     g.restore(); g.lineWidth = 1;
   }
+  // floating rivers: once a temple wakes, ribbons of clear water arc through the air over its part of the realm, and when the
+  // whole realm is awake, great ones loop round the seal (A: "floating rivers ... like Super Mario Wonder")
+  const rivers = [];
+  const dim = S.bossSpawned ? .35 : 1;
+  for (const T of O.towers) if (T.held && T.thawR) { const k = Math.min(1, T.thawR / 700) * dim; rivers.push([T.x, T.y + 120, 460, T.el.length * .7, 1.5, k, T.el], [T.x, T.y + 120, 700, T.el.length * .7 + 2.6, 1.2, k, T.el]); }
+  if (O.wonderR) { const k = Math.min(1, O.wonderR / 1400) * dim; O.towers.forEach((T, i) => rivers.push([H.x, H.y, 1150 + i * 260, i * 2.1, 1.6, k, T.el])); }
+  for (const [x, y, r, a0, sw, k, el] of rivers) river(x, y, r, a0, sw, k, inView, el);
   // the freed marching down the tubes to help, in squads, happy and haloed in their temple's light
   for (const m of O.march) { if (m.x == null || !inView(m.x, m.y, 60)) continue; const hop = Math.abs(Math.sin(m.t * 9 + m.ph)) * 10, im = ok(IMG[m.img + '-happy']) ? IMG[m.img + '-happy'] : IMG[m.img], col = GROUND_RING[m.el];
     g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(m.x, m.y + 4, 22, 7, 0, 0, TAU); g.fill();
     add(() => glowAt(m.x, m.y - 26, 70, col, .7)); if (im && ok(im)) g.drawImage(im, m.x - 32, m.y - 60 - hop, 64, 64); }
+}
+// a floating stream of the element's own life, lifted off the ground on a soft arc (A: "floating rivers ... like Super Mario
+// Wonder"; design review: water only on water land, nothing beam-like, nothing in even beads): wood carries leaves and
+// petals, fire drifting lanterns and embers, earth golden sand and blossoms, water clear water, metal silver glints
+const STREAM = { wood:{ base:'#7CCB5A', bits:['#B8F08A', '#FFC8E0', '#6FBF4A'] }, fire:{ base:'#FF9A4A', bits:['#FFD27A', '#FFB060', '#FFF0B0'] }, earth:{ base:'#E8B85A', bits:['#FFE2A0', '#F5C26B', '#FFD0E0'] },
+  water:{ base:'#5FB0F0', bits:['#DFF4FF', '#A8DCFF', '#FFFFFF'] }, metal:{ base:'#C8D2E2', bits:['#FFFFFF', '#E8EEF8', '#D0D8E8'] } };
+function river(x, y, r, a0, sw, k, inView, el = 'water') {
+  if (k <= 0) return; const C = STREAM[el] || STREAM.water, lift = 110, n = 26, pts = [];
+  for (let i = 0; i <= n; i++) { const u = i / n, a = a0 + sw * u, px = x + Math.cos(a) * r, py = y + Math.sin(a) * r * .62 + Math.sin(u * Math.PI * 2 + S.t * .8) * 14; pts.push([px, py, u]); }
+  if (!pts.some(([px, py]) => inView(px, py - lift, 140))) return;
+  g.save(); g.lineCap = 'round';
+  for (let i = 1; i < pts.length; i++) { const [x0, y0, u] = pts[i - 1], [x1, y1] = pts[i], fade = Math.sin(u * Math.PI) * k, wob = 1 + .35 * Math.sin(u * 9 + S.t * 1.3);
+    g.globalAlpha = .08 * fade; g.strokeStyle = '#0E2A44'; g.lineWidth = 46 * wob; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+    g.globalAlpha = (el === 'water' ? .32 : .16) * fade; g.strokeStyle = C.base; g.lineWidth = 54 * wob; g.beginPath(); g.moveTo(x0, y0 - lift); g.lineTo(x1, y1 - lift); g.stroke(); }
+  g.globalAlpha = 1;
+  // the life it carries, scattered and drifting, never in a row
+  for (let j = 0; j < 22; j++) { const seed = j * 12.9898, u = (j / 22 + S.t * (.03 + (j % 5) * .006)) % 1, i = Math.min(n - 1, (u * n) | 0), [px, py] = pts[i], f = Math.sin(u * Math.PI) * k;
+    const ox = Math.sin(seed + S.t * .9) * 24, oy = Math.cos(seed * 1.7 + S.t * .7) * 16, s = 4 + (j % 4) * 2.2, c = C.bits[j % C.bits.length];
+    if (el === 'fire' && j % 5 === 0) add(() => glowAt(px + ox, py - lift + oy, 30, '#FFB060', .7 * f));
+    g.globalAlpha = .85 * f; g.fillStyle = c; g.beginPath(); g.ellipse(px + ox, py - lift + oy, s, s * (el === 'wood' ? .55 : .8), seed + S.t * (el === 'wood' ? 1.4 : .4), 0, TAU); g.fill(); }
+  g.restore(); g.lineWidth = 1;
 }
 // over everything: the light of each freed creature flying into its temple, and the temples' shots
 function drawOutpostsTop() {
@@ -6855,6 +7029,34 @@ function drawOutpostsTop() {
   for (const T of O.towers) for (const s of T.souls) { const k = Math.min(1, s.t / .7), e = k * k, tx = T.x, ty = T.y - T.h * .45, x = s.x + (tx - s.x) * e, y = s.y + (ty - s.y) * e - Math.sin(k * Math.PI) * 80, col = GROUND_RING[T.el];
     add(() => glowAt(x, y, 46 * s.n, col, .9 * (1 - k * .5))); g.fillStyle = '#FFFFFF'; g.beginPath(); g.arc(x, y, 5 + 2 * s.n, 0, TAU); g.fill(); }
   for (const B of O.bolts) { const e = B.e, dx = e.x - B.x, dy = e.y - B.y; energy(B.x, B.y, dx, dy, GROUND_RING[B.el], 14, false); }
+  // a woken temple's healing: soft motes of green-gold light drifting from its door to the Keeper in its ring
+  const P = S.p;
+  for (const T of O.towers) { if (!T.held || !inRing(T, P.x, P.y) || P.hp <= 0) continue; const x0 = T.x, y0 = T.y + 30, x1 = P.x, y1 = P.y - 40;
+    for (let i = 0; i < 6; i++) { const k = (S.t * .7 + i / 6) % 1, x = x0 + (x1 - x0) * k + Math.sin(k * Math.PI * 2 + i) * 18, y = y0 + (y1 - y0) * k - Math.sin(k * Math.PI) * 60;
+      add(() => glowAt(x, y, 34, '#9BF5B0', .7 * Math.sin(k * Math.PI))); g.fillStyle = `rgba(240,255,235,${.9 * Math.sin(k * Math.PI)})`; g.beginPath(); g.arc(x, y, 4, 0, TAU); g.fill(); }
+    add(() => glowAt(P.x, P.y - 30, 80, '#9BF5B0', .35 + .1 * Math.sin(S.t * 4))); }
+  drawStorm();
+}
+// the Still closing in: everything outside the temple's warmth lies under frost, behind a shimmering wall of ice
+function drawStorm() {
+  const St = S.storm; if (!St) return; const cam = S.cam || { x:camX, y:camY }, x0 = cam.x - 200, y0 = cam.y - 200, w = W / Z + 400, h = H / Z + 400, pu = .5 + .5 * Math.sin(S.t * 3);
+  // outside, the land re-freezes: its colour drains to frost-grey under a white crust, still visible underneath (design review:
+  // it read as night)
+  g.save(); g.beginPath(); g.rect(x0, y0, w, h); g.arc(St.x, St.y, St.r, 0, TAU, true); g.globalCompositeOperation = 'saturation'; g.fillStyle = 'rgb(128,128,128)'; g.fill('evenodd');
+  g.globalCompositeOperation = 'screen'; g.fillStyle = 'rgba(150,175,205,.42)'; g.fill('evenodd'); g.globalCompositeOperation = 'source-over';
+  g.beginPath(); g.rect(x0, y0, w, h); g.arc(St.x, St.y, St.r + 70, 0, TAU, true); g.fillStyle = 'rgba(235,244,255,.16)'; g.fill('evenodd');
+  g.strokeStyle = `rgba(235,246,255,${.75 + .2 * pu})`; g.lineWidth = 10; g.beginPath(); g.arc(St.x, St.y, St.r, 0, TAU); g.stroke();
+  g.strokeStyle = 'rgba(150,195,255,.6)'; g.lineWidth = 26; g.globalAlpha = .35; g.stroke(); g.globalAlpha = 1;
+  // ice clumps along the wall, rounded, never points
+  const n = Math.round(St.r / 22);
+  for (let i = 0; i < n; i++) { const a = i / n * TAU + S.t * .02, x = St.x + Math.cos(a) * St.r, y = St.y + Math.sin(a) * St.r; if (x < x0 || x > x0 + w || y < y0 || y > y0 + h) continue;
+    const r = 9 + 5 * Math.sin(i * 1.7); g.fillStyle = 'rgba(240,248,255,.85)'; g.beginPath(); g.ellipse(x, y, r, r * .7, a, 0, TAU); g.fill(); }
+  g.restore(); g.lineWidth = 1;
+  // the Keeper outside: six frost marks round their feet freeze one by one
+  if (St.out > 0) { const P = S.p, k = St.out / STORM.out;
+    for (let i = 0; i < 6; i++) { const a0 = -Math.PI / 2 + i * TAU / 6 + .06, on = k * 6 > i; g.strokeStyle = on ? 'rgba(235,246,255,.95)' : 'rgba(150,190,240,.35)'; g.lineWidth = 7; g.lineCap = 'round';
+      g.beginPath(); g.ellipse(P.x, P.y + 30, 44, 17, 0, a0, a0 + TAU / 6 - .12); g.stroke(); }
+    g.lineCap = 'butt'; g.lineWidth = 1; add(() => glowAt(P.x, P.y - 30, 120, '#CFE6FF', .5 * k)); }
 }
 // a tower, standing: the Great Tower with its five sockets, or an element tower in its element's colours. While its stone
 // waits, an element tower sends up a column of its light; once its stone is home, a steady crown of it. A tower the
@@ -6906,10 +7108,13 @@ function drawTowerAt(T, cx, cy) {
     const home = S.qiStones[T.el], out = S.stoneOut[T.el] && !home;
     if (out) { const gr = g.createLinearGradient(0, top - 500, 0, top + 40); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, T.el === 'fire' ? 'rgba(255,154,74,.45)' : EL[T.el] + '73');
       g.fillStyle = gr; g.fillRect(T.x - 26 - Math.sin(S.t * 4) * 4, top - 500, 52 + Math.sin(S.t * 4) * 8, 540); }
-    const OT = S.out && art && S.out.towers.includes(T) && !T.held ? T.fill / S.out.need : null;
-    if (OT != null) { g.drawImage(frozenArt(art, T.el), T.x - tw / 2, top, tw, th);
-      if (OT > 0) { const cy0 = top + th * (1 - OT); g.save(); g.beginPath(); g.rect(T.x - tw / 2, cy0, tw, top + th - cy0); g.clip(); g.drawImage(art, T.x - tw / 2, top, tw, th); g.restore();
-        add(() => glowAt(T.x, cy0, tw * .5, GROUND_RING[T.el], .55 + .4 * T.flare)); } }
+    // Hold the temple: it stays frozen until its ring is whole (A, 2026-10-06), then comes back to life from its base up in
+    // a breath of its own light; each freed light still makes the frost flicker, so the temple answers the ring
+    const OT = S.out && art && S.out.towers.includes(T), wake = OT && T.held ? Math.min(1, (S.t - (T.heldAt ?? -9)) / 2.6) : 1;
+    if (OT && !T.held) { g.drawImage(frozenArt(art, T.el), T.x - tw / 2, top, tw, th); if (T.flare > 0) add(() => glowAt(T.x, top + th * .55, tw * .55, GROUND_RING[T.el], .35 * T.flare)); }
+    else if (OT && wake < 1) { const e = wake * wake * (3 - 2 * wake), cy0 = top + th * (1 - e); g.drawImage(frozenArt(art, T.el), T.x - tw / 2, top, tw, th);
+      g.save(); g.beginPath(); g.rect(T.x - tw / 2, cy0, tw, top + th - cy0); g.clip(); g.drawImage(art, T.x - tw / 2, top, tw, th); g.restore();
+      add(() => { glowAt(T.x, cy0, tw * .7, GROUND_RING[T.el], .9); glowAt(T.x, cy0, tw * .3, '#FFFFFF', .6); if (wake > .85) glowAt(T.x, top + th * .1, tw * (wake - .85) * 6, '#FFFFFF', .8); }); }
     else g.drawImage(art || shrineNight(im, T.el), T.x - tw / 2, top, tw, th);
     if (S.out && T.held) add(() => glowAt(T.x, top + th * .25, th * .35, GROUND_RING[T.el], .45 + .1 * Math.sin(S.t * 3)));
     // the trap winding up glows in the painted mouth; while the boulder rolls, the earth temple's doorway stands empty
@@ -7776,6 +7981,7 @@ const TIP_ART = { enemy:'tip-rings', bloom:'tip-bloom' };
 function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'firebar') return `<div class="fbdemo"><img src="${firebarPic()}" alt=""></div>`;
+  if (id === 'storm') return `<div class="fbdemo"><img src="${stormPic()}" alt=""></div>`;
   if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic(S && S.out ? S.out.els[0] : 'wood')}" alt=""></div>`;
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
@@ -7800,7 +8006,7 @@ function tipArt(id) {
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts' };
+const CARD_VO = { storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
@@ -8216,6 +8422,7 @@ function defeatTip() {
     return { img:crea || (pw[0] ? icon(POW[pw[0]].icon) : null), t:`${ELNAME[H.el]} beats ${ELNAME[keeperEl]}`,
       p:`Choose ${pw.map(id => POW[id].n).join(' or ')}: ${andList(cs.map(k => ELNAME[k]))} beat${cs.length > 1 ? '' : 's'} ${ELNAME[H.el]}.` };
   }
+  if (H.src === 'still') return { img:stormPic(), t:'The frost froze you', p:'When the frost closes in, run back into the temple\'s warm light. You have six heartbeats.' };
   if (H.src === 'trap') return { img:null, t:'Watch the ground', p:'Walk around glowing patches, and lead creatures through them.' };
   if (H.src === 'slam' || H.src === 'rush') return { img:crea, t:'Watch for the red warning', p:'Step out of the red circle or lane before it strikes.' };
   if (H.heavy) return { img:crea, t:'Brutes hit hardest', p:'Circle brutes from outside their reach. Each one drops a heart.' };
@@ -8482,7 +8689,7 @@ function renderLevels() {
   $('.tname').classList.toggle('locked', locked);
   if (locked) { $('#lvStars').innerHTML = `<b class="tlock">Free ${LEVELS[u - 1].name.replace(/^The /, 'the ')} to open it</b>`; $('#lvStars').setAttribute('aria-label', 'Locked'); }
   else { $('#lvStars').innerHTML = [0, 1, 2].map(i => `<i class="${i < st ? 'on' : ''}">\u2605</i>`).join(''); $('#lvStars').setAttribute('aria-label', `${st} of 3 stars`); }
-  const pb = $('#playBtn'); pb.disabled = locked; pb.classList.toggle('locked', locked); pb.textContent = locked ? 'Locked' : 'Play';
+  const pb = $('#playBtn'); pb.disabled = locked; pb.classList.toggle('locked', locked); if (locked) { pb.textContent = 'Locked'; pb.className = 'btn green locked'; } else diffBtn(pb, LVL);
   $('#lvPrev').disabled = LVL <= 1; $('#lvNext').disabled = LVL >= LEVELS.length;
   $('#lvls').innerHTML = LEVELS.map((L, i) => `<button role="tab" style="--c:${EL[REALM[i]]}" class="${i + 1 === LVL ? 'cur' : ''}${i + 1 > u ? ' lock' : ''}" data-n="${i + 1}" aria-label="Level ${i + 1}: ${L.name}${i + 1 > u ? ' (locked)' : ''}" aria-selected="${i + 1 === LVL}" ${i + 1 > u ? 'disabled' : ''}></button>`).join('');
   $('#lvls').querySelectorAll('button').forEach(b => b.onclick = () => pickLevel(+b.dataset.n));
@@ -8900,9 +9107,14 @@ function renderMap() {
   const u = unlocked(); if (LVL > u) LVL = u;
   $('#mpIsles').innerHTML = LEVELS.map((L, i) => { const n = i + 1, lock = n > u, st = starsOf(n);
     return `<button class="isle${n === LVL ? ' cur' : ''}${lock ? ' lock' : ''}" data-n="${n}" style="left:${ISLE[i].x}%;top:${ISLE[i].y}%;--c:${EL[REALM[i]]}" aria-label="Level ${n}: ${L.name}${lock ? ', locked' : `, ${st} of 3 stars`}"><b>${lock ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2.5" fill="#fff"/><path d="M8 10V8a4 4 0 0 1 8 0v2" fill="none" stroke="#fff" stroke-width="2.4"/></svg>' : n}</b><span>${[0, 1, 2].map(k => `<i class="${k < st ? 'on' : ''}">★</i>`).join('')}</span></button>`; }).join('');
-  $('#mpIsles').querySelectorAll('.isle').forEach(b => b.onclick = () => { const n = +b.dataset.n; if (n > unlocked()) { SFX.pop(); toast(`Free ${LEVELS[unlocked() - 1].name.replace(/^The /, 'the ')} to open it`); return; } SFX.select(); LVL = n; mapPicked = true; renderMap(); });
-  $('#mpName').innerHTML = `<span class="elname" style="--c:${EL[REALM[LVL - 1]]}">${LEVELS[LVL - 1].name}</span>`; $('#mpGo').textContent = 'Play';
+  $('#mpIsles').querySelectorAll('.isle').forEach(b => b.onclick = () => { const n = +b.dataset.n; if (n > unlocked()) { SFX.pop(); mapSay(`Free ${LEVELS[unlocked() - 1].name.replace(/^The /, 'the ')} first`); return; } SFX.select(); LVL = n; mapPicked = true; renderMap(); });
+  $('#mpName').innerHTML = `<span class="elname" style="--c:${EL[REALM[LVL - 1]]}">${LEVELS[LVL - 1].name}</span>`; diffBtn($('#mpGo'), LVL);
 }
+// on the map a locked realm's message takes the name line for a moment, so nothing stacks over the Play button (design review)
+let MAP_SAY = 0;
+function mapSay(msg) { const el = $('#mpName'); clearTimeout(MAP_SAY); el.innerHTML = `<span class="mpsay">${msg}</span>`; MAP_SAY = setTimeout(() => { if (!$('#map').hidden) renderMap(); }, 2400); }
+// the Play button wears its level's difficulty: its colour, and the word under "Play" (A, 2026-10-06)
+function diffBtn(b, lv) { const D = diffOf(lv); b.className = 'btn green diff ' + D.id; b.style.setProperty('--d0', D.c[0]); b.style.setProperty('--d1', D.c[1]); b.style.setProperty('--d2', D.c[2]); b.innerHTML = `Play<small>${D.n}</small>`; b.setAttribute('aria-label', `Play, ${D.n}`); }
 $('#mpGo').onclick = () => { AU.init(); SFX.select(); AU.music(true);
   if (!SEEN.has('_story' + LVL) && !starsOf(LVL)) { markSeen('_story' + LVL); storyPg = 0; renderStory(); show('story'); return; }
   if (LVL === 1) { show(null); beginRun(); } else intro(LVL); };
