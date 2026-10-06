@@ -2732,7 +2732,9 @@ const STORY_WORD = { water:'shore', wood:'grove', fire:'ridge', earth:'hills', m
 function renderStory() {
   const realm = ['water', 'wood', 'fire', 'earth', 'metal'][LVL - 1], place = LEVELS[LVL - 1].name.replace(/^The /, 'the '), B = BOSSES[realm], A = ANIMAL[animal], w = STORY_WORD[realm];
   const art = $('#storyArt'), pages = [
-    { img:'story-frost', t:`The ${w} ${realm === 'earth' ? 'have' : 'has'} gone still`, p:`The Stillmaker's frost froze ${place}. Everyone stopped, right where they stood.`, alt:'A storm of frost sweeps over a lantern-lit village and freezes its people mid-moment.' },
+    // each realm's own place freezing, with its own people (design review, 2026-10-05: every level showed the shore's village)
+    { img:realm === 'water' ? 'story-frost' : 'story-frost-' + realm, t:`The ${w} ${realm === 'earth' ? 'have' : 'has'} gone still`, p:`The Stillmaker's frost froze ${place}. Everyone stopped, right where they stood.`,
+      alt:{ water:'A storm of frost sweeps over a lantern-lit seaside village and freezes its people mid-moment.', wood:'A storm of frost sweeps through a woodcarvers\' village in the bamboo and freezes its people mid-moment.', fire:'A storm of frost sweeps over a lantern festival on a mountain ridge and freezes its people mid-moment.', earth:'A storm of frost sweeps over terraced harvest hills and freezes the farmers mid-moment.', metal:'A storm of frost sweeps through a silver city of bell towers and freezes its people mid-moment.' }[realm] },
     { img:'luma', t:'Luma sends you out', p:`Luma, the fox spirit of your hearth, sends you and your ${A.y} to bring ${place} back to life.`, alt:'Luma, the little fox spirit of the hearth, beside the fire.',
       over:`<img class="st-k" src="art4/run/k${keeper}-r2.png?v=8" alt=""><img class="st-a" src="art4/a-${animal}-y.png?v=8" alt="">` },
     { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn ${LVL === 1 ? 'two' : 'the five'} Qi Stones. Gather ${LVL === 1 ? 'both' : 'them all'}, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
