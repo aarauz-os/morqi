@@ -2533,13 +2533,27 @@ function stars(x, y, n, col, spd) { for (let i = 0; i < n; i++) { const a = rnd(
 // round painted cinders for fire's Star Call: never white, never pointed
 function cinders(x, y, n, spd) { for (let i = 0; i < n; i++) { const a = rnd(0, TAU), s = rnd(spd * .3, spd); fx({ k:'cinder', x, y, z:rnd(10, 30), vx:Math.cos(a) * s, vy:Math.sin(a) * s * .6, vz:rnd(150, 340), life:rnd(.5, .8), s:rnd(3.5, 6), c:i % 2 ? '#FF9A4A' : '#E8692A' }); } }
 function confetti(x, y, n, spd) { const cols = ['#FF7A2A', '#FFB347', '#FFD24A', '#FFF1C9', '#FF9EB5']; for (let i = 0; i < n; i++) { const a = rnd(0, TAU), s = rnd(spd * .3, spd); fx({ k:'paper', x, y, z:rnd(10, 40), vx:Math.cos(a) * s, vy:Math.sin(a) * s * .6, vz:rnd(200, 420), rot:rnd(0, TAU), vr:rnd(-12, 12), life:rnd(.8, 1.4), s:rnd(4, 8), c:cols[i % cols.length] }); } }
+// big debris sheds small debris as it flies (A, 2026-10-05: "mini rocks falling off of rocks and small embers falling off
+// of huge embers"), and some of it answers the ground when it lands
+function shedFX(p) {
+  const x = p.x + rnd(-p.s * .4, p.s * .4), z = p.z || 0;
+  if (p.shed === 'cinder') fx({ k:'cinder', x, y:p.y, z, vx:p.vx * .2 + rnd(-30, 30), vy:p.vy * .2 + rnd(-20, 20), vz:rnd(-40, 60), life:rnd(.3, .6), s:rnd(2, 3.5), c:Math.random() < .5 ? '#FFB15A' : '#FF8A2A' });
+  else if (p.shed === 'rock') fx({ k:'rock', x, y:p.y, z, vx:p.vx * .3 + rnd(-40, 40), vy:p.vy * .3 + rnd(-25, 25), vz:rnd(0, 120), rot:rnd(0, TAU), vr:rnd(-10, 10), life:rnd(.4, .8), s:rnd(2.5, 5), c:'#7A5A30' });
+  else if (p.shed === 'spark') fx({ k:'spark', x, y:p.y - z, vx:rnd(-120, 120), vy:rnd(-120, 60), drag:5, life:.25, s:2, c:'#F4F7FA' });
+  else if (p.shed === 'drop') fx({ k:'drop', x, y:p.y, z, vx:p.vx * .3 + rnd(-40, 40), vy:p.vy * .3 + rnd(-25, 25), vz:rnd(0, 100), life:.45, s:rnd(2, 3) });
+}
+function landFX(p) {
+  if (p.land === 'dust') { fx({ k:'smoke', x:p.x, y:p.y, vx:rnd(-40, 40), vy:rnd(-30, -5), drag:2.5, life:rnd(.5, .8), s:p.s * 1.4, c:'150,120,80' }); for (let i = 0; i < 3; i++) fx({ k:'rock', x:p.x, y:p.y, z:1, vx:rnd(-90, 90), vy:rnd(-50, 50), vz:rnd(80, 180), rot:rnd(0, TAU), vr:rnd(-10, 10), life:rnd(.4, .7), s:rnd(2.5, 4.5), c:'#7A5A30' }); }
+  else if (p.land === 'splash') { fx({ k:'ring', x:p.x, y:p.y, r0:2, r1:p.s * 3.2, c:'#BFE6FF', life:.3, w:2, add:true }); p.t = Math.max(p.t, p.life * .85); }
+}
 function updateFX(dt) {
   for (const p of FX) {
     p.t += dt;
     // light that flows to the Keeper (Root Grasp's draw): it steers home and is gone on arrival
     if (p.home) { const P = S.p, dx = P.x - p.x, dy = P.y - 30 - p.y, d = Math.hypot(dx, dy) || 1, q = Math.min(1, dt * 6); p.vx += (dx / d * p.home - p.vx) * q; p.vy += (dy / d * p.home - p.vy) * q; if (d < 22) p.t = p.life; }
     if (p.vx !== undefined) { const d = p.drag ? Math.exp(-p.drag * dt) : 1; p.vx *= d; p.vy *= d; p.x += p.vx * dt; p.y += p.vy * dt; }
-    if (p.vz !== undefined) { p.vz -= 900 * dt; p.z += p.vz * dt; if (p.z < 0) { p.z = 0; p.vz *= -.35; p.vx *= .6; p.vy *= .6; } }
+    if (p.vz !== undefined) { p.vz -= 900 * dt; p.z += p.vz * dt; if (p.z < 0) { p.z = 0; if (p.land && !p.landed) { p.landed = 1; landFX(p); } p.vz *= -.35; p.vx *= .6; p.vy *= .6; } }
+    if (p.shed && p.t < p.life * .85 && Math.random() < dt * (p.shedR || 20)) shedFX(p);
     if (p.vr) p.rot += p.vr * dt;
   }
   for (let i = FX.length - 1; i >= 0; i--) if (FX[i].t >= FX[i].life) { FX[i] = FX[FX.length - 1]; FX.pop(); }
@@ -4164,40 +4178,128 @@ function bloomCreature(e, d, dt) {
   if (d < e.r + S.p.r + 16) { stars(e.x, e.y - 30, 5, '#FFE58A', 200); kill(e); }
 }
 /* ================= Ascended (S.hs in the code) ================= */
-// MorQi's point is becoming your best self, and for twelve seconds you are it (A, 2026-10-05: twelve, like the Bloom). Gathering every Qi Stone of a level makes
-// you whole: you rise in the master's robes with the five elements circling you, nothing can touch you, every half second
-// a wave of all five elements breaks over everything near you (cycling, so the strong one always lands), every gem flies
-// to you, and it ends in the Five-Stone Burst before the Warden arrives. The first time ever, a card names it.
-const HIGHEST = { life:12, pulse:.45, R:470 };
+// MorQi's point is becoming your best self, and for fifteen seconds you are it (A, 2026-10-05: twelve, then "maybe do it for 15s"). Gathering every Qi Stone of a level makes
+// you whole: you rise in the master's robes, nothing can touch you, every gem flies to you, and it ends in the Five-Stone
+// Burst before the Warden arrives. The first time ever, a card names it.
+// The five waves (A, 2026-10-05: "spectacular wave pulses of fire, earth, water, metal, and wood in their correct order
+// … mini rocks falling off of rocks and small embers falling off of huge embers … devastating … balance and being in
+// full control is the ascended self"). The elements break in their generating order, each feeding the next: fire leaves
+// ash that becomes earth, earth bears metal, metal gathers water, water feeds wood, wood feeds fire. A wheel of the five
+// lies on the ground under the Keeper; one wave lands on each downbeat of "Ascend" (bars 1 to 5) and lights its node,
+// drawing the cycle round. Through bar 6 the five stones rise and circle the Keeper; on bar 7 comes balance: the wheel's
+// star of control draws itself and all five break at once, and to the end a pulse of all five rolls out every half bar.
+// Every wave gathers in first, lands with a freeze, a shake and a flash in its colour, and leaves debris that sheds
+// smaller debris as it falls (embers off embers, pebbles off boulders, sparks off coins, drops off drops).
+const HIGHEST = { life:15, R:700 };
+const ASC = ['fire', 'earth', 'metal', 'water', 'wood'];
+const ASC_COL = { fire:['#FF8A2A', '#FFD27A'], earth:['#C8913F', '#F1D49A'], metal:['#C9D3DB', '#F4F7FA'], water:['#4FB3FF', '#D8F1FF'], wood:['#5BD06A', '#D4F7B0'] };
 const hsOn = () => !!(S && S.hs && S.hs.on);
+const beatPos = () => { const b = AU.beat(); return b.n + b.ph; };   // in beats of the music, or of the clock when it is off
+const rgbOf = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)).join(',');
 function hsTick(dt) {
   const H = S.hs, P = S.p;
   if (!H.on) return;
-  H.on.t += dt; H.on.p -= dt;
-  if (H.on.p <= 0) { H.on.p = HIGHEST.pulse; hsPulse(); }
-  if (H.on.t >= HIGHEST.life) {
+  const O = H.on; O.t += dt;
+  // one wave on each downbeat; after a pause the count picks up from now instead of firing every missed wave at once
+  let bars = (beatPos() - O.q0) / 4; const next = O.fired + 1;
+  if (next <= 5 && bars > next + 1.6) { O.q0 = beatPos() - (next + 1) * 4; bars = next + 1; }
+  const at = next < 5 ? next + 1 : 7, lead = next < 5 ? .2 : 1;   // the finale gathers for a whole bar
+  if (next <= 5 && bars >= at - lead && O.warn < next) { O.warn = next; O.warnT = O.t; ascGather(next < 5 ? [ASC[next]] : ASC); }
+  if (next <= 5 && (bars >= at || (next === 5 && O.t > HIGHEST.life - 3.5))) { O.fired = next; if (next < 5) ascWave(ASC[next]); else ascFinale(); }
+  if (O.fired >= 5 && bars >= 7.5 + (O.pulses || 0) * .5 && O.t < HIGHEST.life - .6) { O.pulses = (O.pulses || 0) + 1; ascPulse(O.pulses); }
+  for (const w of O.waves) {
+    w.t += dt; if (w.t < 0) continue;
+    const r0 = w.r, k = Math.min(1, w.t / .8); w.r = HIGHEST.R * (1 - Math.pow(1 - k, 2.2));
+    if (w.r > r0) ascFront(w, r0);
+    for (const e of S.en) if (!e.dead && !w.hit.has(e) && Math.hypot(e.x - w.x, e.y - w.y) < w.r + e.r) { w.hit.add(e); ascHit(e, w); }
+  }
+  O.waves = O.waves.filter(w => w.t < 1.3);
+  if (O.fired >= 5) { O.lit = Math.min(1, O.lit + dt * 3); if (Math.random() < dt * 26) { const el = ASC[(Math.random() * 5) | 0], a = rnd(0, TAU), r = rnd(30, 260);   // balance: motes of all five drift up
+    fx({ k:'glow', x:P.x + Math.cos(a) * r, y:P.y + Math.sin(a) * r * .5, vx:0, vy:-rnd(30, 70), s:rnd(16, 30), s1:4, c:ASC_COL[el][0], life:rnd(.8, 1.4) }); } }
+  if (O.t >= HIGHEST.life) {
     // after the final one "Ascend" plays on until the Warden's theme lands on the next bar; otherwise the world's own song returns
-    const final = H.on.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]);
+    const final = O.final; H.on = null; AU.bloom(false); SFX.sweep(); if (final) S.holdLevels = true; else flushLevels(); if (!final) AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]);
     if (final) { stoneBurst(); S.bossAt = S.t + 1.2; }
   }
 }
 function hsStart(final) {
   closeSeal();
-  const H = S.hs, P = S.p; H.used = true; H.on = { t:0, p:.35, final };
-  S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); AU.song('highest', 2);
+  const H = S.hs, P = S.p; H.used = true; H.on = { t:0, final, q0:0, fired:-1, warn:-1, waves:[], nodeT:[], lit:0 };
+  S.eshots = []; S.flashT = .4; S.flashC = '255,240,200'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); H.on.q0 = beatPos();
   // the world stops for half a second while the camera pushes in on the anthem's first hit
   S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true); AU.vo('vo-ascended', .35, .8);
-  ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true); stars(P.x, P.y - 60, 50, '#FFE58A', 600);
+  ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true);
   for (const q of S.gems) q.pull = true;
 }
-function hsPulse() {
-  const P = S.p, el = ELS[(S.hs.on.n = ((S.hs.on.n ?? -1) + 1)) % 5];
-  ring(P.x, P.y, 30, HIGHEST.R, EL[el], .55, 22, true); SFX.boom(true); S.shake = Math.max(S.shake, .3);
-  for (const e of S.en) if (!e.dead && Math.hypot(e.x - P.x, e.y - P.y) < HIGHEST.R) {
-    // every element in turn, so the one that beats each creature always lands; the boss feels it, but is not one-shot
-    for (const k of ELS) if (eff(k, e.el) > 1) { hurt(e, e.boss ? 260 : 900, k); break; }
-  }
+// the element gathers in before it breaks: motes of its colour stream to the Keeper
+function ascGather(els) {
+  const P = S.p;
+  for (let i = 0; i < 26; i++) { const el = els[i % els.length], a = rnd(0, TAU), r = rnd(220, 340);
+    fx({ k:'glow', x:P.x + Math.cos(a) * r, y:P.y - 30 + Math.sin(a) * r * .6, vx:0, vy:0, home:rnd(700, 1000), s:rnd(22, 36), s1:8, c:ASC_COL[el][0], life:.6 }); }
+}
+function ascWave(el) {
+  const P = S.p, O = S.hs.on, [c1, c2] = ASC_COL[el];
+  O.waves.push({ el, x:P.x, y:P.y, t:0, r:0, hit:new Set() }); O.nodeT[ASC.indexOf(el)] = O.t;
+  S.hitstop = Math.max(S.hitstop, .06); S.shake = Math.max(S.shake, el === 'earth' ? .75 : .45); S.flashT = .1; S.flashC = rgbOf(c1);
+  flash(P.x, P.y - 30, 560, c1, .3); ring(P.x, P.y, 30, 260, c2, .3, 20, true);
+  ({ fire:() => { SFX.bx('ember-burst', 1, 0); SFX.boom(true); }, earth:() => { SFX.bx('earth-quake', 1, 0); SFX.stomp(); }, metal:() => { SFX.bx('call-bell', 1, 0); SFX.shing(); },
+     water:() => { SFX.bx('tide-crash', 1, 0); SFX.wave(); }, wood:() => { SFX.bx('wood-roots', 1, 0); SFX.whip(); } })[el]();
   for (const q of S.gems) q.pull = true;
+}
+// balance: the star of control draws itself across the wheel, and all five break together
+function ascFinale() {
+  const P = S.p, O = S.hs.on; O.finT = O.t;
+  ASC.forEach((el, i) => O.waves.push({ el, x:P.x, y:P.y, t:-i * .05, r:0, hit:new Set(), fin:true }));
+  S.hitstop = Math.max(S.hitstop, .14); S.shake = 1; S.flashT = .35; S.flashC = '255,236,190';
+  flash(P.x, P.y - 40, 900, '#FFE08A', .45); ring(P.x, P.y, 30, 820, '#FFE08A', .6, 30, true);
+  SFX.power(); SFX.bx('call-toll', 1, 0); SFX.boom(true); SFX.bx('earth-quake', 1, 0);
+  for (const q of S.gems) q.pull = true;
+}
+// full control: every half bar after balance, a quick ring of all five rolls out, led by each element in turn
+function ascPulse(n) {
+  const P = S.p, O = S.hs.on, el = ASC[n % 5];
+  O.waves.push({ el, x:P.x, y:P.y, t:0, r:0, hit:new Set(), pulse:true });
+  ASC.forEach((e, i) => ring(P.x, P.y, 40 + i * 12, HIGHEST.R * .9, ASC_COL[e][0], .55, 8, true));
+  S.shake = Math.max(S.shake, .25); SFX.boom(false); if (n % 2) SFX.ting();
+}
+// what breaks along a wave's leading edge as it passes, element by element
+function ascFront(w, r0) {
+  const n = Math.min(10, 2 + Math.ceil((w.r - r0) * .1)) * (w.pulse ? .4 : 1), crowd = FX.length > 800 ? .4 : 1;
+  for (let i = 0; i < n; i++) {
+    if (Math.random() > crowd) continue;
+    const a = rnd(0, TAU), r = rnd(r0, w.r), x = w.x + Math.cos(a) * r, y = w.y + Math.sin(a) * r, ca = Math.cos(a), sa = Math.sin(a);
+    if (i === 1) shards(x, y, EL[w.el], 1, 220);   // chips of the element's own Qi Stone ride every wave
+    if (w.el === 'fire') { flames(x, y, 1, 10, rnd(34, 56), 220);
+      if (i % 3 === 0) fx({ k:'ember', x, y, z:10, vx:ca * rnd(90, 220), vy:sa * rnd(60, 140), vz:rnd(280, 520), life:rnd(1, 1.5), s:rnd(8, 14), shed:'cinder', shedR:24 });
+      if (i === 0 && Math.random() < .3) decal({ k:'scorch', x, y, r:rnd(26, 40), life:2.5 }); }
+    else if (w.el === 'earth') {
+      if (i % 2 === 0) fx({ k:'boulder', x, y, z:0, vx:ca * rnd(50, 170), vy:sa * rnd(30, 110), vz:rnd(320, 620), rot:rnd(0, TAU), vr:rnd(-6, 6), life:rnd(1.1, 1.6), s:rnd(16, 28), c:Math.random() < .5 ? '#8E6A3A' : '#A07A44', shed:'rock', shedR:14, land:'dust', q:Array.from({ length:7 }, () => rnd(.75, 1)) });
+      else smoke(x, y, 1, 26, '160,128,86');
+      if (i === 0 && Math.random() < .35) decal({ k:'crack', x, y, r:rnd(24, 38), life:2.2, a:a }); }
+    else if (w.el === 'metal') {
+      if (i % 2 === 0) fx({ k:'coin', x, y, z:16, vx:ca * rnd(180, 360), vy:sa * rnd(110, 220), vz:rnd(220, 420), rot:rnd(0, TAU), vr:rnd(-16, 16), life:rnd(.8, 1.2), s:rnd(13, 21), shed:'spark', shedR:20 });
+      if (i % 3 === 1) fx({ k:'slash', x, y:y - 20, rot:a + Math.PI / 2 + rnd(-.4, .4), life:.24, s:rnd(36, 54) });
+      else fx({ k:'spark', x, y:y - 20, vx:ca * rnd(200, 420), vy:sa * rnd(120, 300) - 80, drag:4, life:rnd(.25, .45), s:2.5, c:i % 4 ? '#F4F7FA' : '#FFE08A' }); }
+    else if (w.el === 'water') {
+      fx({ k:'drop', x, y, z:6, vx:ca * rnd(80, 240), vy:sa * rnd(50, 150), vz:rnd(320, 580), life:rnd(.8, 1.2), s:rnd(4, i % 4 ? 7 : 10), land:'splash', shed:i % 4 ? null : 'drop', shedR:16 });
+      if (i % 3 === 0) fx({ k:'smoke', x, y:y - 6, vx:ca * 60, vy:sa * 40 - 20, drag:2.5, life:rnd(.5, .8), s:rnd(10, 18), c:'214,238,255' }); }
+    else {
+      // a storm of leaves and blossom with round green buds bursting along the edge (roots read as arrowheads at this zoom)
+      for (let j = 0; j < 2; j++) fx({ k:'leaf', x, y:y - 10, vx:ca * rnd(140, 300) + sa * 90, vy:sa * rnd(90, 200) - ca * 70, drag:2, rot:rnd(0, TAU), vr:rnd(-12, 12), life:rnd(.9, 1.4), s:rnd(8, 14), c:(i + j) % 3 ? ((i + j) % 2 ? '#7FD36B' : '#3E9E2E') : '#FFB7D0' });
+      if (i % 2 === 0) { fx({ k:'glow', x, y:y - 8, s:46, s1:10, c:'#9BE37A', life:.35 }); burst(x, y - 8, '#C9F7A8', 3, 200); } }
+  }
+}
+// a creature the wave reaches: it is freed in a burst of that element (the boss feels every wave but is not one-shot)
+function ascHit(e, w) {
+  const el = w.el, few = S.en.length > 40 && Math.random() < .5;
+  hurt(e, w.pulse ? (e.boss ? 400 : 2000) : w.fin ? (e.boss ? 800 : 2000) : (e.boss ? 1600 : 2000), el, { kb:420, fx:w.x, fy:w.y });
+  if (few) return;
+  if (el === 'fire') { flames(e.x, e.y - 10, 3, 14, 30, 160); cinders(e.x, e.y, 3, 160); }
+  else if (el === 'earth') { debris(e.x, e.y, 4, 240, '#9A7040'); smoke(e.x, e.y, 1, 20, '150,120,80'); }
+  else if (el === 'metal') burst(e.x, e.y - 20, '#F4F7FA', 6, 420);
+  else if (el === 'water') drops(e.x, e.y - 10, 7, 240);
+  else leaves(e.x, e.y - 10, 5, 220);
+  if (eff(el, e.el) > 1) shards(e.x, e.y - 20, ASC_COL[el][0], 4, 260);   // its element beats this one: a bright crack of crystal
 }
 /* ================= the five Qi Stones ================= */
 // The point of every level (A: "yes lets go with your recommendations"): balance. Each creature you free gives qi of its
@@ -5308,6 +5410,7 @@ function draw() {
   }
   // sacred trees (Rising Grove)
   drawFuseGround();
+  drawAscendGround();
   for (const tr of S.trees) { const k = Math.min(1, tr.t / .4) * Math.min(1, (tr.life - tr.t) / .4), sw = Math.sin(S.t * 3 + tr.x) * .05;
     g.save(); g.translate(tr.x, tr.y); g.rotate(sw); g.scale(k, k);
     g.fillStyle = '#5A3A1A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.roundRect(-9, -70, 18, 72, 6); g.fill(); g.stroke();
@@ -5442,10 +5545,10 @@ function draw() {
   g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(P.x, P.y + 30, 26 - bob * .8, 9, 0, 0, TAU); g.fill();
   if (S.buffs.ward > 0) { const k = Math.min(1, S.buffs.ward / 2); g.save(); g.globalAlpha = .55 * k; g.strokeStyle = '#5FE3B4'; g.lineWidth = 4; g.beginPath(); for (let i = 0; i <= 6; i++) { const a = i / 6 * TAU + S.t * .6; g.lineTo(kx + Math.cos(a) * 52, ky - 26 + Math.sin(a) * 40); } g.stroke(); g.restore(); g.lineWidth = 1; }
   if (S.buffs.tiger > 0) add(() => { glowAt(kx, ky - 30, 170 + Math.sin(S.t * 18) * 14, '#FF9A3A', .8); if (Math.random() < .5) flames(kx, ky - 10, 1, 20, 22, 120); });
-  if (hs) {   // Ascended: a golden aura, the five elements circling, floating a little above the ground
+  if (hs) {   // Ascended: a golden aura and the five Qi Stones on their wheel, floating a little above the ground
     const T = S.hs.on.t, k = Math.min(1, T / .3, (HIGHEST.life - T) / .3);
-    add(() => { glowAt(kx, ky - 50, 260 + Math.sin(S.t * 6) * 20, '#FFE08A', .75 * k); glowAt(kx, ky - 50, 120, '#FFFFFF', .4 * k); });
-    ELS.forEach((el, i) => { const a = S.t * 2.4 + i * TAU / 5, ox = Math.cos(a) * 78, oy = Math.sin(a) * 30 - 60; add(() => glowAt(kx + ox, ky + oy, 44, EL[el], .9 * k)); g.fillStyle = EL[el]; g.beginPath(); g.arc(kx + ox, ky + oy, 9, 0, TAU); g.fill(); });
+    add(() => glowAt(kx, ky - 50, 260 + Math.sin(S.t * 6) * 20, '#FFE08A', .75 * k));
+    drawAscendStones(kx, ky);
   }
   if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob - (hs ? 18 + Math.sin(S.t * 3) * 6 : 0)); g.rotate(hs ? 0 : lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
     g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1));
@@ -5518,7 +5621,7 @@ function draw() {
     g.save(); g.translate(ex, ey); g.rotate(a); g.fillStyle = '#FFD24A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.moveTo(16, 0); g.lineTo(-8, -12); g.lineTo(-8, 12); g.closePath(); g.fill(); g.stroke(); g.restore();
   }
   // an incoming wave: the edges it comes from glow in its element, with arrows pointing in
-  if (S.warn) {
+  if (S.warn && !hsOn()) {   // while Ascended nothing can touch you, so the warning would only be noise
     const wv = S.warn.w, col = wv.el === 'mix' ? '#FFD24A' : EL[wv.el], pulse = .55 + .45 * Math.sin(S.t * 14);
     for (const sd of S.warn.dirs) {
       const [dx, dy] = SIDES[sd];
@@ -5558,6 +5661,55 @@ function callPhases() { const C = S.call, D = CALL[C.id], tr = C.tier, T = CALL_
 // ellipses on the ground (the same shape the blast strikes)
 /* element fusions, drawn: painted like everything else (no added white), round where they fly, never pointing at
    anything; the Mountain Blades stand upright out of the stone */
+/* Ascended on the ground (A, 2026-10-05): each wave's leading edge as a band of its element, and the wheel of the five
+   under the Keeper. The wheel's nodes are the five Qi Stones in their generating order, fire at the top and round
+   clockwise; a stone lights when its wave breaks and the cycle draws on to it; at balance the star of control (each
+   element keeping the one two steps on in check) draws itself across the wheel. */
+const ASC_R = 172, ASC_SQ = .42;
+const ascNode = (cx, cy, i) => { const a = -Math.PI / 2 + i * TAU / 5; return [cx + Math.cos(a) * ASC_R, cy + Math.sin(a) * ASC_R * ASC_SQ]; };
+function drawAscendGround() {
+  if (!hsOn()) return;
+  const O = S.hs.on, P = S.p, cx = P.x, cy = P.y + 22, life = Math.min(1, O.t / .4, (HIGHEST.life - O.t) / .5);
+  for (const w of O.waves) { if (w.t < 0 || w.r < 8) continue;
+    const [c1, c2] = ASC_COL[w.el], a = Math.max(0, 1 - w.t / 1.3) * (1 - .55 * w.r / HIGHEST.R), bw = w.el === 'water' ? 90 : w.el === 'earth' ? 70 : 54, r0 = Math.max(0, w.r - bw);
+    const gr = g.createRadialGradient(w.x, w.y, r0, w.x, w.y, w.r + 6); gr.addColorStop(0, c1 + '00'); gr.addColorStop(.62, c1 + '66'); gr.addColorStop(.9, c2 + 'CC'); gr.addColorStop(1, c2 + '00');
+    g.globalAlpha = a; g.fillStyle = gr; g.beginPath(); arc0(w.x, w.y, w.r + 6, 0, TAU); arc0(w.x, w.y, r0, 0, TAU, true); g.fill('evenodd');
+    if (w.el === 'earth') { g.strokeStyle = 'rgba(40,26,10,.55)'; g.lineWidth = 5; g.beginPath(); arc0(w.x, w.y, w.r * .97, 0, TAU); g.stroke(); }
+    if (w.el === 'metal') { g.strokeStyle = c2; g.lineWidth = 2; for (const f of [1, .93]) { g.beginPath(); arc0(w.x, w.y, w.r * f, 0, TAU); g.stroke(); } }
+    g.globalAlpha = 1; }
+  g.save(); g.globalAlpha = life;
+  // the wheel: a dark glass disc, a gold rim, a slow outer ring of marks
+  g.fillStyle = 'rgba(14,18,48,.38)'; g.beginPath(); g.ellipse(cx, cy, ASC_R + 30, (ASC_R + 30) * ASC_SQ, 0, 0, TAU); g.fill();
+  g.strokeStyle = 'rgba(255,224,138,.55)'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(cx, cy, ASC_R + 30, (ASC_R + 30) * ASC_SQ, 0, 0, TAU); g.stroke();
+  g.strokeStyle = 'rgba(255,224,138,.35)'; g.lineWidth = 2; for (let i = 0; i < 40; i++) { const a = i / 40 * TAU + O.t * .25, r1 = ASC_R + 20, r2 = ASC_R + (i % 5 ? 25 : 29);
+    g.beginPath(); g.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1 * ASC_SQ); g.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2 * ASC_SQ); g.stroke(); }
+  // the generating cycle draws on from stone to stone as each wave breaks
+  g.lineCap = 'round';
+  for (let i = 0; i < 5; i++) { if (O.fired < i + 1 && !(i === 4 && O.fired >= 5)) continue;
+    const t0 = O.nodeT[(i + 1) % 5] ?? O.finT ?? O.t, q = Math.min(1, (O.t - t0) / .3), a0 = -Math.PI / 2 + i * TAU / 5;
+    g.strokeStyle = ASC_COL[ASC[i]][0]; g.lineWidth = 5; g.beginPath(); g.ellipse(cx, cy, ASC_R, ASC_R * ASC_SQ, 0, a0, a0 + TAU / 5 * q); g.stroke(); }
+  // balance: the star of control
+  if (O.fired >= 5) { const q = Math.min(1, (O.t - O.finT) / .35);
+    add(() => { g.strokeStyle = '#FFE08A'; g.lineWidth = 4; g.globalAlpha = life * (.7 + .3 * Math.sin(O.t * 8));
+      for (let i = 0; i < 5; i++) { const [x0, y0] = ascNode(cx, cy, i), [x1, y1] = ascNode(cx, cy, (i + 2) % 5), e = Math.max(0, Math.min(1, q * 5 - i));
+        if (e > 0) { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + (x1 - x0) * e, y0 + (y1 - y0) * e); g.stroke(); } } }); }
+  g.restore(); g.lineCap = 'butt'; g.lineWidth = 1;
+}
+// the five Qi Stones on their nodes, drawn with the Keeper: dim until their wave, lifting as it gathers, flaring as it
+// breaks; at balance all five rise and circle the Keeper together
+function drawAscendStones(kx, ky) {
+  const O = S.hs.on, cx = S.p.x, cy = S.p.y + 22, life = Math.min(1, O.t / .4, (HIGHEST.life - O.t) / .5);
+  for (let i = 0; i < 5; i++) {
+    const el = ASC[i], lit = O.fired >= i, nt = O.nodeT[i], since = nt != null ? O.t - nt : 9, gathering = O.warn === i && O.fired < i;
+    let [x, y] = ascNode(cx, cy, i); y -= 44;
+    if (gathering) y -= 34 * Math.min(1, (O.t - O.warnT) / .25);
+    let s = lit ? 74 : 56; if (since < .4) s *= 1 + .6 * (1 - since / .4);
+    if (O.warn >= 5) { const q = Math.min(1, (O.t - O.warnT) / .6), a = O.t * (O.fired >= 5 ? 2.4 : 1.8) + i * TAU / 5, ox = kx + Math.cos(a) * 120, oy = ky - 70 + Math.sin(a) * 46;
+      x += (ox - x) * q; y += (oy - y) * q; s = 66; }
+    if (lit) add(() => glowAt(x, y, s * 2.4 * (since < .4 ? 1.4 : 1), ASC_COL[el][0], .8 * life));
+    if (!spr('x-stone-' + el, x, y, s, Math.sin(O.t * 2 + i) * .08, (lit ? 1 : .45) * life)) { g.globalAlpha = life; g.fillStyle = EL[el]; g.beginPath(); g.arc(x, y, s * .3, 0, TAU); g.fill(); g.globalAlpha = 1; }
+  }
+}
 function drawFuseGround() {
   if (!S.fz) return;
   for (const z of S.fz) {
@@ -5882,6 +6034,16 @@ function drawFX(top) {
       continue;
     }
     if (p.k === 'flame') { const st = Math.min(3, (k * 4) | 0), w = p.s * 1.1 * (1 + Math.sin(S.t * 30 + p.x) * .08), h = w * 1.5; g.globalAlpha = Math.pow(a, .6); g.drawImage(flameSprite(st), p.x - w / 2, p.y - h * .73, w, h); g.globalAlpha = 1; }
+    // Ascended's debris (2026-10-05): a boulder thrown up by the earth wave, with its shadow on the ground; a silver
+    // cash coin from the metal wave, spinning edge-on and back. Both are round, so neither can read as an arrow
+    else if (p.k === 'boulder') { const y = p.y - p.z, al = Math.min(1, a * 2.5);
+      g.globalAlpha = al * .3; g.fillStyle = '#000'; g.beginPath(); g.ellipse(p.x, p.y, p.s * (1 - Math.min(.6, p.z / 400)), p.s * .35, 0, 0, TAU); g.fill();
+      g.globalAlpha = al; g.beginPath(); for (let i = 0; i < 7; i++) { const an = p.rot + i * TAU / 7, r = p.s * p.q[i]; g.lineTo(p.x + Math.cos(an) * r, y + Math.sin(an) * r * .85); } g.closePath();
+      g.lineJoin = 'round'; g.fillStyle = p.c; g.fill(); g.lineWidth = 2.5; g.strokeStyle = 'rgba(26,18,6,.8)'; g.stroke();
+      g.fillStyle = 'rgba(255,236,190,.35)'; g.beginPath(); g.ellipse(p.x - p.s * .25, y - p.s * .3, p.s * .35, p.s * .2, -.5, 0, TAU); g.fill(); g.lineJoin = 'miter'; g.globalAlpha = 1; }
+    else if (p.k === 'coin') { const y = p.y - p.z, w = p.s * Math.max(.18, Math.abs(Math.cos(p.rot))), al = Math.min(1, a * 2.5);
+      g.globalAlpha = al; g.fillStyle = '#D9E2EA'; g.strokeStyle = '#4A5868'; g.lineWidth = 2; g.beginPath(); g.ellipse(p.x, y, w, p.s, 0, 0, TAU); g.fill(); g.stroke();
+      g.fillStyle = '#4A5868'; g.fillRect(p.x - w * .28, y - p.s * .28, w * .56, p.s * .56); g.globalAlpha = 1; }
     else if (p.k === 'plus') { g.globalAlpha = a; g.fillStyle = p.c; g.fillRect(p.x - p.s / 2, p.y - p.s / 6, p.s, p.s / 3); g.fillRect(p.x - p.s / 6, p.y - p.s / 2, p.s / 3, p.s); g.globalAlpha = 1; }
     else if (p.k === 'ring' && !p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'hit') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = `rgba(255,255,255,${a})`; const s = p.s * (.6 + k * .6); g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? s * .25 : s * .6; g.lineTo(Math.cos(i * TAU / 8) * r, Math.sin(i * TAU / 8) * r); } g.closePath(); g.fill(); g.restore(); }
@@ -5893,6 +6055,7 @@ function drawFX(top) {
     if (p.k === 'glow') glowAt(p.x, p.y, p.s + ((p.s1 ?? p.s) - p.s) * k, p.c, a);
     else if (p.k === 'hit') glowAt(p.x, p.y, p.s * 1.6, p.c, a);
     else if (p.k === 'ring' && p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
+    else if (p.k === 'ember') { const y = p.y - p.z, sz = p.s * (1 - k * .35); glowAt(p.x, y, sz * 6, '#FF8A2A', a * .85); glowAt(p.x, y, sz * 2.4, '#FFD27A', a); }
     else if (p.k === 'spark') { g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.s; g.lineCap = 'round'; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x - p.vx * .04, p.y - p.vy * .04); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'star') { const s = p.s * 2.4 * (1 - k * .5); g.globalAlpha = a; g.drawImage(starSprite(p.c), p.x - s / 2, p.y - s / 2, s, s); g.globalAlpha = 1; }
     else if (p.k === 'slash') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.strokeStyle = `rgba(235,245,255,${a})`; g.lineWidth = 9 * a + 1; g.beginPath(); arc0(0, 0, p.s, -1.1, 1.1); g.stroke(); g.strokeStyle = `rgba(255,255,255,${a})`; g.lineWidth = 3; g.beginPath(); arc0(0, 0, p.s * .9, -.9, .9); g.stroke(); g.restore(); }
