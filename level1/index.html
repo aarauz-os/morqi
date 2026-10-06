@@ -79,25 +79,53 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .still-sky.h{top:calc(92px + env(safe-area-inset-top));width:min(86vw,338px);--o:.08}.met-still .still-sky.h{--o:.22}
 @keyframes stillOpen{from{opacity:0}to{opacity:var(--o)}}@keyframes stillDrift{0%,100%{opacity:var(--o);translate:-50% 0}50%{opacity:var(--o);translate:-50% 6px}}
 @media (prefers-reduced-motion:reduce){.still-sky{animation:none;opacity:var(--o)}}
-#still{background:#04050A;overflow:hidden}#still .st-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter 4s ease}
-#still.dim .st-bg{filter:saturate(.3) brightness(.45)}#still.ice .st-bg{filter:saturate(0) brightness(.7) sepia(.3) hue-rotate(170deg)}
+#still{background:#04050A;overflow:hidden}
+/* the camera pushes in on the Keeper once they are caught: the city behind and the Keeper in front scale together, with
+   the Stillmaker between them (A, 2026-10-06: the shock has to read) */
+#still .st-stage{position:absolute;inset:0;transform-origin:var(--ox,50%) var(--oy,70%);transition:scale 3.2s cubic-bezier(.45,0,.25,1)}#still .st-back{z-index:1}#still .st-front{z-index:3;pointer-events:none}#still.trap .st-stage{scale:var(--push,1)}
+#still .st-dark,#still .st-frost{z-index:1}#still > .st-mote{position:absolute;left:0;top:0;z-index:4;will-change:transform}
+#still .st-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter 4s ease}
+#still.dim .st-bg{filter:saturate(.3) brightness(.45)}#still.ice .st-bg{filter:saturate(0) brightness(.7) sepia(.3) hue-rotate(170deg)}#still.slump .st-bg{filter:saturate(0) brightness(.45) sepia(.3) hue-rotate(170deg);transition-duration:2s}
 #still .st-dark{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(20,24,60,.1),rgba(2,3,10,.88) 75%);opacity:0;transition:opacity 2s}#still.dim .st-dark{opacity:1}
 #still .st-frost{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 6s ease;background:radial-gradient(ellipse at 50% 50%,transparent 48%,rgba(90,140,200,.3) 78%,rgba(130,175,225,.5) 100%)}#still.dim .st-frost{opacity:.7}#still.ice .st-frost{opacity:1;transition-duration:.25s}
-#still .st-fig{position:absolute;left:50%;top:4%;width:min(96vw,440px);aspect-ratio:1;translate:-50% -120%;opacity:0;transition:translate 3.2s cubic-bezier(.2,.7,.2,1),opacity 2s;filter:drop-shadow(0 0 26px rgba(40,30,110,.9)) drop-shadow(0 0 60px rgba(20,16,70,.8))}
-#still.come .st-fig{translate:-50% 0;opacity:1}#still.go .st-fig{opacity:0;translate:-50% -6%;transition-duration:2.4s}
-#still .st-fig img{width:100%;height:100%}
+#still .st-socks i{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#0A0C14;box-shadow:inset 0 0 6px #000}
+/* he forms out of the dark: a gathering cloud, his eyes first, then the rest of him (A, 2026-10-06) */
+#still .st-fig{position:absolute;left:58%;top:2%;width:min(80vw,400px);aspect-ratio:1;translate:-50% 0;scale:.94;opacity:0;z-index:2;transition:opacity 2.4s ease,scale 3.4s cubic-bezier(.2,.7,.2,1),translate 2.4s ease;filter:drop-shadow(0 0 26px rgba(40,30,110,.9)) drop-shadow(0 0 60px rgba(20,16,70,.8))}
+#still.come .st-fig{opacity:1;scale:1}#still.go .st-fig{opacity:0;translate:-50% -6%}
+#still .st-fig img{position:relative;width:100%;height:100%;filter:blur(18px) brightness(0);opacity:.2;transition:filter 3.2s ease .5s,opacity 2.6s ease .5s}#still.come .st-fig img{filter:none;opacity:1}
+#still .st-smoke{position:absolute;inset:6% 14%;border-radius:50%;background:radial-gradient(closest-side,rgba(10,8,30,.95),rgba(30,20,70,.55) 55%,transparent);opacity:0;scale:1.4;transition:opacity 1.6s,scale 3.4s ease}#still.come .st-smoke{opacity:.75;scale:1}#still.ring .st-smoke{opacity:.35}
+#still .st-feyes{position:absolute;left:51.7%;top:26.2%;width:46%;aspect-ratio:1200/346;translate:-50% -50%;background:url(art4/still/eyes.png?v=2) center/100% 100% no-repeat;opacity:0}#still.come .st-feyes{animation:stEyes 3.6s ease forwards}
+@keyframes stEyes{0%{opacity:0}18%{opacity:1}60%{opacity:1}100%{opacity:0}}
 #still .st-bell{position:absolute;left:42.3%;top:57%;width:14%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,rgba(170,210,255,.35),transparent 65%);opacity:0;transition:opacity .5s}#still.ring .st-bell{opacity:1;animation:stShim 1.6s ease-in-out infinite}@keyframes stShim{50%{opacity:.35}}
 #still .st-toll{position:absolute;left:42.3%;top:57%;width:14%;aspect-ratio:1;margin:-7% 0 0 -7%;border-radius:50%;border:3px solid rgba(170,210,255,.8);pointer-events:none}
-#still .st-keeper{position:absolute;left:50%;bottom:9%;height:150px;translate:-50% 0;transition:filter 3.5s}#still.drain .st-keeper{filter:saturate(.15) brightness(.8)}#still.ice .st-keeper,#still.ice .st-pet{filter:grayscale(1) brightness(1.15) sepia(.35) hue-rotate(170deg) saturate(1.6);transition-duration:.25s}
-#still .st-pet{position:absolute;left:31%;bottom:9.5%;height:70px;translate:-50% 0;transition:filter 3.5s}
-#still .st-socks i{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#0A0C14;box-shadow:inset 0 0 6px #000}
-#still .st-orbs i{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(10,12,24,.5);display:grid;place-items:center;box-shadow:0 0 0 3px var(--c),0 0 18px 4px var(--c)}#still .st-orbs img{width:46px;height:46px;border-radius:50%;object-fit:cover}
-#still .st-white{position:absolute;inset:0;background:rgb(110,160,220);opacity:0;pointer-events:none;transition:opacity .2s}#still.flash .st-white{opacity:.4}#still.black .st-white{background:#03040A;opacity:1;transition:opacity 1.6s}
-#still .st-end{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:26px;opacity:0;pointer-events:none;transition:opacity 1.8s}#still.end .st-end{opacity:1;pointer-events:auto}
-#still .st-tbc{font-family:var(--round);font-weight:900;font-size:40px;color:#FFFFFF;letter-spacing:.01em;text-align:center;margin:0}#still .st-end .btn{opacity:0;transition:opacity 1s 3.6s}#still.end .st-end .btn{opacity:1}
-#still .st-stare{width:min(80vw,360px);aspect-ratio:5/1;background:url(art4/still/stillmaker.png?v=9) 52% 25.4%/640% auto no-repeat;opacity:0;transition:opacity 2.4s 1.6s;-webkit-mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 40%,transparent 100%);mask:radial-gradient(ellipse 50% 50% at 50% 50%,#000 40%,transparent 100%);filter:brightness(1.1) contrast(1.1)}#still.end .st-stare{opacity:1}
+/* the Keeper and companion stand exactly where the game last drew them; caught, drained, frozen, then sinking */
+#still .st-keeper,#still .st-pet{position:absolute;z-index:5;object-fit:contain;transition:filter 2.5s,translate 1.8s cubic-bezier(.5,0,.8,.4),rotate 1.8s,scale 1.8s;animation:stHover 2.62s ease-in-out infinite}#still .st-pet{z-index:4;animation-delay:-.35s}
+@keyframes stHover{0%,50%,100%{translate:0 0}25%{translate:0 2.3px}75%{translate:0 -2.3px}}
+#still .st-kglow{position:absolute;translate:-50% -50%;border-radius:50%;z-index:3;mix-blend-mode:screen;background:radial-gradient(circle,rgba(228,236,255,.18),rgba(143,168,255,.2) 22%,rgba(143,168,255,.07) 55%,transparent 72%);transition:opacity 2.4s}#still.trap .st-kglow{opacity:.7}#still.ice .st-kglow,#still.go .st-kglow{opacity:0}
+#still .st-keeper{filter:drop-shadow(0 0 2.5px var(--rim,#fff))}
+#still .st-sh{position:absolute;translate:-50% -50%;border-radius:50%;background:rgba(0,0,0,.32);z-index:3}
+#still .st-trap{position:absolute;translate:-50% -50%;z-index:3;opacity:0;transition:opacity .8s}
+#still .st-trap::before{content:"";position:absolute;inset:-14% -8%;border-radius:46% 54% 50% 50%;background:radial-gradient(ellipse at 44% 56%,rgba(215,235,255,.5),rgba(160,200,245,.22) 45%,transparent 70%),radial-gradient(ellipse at 64% 40%,rgba(225,240,255,.35),transparent 60%);filter:blur(1.5px)}
+#still .st-trap::after{content:"";position:absolute;left:50%;bottom:20%;width:90%;height:360%;translate:-50% 0;background:radial-gradient(ellipse 50% 50% at 50% 100%,rgba(140,180,255,.32),rgba(140,180,255,.1) 55%,transparent 75%)}
+#still .st-trap b{position:absolute;width:var(--w);height:var(--h);margin-left:calc(var(--w) / -2);border-radius:50% 50% 3px 3px / 38% 38% 3px 3px;background:linear-gradient(to top,rgba(140,185,250,.95),rgba(225,240,255,.98) 70%,#fff);box-shadow:inset -2px 0 3px rgba(90,140,220,.5),inset 2px 0 2px rgba(255,255,255,.7);transform-origin:50% 100%;rotate:var(--r);scale:1 0;transition:scale .6s cubic-bezier(.2,1.3,.4,1) var(--d);filter:drop-shadow(0 0 3px rgba(150,190,255,.8))}
+#still.trap .st-trap{opacity:1}#still.trap .st-trap b{scale:1 1}#still.go .st-trap{opacity:.4}
+#still.drain .st-keeper{filter:brightness(1.35) drop-shadow(0 0 5px #fff) drop-shadow(0 0 16px #9FC4FF)}
+#still.ice .st-keeper,#still.ice .st-pet{animation:none;filter:grayscale(1) brightness(1.15) sepia(.35) hue-rotate(170deg) saturate(1.6);transition-duration:.25s,1.8s,1.8s,1.8s}
+#still.slump .st-keeper{translate:0 var(--lift);rotate:-7deg;scale:.95;filter:grayscale(1) brightness(.8) sepia(.35) hue-rotate(170deg) saturate(1.3);transition-duration:2s,1.8s,1.8s,1.8s}#still.slump .st-pet{translate:0 var(--plift);rotate:6deg;filter:grayscale(1) brightness(.8) sepia(.35) hue-rotate(170deg) saturate(1.3)}
+/* his powers circling him, the five stones, and the cold gathering into the Stillmaker */
+#still .st-orbs{position:absolute;inset:0;pointer-events:none}#still .st-orbs > i{position:absolute;left:0;top:0;will-change:transform}
+#still .st-orb{width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:rgba(10,12,24,.55);display:grid;place-items:center;box-shadow:0 0 0 2px var(--c),0 0 14px 4px var(--c)}#still .st-orb img{width:19px;height:19px;border-radius:50%;object-fit:cover}
+#still .st-orb.bare{width:14px;height:14px;margin:-7px 0 0 -7px;background:radial-gradient(circle,#fff,var(--c) 60%);box-shadow:0 0 14px 5px var(--c)}
+#still .st-stone{width:36px;height:36px;margin:-18px 0 0 -18px;--g:.3;filter:drop-shadow(0 0 calc(4px + 14px * var(--g)) var(--c)) brightness(calc(.8 + .5 * var(--g)))}#still .st-stone img{width:100%;height:100%;object-fit:contain}
+#still .st-orbs > canvas.st-tails{position:absolute;left:0;top:0;width:100%;height:100%;z-index:6;pointer-events:none}
+#still .st-sglow{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:radial-gradient(circle,#fff,var(--c) 40%,transparent 72%);animation:stSock .45s ease-in forwards}@keyframes stSock{from{opacity:0;scale:.5}to{opacity:1;scale:1.6}}
+#still .st-mote{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#CFE0FF;box-shadow:0 0 8px 2px rgba(150,180,255,.8)}
+#still .st-white{position:absolute;inset:0;z-index:20;background:rgb(110,160,220);opacity:0;pointer-events:none;transition:opacity .2s}#still.flash .st-white{opacity:.4}#still.black .st-white{background:#03040A;opacity:1;transition:opacity 1.6s}
+#still .st-end{position:absolute;inset:0;z-index:21;display:grid;place-content:center;justify-items:center;gap:26px;opacity:0;pointer-events:none;transition:opacity 1.8s}#still.end .st-end{opacity:1}
+#still .st-tbc{font-family:var(--round);font-weight:900;font-size:40px;color:#FFFFFF;letter-spacing:.01em;text-align:center;margin:0}
+#still .st-stare{width:min(86vw,420px);aspect-ratio:1200/346;background:url(art4/still/eyes.png?v=2) center/100% 100% no-repeat;opacity:0;transition:opacity 3s ease}#still.eyes .st-stare{opacity:1}
 #still.ice .st-fig img{animation:stQuake .5s ease-out}@keyframes stQuake{0%,100%{translate:0 0}20%{translate:-8px 3px}40%{translate:7px -4px}60%{translate:-5px 2px}80%{translate:3px -1px}}
-@media (prefers-reduced-motion:reduce){#still .st-fig{transition:opacity 1s}}#cards.two{grid-template-columns:repeat(2,minmax(0,1fr));width:68%;margin:0 auto}#loadout{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:30px}.lu-pips{display:flex;justify-content:center;gap:6px;margin-top:4px}.lu-pips i{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px rgba(20,24,60,.35)}
+@media (prefers-reduced-motion:reduce){#still .st-fig{transition:opacity 1s}#still .st-stage{transition:none}#still .st-keeper,#still .st-pet{animation:none}}#cards.two{grid-template-columns:repeat(2,minmax(0,1fr));width:68%;margin:0 auto}#loadout{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:30px}.lu-pips{display:flex;justify-content:center;gap:6px;margin-top:4px}.lu-pips i{width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px rgba(20,24,60,.35)}
 .pop{animation:pop .5s var(--spring) both}
 @keyframes pop{from{transform:translateY(24px) scale(.94);opacity:0}}
 
@@ -1546,16 +1574,13 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   </section>
 
   <section class="scr" id="still" hidden aria-label="The Stillmaker arrives">
-    <img class="st-bg" id="stBg" alt="">
+    <div class="st-stage st-back"><img class="st-bg" id="stBg" alt=""><div class="st-socks" id="stSocks"></div></div>
     <div class="st-dark"></div>
     <div class="st-frost"></div>
-    <div class="st-socks" id="stSocks"></div>
-    <div class="st-fig" id="stFig"><img src="art4/still/stillmaker.png?v=9" alt="The Stillmaker, in his dark coat, holding his bell."><i class="st-bell" id="stBell"></i></div>
-    <img class="st-pet" id="stPet" alt="">
-    <img class="st-keeper" id="stKeeper" alt="">
-    <div class="st-orbs" id="stOrbs"></div>
+    <div class="st-fig" id="stFig"><i class="st-smoke"></i><img src="art4/still/stillmaker.png?v=9" alt="The Stillmaker, in his dark coat, holding his bell."><i class="st-feyes"></i><i class="st-bell" id="stBell"></i></div>
+    <div class="st-stage st-front"><i class="st-trap" id="stTrap"></i><i class="st-kglow" id="stKGlow"></i><i class="st-sh" id="stPSh"></i><i class="st-sh" id="stKSh"></i><img class="st-pet" id="stPet" alt=""><img class="st-keeper" id="stKeeper" alt=""><div class="st-orbs" id="stOrbs"></div></div>
     <div class="st-white"></div>
-    <div class="st-end"><div class="st-stare" aria-hidden="true"></div><h1 class="st-tbc">To be continued…</h1><button class="btn green" id="stNext">Next</button></div>
+    <div class="st-end"><div class="st-stare" aria-hidden="true"></div><h1 class="st-tbc">To be continued…</h1></div>
   </section>
   <section class="scr" id="thanks" hidden>
     <div class="thx-sky" aria-hidden="true"></div>
@@ -1902,6 +1927,14 @@ const AU = (() => {
     heal() { tone({ f:520, f1:1040, dur:.35, vol:.08 }); tone({ f:780, f1:1560, dur:.35, vol:.05, at:.08 }); },
     sweep() { noise({ ft:'bandpass', f:400, f1:5000, q:3, dur:.6, vol:.12 }); tone({ f:300, f1:1200, dur:.5, vol:.06 }); },
     freeze() { noise({ ft:'highpass', f:4000, f1:12000, dur:.5, vol:.1 }); for (let i = 0; i < 5; i++) tone({ f:rnd(2000, 4000), dur:.1, vol:.03, at:i * .05 }); },
+    // the Silver City's ending (A, 2026-10-06): a cold drone under the float and the trap, a pull as each power leaves the
+    // Keeper, a crystal note as it lands in its own stone, the dark gathering into him, and each stone taken into his bell
+    dread(d = 5) { tone({ f:55, dur:d, vol:.08, type:'sawtooth', att:1.2, lp:260 }); tone({ f:58.27, dur:d, vol:.06, type:'sawtooth', att:1.6, lp:220 }); noise({ f:160, dur:d, vol:.05, att:1.4 }); },
+    trap() { this.boom(true); tone({ f:46, f1:28, dur:1.4, vol:.32, att:.004 }); noise({ ft:'highpass', f:3000, f1:9000, dur:.9, vol:.08 }); for (let i = 0; i < 7; i++) tone({ f:rnd(420, 680), dur:.12, vol:.03, at:.05 + i * .07 }); },
+    pull(i = 0) { noise({ ft:'bandpass', f:1500, f1:260, q:3, dur:.55, vol:.07, att:.25 }); tone({ f:PENTA[(i * 3) % 5], f1:PENTA[(i * 3) % 5] / 2, dur:.5, vol:.035, att:.2 }); },
+    absorb(i = 0) { const f = PENTA[i % 5]; tone({ f, dur:1, vol:.07, type:'triangle', att:.005 }); tone({ f:f / 2, dur:.8, vol:.04, att:.005 }); noise({ ft:'bandpass', f:600, q:2, dur:.2, vol:.03 }); },
+    form() { noise({ f:180, f1:2600, dur:3, vol:.13, att:2.6 }); tone({ f:32, f1:49, dur:3.2, vol:.28, att:2.8, glide:3 }); tone({ f:98, f1:92.5, dur:3.2, vol:.05, type:'sawtooth', lp:400, att:2.6 }); },
+    seize(i = 0) { tone({ f:196 - i * 12, f1:65, dur:.7, vol:.12, type:'triangle', att:.003 }); noise({ ft:'bandpass', f:900, q:2, dur:.3, vol:.07 }); },
     power() { tone({ f:200, f1:800, type:'sawtooth', dur:.4, vol:.08, lp:1500 }); this.levelup(); },
     // the genie (Ascended): out, a swirl of air rising into a warm chord with a sub underneath; in, the swirl falling
     // back into one soft chime. Everything pitched sits at or below about 700 Hz, the air above it
@@ -2971,7 +3004,7 @@ function scatterProps(w) {
     out.push({ x, y, n:kinds[(Math.random() * kinds.length) | 0], s:rnd(62, 84), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 });
   }
   // each element tower's district grows its own element's plants and things, frozen until its stone is taken
-  if (LVL === 5) for (const Sh of SHRINES) { const k2 = PROPS[Sh.el]; k2.forEach(n => IMG[n] || load(n, `art4/props/${n}.png?v=8`)); IMG['x-temple-' + Sh.el] || load('x-temple-' + Sh.el, `art4/props/x-temple-${Sh.el}.png?v=11`);
+  if (LVL === 5) for (const Sh of SHRINES) { const k2 = PROPS[Sh.el]; k2.forEach(n => IMG[n] || load(n, `art4/props/${n}.png?v=8`)); IMG['x-temple-' + Sh.el] || load('x-temple-' + Sh.el, `art4/props/x-temple-${Sh.el}.png?v=12`);
     for (let i = 0; i < 16; i++) { const a = rnd(0, TAU), d = rnd(170, Sh.R - 40); out.push({ x:Sh.x + Math.cos(a) * d, y:Sh.y + Math.sin(a) * d * .8, n:k2[i % 2], s:rnd(66, 90), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 }); } }
   return out.sort((a, b) => a.y - b.y);
 }
@@ -4790,7 +4823,7 @@ const towersOn = () => /[?&]towers=1/.test(location.search);
 function makeOutposts() {
   const els = ['wood', 'water', 'fire'], hub = { hub:true, el:'wood', x:1800, y:1500, h:560, rx:160, ry:60 };
   const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / 3; return { el, x:Math.round(1800 + Math.cos(a) * 1000), y:Math.round(1500 + Math.sin(a) * 900), h:340, rx:128, ry:54 }; });
-  els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=11`));
+  els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`));
   return { hub, towers, els, need:240, march:[] };
 }
 const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? [S.out.hub, ...S.out.towers] : [];
@@ -5934,7 +5967,7 @@ function draw() {
   // (playtest 1: with the camera locked to the arena's centre, its top hid under the HUD and so did the player)
   const AR = S.arena, fxp = AR ? clamp(P.x, AR.x - AR.r * .6, AR.x + AR.r * .6) : P.x, fyp = AR ? clamp(P.y, AR.y - AR.r * .6, AR.y + AR.r * .6) : P.y;
   // during a boss's change the camera glides to it instead
-  const TF = S.tf, tx = TF ? TF.x : fxp, ty = TF ? TF.y - TF.s * .3 : fyp, ease = TF ? .06 : .2;
+  const TF = S.tf, tx = TF ? (TF.cam ? TF.cam.x + VW / 2 : TF.x) : fxp, ty = TF ? (TF.cam ? TF.cam.y + VH * .45 : TF.y - TF.s * .3) : fyp, ease = TF ? .06 : .2;
   camX += (tx - VW / 2 - camX) * ease; camY += (ty - VH * .45 - camY) * ease;
   camX = clamp(camX, 0, WORLD - VW); camY = clamp(camY, 0, WORLD - VH);
   const sh = reduce ? 0 : S.shake * 20, cx = camX + rnd(-.5, .5) * sh, cy = camY + rnd(-.5, .5) * sh;
@@ -6097,7 +6130,7 @@ function draw() {
   // every tower whose front, at the Keeper's x, is behind the Keeper's feet stands behind them
   for (let i = twi; i < TW.length; i++) if (!TW[i].drawnAt && !keeperBehind(TW[i])) { TW[i].drawnAt = S.t; drawTowerAt(TW[i], cx, cy); }
   // sacred trees (Rising Grove)
-  if (!S.noKeeper) { drawFuseGround(); drawAscendGround(); }
+  if (!S.noKeeper && !S.p.float) { drawFuseGround(); drawAscendGround(); }
   for (const tr of S.trees) { const k = Math.min(1, tr.t / .4) * Math.min(1, (tr.life - tr.t) / .4), sw = Math.sin(S.t * 3 + tr.x) * .05;
     g.save(); g.translate(tr.x, tr.y); g.rotate(sw); g.scale(k, k);
     g.fillStyle = '#5A3A1A'; g.strokeStyle = '#1A1206'; g.lineWidth = 3; g.beginPath(); g.roundRect(-9, -70, 18, 72, 6); g.fill(); g.stroke();
@@ -6163,7 +6196,7 @@ function draw() {
   // particles that sit under the characters
   drawFX(false);
   // gifts shown on the Keeper
-  const pv = S.gifts;
+  const pv = P.float ? {} : S.gifts;
   if (pv.rooted) { g.strokeStyle = 'rgba(230,178,58,.8)'; g.lineWidth = 3 + pv.rooted; g.beginPath(); for (let i = 0; i <= 6; i++) { const a = i / 6 * TAU + S.t * .3; g.lineTo(P.x + Math.cos(a) * (40 + pv.rooted * 4), P.y + 28 + Math.sin(a) * (14 + pv.rooted * 1.5)); } g.stroke(); g.lineWidth = 1; }
   if (pv.spring) { const pr = .5 + .5 * Math.sin(S.t * 3); g.fillStyle = `rgba(110,180,240,${.14 + .05 * pv.spring})`; g.beginPath(); g.ellipse(P.x, P.y + 28, 34 + pv.spring * 5 + pr * 4, 12 + pv.spring * 1.5, 0, 0, TAU); g.fill(); }
   // the spirit animal
@@ -6231,6 +6264,8 @@ function draw() {
   if (P.safe > 0) { const a = Math.min(1, P.safe / .5), pu = 1 + Math.sin(S.t * 6) * .04; g.save(); g.globalAlpha = .9 * a;
     g.fillStyle = 'rgba(255,190,214,.14)'; g.strokeStyle = 'rgba(255,214,228,.75)'; g.lineWidth = 3; g.beginPath(); g.ellipse(kx, ky - 42, 58 * pu, 66 * pu, 0, 0, TAU); g.fill(); g.stroke(); g.restore(); }
   g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(P.x, P.y + 30, 26 - bob * .8, 9, 0, 0, TAU); g.fill();
+  // lifted and carried after the Warden is freed: a cold light under them, not their own
+  if (P.float) add(() => { glowAt(kx, ky - 30, 150, '#8FA8FF', .45 * P.float); glowAt(kx, ky + 10, 70, '#E4ECFF', .35 * P.float); });
   if (S.buffs.ward > 0) { const k = Math.min(1, S.buffs.ward / 2); g.save(); g.globalAlpha = .55 * k; g.strokeStyle = '#5FE3B4'; g.lineWidth = 4; g.beginPath(); for (let i = 0; i <= 6; i++) { const a = i / 6 * TAU + S.t * .6; g.lineTo(kx + Math.cos(a) * 52, ky - 26 + Math.sin(a) * 40); } g.stroke(); g.restore(); g.lineWidth = 1; }
   if (S.buffs.tiger > 0) add(() => { glowAt(kx, ky - 30, 170 + Math.sin(S.t * 18) * 14, '#FF9A3A', .8); if (Math.random() < .5) flames(kx, ky - 10, 1, 20, 22, 120); });
   if (hs) {   // Ascended: a golden aura and the five Qi Stones on their wheel, floating a little above the ground
@@ -6253,12 +6288,12 @@ function draw() {
   if (S.aura) drawAura(kx, ky);
   if (S.dashCd > 0) { const k = 1 - S.dashCd / DASH_CD; g.save(); g.strokeStyle = 'rgba(111,242,207,.85)'; g.lineWidth = 4.5; g.lineCap = 'round'; g.beginPath(); g.ellipse(P.x, P.y + 28, 36, 14, 0, -Math.PI / 2, -Math.PI / 2 + k * TAU); g.stroke(); g.restore(); }
   const hb = Math.max(0, P.hp / P.max);
-  // a glossy health capsule with a white rim, like the HUD
-  g.fillStyle = '#FFFFFF'; g.beginPath(); g.roundRect(P.x - 42, P.y + 40, 84, 16, 8); g.fill();
+  // a glossy health capsule with a white rim, like the HUD (none while the ending carries the Keeper)
+  if (!P.float) { g.fillStyle = '#FFFFFF'; g.beginPath(); g.roundRect(P.x - 42, P.y + 40, 84, 16, 8); g.fill();
   g.fillStyle = '#1C2452'; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, 78, 10, 5); g.fill();
   if (hb > 0) { const gr = g.createLinearGradient(0, P.y + 43, 0, P.y + 53); if (hb > .3) { gr.addColorStop(0, '#B6F58A'); gr.addColorStop(1, '#3FB24A'); } else { gr.addColorStop(0, '#FFB19A'); gr.addColorStop(1, '#D63A2C'); }
     g.fillStyle = gr; g.beginPath(); g.roundRect(P.x - 39, P.y + 43, Math.max(10, 78 * hb), 10, 5); g.fill();
-    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.roundRect(P.x - 36, P.y + 44.5, Math.max(4, 78 * hb - 6), 3, 2); g.fill(); }
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.roundRect(P.x - 36, P.y + 44.5, Math.max(4, 78 * hb - 6), 3, 2); g.fill(); } }
   }
   // a tower the Keeper stands behind, drawn early for a creature in front of it, is drawn again over the Keeper (QA,
   // 2026-10-06: with a crowd about, the Keeper painted over the tower)
@@ -6273,7 +6308,7 @@ function draw() {
   for (const s of S.pshots) { if (!inView(s.x, s.y, 30)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.el] || '#C9D3DB', 9, false); }
   for (const s of S.eshots) { if (!inView(s.x, s.y, 40)) continue; energy(s.x, s.y, s.vx, s.vy, SHOT_COL[s.k] || SHOT_COL[s.el] || '#7FC4FF', s.boss ? 18 : 14, true, s.k === 'bubble'); }
   g.lineWidth = 1;
-  if (!S.noKeeper) drawFuseTop();
+  if (!S.noKeeper && !S.p.float) drawFuseTop();
   if (S.call) drawCallTop();
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
@@ -7948,6 +7983,9 @@ function win() {
   S.giftNew = gift && !SEEN.has('_freed-' + realm) ? gift : null; markSeen('_freed-' + realm);
   if (S.giftNew && !callPick) callPick = S.giftNew;
   const T = S.tf = { t:0, x:B.x, y:B.y, el:B.el, s:B.size, flip:S.p.x > B.x, who:freedOf(B.realm || B.el), img:ok(IMG[poseImg(B, 'up')]) ? IMG[poseImg(B, 'up')] : IMG[B.img], cue:0, r:0 };
+  // the last level never says Victory: the Warden is freed, then the Keeper is lifted and carried to the Great Tower,
+  // where the Stillmaker is waiting (A, 2026-10-06: "the demo can end on the eyes with nothing after")
+  const fin = LVL === LEVELS.length;
   let last = performance.now();
   const at = (k, t, fn) => { if (T.cue === k && T.t >= t) { T.cue++; fn(); } };
   const step = now => {
@@ -7964,16 +8002,19 @@ function win() {
       for (let i = 0; i < 26; i++) { const a = rnd(-2.6, -.5); fx({ k:'star', x:cx + rnd(-60, 60), y:cy + rnd(-60, 60), vx:Math.cos(a) * rnd(40, 140), vy:Math.sin(a) * rnd(60, 160), drag:.4, life:rnd(1.4, 2.4), s:rnd(14, 26), c:'#39415E' }); }
     });
     at(9, 3.75, () => { SFX.heal(); stars(T.x, T.y - 120, 40, '#FFE58A', 420); });
-    at(10, 4.3, () => { floatText(T.x, T.y - T.s * .95, 'Victory!', '#FFE08A', 46); SFX.fanfare(true); });
+    at(10, 4.3, () => { if (!fin) { floatText(T.x, T.y - T.s * .95, 'Victory!', '#FFE08A', 46); SFX.fanfare(true); } });
     // the person the boss was thanks you in their own voice, with the words the Victory card then shows (A, 2026-10-05)
     at(11, 4.9, () => AU.vo('vo-thanks-' + (B.realm || worldOf()), 0, .4));
+    // what the win earns is kept without the Victory screen: stars, Sparks, the companion's growth, the demo done
+    at(12, 6.4, () => { if (fin) results(true); });
     if (T.t > 3.3 && T.r < 2600) { T.r += 70; paintThaw(T.x, T.y, T.r); for (let i = 0; i < 6; i++) paintThaw(rnd(0, WORLD), rnd(0, WORLD), 180); }
     // night lifts into dawn
     if (T.t > 3.3) S.night = Math.max(0, (S.night || 0) - dt / 1.8);
-    if (T.t > 3.5 && Math.random() < .5) fx({ k:'star', x:T.x + rnd(-160, 160), y:T.y + rnd(-20, 40), vx:rnd(-20, 20), vy:rnd(-90, -50), drag:.2, life:rnd(1.2, 2), s:rnd(8, 14), c:['#FFE08A', '#FFB8D0', '#B8F5C8'][(Math.random() * 3) | 0] });
+    if (T.t > 3.5 && !T.fl && Math.random() < .5) fx({ k:'star', x:T.x + rnd(-160, 160), y:T.y + rnd(-20, 40), vx:rnd(-20, 20), vy:rnd(-90, -50), drag:.2, life:rnd(1.2, 2), s:rnd(8, 14), c:['#FFE08A', '#FFB8D0', '#B8F5C8'][(Math.random() * 3) | 0] });
     S.flashT = Math.max(0, S.flashT - dt); S.shake = Math.max(0, S.shake - dt * 1.5);
-    updateFX(dt); S.en = []; draw(); drawChange(T);
-    if (T.t < 6.4) requestAnimationFrame(step); else results();
+    updateFX(dt); S.en = []; if (fin && T.t > 7.1) floatStep(T, dt); draw(); drawChange(T);
+    if (T.done) return;
+    if (T.t < 6.4 || fin) requestAnimationFrame(step); else results();
   };
   requestAnimationFrame(step);
 }
@@ -8011,7 +8052,7 @@ function drawChange(T) {
   }
   // the person it was, in a column of warm light
   if (a > 3.3) {
-    const k = Math.min(1, (a - 3.3) / .6), back = 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2), al = Math.min(1, (a - 3.3) / .25), bob = Math.sin(a * 2.4) * 5;
+    const k = Math.min(1, (a - 3.3) / .6), back = 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2), al = Math.min(1, (a - 3.3) / .25) * (T.fl ? Math.max(0, 1 - T.fl.t / 1.6) : 1), bob = Math.sin(a * 2.4) * 5;
     add(() => { glowAt(T.x, T.y - s * .35, s * 1.7, '#FFE08A', .55 * al); glowAt(T.x, T.y - s * .2, s * .9, '#FFFFFF', .35 * al); });
     sprite(IMG[T.who.img], T.x, T.y - (k >= 1 ? Math.max(0, bob) : 0), s * .8 * (.55 + .45 * back), al, !T.flip);
   }
@@ -8181,14 +8222,14 @@ function petProgHTML(r) {
     <div><b>${A.y} · Lv ${a.lv}${up ? ` <i>+${up}</i>` : ''}</b><div class="bar"><i style="--w:${Math.round(a.into / a.need * 100)}%"></i></div>
     <span>${evolved ? `Ultimate evolved: <strong>${a.name}</strong>!` : a.next ? `Lv ${a.next} unlocks <strong>${a.nextName}</strong>` : `${a.name} is fully evolved`}</span></div></div>`;
 }
-function results() {
-  $('#hud').hidden = true;
+function results(quiet) {
+  $('#hud').hidden = true; S.quietPay = !!quiet;
   // the home theme comes in under Victory, so the screen is never silent and it carries you home (A's playthrough, 2026-10-05)
   if (S.won) setTimeout(() => { if (S && S.over && !$('#results').hidden) { AU.music(true); AU.song('home'); } }, 1600);
-  { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
+  { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (!quiet && r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
   { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `${PEOPLE[S.boss ? S.boss.realm || S.boss.el : worldOf()]} is free!`; }
   { const realm = S.boss ? S.boss.realm || S.boss.el : worldOf(), id = S.giftNew || Object.keys(CALL).find(k => CALL[k].from === realm && callOwned(k)), el = $('#resGift'); el.hidden = !id; el.classList.remove('in'); el.dataset.id = id || '';
-    if (id) { const D = CALL[id]; el.innerHTML = `<img src="art4/calls/${D.img}.png?v=9" alt=""><span><i>Star Call won!</i><b>${D.n}</b></span><em>▸</em>`;
+    if (id && !quiet) { const D = CALL[id]; el.innerHTML = `<img src="art4/calls/${D.img}.png?v=9" alt=""><span><i>Star Call won!</i><b>${D.n}</b></span><em>▸</em>`;
       setTimeout(() => { el.classList.add('in'); SFX.bx('call-seal', 2, 0); }, reduce ? 0 : 1500);
       // a new Star Call gets its own full screen: the gift, its name, a picture of what it does, and the giver's voice
       if (S.giftNew) setTimeout(() => { if (!$('#results').hidden && !S.revealed) openReveal(id); }, reduce ? 600 : 3600); } }
@@ -8208,7 +8249,7 @@ function results() {
     const now = bloomLife(), el = $('#resBloom');
     el.hidden = now === bl; if (now !== bl) el.innerHTML = `<img src="art4/props/x-bloom.png?v=8" alt="">Your Bloom now lasts ${now} seconds`;
     renderLevels(); }
-  [...$('#resStars').children].forEach((el, i) => { if (goals[i][0]) setTimeout(() => { el.classList.add('in'); SFX.ting(); }, reduce ? 0 : 700 + i * 380); });
+  if (!quiet) [...$('#resStars').children].forEach((el, i) => { if (goals[i][0]) setTimeout(() => { el.classList.add('in'); SFX.ting(); }, reduce ? 0 : 700 + i * 380); });
   const clock = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   // two rows: what you did (freed, time, evolutions), then what you earned, one Sparks total and the music parts of it,
   // each with the orb (design review, 2026-10-05: the music chips read as extra on top of the total)
@@ -8225,7 +8266,7 @@ function results() {
   if (last) { store.set('morqi.demoDone', '1'); $('#nextLvBtn').textContent = 'Continue ▶'; }
   // one green button: the next level when there is one
   $('#nextLvBtn').hidden = !next; $('#againBtn').classList.toggle('quiet', next);
-  show('results');
+  if (!quiet) show('results');
 }
 
 // a test hook: step the simulation without relying on animation frames
@@ -8325,71 +8366,180 @@ $('#nextLvBtn').onclick = () => { SFX.select(); if (LVL === LEVELS.length) { sti
 // the home theme, and what is waiting for them at home
 /* The Stillmaker's debut (A, 2026-10-06: "right after you beat silver city's warden. The stillmaker has his debut and
    dramatic entrance with his own new music and takes all our power and then the story ends with 'to be continued' ...
-   the cliffhanger makes you feel like 'woah, this enemy is THAT strong'"). About seventeen seconds, no words on screen
-   but the last: the city drains and frost creeps in from the edges, his theme starts, he descends out of the dark with
-   his bell, his eyes light, and he speaks. He lifts the bell and everything the Keeper earned is pulled out of them into
-   it, one light at a time: every power, every gift, every fusion, the companion, the Star Call, and last the five Qi
-   Stones. "Be still." The bell rings, the world freezes white, the Keeper is frozen where they stand, and he is gone.
-   Black. "To be continued…". It is the story only: the Sanctuary and everything earned are kept. */
-let STILL_T = [];
-function stillScene() {
+   the cliffhanger makes you feel like 'woah, this enemy is THAT strong'"). Reworked the same day, after A played it:
+   no Victory in between. The Warden is freed; the Keeper is lifted off the ground and carried to the Great Tower (the
+   camera goes with them); the scene takes over from that very frame. The room goes dark and the Keeper is caught; every
+   power pulls out of them and circles them; he forms out of the dark, eyes first, and the Keeper stares up at him in
+   shock. "So you woke my forge." "Such bright little powers. I'll take them." The five Qi Stones tear out of the tower,
+   each power flies into the stone of its own element while the Keeper glows with what is leaving them, and the stones go
+   to his bell one by one. "Be still." The Keeper freezes, sinks, defeated; he is gone; black; "To be continued…"; his
+   eyes open in the dark, and the demo ends there. It is the story only: the Sanctuary and everything earned are kept. */
+let STILL_T = [], STILL_RAF = 0;
+// where the ending is staged: the Keeper a little right of the Great Tower and in front of it, with the sky above
+// them left for him
+function stillSpot() {
+  const x = TOWER.x + .30 * VW, y = TOWER.y - TOWER.h + .56 * VH - 30;
+  return { x, y, cam:{ x:clamp(x - .60 * VW, 0, WORLD - VW), y:clamp(y + 30 - .74 * VH, 0, WORLD - VH) } };
+}
+// the float: lifted by a cold light, carried to the spot, turned to face the tower, held until the camera has settled
+function floatStep(T, dt) {
+  const P = S.p, pet = S.pet;
+  if (!T.fl) { const sp = stillSpot(); T.fl = { t:0, x0:P.x, y0:P.y, hold:0, ...sp }; S.arena = null; S.txt = []; S.shots = []; S.lobs = []; S.pearls = []; S.drops = []; S.items = []; S.gems = []; S.chests = []; S.orbs = []; S.hz = []; S.zones = []; S.ttraps = []; S.waves = []; S.crates = [];
+    S.shieldT = null; P.safe = 0; for (const b in S.buffs) S.buffs[b] = 0; if (S.awake) { S.awake = null; ring(pet.x, pet.y, 10, 160, EL[keeperEl], .3, 8, true); }
+    P.moving = false; P.vx = 0; P.rx = 0; P.hitAt = -9; S.dash = 0; pet.moving = false; pet.dash = 0; if (S.hs) S.hs.on = null; S.aura = null; SFX.sweep(); SFX.dread(7); }
+  const F = T.fl; F.t += dt;
+  const dur = clamp(1.8 + Math.hypot(F.x - F.x0, F.y - F.y0) / 700, 2.2, 4), k = clamp((F.t - .7) / dur, 0, 1), e = k * k * (3 - 2 * k), rise = Math.min(1, F.t / .8);
+  P.float = rise; P.x = F.x0 + (F.x - F.x0) * e; P.y = F.y0 + (F.y - F.y0) * e;
+  P.ry = -38 * rise * (2 - rise) + Math.sin(F.t * 2.4) * 4 * rise;
+  P.face = k > 0 && k < 1 ? (F.x >= F.x0 ? 1 : -1) : k >= 1 ? -1 : P.face;
+  const tx = P.x + 64, ty = P.y + 14; pet.x += (tx - pet.x) * Math.min(1, dt * 3.5); pet.y += (ty - pet.y) * Math.min(1, dt * 3.5); pet.z = 24 * rise + Math.sin(F.t * 2.4 + .8) * 3 * rise; pet.dir = k >= 1 ? -1 : Math.sign(F.x - F.x0) || -1;
+  T.cam = { x:clamp(P.x - .60 * VW, 0, WORLD - VW), y:clamp(P.y + 30 - .74 * VH, 0, WORLD - VH) };
+  // the dawn the freeing brought drains away again as they go
+  S.night = Math.min(.6, (S.night || 0) + dt * .22);
+  if (k < 1 && Math.random() < .35) fx({ k:'star', x:P.x + rnd(-40, 40), y:P.y + P.ry + rnd(-60, 10), vx:rnd(-20, 20), vy:rnd(30, 70), drag:.3, life:rnd(.8, 1.4), s:rnd(8, 14), c:'#9FB8FF' });
+  if (k >= 1) { F.hold += dt;
+    const settled = Math.abs(camX - T.cam.x) < 1 && Math.abs(camY - T.cam.y) < 1, still = Math.abs(Math.sin(F.t * 2.4)) < .12 && Math.cos(F.t * 2.4) > 0;
+    if (F.hold > 3 || F.hold > .9 && settled && still) { T.done = true; stillScene(true); } }
+}
+function stillScene(fromFloat) {
   // the story keeps its time with reduced motion too; only the movement is cut (design review, 2026-10-06)
   const sc = $('#still'), later = (ms, fn) => STILL_T.push(setTimeout(fn, ms));
-  STILL_T.forEach(clearTimeout); STILL_T = []; sc.className = 'scr';
-  // the city behind him is the last frame of the run, with the Keeper and companion lifted out: they are in the scene
-  // the frame behind him is the Great Tower with its five stones, and nothing of play: the camera settles on the tower,
-  // left of centre, the Keeper, companion, words and effects are lifted out, then everything is put back (design review,
-  // 2026-10-06: the stones must leave real sockets)
-  let socks = [];
-  try { if (S) { const keep = { x:S.p.x, y:S.p.y, arena:S.arena, txt:S.txt, nums:S.nums, pshots:S.pshots, eshots:S.eshots, drops:S.drops, shots:S.shots, lobs:S.lobs, pearls:S.pearls, cx:camX, cy:camY }, fx0 = FX.splice(0), tags = S.en.map(e => e.tagT);
-      S.noKeeper = true; S.arena = null; S.txt = []; S.nums = []; S.pshots = []; S.eshots = []; S.drops = []; S.shots = []; S.lobs = []; S.pearls = []; S.en.forEach(e => { e.tagT = 0; }); S.p.x = TOWER.x + .24 * VW; S.p.y = TOWER.y - TOWER.h + .35 * VH;
-      for (let i = 0; i < 40; i++) draw();
-      const top = TOWER.y - TOWER.h; socks = TOWER.order.map((el, i) => [(TOWER.x - camX) * Z, (top + TOWER.h * TOWER.sock[i] - camY) * Z]);
-      $('#stBg').src = $('#cv').toDataURL('image/jpeg', .85);
-      S.noKeeper = false; S.p.x = keep.x; S.p.y = keep.y; S.arena = keep.arena; S.txt = keep.txt; S.nums = keep.nums; S.pshots = keep.pshots; S.eshots = keep.eshots; S.drops = keep.drops; S.shots = keep.shots; S.lobs = keep.lobs; S.pearls = keep.pearls; S.en.forEach((e, i) => { e.tagT = tags[i]; }); FX.push(...fx0); camX = keep.cx; camY = keep.cy; } } catch (e) {}
-  $('#stKeeper').src = `art4/k${keeper}-breath.png?v=8`; $('#stPet').src = lookSrc(`art4/a-${animal}-y.png?v=8`); $('#stOrbs').innerHTML = ''; $('#stSocks').innerHTML = '';
+  STILL_T.forEach(clearTimeout); STILL_T = []; cancelAnimationFrame(STILL_RAF); sc.className = 'scr';
+  // the backdrop is the game's own last frame with the Keeper and companion lifted out, and the DOM Keeper and companion
+  // are put back exactly where the game drew them, so the cut cannot be seen
+  let socks = [], Hk = null, Hp = null, gk = null, gp = null, lift = 0, plift = 0;
+  try { if (S) {
+    const P = S.p, pet = S.pet, keep = { x:P.x, y:P.y, ry:P.ry, face:P.face, float:P.float, px:pet.x, py:pet.y, pz:pet.z, pdir:pet.dir, tf:S.tf, arena:S.arena, txt:S.txt, nums:S.nums, pshots:S.pshots, eshots:S.eshots, drops:S.drops, shots:S.shots, lobs:S.lobs, pearls:S.pearls, cx:camX, cy:camY, night:S.night }, fx0 = FX.splice(0), tags = S.en.map(e => e.tagT);
+    S.txt = []; S.nums = []; S.pshots = []; S.eshots = []; S.drops = []; S.shots = []; S.lobs = []; S.pearls = []; S.arena = null; S.en.forEach(e => { e.tagT = 0; }); S.shake = 0;
+    if (!fromFloat) { // straight in (a replay or a test): the Keeper already hovering at the spot
+      const sp = stillSpot(); P.x = sp.x; P.y = sp.y; P.ry = -38; P.face = -1; P.float = 1; P.moving = false; P.vx = 0; P.rx = 0; P.hitAt = -9;
+      pet.x = P.x + 64; pet.y = P.y + 14; pet.z = 24; pet.dir = -1; pet.moving = false; pet.dash = 0; S.night = Math.max(S.night || 0, .6);
+      S.tf = { cam:sp.cam, x:sp.x, y:sp.y, s:0 }; for (let i = 0; i < 80; i++) draw(); }
+    const kx = P.x + (P.rx || 0), ky = P.y + (P.ry || 0), nf = FACE[animal];
+    Hk = { x:(kx - 60 - camX) * Z, y:(ky - 80.4 - camY) * Z, s:120 * Z, flip:P.face < 0 }; gk = { x:(P.x - camX) * Z, y:(P.y + 30 - camY) * Z }; lift = -(P.ry || 0) * Z;
+    Hp = { x:(pet.x - 39 - camX) * Z, y:(pet.y - (pet.z || 0) - 48.36 - Math.abs(Math.sin(S.t * 3)) * 2 - camY) * Z, s:78 * Z, flip:!!(nf && pet.dir && pet.dir !== nf) }; gp = { x:(pet.x - camX) * Z, y:(pet.y + 18 - camY) * Z }; plift = (pet.z || 0) * Z;
+    S.noKeeper = true; draw(); if (fromFloat && S.tf && S.tf.who) drawChange(S.tf);
+    const top = TOWER.y - TOWER.h; socks = TOWER.order.map((el, i) => [(TOWER.x - camX) * Z, (top + TOWER.h * TOWER.sock[i] - camY) * Z]);
+    $('#stBg').src = $('#cv').toDataURL('image/jpeg', .9);
+    S.noKeeper = false; P.x = keep.x; P.y = keep.y; P.ry = keep.ry; P.face = keep.face; P.float = keep.float; pet.x = keep.px; pet.y = keep.py; pet.z = keep.pz; pet.dir = keep.pdir; S.tf = keep.tf; S.night = keep.night;
+    S.arena = keep.arena; S.txt = keep.txt; S.nums = keep.nums; S.pshots = keep.pshots; S.eshots = keep.eshots; S.drops = keep.drops; S.shots = keep.shots; S.lobs = keep.lobs; S.pearls = keep.pearls; S.en.forEach((e, i) => { e.tagT = tags[i]; }); FX.push(...fx0); camX = keep.cx; camY = keep.cy; } } catch (e) {}
+  const W0 = sc.clientWidth || innerWidth, H0 = sc.clientHeight || innerHeight;
+  if (!Hk) { const s = 70; Hk = { x:W0 * .6 - s / 2, y:H0 * .74 - s - 22, s, flip:true }; gk = { x:W0 * .6, y:H0 * .74 }; lift = 22; Hp = { x:W0 * .6 + 18, y:H0 * .74 - 60, s:45, flip:false }; gp = { x:W0 * .6 + 37, y:H0 * .74 - 7 }; plift = 14; }
+  const place = (el, b) => { el.style.cssText = `left:${b.x}px;top:${b.y}px;width:${b.s}px;height:${b.s}px;transform:scaleX(${b.flip ? -1 : 1})`; };
+  const kim = $('#stKeeper'), pim = $('#stPet');
+  kim.src = ok(IMG['k' + keeper]) ? IMG['k' + keeper].src : `art4/k${keeper}.png?v=8`; place(kim, Hk); sc.style.setProperty('--rim', EL[keeperEl]);
+  { const gl = $('#stKGlow'), r = 150 * Z * 2; gl.style.cssText = `left:${Hk.x + Hk.s / 2}px;top:${Hk.y + Hk.s * .67 - 30 * Z}px;width:${r}px;height:${r}px`; }
+  pim.src = ok(IMG[animal + 'y']) ? IMG[animal + 'y'].src : lookSrc(`art4/a-${animal}-y.png?v=8`); place(pim, Hp);
+  sc.style.setProperty('--lift', lift + 'px'); sc.style.setProperty('--plift', plift + 'px');
+  const shadow = (el, g, w) => { el.style.cssText = `left:${g.x}px;top:${g.y}px;width:${w}px;height:${w * .34}px`; };
+  shadow($('#stKSh'), gk, 52 * Z); shadow($('#stPSh'), { x:gp.x, y:gp.y }, 44 * Z);
+  const trap = $('#stTrap'); trap.style.cssText = `left:${gk.x}px;top:${gk.y}px;width:${Hk.s * 2}px;height:${Hk.s * .76}px`;
+  trap.innerHTML = Array.from({ length:9 }, (_, i) => { const a = i / 9 * TAU + rnd(-.2, .2), x = 50 + Math.cos(a) * 44, y = 50 + Math.sin(a) * 40, lean = -Math.cos(a) * 16;
+    return Array.from({ length:2 + (i % 2) }, (_, j) => `<b style="left:calc(${x.toFixed(1)}% + ${(j - .5) * 9}px);bottom:${(100 - y).toFixed(1)}%;--w:${(10 + j * 2 + rnd(0, 2)).toFixed(0)}px;--h:${(rnd(.12, .24) * Hk.s).toFixed(1)}px;--r:${(lean + (j - .5) * 10).toFixed(0)}deg;--d:${(.08 + (i % 5) * .13 + j * .06).toFixed(2)}s"></b>`).join(''); }).join('');
+  $('#stOrbs').innerHTML = ''; $('#stSocks').innerHTML = ''; sc.querySelectorAll('.st-mote').forEach(m => m.remove());
+  // the push-in centres between the Keeper and the Great Tower, so the tower and its sockets stay in the shot
+  const PUSH = 1.35, ox = socks[0] ? socks[0][0] : W0 * .3, oy = gk.y;
+  sc.style.setProperty('--push', PUSH); sc.style.setProperty('--ox', ox + 'px'); sc.style.setProperty('--oy', oy + 'px');
   show('still'); AU.music(false);
   const seen = SEEN.has('_stillmaker'); markSeen('_stillmaker');
-  sc.onclick = seen ? () => { STILL_T.forEach(clearTimeout); STILL_T = []; sc.classList.add('black', 'end'); AU.music(true); AU.songAt('still', 9); } : null;
-  later(60, () => { sc.classList.add('dim'); SFX.boom(true); });
-  later(1500, () => { AU.music(true); AU.song('still'); });
-  later(2000, () => sc.classList.add('come'));
-  later(4300, () => SFX.bx('call-toll', 2, 0));
-  // his lines lower his theme only a little, so the war keeps its weight under him (QA, 2026-10-06; A approved the mix
-  // with the music near full under his voice)
-  later(4900, () => { AU.vo('vo-still-1', 0, .75); $('#stKeeper').src = `art4/k${keeper}-hurt.png?v=8`; });
+  // the ending holds on his eyes; a tap after that goes quietly home
+  const toEnd = () => { STILL_T.forEach(clearTimeout); STILL_T = []; cancelAnimationFrame(STILL_RAF); $('#stOrbs').innerHTML = ''; sc.classList.add('black', 'end', 'eyes', 'done'); AU.music(true); AU.songAt('still', 9); };
+  sc.onclick = () => { if (sc.classList.contains('done')) { sc.onclick = null; SFX.select(); goHome(); } else if (seen) toEnd(); };
+
+  // the moving parts (powers, stones) live in one frame loop, positioned in the scene's own pixels
+  const chest = { x:Hk.x + Hk.s / 2, y:Hk.y + Hk.s * .55 }, Rx = Math.max(44, Hk.s * .9), Ry = Rx * .36, t0 = performance.now(), box = $('#stOrbs');
+  const orbs = [], stones = [], node = (cls, src, col) => { const el = document.createElement('i'); el.className = cls; el.style.setProperty('--c', col); el.innerHTML = src ? `<img src="${src}" alt="">` : ''; box.appendChild(el); return el; };
+  const sm = k => k * k * (3 - 2 * k), at = (el, x, y, s = 1, o = 1, z) => { el.style.transform = `translate(${x}px,${y}px) scale(${s})`; el.style.opacity = o; if (z != null) el.style.zIndex = z; };
+  const bell = () => { const b = $('#stBell').getBoundingClientRect(), o = sc.getBoundingClientRect(); return { x:ox + (b.left + b.width / 2 - o.left - ox) / PUSH, y:oy + (b.top + b.height / 2 - o.top - oy) / PUSH }; };
+  const flare = col => $('#stFig img').animate([{ filter:`brightness(1.5) drop-shadow(0 0 30px ${col})` }, { filter:'brightness(1) drop-shadow(0 0 0 transparent)' }], { duration:700, easing:'ease-out' });
+  // each moving power or stone draws one tapering tail of light behind it (design review: no dotted lines, they mean aiming)
+  const tc = document.createElement('canvas'), dpr = Math.min(2, devicePixelRatio || 1); tc.className = 'st-tails'; tc.width = W0 * dpr; tc.height = H0 * dpr; box.appendChild(tc);
+  const tx = tc.getContext('2d'), tails = new Map(); let live = new Set();
+  const trail = (x, y, col, r, key) => { if (reduce) return; live.add(key); const h = tails.get(key) || { col, r, pts:[] }; h.pts.push([x, y]); if (h.pts.length > 12) h.pts.shift(); tails.set(key, h); };
+  const drawTails = () => { tx.setTransform(dpr, 0, 0, dpr, 0, 0); tx.clearRect(0, 0, W0, H0); tx.lineCap = 'round'; tx.globalCompositeOperation = 'lighter';
+    for (const [key, h] of tails) { if (!live.has(key)) h.pts.shift(); if (h.pts.length < 2) { if (!h.pts.length) tails.delete(key); continue; }
+      for (let i = 1; i < h.pts.length; i++) { const k = i / h.pts.length; tx.strokeStyle = h.col; tx.globalAlpha = .55 * k; tx.lineWidth = h.r * k; tx.beginPath(); tx.moveTo(...h.pts[i - 1]); tx.lineTo(...h.pts[i]); tx.stroke();
+        tx.strokeStyle = '#FFFFFF'; tx.globalAlpha = .5 * k; tx.lineWidth = h.r * .3 * k; tx.stroke(); } }
+    tx.globalAlpha = 1; live = new Set(); };
+  const loop = now => {
+    const t = (now - t0) / 1000;
+    for (const o of orbs) {
+      if (t < o.born) { o.el.style.opacity = 0; continue; }
+      const a = o.a0 + t * 1.7, r = sm(Math.min(1, (t - o.born) / .55)), ox = chest.x + Math.cos(a) * Rx * r, oy = chest.y + Math.sin(a) * Ry * r - 6 * r;
+      if (o.go == null || t < o.go) { at(o.el, ox, oy, .45 + .55 * r, 1, Math.sin(a) > 0 ? 7 : 3); o.lx = ox; o.ly = oy; continue; }
+      const S1 = o.stone, k = Math.min(1, (t - o.go) / .6), e = sm(k), mx = (o.lx + S1.x) / 2, my = Math.min(o.ly, S1.y) - 40;
+      const x = (1 - e) * (1 - e) * o.lx + 2 * (1 - e) * e * mx + e * e * S1.x, y = (1 - e) * (1 - e) * o.ly + 2 * (1 - e) * e * my + e * e * S1.y;
+      at(o.el, x, y, 1 - .6 * e, k < 1 ? 1 : 0, 8); if (k < 1) trail(x, y, EL[o.e], 9, o);
+      if (k >= 1 && !o.done) { o.done = true; S1.fed++; S1.el.animate([{ scale:1.5 }, { scale:1 }], { duration:380, easing:'ease-out' }); S1.el.style.setProperty('--g', Math.min(1, .35 + S1.fed * .2)); }
+    }
+    for (const s of stones) {
+      if (t < s.out) { s.el.style.opacity = 0; continue; }
+      if (!s.hole) { s.hole = true; const d = document.createElement('i'); d.style.left = s.sx + 'px'; d.style.top = s.sy + 'px'; $('#stSocks').appendChild(d); s.glow && s.glow.remove(); }
+      const k = Math.min(1, (t - s.out) / .9), e = sm(k), bob = Math.sin(t * 2.2 + s.i) * 3;
+      let x = s.sx + (s.x - s.sx) * e, y = s.sy + (s.y - s.sy) * e - Math.sin(e * Math.PI) * 50 + (k >= 1 ? bob : 0);
+      if (t >= s.fly) { const B1 = s.to || (s.to = bell()), f = Math.min(1, (t - s.fly) / .7), fe = f * f; x = s.x + (B1.x - s.x) * fe; y = s.y + bob + (B1.y - s.y - bob) * fe - Math.sin(f * Math.PI) * 30;
+        if (f >= 1) { if (!s.gone) { s.gone = true; flare(s.col); } s.el.style.opacity = 0; continue; } at(s.el, x, y, 1 - .5 * fe, 1, 9); trail(x, y, s.col, 13, s); continue; }
+      at(s.el, x, y, .7 + .3 * e, 1, 9); if (k < 1) trail(x, y, s.col, 13, s);
+    }
+    drawTails(); STILL_RAF = requestAnimationFrame(loop);
+  };
+
+  // 0: the trap. The room goes dark round them and the frost closes at their feet; they start in shock
+  later(60, () => { sc.classList.add('dim', 'trap'); SFX.trap(); });
+  // their eyes stay open on him (A: "the player is looking at him in shock"); the pained face comes only when the powers are
+  // torn out of them (design review, 2026-10-06: the hurt pose has its eyes shut)
+  later(380, () => { kim.src = `art4/k${keeper}-reach.png?v=8`; kim.animate([{ translate:'0 0', scale:1 }, { translate:'4px 2px', scale:'1.04 .96' }, { translate:'-2px -1px', scale:1 }, { translate:'0 0', scale:1 }], { duration:420, easing:'ease-out' }); });
+  later(4300, () => kim.animate([{ translate:'0 0' }, { translate:'3px 1px' }, { translate:'0 0' }], { duration:300 }));
+  later(700, () => SFX.heartbeat()); later(1600, () => SFX.heartbeat());
+  // 1.7 s: every power pulls out of them and circles them: theirs, but out of reach. An element they hold nothing of
+  // still gives up its own light, so all five are there
+  later(1700, () => {
+    const lights = [];
+    if (S) { for (const id in S.skills) lights.push([icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon), POW[id].e]);
+      for (const el in S.fuse || {}) lights.push([icon(FUSE[el].icon), FEEDS[el]]);
+      for (const id in S.gifts) lights.push([icon(GIFT[id].icon), GIFT[id].e]);
+      if (S.call) lights.push([`art4/calls/${CALL[S.call.id].img}.png?v=9`, CALL[S.call.id].el]); }
+    for (const el of CYCLE) if (!lights.some(l => l[1] === el)) lights.push([null, el]);
+    lights.forEach(([src, el], n) => { const o = { el:node('st-orb' + (src ? '' : ' bare'), src, EL[el]), e:el, a0:n * TAU / lights.length, born:1.7 + n * .14 }; orbs.push(o); later(1700 + n * 140, () => SFX.pull(n)); });
+    sc.classList.add('lost'); STILL_RAF = requestAnimationFrame(loop);
+  });
+  // 3.6 s: his theme. 3.9 s: he forms out of the dark, his eyes first, the cold gathering into him
+  later(3600, () => { AU.music(true); AU.song('still'); });
+  later(3900, () => { sc.classList.add('come'); SFX.form(); if (!reduce) { const f = $('#stFig').getBoundingClientRect(), o = sc.getBoundingClientRect(), cx = f.left + f.width / 2 - o.left, cy = f.top + f.height * .45 - o.top;
+    for (let i = 0; i < 26; i++) { const m = document.createElement('i'); m.className = 'st-mote'; sc.appendChild(m); const a = rnd(0, TAU), d = rnd(.6, 1) * Math.max(W0, H0);
+      m.animate([{ transform:`translate(${cx + Math.cos(a) * d}px,${cy + Math.sin(a) * d}px) scale(1)`, opacity:0 }, { opacity:.9, offset:.4 }, { transform:`translate(${cx}px,${cy}px) scale(.3)`, opacity:0 }], { duration:rnd(1400, 2600), delay:rnd(0, 900), easing:'cubic-bezier(.5,0,.8,.6)', fill:'both' }).onfinish = () => m.remove(); } } });
+  later(5500, () => SFX.bx('call-toll', 2, 0));
+  // his lines lower his theme only a little, so the war keeps its weight under him (QA, 2026-10-06; A approved the mix)
+  later(7000, () => AU.vo('vo-still-1', 0, .75));
   // his bell: each toll sends a ring of cold out from it that grows and fades, never a ring that stands
   const toll = () => { const r = document.createElement('i'); r.className = 'st-toll'; $('#stFig').appendChild(r); r.animate([{ scale:.3, opacity:.9 }, { scale:3.2, opacity:0 }], { duration:1400, easing:'cubic-bezier(.2,.6,.3,1)', fill:'forwards' }); later(1450, () => r.remove()); };
-  later(8200, () => { AU.vo('vo-still-2', 0, .8); sc.classList.add('ring'); toll(); later(300, toll); });
-  // everything the Keeper earned leaves them for his bell, one light after another, and last the five stones are torn
-  // from the Great Tower's sockets; the companion stays at the Keeper's side and freezes with them
-  later(9600, () => {
-    const lights = [];
-    for (const id in S.skills) lights.push([icon(S.evo[id] ? POW[id].evoIcon : POW[id].icon), EL[POW[id].e]]);
-    for (const el in S.fuse || {}) lights.push([icon(FUSE[el].icon), EL[FEEDS[el]]]);
-    for (const id in S.gifts) lights.push([icon(GIFT[id].icon), EL[GIFT[id].e]]);
-    if (S.call) lights.push([`art4/calls/${CALL[S.call.id].img}.png?v=9`, '#E4EAFF']);
-    TOWER.order.forEach((el, i) => lights.push([`art4/props/x-stone-${el}.png?v=8`, EL[el], socks[i], i]));
-    const box = $('#stOrbs'), k = $('#stKeeper').getBoundingClientRect(), b = $('#stBell').getBoundingClientRect(), o = sc.getBoundingClientRect();
-    const kx = k.left + k.width / 2 - o.left, ky = k.top + k.height * .62 - o.top, x1 = b.left + b.width / 2 - o.left, y1 = b.top + b.height / 2 - o.top;
-    sc.classList.add('drain');
-    lights.forEach(([src, col, from, si], n) => later(n * 230, () => {
-      const [x0, y0] = from || [kx, ky], el = document.createElement('i'); el.style.setProperty('--c', col); el.innerHTML = `<img src="${src}" alt="">`; box.appendChild(el);
-      if (from) { const d = document.createElement('i'); d.style.left = x0 + 'px'; d.style.top = y0 + 'px'; $('#stSocks').appendChild(d); }
-      const side = (n % 2 ? 1 : -1) * (70 + (n * 37) % 90), mx = (x0 + x1) / 2 + side, my = (y0 + y1) / 2 + 30;
-      el.animate([{ left:x0 + 'px', top:y0 + 'px', scale:.4, opacity:0 }, { left:x0 + side * .3 + 'px', top:y0 - 30 + 'px', scale:1.1, opacity:1, offset:.18 }, { left:mx + 'px', top:my + 'px', scale:1, opacity:1, offset:.6 }, { left:x1 + 'px', top:y1 + 'px', scale:.2, opacity:0 }],
-        { duration:reduce ? 900 : 1300, easing:'cubic-bezier(.5,0,.6,1)', fill:'forwards' });
-      SFX.sweep(); later(1250, () => el.remove()); }));
+  // 10.4 s, the war: "I'll take them". The five Qi Stones tear out of the Great Tower and hang in an arch over the Keeper
+  later(10400, () => { AU.vo('vo-still-2', 0, .8); sc.classList.add('ring'); toll(); later(300, toll); });
+  later(10700, () => {
+    const t = (performance.now() - t0) / 1000;
+    TOWER.order.forEach((el, i) => { const j = CYCLE.indexOf(el), [sx, sy] = socks[i] || [W0 * .25, H0 * (.25 + i * .07)];
+      const s = { el:node('st-stone', `art4/props/x-stone-${el}.png?v=8`, EL[el]), e:el, col:EL[el], i:j, sx, sy, x:ox + (W0 * .55 - ox) / PUSH + (j - 2) * 36, y:Hk.y - 30 - (2 - Math.abs(j - 2)) * 12, out:t + .45 + i * .12, fly:t + 3.3 + j * .45, fed:0 };
+      stones.push(s); later(i * 120, () => SFX.clank());
+      const gl = s.glow = document.createElement('b'); gl.className = 'st-sglow'; gl.style.cssText = `left:${sx}px;top:${sy}px;--c:${EL[el]}`; $('#stSocks').appendChild(gl); });
+    // 11.7 s: each power flies into the stone of its own element, and the Keeper glows with what is leaving them
+    const gap = Math.min(.22, 1.9 / Math.max(1, orbs.length));
+    orbs.forEach((o, n) => { o.stone = stones.find(s => s.e === o.e); o.go = t + 1 + n * gap; later(1000 + n * gap * 1000 + 600, () => SFX.absorb(CYCLE.indexOf(o.e))); });
+    later(1000, () => { sc.classList.add('drain'); kim.src = `art4/k${keeper}-hurt.png?v=8`; });
+    // 14 s: the stones go to his bell, one after another
+    CYCLE.forEach((el, j) => later(3300 + j * 450 + 700, () => { SFX.seize(j); toll(); }));
   });
-  later(14200, () => AU.vo('vo-still-3', 0, .7));
-  later(14900, () => { toll(); later(250, toll); sc.classList.add('ice', 'flash'); SFX.bx('call-bell', 0); SFX.boom(true); later(260, () => sc.classList.remove('flash')); });
-  later(16400, () => sc.classList.add('go'));
-  later(18600, () => sc.classList.add('black'));
+  // 16.9 s, the cut: "Be still." The Keeper freezes where they hang
+  later(16900, () => AU.vo('vo-still-3', 0, .7));
+  later(16950, () => { cancelAnimationFrame(STILL_RAF); box.innerHTML = ''; toll(); later(250, toll); sc.classList.remove('drain', 'lost'); sc.classList.add('ice', 'flash'); SFX.bx('call-bell', 0); SFX.boom(true); SFX.freeze(); later(260, () => sc.classList.remove('flash')); });
+  // then they sink to the ground, defeated, and he withdraws into the dark
+  later(18400, () => { sc.classList.add('slump'); kim.src = `art4/k${keeper}-breath.png?v=8`; });
+  later(19400, () => sc.classList.add('go'));
+  later(21000, () => sc.classList.add('black'));
   // the last beat: "To be continued", and then, in the black, his eyes open
-  later(20000, () => sc.classList.add('end'));
-  later(21800, () => SFX.bx('call-toll', 2, 0));
+  later(22400, () => sc.classList.add('end'));
+  later(24200, () => { sc.classList.add('eyes'); SFX.bx('call-toll', 2, 0); });
+  later(27000, () => sc.classList.add('done'));
 }
-$('#stNext').onclick = e => { e.stopPropagation(); STILL_T.forEach(clearTimeout); STILL_T = []; SFX.select(); showThanks(true); };
 // the thank-you screen's own timers, cleared the moment the player leaves it (QA, 2026-10-06: Haven started inside a new run)
 let THX_T = [];
 function showThanks(afterStill) {
@@ -8693,7 +8843,7 @@ function musicSparks() {
 }
 function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; S.qiMus = musicSparks(); S.musMile = S.qiMus ? musMilestone() : null;
   S.qiGot = Math.round((S.thawed + 9 * (S.hordeFreed || 0)) / 8) + (S.won ? 40 : 0) + S.qiMus + (S.musMile ? S.musMile.n : 0) + (S.lvSparks || 0); addQi(S.qiGot);
-  if (S.won && S.qiGot && !SEEN.has('_sparks')) { markSeen('_sparks'); setTimeout(() => AU.vo('vo-sparks', 0, .5), 2600); } }
+  if (S.won && S.qiGot && !S.quietPay && !SEEN.has('_sparks')) { markSeen('_sparks'); setTimeout(() => AU.vo('vo-sparks', 0, .5), 2600); } }
 function renderGrow() {
   const g = grown(), q = qi(); $('#grQi').textContent = q.toLocaleString(); $('#hmQiN').textContent = q.toLocaleString();
   $('#grList').innerHTML = PLOTS.map(p => { const lv = g[p.el] || 0, max = lv >= plotMax(p.el), cost = plotCost(lv, p.el), can = !max && q >= cost, deep = p.el === 'water' && lv >= PLOT_MAX;
