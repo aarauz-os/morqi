@@ -2504,7 +2504,7 @@ const AU = (() => {
      F major 7, E minor 7, D minor 7, C major 7, a descending turn that never quite lands; B flat major 7 lifts it at
      the golden point. Four bars of drums and percussion first, then the bass, then the hook; a six-bar breakdown without
      the kick, and a drop back in. Hook 8 bars on / 5 off, peaking 62% through; pitched voices at or below about 700 Hz. */
-  const TEMPO = { home:144 / 122, still:144 / 66 }, H6 = SIX * TEMPO.home;
+  const TEMPO = { home:144 / 122 }, H6 = SIX * TEMPO.home;
   const HAVEN = {
     ch:[[174.61, 220, 261.63, 329.63], [164.81, 196, 246.94, 293.66], [146.83, 174.61, 220, 261.63], [130.81, 164.81, 196, 246.94]],
     root:[43.65, 41.2, 36.71, 32.7],
@@ -2527,26 +2527,56 @@ const AU = (() => {
   };
   // the rolling bass: short and round, a little bite from the filter
   const houseBass = (t, f, v) => mv({ t, f, type:'sawtooth', dur:H6 * 1.6, vol:v, att:.005, hold:H6 * .6, lp:520, q:2 });
-  /* "The Stillmaker" (A, 2026-10-06: his debut "with his own new music"): slow and cold, at 66. A low D drone that never
-     moves, a heartbeat, his own bell every two bars (struck, inharmonic, ringing long), a music-box motif that falls a
-     half step at a time as if it were freezing, and from the third bar a hushed choir on D minor, B flat, G minor and a
-     dark A. Ice crackles in the air. Everything stays under 700 Hz */
-  const STILL = { box:[[[0, 587.33], [4, 554.37], [8, 440], [14, 466.16]], [[0, 440], [6, 392], [8, 349.23], [12, 329.63]]],
-    ch:[[146.83, 174.61, 220, 329.63], [116.54, 146.83, 174.61, 220], [98, 116.54, 146.83, 164.81], [110, 138.59, 164.81, 233.08]] };
+  /* "The Stillmaker" (A, 2026-10-06: his debut "with his own new music"; the Villain's-Theme take was "a no go. i prefer
+     the dark and sinister and boppyness of the warden theme better. that cant happen. the stillmakers must be even more
+     sinister or cooler in aura in drum patterns and bass. its ultimate atmosphere that transitions into war and then ends
+     in peace ... calm sinster emotion to absolute chaos to calm from peace presence and understanding. its not about dark
+     or light its all to show and end on...balance"). The Warden's half-time bounce, a step lower and colder: C with the
+     Phrygian half-step and the tritone (C minor, D flat, C minor, G flat), the devil's interval under a sliding, driven
+     808. Four movements, timed to his scene (the song starts 1.5 s in):
+       calm    bars 0-3   he descends and speaks: a slow cold groove, his bell, a whispered hook, 808s sliding into the
+                          half-step and the tritone
+       war     bars 4-7   he takes everything: the drums double, the 808 jumps octaves through the drive, war drums, brass
+                          stabs, the hook doubled, a snare roll into the freeze
+       cut     bar 8      "Be still": one great hit and a sub drop, then frozen silence
+       peace   bar 9 on   he is gone: a heartbeat, a clean slow line, and chords with no third (neither minor nor major)
+                          that come to rest on C: balance
+     Every pitched voice at or below 700 Hz */
+  const STILL = { ch:[[130.81, 155.56, 196], [138.59, 174.61, 207.65], [130.81, 155.56, 196], [185, 233.08, 277.18]],
+    root:[32.7, 34.65, 32.7, 46.25],
+    calm:{ kicks:[[0, 7, 10], [0, 3, 10, 14]], root:[32.7, 34.65, 32.7, 46.25] },
+    war:{ kicks:[[0, 2, 3, 6, 8, 10, 11, 14], [0, 3, 6, 7, 10, 12, 13, 15]], root:[32.7, 34.65, 46.25, 34.65] },
+    hook:[[0, 261.63], [3, 277.18], [6, 261.63], [10, 196], [12, 185]],
+    sus:[[130.81, 146.83, 196, 261.63], [116.54, 130.81, 174.61, 233.08], [130.81, 146.83, 196, 261.63], [98, 130.81, 146.83, 196]],
+    line:[261.63, 293.66, 392, 261.63] };
   function stillStep(s, t) {
-    const bar = s >> 4, i = s & 15, L = SIX * TEMPO.still, B = L * 16;
-    if (i === 0) { mv({ t, f:36.71, dur:B + .6, vol:.16, att:.8 }); mv({ t, f:55, dur:B + .6, vol:.05, att:1 }); mv({ t, f:73.42, dur:B + .4, vol:.03, att:1.2, type:'sawtooth', lp:140 }); }
-    // the heartbeat: lub-dub on the one
-    if (i === 0 || i === 2) mv({ t, f:i ? 52 : 64, f1:34, gl1:.18, dur:.3, vol:i ? .22 : .34, att:.004 });
-    // his bell, every other bar
-    if (i === 0 && bar % 2 === 0) for (const [m, v] of [[1, .12], [2.76, .045], [4.2, .02], [.5, .05]]) mv({ t, f:146.83 * m, dur:5.5, vol:v, att:.003, rev:.6 });
-    // the music box, freezing
-    if (bar >= 1) for (const [st, f] of STILL.box[(bar - 1) & 1]) if (st === i) { mv({ t, f, dur:2.4, vol:.05, att:.003, type:'triangle', det:-14, rev:.7 }); mv({ t:t + .012, f:f / 2, dur:1.6, vol:.016, att:.003, det:9, rev:.7 }); }
-    // the choir
-    if (bar >= 2 && i === 0) for (const f of STILL.ch[bar & 3]) mv({ t, f, dur:B + .3, vol:.014, att:1.4, type:'sawtooth', lp:820, vib:4.5, vibD:9, rev:.5 });
-    // ice in the air, and every fourth bar a cold swell into the next
-    if ((s * 7 + bar) % 5 === 0) mn({ t:t + Math.random() * L, f:6200, dur:.05, att:.002, vol:.008 });
-    if (bar % 4 === 3 && i === 8) mn({ t, f:240, f1:1800, ft:'lowpass', dur:L * 8, att:L * 6, vol:.04 });
+    const bar = s >> 4, i = s & 15, c = bar & 3;
+    if (bar < 4) {   // calm, and sinister
+      if (i === 0) pad(t, STILL.ch[c], SIX * 16 + .6, .014);
+      if (i === 0 && bar % 2 === 0) toll(t, 130.81, .09);
+      if (bar >= 1) { const ks = STILL.calm.kicks[bar & 1], at = ks.indexOf(i); if (at >= 0) { kick(t, .4); b808(t, STILL.calm.root[c], SIX * ((ks[at + 1] ?? 16) - i) + .06, at === 0 ? STILL.calm.root[(c + 3) & 3] : null, .3); } if (i === 8) clap(t, .16, .6); if (i === 14 && bar & 1) rim(t, .05); if (bar >= 2) hats(t, bar, i, 0, .018); }
+      if (bar >= 2) for (const [st, f] of STILL.hook) if (st === i) chop(t, f, .045, SIX * 2.2);
+      if (bar === 3 && i === 8) riser(t, SIX * 8, .08);
+      return; }
+    if (bar < 8) {   // war
+      if (i === 0) { if (bar === 4) { crash(t, .12); kick(t, .9); } pad(t, STILL.ch[(c + 1) & 3], SIX * 16 + .4, .026); toll(t, 65.41 * 2, .08); }
+      groove(t, bar, i, STILL.war, c, 2, .82);
+      if (i === 4 || i === 12) clap(t, .36, .3);
+      if (i % 4 === 0) mv({ t, f:STILL.war.root[c] * 4, type:'sawtooth', dur:.28, vol:.05, lp:900, to:drv });
+      if (i === 0 || i === 6 || i === 10) taiko(t, .16, 70);
+      for (const [st, f] of STILL.hook) if (st === i) { chop(t, f, .055, SIX * 1.8); mv({ t, f:f / 2, type:'sawtooth', dur:SIX * 1.8, vol:.03, att:.01, lp:600, to:drv }); }
+      hats(t, bar, i, 2, .036);
+      if (bar === 7) { if (i === 0) riser(t, SIX * 16, .11); if (i >= 8) mn({ t, f:1700, ft:'bandpass', q:1.4, dur:.05, vol:.05 + (i - 8) * .012 }); }
+      return; }
+    if (bar === 8) {   // "Be still": the cut
+      if (i === 0) { kick(t, .95); crash(t, .16); mv({ t, f:65.41, f1:22, gl1:1.4, dur:1.7, vol:.4, att:.004 }); toll(t, 65.41 * 2, .16); }
+      return; }
+    // peace: a heartbeat that slows away, a clean slow line, chords with no third, coming to rest on C
+    const pb = bar - 9, d = Math.min(pb, 3);
+    if (i === 0 && pb < 4) { pad(t, STILL.sus[d], SIX * 16 + .8, .018, 'triangle'); sub(t, 65.41, SIX * 16, .06); mv({ t, f:STILL.line[d], dur:SIX * 14, vol:.05, att:.08, hold:SIX * 8, vib:4.5, vibD:8, rev:.7 }); }
+    if (pb < 3 && (i === 0 || i === 3)) mv({ t, f:i ? 52 : 62, f1:36, gl1:.16, dur:.3, vol:(i ? .14 : .2) * (1 - pb * .25), att:.004 });
+    if (pb >= 3 && i === 0 && pb % 2 === 1) pad(t, STILL.sus[0], SIX * 32 + 1, .014, 'triangle');
+    if (i === 0 && pb % 4 === 3) toll(t, 130.81, .06);
   }
   function havenStep(s, t) {
     if (!pump) { pump = c.createGain(); pump.connect(padF); }
@@ -2637,7 +2667,9 @@ const AU = (() => {
     if (i === 4 || i === 12) { chant(t, f, .05); chant(t, f * 1.5, .03); kick(t, .4); }
     if (i === 0 && ((s >> 4) & 1)) mv({ t, f:f / 2, dur:SIX * 14, vol:.03, att:.3, hold:SIX * 8, rev:.6 });
   }
-  return { init, S, music, song, threat, world, beat, bloom, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; },
+  // jump the playing song to a bar: a skipped Stillmaker scene goes straight to his peace (QA, 2026-10-06)
+  function songAt(name, bar) { if (M.song !== name || !M.timer) song(name); M.step = bar * 16; }
+  return { init, S, music, song, songAt, threat, world, beat, bloom, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; },
     meter() {   // test hook: the loudness of the effects and the music right now, in dB
       if (!c) return null; if (!this._m) { const m = n => { const a = c.createAnalyser(); a.fftSize = 2048; n.connect(a); return a; }; this._m = { s:m(sfx), u:m(mus), b:new Float32Array(2048) }; }
       const db = a => { a.getFloatTimeDomainData(this._m.b); let e = 0; for (const x of this._m.b) e += x * x; return 10 * Math.log10(e / this._m.b.length + 1e-12); };
@@ -8169,15 +8201,17 @@ function stillScene() {
   $('#stKeeper').src = `art4/k${keeper}-breath.png?v=8`; $('#stPet').src = lookSrc(`art4/a-${animal}-y.png?v=8`); $('#stOrbs').innerHTML = ''; $('#stSocks').innerHTML = '';
   show('still'); AU.music(false);
   const seen = SEEN.has('_stillmaker'); markSeen('_stillmaker');
-  sc.onclick = seen ? () => { STILL_T.forEach(clearTimeout); STILL_T = []; sc.classList.add('black', 'end'); AU.music(true); AU.song('still'); } : null;
+  sc.onclick = seen ? () => { STILL_T.forEach(clearTimeout); STILL_T = []; sc.classList.add('black', 'end'); AU.music(true); AU.songAt('still', 9); } : null;
   later(60, () => { sc.classList.add('dim'); SFX.boom(true); });
   later(1500, () => { AU.music(true); AU.song('still'); });
   later(2000, () => sc.classList.add('come'));
   later(4300, () => SFX.bx('call-toll', 2, 0));
-  later(4900, () => { AU.vo('vo-still-1', 0, .3); $('#stKeeper').src = `art4/k${keeper}-hurt.png?v=8`; });
+  // his lines lower his theme only a little, so the war keeps its weight under him (QA, 2026-10-06; A approved the mix
+  // with the music near full under his voice)
+  later(4900, () => { AU.vo('vo-still-1', 0, .75); $('#stKeeper').src = `art4/k${keeper}-hurt.png?v=8`; });
   // his bell: each toll sends a ring of cold out from it that grows and fades, never a ring that stands
   const toll = () => { const r = document.createElement('i'); r.className = 'st-toll'; $('#stFig').appendChild(r); r.animate([{ scale:.3, opacity:.9 }, { scale:3.2, opacity:0 }], { duration:1400, easing:'cubic-bezier(.2,.6,.3,1)', fill:'forwards' }); later(1450, () => r.remove()); };
-  later(8200, () => { AU.vo('vo-still-2', 0, .3); sc.classList.add('ring'); toll(); later(300, toll); });
+  later(8200, () => { AU.vo('vo-still-2', 0, .8); sc.classList.add('ring'); toll(); later(300, toll); });
   // everything the Keeper earned leaves them for his bell, one light after another, and last the five stones are torn
   // from the Great Tower's sockets; the companion stays at the Keeper's side and freezes with them
   later(9600, () => {
@@ -8198,7 +8232,7 @@ function stillScene() {
         { duration:reduce ? 900 : 1300, easing:'cubic-bezier(.5,0,.6,1)', fill:'forwards' });
       SFX.sweep(); later(1250, () => el.remove()); }));
   });
-  later(14200, () => AU.vo('vo-still-3', 0, .2));
+  later(14200, () => AU.vo('vo-still-3', 0, .7));
   later(14900, () => { toll(); later(250, toll); sc.classList.add('ice', 'flash'); SFX.bx('call-bell', 0); SFX.boom(true); later(260, () => sc.classList.remove('flash')); });
   later(16400, () => sc.classList.add('go'));
   later(18600, () => sc.classList.add('black'));
