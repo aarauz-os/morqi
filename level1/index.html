@@ -61,8 +61,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #title{background:#0C1420 url(art4/hero-tall.jpg?v=9) 50% 0/cover no-repeat;justify-content:flex-end;gap:18px;padding-bottom:calc(26px + env(safe-area-inset-bottom))}
 /* night at both ends: a soft shade at the top keeps the logo and tagline crisp over the five bosses on the key art, and the
    bottom fades for the level and Play */
-#title::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,20,32,.62) 0%,rgba(12,20,32,.3) 14%,rgba(12,20,32,0) 26%,rgba(12,20,32,0) 50%,rgba(12,20,32,.55) 68%,rgba(12,20,32,.92) 86%)}
-#title > *{position:relative}
+#title::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,10,26,.9) 0%,rgba(8,10,26,.7) 16%,rgba(8,10,26,.25) 26%,rgba(12,20,32,0) 34%,rgba(12,20,32,0) 50%,rgba(12,20,32,.55) 68%,rgba(12,20,32,.92) 86%)}
+#title > *{position:relative}#title > .still-sky{position:absolute}
 #title h1{font-family:var(--round);font-weight:900;letter-spacing:-.02em}
 
 /* section titles: a clean heading instead of a banner */
@@ -71,6 +71,14 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .rb.red .ribbon{color:var(--coral-2)}
 .fbdemo{position:absolute;inset:0;display:grid;place-items:center;background:#22252E}.fbdemo img{width:100%!important;height:100%!important;max-width:none;object-fit:contain}
 .lu-pips[hidden]{display:none}
+.still-sky{position:absolute;left:50%;aspect-ratio:690/210;translate:-50% 0;pointer-events:none;z-index:0;filter:saturate(.55);
+  -webkit-mask:radial-gradient(ellipse 48% 34% at 50% 42%,#000 30%,transparent 100%);mask:radial-gradient(ellipse 48% 34% at 50% 42%,#000 30%,transparent 100%);animation:stillOpen 2.6s ease-out both,stillDrift 11s 2.6s ease-in-out infinite}
+.still-sky::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 50% 50%,rgba(6,8,22,.6),rgba(6,8,22,0) 75%)}
+.still-sky i{position:absolute;inset:0;background:url(art4/still/eyes.png?v=1) center/100% 100% no-repeat}
+.still-sky.t{top:calc(134px + env(safe-area-inset-top));width:min(92vw,420px);--o:.42}
+.still-sky.h{top:calc(92px + env(safe-area-inset-top));width:min(66vw,260px);--o:.08}.met-still .still-sky.h{--o:.22}
+@keyframes stillOpen{from{opacity:0}to{opacity:var(--o)}}@keyframes stillDrift{0%,100%{opacity:var(--o);translate:-50% 0}50%{opacity:var(--o);translate:-50% 6px}}
+@media (prefers-reduced-motion:reduce){.still-sky{animation:none;opacity:var(--o)}}
 #still{background:#04050A;overflow:hidden}#still .st-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:filter 4s ease}
 #still.dim .st-bg{filter:saturate(.3) brightness(.45)}#still.ice .st-bg{filter:saturate(0) brightness(.7) sepia(.3) hue-rotate(170deg)}
 #still .st-dark{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(20,24,60,.1),rgba(2,3,10,.88) 75%);opacity:0;transition:opacity 2s}#still.dim .st-dark{opacity:1}
@@ -653,6 +661,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .riseTip{display:flex;gap:12px;align-items:center;text-align:left;margin:10px 0 12px;max-width:320px}
 .riseTip img{width:44px;height:44px;object-fit:contain;flex:none}
 .riseTip img[hidden]{display:none}
+.riseTip img.pic{width:132px;height:88px;border-radius:12px;object-fit:cover}
 .riseTip b{display:block;font-family:var(--round);font-size:15.5px;color:#fff;margin-bottom:2px}
 .riseTip p{margin:0;font-size:13.5px;line-height:1.35;color:rgba(255,255,255,.7)}
 #riseBtn{width:100%}
@@ -1369,6 +1378,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   </div>
 
   <section class="scr" id="title">
+    <div class="still-sky t" aria-hidden="true"><i></i></div>
     <div class="brand"><canvas class="logo-cloud" id="logoCloud" aria-hidden="true"></canvas><img class="logo" src="art4/logo-morqi.png?v=8" alt="MorQi"><span class="tag">Balance is your superpower</span></div>
     <div class="tsound">
       <label class="set-t"><button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg></button>
@@ -1396,7 +1406,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <button class="hm-gear" id="hmGear" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
-    <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa"><img class="hm-a" id="hmPet" alt=""></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
+    <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="still-sky h" aria-hidden="true"><i></i></div><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa"><img class="hm-a" id="hmPet" alt=""></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
     <button class="btn green hm-go" id="hmGo">Play</button>
     <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
       <h3>Grow your Sanctuary</h3><p class="gr-qi"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="grQi">0</b> Sparks</p><p class="gr-sub">Earn Sparks by freeing creatures</p>
@@ -1963,8 +1973,8 @@ const AU = (() => {
   }
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
-    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=13`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=15`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -2772,7 +2782,12 @@ const store = { get(k) { try { const v = localStorage.getItem(k); return v ?? ja
 // a level asked for in the link (?level=) counts as open; the level being looked at on the title does not
 const LVL0 = LVL, unlocked = () => Math.max(LVL0, +(store.get('morqi.unlocked') || 1));
 const SEEN = new Set((store.get('morqi.seen') || '').split(',').filter(Boolean));
-const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(',')); };
+const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(',')); if (kid === '_stillmaker') stillSky(); };
+// the Stillmaker watches from the sky of the title and the home (A, 2026-10-06: "a almost transparent view of the still
+// maker's eyes in the clouds or sky somewhere in the background"): on the cover always, his eyes opening slowly out of the
+// dark; on the home, barely there until the player has met him, then a little clearer
+const stillSky = () => document.documentElement.classList.toggle('met-still', SEEN.has('_stillmaker'));
+stillSky();
 function show(id) { document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); if (id) guardTaps();
   const tb = document.getElementById('tabs'); if (tb) { tb.hidden = !FRONT.includes(id); tb.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.tab === id)); } }
 const FRONT = ['home', 'map', 'book', 'season'];
@@ -2860,7 +2875,7 @@ function renderStory() {
     { img:'luma', t:'Luma sends you out', p:`Luma, the fox spirit of your hearth, sends you and your ${A.y} to bring ${place} back to life.`, alt:'Luma, the little fox spirit of the hearth, beside the fire.',
       over:`<img class="st-k" src="art4/run/k${keeper}-r2.png?v=8" alt=""><img class="st-a" src="art4/a-${animal}-y.png?v=8" alt="">` },
     // the Silver City's own last page (A, 2026-10-06, taking up the design review's line): the forge that still glows
-    realm === 'metal' ? { img:'story-stones', t:'The old forge still glows', p:`Under the frozen city, the old forge still glows. Free creatures, and its five towers will give up their stones. Bring them to the Great Tower, and ${B.name.replace(/^The /, 'the ')} will rise.`,
+    realm === 'metal' ? { img:'story-stones', t:'The old forge still glows', p:`Under the frozen city, the old forge still glows. Free creatures, and its five temples will give up their stones. Bring them to the Great Tower, and ${B.name.replace(/^The /, 'the ')} will rise.`,
       alt:'Five glowing Qi Stones above a frozen city.', over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } :
     { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn ${LVL === 1 ? 'two' : 'the five'} Qi Stones. Gather ${LVL === 1 ? 'both' : 'them all'}, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
       over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } ];
@@ -2932,6 +2947,7 @@ function startRun() {
   S.props = scatterProps(worldOf()); loadBoss(worldOf());
   // the Silver City starts at the foot of the Great Tower, in the middle of the map (A, 2026-10-06)
   if (LVL === 5) { S.p.x = L5_START.x; S.p.y = L5_START.y; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
+  S.out = LVL === 2 && towersOn() ? makeOutposts() : null;
   AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
@@ -2955,7 +2971,7 @@ function scatterProps(w) {
     out.push({ x, y, n:kinds[(Math.random() * kinds.length) | 0], s:rnd(62, 84), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 });
   }
   // each element tower's district grows its own element's plants and things, frozen until its stone is taken
-  if (LVL === 5) for (const Sh of SHRINES) { const k2 = PROPS[Sh.el]; k2.forEach(n => IMG[n] || load(n, `art4/props/${n}.png?v=8`));
+  if (LVL === 5) for (const Sh of SHRINES) { const k2 = PROPS[Sh.el]; k2.forEach(n => IMG[n] || load(n, `art4/props/${n}.png?v=8`)); IMG['x-temple-' + Sh.el] || load('x-temple-' + Sh.el, `art4/props/x-temple-${Sh.el}.png?v=10`);
     for (let i = 0; i < 16; i++) { const a = rnd(0, TAU), d = rnd(170, Sh.R - 40); out.push({ x:Sh.x + Math.cos(a) * d, y:Sh.y + Math.sin(a) * d * .8, n:k2[i % 2], s:rnd(66, 90), d:Math.random() < .5 ? -1 : 1, live:false, pop:0 }); } }
   return out.sort((a, b) => a.y - b.y);
 }
@@ -3129,7 +3145,7 @@ function spawnBoss() {
   // the arena should not feel congested or make attacks hard to evade, so it is about a third wider than the Warden's was.
   { const r = Math.max(580, Math.min(VW, VH) * .82), m = r + 90;   // extra room above for the HUD and below for the power row
     // the Silver City's boss rises in the square in front of the Great Tower, clear of every tower
-    S.arena = S.level === 5 ? { x:TOWER.x, y:clamp(TOWER.y + r + 90, r + 330, WORLD - r - 200), r } : { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
+    S.arena = S.out ? { x:1800, y:clamp(2420, r + 330, WORLD - r - 200), r } : S.level === 5 ? { x:TOWER.x, y:clamp(TOWER.y + r + 90, r + 330, WORLD - r - 200), r } : { x:clamp(S.p.x, m, WORLD - m), y:clamp(S.p.y, r + 330, WORLD - r - 200), r };
     const A = S.arena; e.x = A.x; e.y = A.y - 280;
     if (Math.hypot(S.p.x - A.x, S.p.y - A.y) > r - 80) { S.p.x = A.x; S.p.y = A.y + 180; ring(S.p.x, S.p.y, 20, 260, '#FFE6A3', .5, 12, true); } }
   e.pat = 0; e.atk = 2.6; S.bossFx = []; S.heartT = 3;
@@ -4671,12 +4687,13 @@ function ascHit(e, w) {
 // never the tower (A, 2026-10-06: "The payoff has to feel earned. That level should be much longer to finish"; the five
 // stones had all come inside fifty seconds, two of them during one Ascended)
 const STONE = { need:[99, 66, 66, 66, 0], extraEvery:8 };
-const stoneEls = () => S.level === 1 ? (LV().els || ELS) : ELS;
-const stoneNeed = el => S.level === 5 ? TOWER.need[TOWER.order.indexOf(el)] : STONE.need[S.level - 1];
+const stoneEls = () => S.out ? S.out.els : S.level === 1 ? (LV().els || ELS) : ELS;
+const stoneNeed = el => S.out ? S.out.need : S.level === 5 ? TOWER.need[TOWER.order.indexOf(el)] : STONE.need[S.level - 1];
 const towerNext = () => TOWER.order.find(k => !S.qiStones[k] && !S.stoneOut[k]);
 const allStones = () => stoneEls().every(el => S.qiStones[el]);
 const behind = () => stoneEls().filter(el => !S.qiStones[el] && !S.stoneOut[el]).sort((a, b) => (S.qi[a] || 0) - (S.qi[b] || 0))[0];
 function qiKill(e) {
+  if (S.out) { outpostKill(e); return; }
   // nothing freed during Ascended charges the tower, its swarm or the crowd that comes with it (QA, 2026-10-06)
   const el = S.level === 5 ? (e.horde || hsOn() ? null : towerNext()) : e.el; if (!el) return;
   S.qi[el] = (S.qi[el] || 0) + 1;
@@ -4712,19 +4729,21 @@ function collectStone(el) {
 // element towers stand round it in the order of the generating cycle, each in a district of its own element, joined to
 // the Great Tower by the forge's molten channels. Every tower is solid.
 const TOWER = { x:1800, y:1760, h:640, rx:172, ry:62, order:['water', 'wood', 'fire', 'earth', 'metal'], sock:[.768, .629, .479, .352, .221], need:[700, 1700, 1950, 2200, 2400] };
-const SHRINES = TOWER.order.map((el, i) => { const a = -Math.PI / 2 + i * TAU / 5; return { el, i, x:Math.round(1800 + Math.cos(a) * 1150), y:Math.round(1800 + Math.sin(a) * 1150), h:330, rx:92, ry:38, R:500, cd:1.5 }; });
+const SHRINES = TOWER.order.map((el, i) => { const a = -Math.PI / 2 + i * TAU / 5; return { el, i, x:Math.round(1800 + Math.cos(a) * 1150), y:Math.round(1800 + Math.sin(a) * 1150), h:340, rx:128, ry:54, R:500, cd:1.5 }; });
 const L5_START = { x:1800, y:1960 };
 // the wood tower's thorn slots: fixed holes in its floor, in three rings that fire in turn, so the pattern can be learned
 // (design review, 2026-10-06: traps that followed the Keeper made no sense)
 const THORN_SLOTS = (() => { const Sh = SHRINES[1], out = []; [[200, 7, 0], [300, 10, 1], [400, 13, 2]].forEach(([r, n, ring]) => { for (let i = 0; i < n; i++) { const a = i * TAU / n + ring * .3; out.push({ x:Sh.x + Math.cos(a) * r, y:Sh.y + Math.sin(a) * r * .8, ring }); } }); return out; })();
 const inDistrict = (Sh, x, y) => Math.hypot((x - Sh.x) / Sh.R, (y - Sh.y) / (Sh.R * .8)) < 1;
 // nothing walks through a tower: anything inside its footprint is set back on its edge
-function solidOut(o, r) {
-  for (const T of [TOWER, ...SHRINES]) { const cx = T.x, cy = T.y - 14, ax = T.rx + r, ay = T.ry + r * .55, dx = (o.x - cx) / ax, dy = (o.y - cy) / ay, q = Math.hypot(dx, dy);
-    if (q >= 1) continue; if (q < .001) { o.y = cy + ay; continue; } o.x = cx + dx / q * ax; o.y = cy + dy / q * ay; }
+// the footprint is tested at the feet, where the shadow is drawn (QA, 2026-10-06: tested at the body's centre, the Keeper
+// stopped half a body short of the temple's front, against an invisible wall)
+function solidOut(o, r, feet = 0) {
+  for (const T of towerList()) { const cx = T.x, cy = T.y - 14, ax = T.rx + r, ay = T.ry + r * .55, dx = (o.x - cx) / ax, dy = (o.y + feet - cy) / ay, q = Math.hypot(dx, dy);
+    if (q >= 1) continue; if (q < .001) { o.y = cy + ay - feet; continue; } o.x = cx + dx / q * ax; o.y = cy + dy / q * ay - feet; }
 }
-const inTower = (x, y, r, skip) => [TOWER, ...SHRINES].some(T => T !== skip && Math.hypot((x - T.x) / (T.rx + r), (y - T.y + 14) / (T.ry + r * .55)) < 1);
-function towerSolid() { solidOut(S.p, S.p.r); for (const e of S.en) if (!e.dead) solidOut(e, e.r * .8); }
+const inTower = (x, y, r, skip) => towerList().some(T => T !== skip && Math.hypot((x - T.x) / (T.rx + r), (y - T.y + 14) / (T.ry + r * .55)) < 1);
+function towerSolid() { solidOut(S.p, S.p.r * .7, 30); for (const e of S.en) if (!e.dead) solidOut(e, e.r * .6, e.r * .5); }
 function towerFinish() { stoneBurst(); S.bossAt = S.t + 1.2; SFX.fanfare(true); }
 // the finishing Ascended: offered once at half the Level 5 boss's life
 function finisherTick() {
@@ -4737,6 +4756,7 @@ function finisherTick() {
 // each grate fires every fourth bar of the music, the grates taking turns, and they rest once the boss is up
 function spikeTick(dt) {
   if (S.level === 5) { towerSolid(); templeTraps(dt); }
+  if (S.out) { towerSolid(); outpostTick(dt); }
   // the fire bars sweep while the city is awake, and draw their fireballs back into the posts while Ascended or its
   // after-shield holds and once the boss is up; a fireball burns, with a moment's grace before the next can
   if (S.level === 5) { forgeTick(dt); S.barHit = Math.max(0, (S.barHit || 0) - dt);
@@ -4756,6 +4776,47 @@ function spikeTick(dt) {
       if (Math.hypot(S.p.x - T.x, (S.p.y - T.y) / .7) < T.r) ouch(16, T.x, T.y, { src:'spikes', el:'metal' }); } }
   S.traps = S.traps.filter(T => T.t < T.wind + .4);
 }
+/* Tower capture, a prototype on Level 2 behind ?towers=1 (A, 2026-10-06: "Tower War - Tactical Conquest ... you have to
+   make sure you take over all towers ... the lanes connecting the towers cant be destroyed by the players or enemies but
+   you can still destroy the enemies who are outside of it. maybe we can see the lanes be transparent tubes where you can
+   see the freed fighting to get the frozen freed. each freed that yields one element goes into the ones they need and
+   whatever i free from the outside goes to that group and the game ... goes into boss mode once all elemental towers
+   have been taken over ... the middle of the map ... ONE giantic and impressive tower with 3 small towers"). A hub
+   tower stands north of the start, with three of the realm's element temples round it, each joined to it by a glass
+   tube. Every creature the Keeper frees joins its element's group (or, from another element, the group that needs it
+   most), walks out through the tube and frees one of that temple's frozen garrison; when a garrison is all freed the
+   temple is taken. All three taken: Ascended, then the boss. One thumb as ever: the freed march on their own. */
+const towersOn = () => /[?&]towers=1/.test(location.search);
+function makeOutposts() {
+  const els = ['wood', 'water', 'fire'], hub = { hub:true, el:'wood', x:1800, y:1500, h:560, rx:160, ry:60 };
+  const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / 3; return { el, x:Math.round(1800 + Math.cos(a) * 1000), y:Math.round(1500 + Math.sin(a) * 900), h:340, rx:128, ry:54 }; });
+  els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=10`));
+  return { hub, towers, els, need:240, march:[] };
+}
+const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? [S.out.hub, ...S.out.towers] : [];
+function outpostKill(e) {
+  const O = S.out, open = O.els.filter(k => !S.qiStones[k]); if (!open.length) return;
+  // a creature of a temple's own element joins that temple; any other goes to the open temple nearest where it was freed,
+  // so where the Keeper fights decides which temple falls next
+  const near = O.towers.filter(t => open.includes(t.el)).sort((p, q) => Math.hypot(p.x - e.x, p.y - e.y) - Math.hypot(q.x - e.x, q.y - e.y))[0];
+  const el = open.includes(e.el) ? e.el : near.el, T = O.towers.find(t => t.el === el);
+  S.qi[el] = (S.qi[el] || 0) + 1;
+  if (O.march.length < 48) O.march.push({ el, img:e.img, own:e.own, t:0, dur:3.4, T, ph:Math.random() * TAU });
+  if (S.qi[el] >= O.need) captureOutpost(T);
+}
+function captureOutpost(T) {
+  // the fanfare first, then Luma names the temple a moment later (never under it, and every one, not only the first);
+  // the last capture starts Ascended, which has its own voice
+  S.qiStones[T.el] = true; S.shake = Math.max(S.shake, .4); SFX.fanfare(false); if (!allStones()) AU.vo('vo-stone-' + T.el, 1.1, .5, false);
+  paintThaw(T.x, T.y, 640); ring(T.x, T.y - 80, 20, 760, EL[T.el], 1.1, 20, true); stars(T.x, T.y - 160, 44, EL[T.el], 560);
+  if (allStones() && !S.hs.used) hsStart(true);
+}
+function outpostTick(dt) {
+  const O = S.out;
+  // the first time: a card shows the hub, the tubes and the temples, and Luma explains it
+  if (!O.taught && S.t > 3) { O.taught = true; coach('outposts', 'Take the temples!', 'Free creatures and they march through the glass to free each temple. Take all three.', () => ({ sx:W / 2, sy:H * .45 })); } for (const m of O.march) { m.t += dt; if (m.t >= m.dur && !m.done) { m.done = true; const T = m.T; stars(T.x + rnd(-50, 50), T.y + 50, 6, EL[m.el], 160); } }
+  O.march = O.march.filter(m => m.t < m.dur + .2);
+}
 /* The temple traps (A, 2026-10-06: "it should have traps coming out of it like how traps work in Indiana Jones movies
    with caves and hidden temples"): each element tower guards its district with its own trap, firing while the Keeper is
    inside it. Water opens a flood gate, and a wall of water rushes down a lane; wood bursts thorn spears out of the floor
@@ -4771,7 +4832,12 @@ function templeTraps(dt) {
   for (const Sh of SHRINES) {
     if (!live || !inDistrict(Sh, P.x, P.y)) { Sh.cd = Math.max(Sh.cd, 1.2); continue; }
     if ((Sh.cd -= dt) > 0) continue;
-    const D = TRAP[Sh.el]; Sh.cd = D.every; const ux0 = P.x - Sh.x, uy0 = P.y - Sh.y, m = Math.hypot(ux0, uy0) || 1, ux = ux0 / m, uy = uy0 / m, ox = Sh.x + ux * (Sh.rx + 30), oy = Sh.y + uy * (Sh.ry + 30);
+    // every trap but the thorns comes out of its temple's painted mouth on the front, and only reaches within about 70
+    // degrees of the front: behind a temple is a safe place, as in any trapped temple (design review, 2026-10-06)
+    const D = TRAP[Sh.el], ox = Sh.x, oy = Sh.y + 56, cu = Math.hypot(P.x - Sh.x, P.y + 30 - Sh.y) || 1;
+    if (Sh.el !== 'wood' && (P.y + 30 - Sh.y) / cu < .34) { Sh.cd = .6; continue; }
+    const ux0 = P.x - ox, uy0 = Math.max(10, P.y + 30 - oy), m = Math.hypot(ux0, uy0) || 1, ux = ux0 / m, uy = uy0 / m;
+    Sh.cd = D.every;
     if (!SEEN.has('_temple') && luma('vo-temple')) markSeen('_temple');
     if (Sh.el === 'wood') { Sh.ring = ((Sh.ring ?? -1) + 1) % 3; for (const o of THORN_SLOTS) if (o.ring === Sh.ring) S.ttraps.push({ k:'thorns', x:o.x, y:o.y, r:D.r, t:0, wind:D.wind, life:D.wind + .5 }); }
     else if (Sh.el === 'metal') { const sx = (ox - camX) * Z, sy = (oy - 40 - camY) * Z; if (sx < 20 || sx > W - 20 || sy < 120 || sy > H - 120) { Sh.cd = .5; continue; }
@@ -4779,7 +4845,7 @@ function templeTraps(dt) {
     // a lane stops where it meets another tower or the edge of the world (QA, 2026-10-06: the boulder rolled through the
     // Great Tower and off the map)
     else { let len = D.len; for (let d = 40; d <= D.len; d += 20) { const x = ox + ux * d, y = oy + uy * d; if (x < 60 || x > WORLD - 60 || y < 60 || y > WORLD - 60 || inTower(x, y, Sh.el === 'earth' ? TRAP.earth.r : 30, Sh)) { len = d - 20; break; } }
-      S.ttraps.push({ k:{ water:'flood', fire:'flame', earth:'boulder' }[Sh.el], x:ox, y:oy, ux, uy, len, w:D.w, t:0, wind:D.wind, life:D.wind + (Sh.el === 'fire' ? D.burn : len / (Sh.el === 'earth' ? 760 : 680)), f:0, hit:new Set() }); }
+      S.ttraps.push({ k:{ water:'flood', fire:'flame', earth:'boulder' }[Sh.el], sh:Sh, x:ox, y:oy, ux, uy, len, w:D.w, t:0, wind:D.wind, life:D.wind + (Sh.el === 'fire' ? D.burn : len / (Sh.el === 'earth' ? 760 : 680)), f:0, hit:new Set() }); }
     if (Sh.el === 'earth') SFX.bx('earth-quake', 2, 400); }
   for (const T of S.ttraps) { const was = T.t; T.t += dt; const go = T.t >= T.wind, a0 = was < T.wind && go;
     const inLane = (x, y, pad) => { const a = (x - T.x) * T.ux + (y - T.y) * T.uy, l = (x - T.x) * -T.uy + (y - T.y) * T.ux; return { a, l, inside:Math.abs(l) < T.w / 2 + pad && a > -pad && a < T.len + pad }; };
@@ -5356,7 +5422,7 @@ function update(dt) {
     fx({ k:'glow', x:P.x, y:P.y - 20, s:70, s1:6, c:EL[keeperEl], life:.3 }); if (Dh.t >= Dh.dur) S.dash = null; }
   // a dash on a slow frame can jump further than a tower is deep: the path is walked in steps and stops at the first tower
   // it would enter (QA, 2026-10-06: a 20 fps dash came out the other side of the water and fire towers)
-  if (S.level === 5 && Math.hypot(P.x - px0, P.y - py0) > 30) for (let i = 1; i <= 8; i++) { const x = px0 + (P.x - px0) * i / 8, y = py0 + (P.y - py0) * i / 8; if (inTower(x, y, P.r)) { P.x = px0 + (P.x - px0) * (i - 1) / 8; P.y = py0 + (P.y - py0) * (i - 1) / 8; if (S.dash) S.dash = null; break; } }
+  if (S.level === 5 && Math.hypot(P.x - px0, P.y - py0) > 30) for (let i = 1; i <= 8; i++) { const x = px0 + (P.x - px0) * i / 8, y = py0 + (P.y - py0) * i / 8; if (inTower(x, y + 30, P.r * .7)) { P.x = px0 + (P.x - px0) * (i - 1) / 8; P.y = py0 + (P.y - py0) * (i - 1) / 8; if (S.dash) S.dash = null; break; } }
   if (S.arena) { const A = S.arena, d = Math.hypot(P.x - A.x, P.y - A.y), lim = A.r - 34; if (d > lim) { P.x = A.x + (P.x - A.x) / d * lim; P.y = A.y + (P.y - A.y) / d * lim; } }
   if (Math.abs(mx) > .1) P.face = mx > 0 ? 1 : -1;
   P.moving = m > .1; P.mx = mx; P.my = my;
@@ -5927,6 +5993,7 @@ function draw() {
     g.restore();
   }
   if (S.level === 5) drawForgeGround();
+  if (S.out) drawOutposts(inView);
   // the towers' shadows lie on the ground; the towers themselves stand among the creatures, drawn in depth order
   if (S.level === 5) for (const T of [TOWER, ...SHRINES]) if (inView(T.x, T.y, 300)) { g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(T.x, T.y - 6, T.rx * 1.25, T.ry * 1.1, 0, 0, TAU); g.fill(); }
   for (const it of S.items) if (inView(it.x, it.y, 40)) drawItem(it);
@@ -5985,14 +6052,16 @@ function draw() {
   for (const e of list) { const w = e.r * 2.3; g.drawImage(ringSprite(GROUND_RING[e.el]), e.x - w / 2, e.y + e.r * .7 - w * .23, w, w * .46); }
   g.lineWidth = 1;
   // the Silver City's towers stand among the creatures: each is drawn when the sorted crowd reaches its foot
-  const TW = S.level === 5 ? [TOWER, ...SHRINES].slice().sort((p, q) => p.y - q.y) : [], tagsLater = []; let twi = 0;
-  const towersTo = y => { while (twi < TW.length && TW[twi].y <= y) drawTowerAt(TW[twi++], cx, cy); };
-  for (const e of list) {
-    towersTo(e.y);
+  // towers sort by their front line and everything standing by its feet (QA, 2026-10-06: at a temple's front corner the
+  // Keeper's body was tested, not the feet, and vanished behind it)
+  const TW = towerList().slice().sort((p, q) => towerFront(p) - towerFront(q)), tagsLater = []; let twi = 0;
+  const towersTo = y => { while (twi < TW.length && towerFront(TW[twi]) <= y) drawTowerAt(TW[twi++], cx, cy); };
+  // one creature, drawn; drawn again (again = true) when a tower redrawn over the Keeper would hide it
+  const drawCreature = (e, again) => {
     // during a Bloom the creatures wear their happy faces, freed of the spell for a moment
     const art = S.bloom && !e.boss && e.own && ok(IMG[e.img + '-happy']) ? e.img + '-happy' : e.img;
     const im = e.boss ? (ok(IMG[e.img]) ? IMG[e.img] : null) : e.own ? tinted(art, '#000', 0) : tinted(art, EL[e.el]), s = e.size, wind = e.act && e.act.ph === 0 ? Math.min(1, e.act.t / e.act.wind) : 0, rolling = e.act && e.act.ph === 1 && e.act.k === 'lane';
-    if (!im) continue;
+    if (!im) return;
     const hk = Math.max(0, 1 - (S.t - (e.hitAt ?? -9)) / .16), bk = Math.max(0, 1 - (S.t - (e.biteAt ?? -9)) / .2), froz = e.frozen > 0;
     const step = froz ? 0 : Math.sin(e.wob * 1.7), toward = S.p.x > e.x ? 1 : -1;
     let hop, rot, sx, sy; const fly = !e.boss && e.K && (e.K.beh === 'weave' || e.K.beh === 'zigzag' || e.K.beh === 'thorns');
@@ -6008,7 +6077,7 @@ function draw() {
       if (e.dance > 0) { const b = AU.beat(), q = Math.pow(1 - b.ph, 4); rot = Math.sin(b.ph * TAU + e.ph) * .2; hop = q * 16; sx = 1 + q * .1; sy = 1 - q * .12; } }
     const flip = e.own ? (e.K.face === -1 && toward > 0) : (e.type === 'wolf' && toward > 0);
     if (e.own && !e.boss && fly) { g.fillStyle = 'rgba(10,20,30,.25)'; g.beginPath(); g.ellipse(e.x, e.y + e.r * .6, e.r * .9, e.r * .35, 0, 0, TAU); g.fill(); }
-    if (e.boss) { drawBoss(e, hk); continue; }
+    if (e.boss) { drawBoss(e, hk); return; }
     g.save(); g.translate(e.x, e.y + e.r * .5 - hop); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
     g.drawImage(im, -s / 2, -s * .62 - e.r * .5, s, s);
     if (hk > 0) { const wh = silhouette(art, '#FFFFFF'); if (wh) { g.globalAlpha = hk * (e.boss ? .22 : .9); g.drawImage(wh, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
@@ -6017,14 +6086,16 @@ function draw() {
     g.restore();
     if (wind) { const y = e.y - s * .62 - 18 - Math.sin(S.t * 12) * 3; g.font = '900 30px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(60,10,6,.8)'; g.strokeText('!', e.x, y); g.fillStyle = '#FF4A3A'; g.fillText('!', e.x, y); g.lineWidth = 1; }
     // name tags are drawn after everything standing, so no tower covers them (QA, 2026-10-06)
-    if (e.tagT > 0) tagsLater.push(() => { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
+    if (e.tagT > 0 && !again) tagsLater.push(() => { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
       g.strokeStyle = GROUND_RING[e.el]; g.lineWidth = 4; g.beginPath(); g.ellipse(e.x, e.y + e.r * .5, e.r * 1.8 + Math.sin(S.t * 8) * 4, e.r * .8, 0, 0, TAU); g.stroke();
       // the name stays inside the safe part of the screen, clear of the top bar and the minimap (A's playthrough, 2026-10-05)
       const tx = clamp(e.x, cx + 74 / Z, cx + (W - 74) / Z); let ty = Math.max(y, cy + 178 / Z); if ((tx - cx) * Z > W - 160 && (ty - cy) * Z < 290) ty = cy + 290 / Z;
       g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, tx, ty); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, tx, ty); g.globalAlpha = 1; g.lineWidth = 1; });
     if (e.type === 'golem') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(e.x - 42, e.y - s * .62 - 14, 84, 10); g.fillStyle = EL[e.el]; g.fillRect(e.x - 40, e.y - s * .62 - 12, 80 * Math.max(0, e.hp / e.max), 6); }
-  }
-  towersTo(P.y);
+  };
+  for (const e of list) { towersTo(e.y + e.r * .5); drawCreature(e); }
+  // every tower whose front, at the Keeper's x, is behind the Keeper's feet stands behind them
+  for (let i = twi; i < TW.length; i++) if (!TW[i].drawnAt && !keeperBehind(TW[i])) { TW[i].drawnAt = S.t; drawTowerAt(TW[i], cx, cy); }
   // sacred trees (Rising Grove)
   if (!S.noKeeper) { drawFuseGround(); drawAscendGround(); }
   for (const tr of S.trees) { const k = Math.min(1, tr.t / .4) * Math.min(1, (tr.life - tr.t) / .4), sw = Math.sin(S.t * 3 + tr.x) * .05;
@@ -6191,8 +6262,10 @@ function draw() {
   }
   // a tower the Keeper stands behind, drawn early for a creature in front of it, is drawn again over the Keeper (QA,
   // 2026-10-06: with a crowd about, the Keeper painted over the tower)
-  for (let i = 0; i < twi; i++) if (TW[i].y > P.y) drawTowerAt(TW[i], cx, cy);
-  towersTo(Infinity); for (const f of tagsLater) f(); g.globalAlpha = 1; g.lineWidth = 1;
+  for (let i = 0; i < twi; i++) if (keeperBehind(TW[i])) { const T = TW[i], G = towerGeo(T); drawTowerAt(T, cx, cy);
+    if (G) for (const e of list) if (e.y + e.r * .5 >= towerFront(T) && Math.abs(e.x - T.x) < G.tw / 2 + e.size / 2) drawCreature(e, true); }
+  for (let i = twi; i < TW.length; i++) if (TW[i].drawnAt !== S.t) drawTowerAt(TW[i], cx, cy);
+  for (const T of TW) T.drawnAt = null; for (const f of tagsLater) f(); g.globalAlpha = 1; g.lineWidth = 1;
   if (S.level === 5) { forgeAir(cx, cy); world(g); drawFireBalls(); drawTempleTraps(); }
   // projectiles are light, not objects (A, 2026-10-04: "a lighter energy type" instead of the hard shapes): a white
   // core, a halo in the element's colour and a short comet tail. Enemy and boss shots are larger and carry a pulsing
@@ -6602,6 +6675,43 @@ function drawAura(kx, ky) {
       if (!spr('x-boulder', x, y, 70, a)) { g.fillStyle = '#8E6A3A'; g.beginPath(); g.arc(x, y, 18, 0, TAU); g.fill(); } } }
   g.restore(); g.lineWidth = 1; g.lineCap = 'butt';
 }
+// the tower-capture card's picture, drawn from the game's own pieces: the hub, three temples, the glass tubes, and the
+// freed marching out to a temple's frozen garrison
+let OUTPOST_PIC = null;
+function outpostPic() {
+  if (OUTPOST_PIC) return OUTPOST_PIC;
+  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d');
+  c.fillStyle = '#3A4A3A'; c.fillRect(0, 0, 480, 320);
+  // the hub in the middle, three temples clear of it in a ring (two above, one below), a tube to each, the freed marching
+  // down to the water temple's frozen garrison
+  const hx = 240, hy = 190, spots = [[85, 140, 'wood'], [395, 140, 'fire'], [240, 312, 'water']];
+  for (const [x, y] of spots) { c.lineCap = 'round'; c.strokeStyle = 'rgba(20,30,50,.4)'; c.lineWidth = 30; c.beginPath(); c.moveTo(hx, hy - 6); c.lineTo(x, y - 18); c.stroke(); c.strokeStyle = 'rgba(190,225,255,.32)'; c.lineWidth = 22; c.stroke(); }
+  const im = IMG['x-tower-metal']; if (ok(im)) { const h = 140, w = h * im.naturalWidth / im.naturalHeight; c.drawImage(towerNight(im), hx - w / 2, hy - h, w, h); }
+  for (const [x, y, el] of spots) { const t = IMG['x-temple-' + el]; if (ok(t)) c.drawImage(t, x - 50, y - 98, 100, 100); }
+  const mw = IMG['e-water-a']; if (ok(mw)) for (let i = 0; i < 3; i++) c.drawImage(mw, 240 - 13, 200 + i * 24, 26, 26);
+  const fz = tinted('e-water-a', EL.water); if (fz) for (let i = 0; i < 3; i++) c.drawImage(fz, 290 + i * 30, 284, 28, 28);
+  return OUTPOST_PIC = cv.toDataURL('image/png');
+}
+// the tower-capture prototype's ground: the glass tubes from the hub to each temple, the freed marching through them,
+// and each temple's frozen garrison waiting at its door (fewer as they are freed)
+function drawOutposts(inView) {
+  const O = S.out, H = O.hub;
+  for (const T of O.towers) { const x1 = H.x, y1 = H.y + 20, x2 = T.x, y2 = T.y + 40, won = S.qiStones[T.el], col = EL[T.el];
+    g.lineCap = 'round';
+    g.strokeStyle = 'rgba(20,30,50,.35)'; g.lineWidth = 58; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+    g.strokeStyle = won ? col + '55' : 'rgba(190,225,255,.18)'; g.lineWidth = 46; g.stroke();
+    g.strokeStyle = 'rgba(230,245,255,.45)'; g.lineWidth = 3; const nx = -(y2 - y1), ny = x2 - x1, nm = Math.hypot(nx, ny) || 1;
+    for (const o of [-21, 21]) { g.beginPath(); g.moveTo(x1 + nx / nm * o, y1 + ny / nm * o); g.lineTo(x2 + nx / nm * o, y2 + ny / nm * o); g.stroke(); }
+    if (won) { g.strokeStyle = col; g.lineWidth = 8; g.setLineDash([24, 60]); g.lineDashOffset = -S.t * 120; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); g.setLineDash([]); }
+    g.lineCap = 'butt'; g.lineWidth = 1;
+    // the garrison: frozen creatures of the temple's element in a ring before its door, one fewer for every few freed
+    if (!won && inView(T.x, T.y, 400)) { const left = Math.ceil(8 * (1 - (S.qi[T.el] || 0) / O.need)), im = tinted(`e-${T.el}-a`, EL[T.el]);
+      for (let i = 0; i < left; i++) { const a = Math.PI * (.15 + .7 * i / 7), x = T.x + Math.cos(a) * 190, y = T.y + 30 + Math.sin(a) * 70; if (im) g.drawImage(im, x - 24, y - 40, 48, 48); } } }
+  // the freed, marching out through the tubes to free the garrison
+  for (const m of O.march) { const q = Math.min(1, m.t / m.dur), T = m.T, x = H.x + (T.x - H.x) * q, y = H.y + 20 + (T.y + 40 - H.y - 20) * q, hop = Math.abs(Math.sin(m.t * 9 + m.ph)) * 8;
+    if (!inView(x, y, 60)) continue; const im = m.own && ok(IMG[m.img + '-happy']) ? IMG[m.img + '-happy'] : IMG[m.img];
+    if (im && ok(im)) g.drawImage(im, x - 18, y - 34 - hop, 36, 36); }
+}
 // a tower, standing: the Great Tower with its five sockets, or an element tower in its element's colours. While its stone
 // waits, an element tower sends up a column of its light; once its stone is home, a steady crown of it. A tower the
 // Keeper is behind turns see-through, so the Keeper is never lost
@@ -6616,12 +6726,35 @@ function shrineNight(im, el) {
   c.globalCompositeOperation = 'destination-in'; c.drawImage(im, 0, 0);
   return SHRINE_IM[el] = cv;
 }
+// where a tower's front meets the ground: things whose feet are behind this line stand behind it
+const towerFront = T => T === TOWER || T.hub ? T.y : T.y + 20;
+// where a tower's painted base really ends, column by column, read from its own art once (QA, 2026-10-06: a curve or a
+// straight line guessed wrong at the corners and sides, ghosting a Keeper who stood on open ground)
+const ART_PROFILE = new Map();
+function artProfile(im) {
+  if (ART_PROFILE.has(im)) return ART_PROFILE.get(im);
+  const N = 64, R = 256, c = document.createElement('canvas'); c.width = N; c.height = R; const x = c.getContext('2d'); x.drawImage(im, 0, 0, N, R);
+  const d = x.getImageData(0, 0, N, R).data, out = new Float32Array(N).fill(-1);
+  for (let col = 0; col < N; col++) for (let row = R - 1; row >= 0; row--) if (d[(row * N + col) * 4 + 3] > 60) { out[col] = (row + 1) / R; break; }
+  ART_PROFILE.set(im, out); return out;
+}
+function towerGeo(T) {
+  const art = T !== TOWER && !T.hub && ok(IMG['x-temple-' + T.el]) ? IMG['x-temple-' + T.el] : null, im = art || IMG['x-tower-metal']; if (!ok(im)) return null;
+  const th = T.h, tw = th * im.naturalWidth / im.naturalHeight; return { im, art, th, tw, top:T.y - th + (art ? 40 : 0) };
+}
+const towerFrontAt = (T, x) => { const G = towerGeo(T); if (!G) return -1e9; const col = Math.floor((x - (T.x - G.tw / 2)) / G.tw * 64); if (col < 0 || col > 63) return -1e9; const f = artProfile(G.im)[col]; return f < 0 ? -1e9 : G.top + f * G.th; };
+// the Keeper is behind a tower when the painted base comes down past their feet anywhere across their stance
+const keeperBehind = T => { const P = S.p, feet = P.y + 30, G = towerGeo(T); return !!G && P.y > G.top - 40 && [-18, 0, 18].some(dx => towerFrontAt(T, P.x + dx) > feet + 2); };
 function drawTowerAt(T, cx, cy) {
-  const im = IMG['x-tower-metal']; if (!ok(im)) return; const th = T.h, tw = th * im.naturalWidth / im.naturalHeight, top = T.y - th, P = S.p;
+  // the element towers are Codex's five temples (2026-10-06), each showing its trap mouth; their base sits a little in
+  // front of the footprint's centre. The recoloured pagoda stays as the fallback while the art loads
+  const art = T !== TOWER && !T.hub && ok(IMG['x-temple-' + T.el]) ? IMG['x-temple-' + T.el] : null, im = art || IMG['x-tower-metal']; if (!ok(im)) return;
+  const th = T.h, tw = th * im.naturalWidth / im.naturalHeight, top = T.y - th + (art ? 40 : 0), P = S.p;
   if (T.x + tw / 2 < cx || T.x - tw / 2 > cx + VW || T.y < cy || top > cy + VH) return;
-  const behind = P.y < T.y - 10 && P.y > top + 40 && Math.abs(P.x - T.x) < tw * .42;
+  const behind = keeperBehind(T) && P.y > top + 40;
   g.save();
-  if (T === TOWER) {
+  if (T.hub) { g.drawImage(towerNight(im), T.x - tw / 2, top, tw, th); if (allStones()) add(() => glowAt(T.x, top + th * .25, th * .4, '#FFE08A', .6)); }
+  else if (T === TOWER) {
     g.drawImage(towerNight(im), T.x - tw / 2, top, tw, th);
     TOWER.order.forEach((el, i) => { const sx = T.x, sy = top + th * TOWER.sock[i], r = th * .05;
       if (S.qiStones[el]) { add(() => glowAt(sx, sy, r * 4, EL[el], .7)); spr('x-stone-' + el, sx, sy, r * 2.4); } });
@@ -6629,12 +6762,17 @@ function drawTowerAt(T, cx, cy) {
     const home = S.qiStones[T.el], out = S.stoneOut[T.el] && !home;
     if (out) { const gr = g.createLinearGradient(0, top - 500, 0, top + 40); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, T.el === 'fire' ? 'rgba(255,154,74,.45)' : EL[T.el] + '73');
       g.fillStyle = gr; g.fillRect(T.x - 26 - Math.sin(S.t * 4) * 4, top - 500, 52 + Math.sin(S.t * 4) * 8, 540); }
-    g.drawImage(shrineNight(im, T.el), T.x - tw / 2, top, tw, th);
+    g.drawImage(art || shrineNight(im, T.el), T.x - tw / 2, top, tw, th);
+    // the trap winding up glows in the painted mouth; while the boulder rolls, the earth temple's doorway stands empty
+    for (const Tr of S.ttraps || []) if (Tr.sh === T) { if (Tr.t < Tr.wind) trapMouth(Tr, Tr.t / Tr.wind, { flood:'#5FB0FF', flame:'#FF8A2A', boulder:'#FFC870', darts:'#DDE6F4' }[Tr.k]);
+      else if (Tr.k === 'boulder' && art) { const y = T.y - T.h + 40 + MOUTH.earth * T.h; g.fillStyle = '#1A140E'; g.beginPath(); g.ellipse(T.x, y, 38, 42, 0, 0, TAU); g.fill(); } }
     if (home || out) add(() => glowAt(T.x, top + th * .2, th * (home ? .32 : .26 + .04 * Math.sin(S.t * 6)), T.el === 'fire' ? '#FF9A4A' : EL[T.el], home ? .55 : .8));
   }
   g.restore();
   // the tower stays solid; a Keeper behind it shows through as a soft outline, so they are never lost
-  if (behind) { const sil = silhouette('k' + keeper, '#BFD4FF'); if (sil) { const ks = 120; g.save(); g.globalAlpha = .55; g.translate(P.x, P.y + 30); if (P.face < 0) g.scale(-1, 1); g.drawImage(sil, -ks / 2, -ks * .72 - 24, ks, ks); g.restore(); } }
+  // a dark outline with a light core, so it reads on the pale temples and the dark tower alike (QA, 2026-10-06)
+  if (behind) { const dk = silhouette('k' + keeper, '#141A3A'), lt = silhouette('k' + keeper, '#DDE8FF'); if (dk && lt) { const ks = 120; g.save(); g.translate(P.x, P.y + 30); if (P.face < 0) g.scale(-1, 1);
+    g.globalAlpha = .8; for (const [dx, dy] of [[-3, 0], [3, 0], [0, -3], [0, 3]]) g.drawImage(dk, -ks / 2 + dx, -ks * .72 - 24 + dy, ks, ks); g.globalAlpha = .7; g.drawImage(lt, -ks / 2, -ks * .72 - 24, ks, ks); g.restore(); } }
 }
 // the tower in the forge's night: its daylight colours (blossom, shrubs) drained to iron, so it belongs to the city
 let TOWER_NIGHT = null;
@@ -6721,16 +6859,18 @@ function drawDecor(el, o, home) {
 function drawTempleWarn() {
   for (const T of S.ttraps || []) { if (T.t >= T.wind) continue; const p = Math.min(1, T.t / T.wind);
     if (T.k === 'thorns') warnCircle(T.x, T.y, T.r, p);
-    else if (T.k === 'darts') { trapMouth(T, p, '#B8C4D8'); for (let i = -1; i <= 1; i++) { const x = T.x - T.uy * i * 22, y = T.y + T.ux * i * 10; g.fillStyle = `rgba(255,60,40,${.6 + .4 * Math.sin(S.t * 12)})`; g.beginPath(); g.ellipse(x, y, 9, 5, 0, 0, TAU); g.fill(); } }
-    else { g.save(); g.translate(T.x, T.y); g.rotate(Math.atan2(T.uy, T.ux)); warnLane(T.len, T.w, p); g.restore(); trapMouth(T, p, { flood:'#3E8EE0', flame:'#FF6A2A', boulder:'#E8A830' }[T.k]); } }
+    else if (T.k === 'darts') { for (let i = -1; i <= 1; i++) { const x = T.x - T.uy * i * 22, y = T.y + T.ux * i * 10; g.fillStyle = `rgba(255,60,40,${.6 + .4 * Math.sin(S.t * 12)})`; g.beginPath(); g.ellipse(x, y, 9, 5, 0, 0, TAU); g.fill(); } }
+    else { g.save(); g.translate(T.x, T.y); g.rotate(Math.atan2(T.uy, T.ux)); warnLane(T.len, T.w, p); g.restore(); } }
 }
-// the tower's trap mouth opening in its wall where the trap will come out: a dark arch that widens, its element glowing
-// deep inside (design review, 2026-10-06: the trap should be seen coming out of the tower)
+// the warning at the temple's own painted trap mouth: its element's light swells inside the gate, the dragon's mouth,
+// the doorway or the slit wall (design review, 2026-10-06: the trap must come out of the mouth the art shows)
+const MOUTH = { water:.58, fire:.62, earth:.5, metal:.66 };
 function trapMouth(T, p, col) {
-  const x = T.x - T.ux * 20, y = T.y - T.uy * 14 - 18, w = 18 + 26 * p, h = 26 + 30 * p;
-  g.fillStyle = '#0C0D12'; g.beginPath(); g.moveTo(x - w, y + 10); g.lineTo(x - w, y - h * .4); g.quadraticCurveTo(x, y - h * 1.3, x + w, y - h * .4); g.lineTo(x + w, y + 10); g.closePath(); g.fill();
-  g.strokeStyle = '#3A3E4A'; g.lineWidth = 4; g.stroke(); g.lineWidth = 1;
-  const gr = g.createRadialGradient(x, y - h * .2, 2, x, y - h * .2, w); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.globalAlpha = .3 + .6 * p; g.fillStyle = gr; g.fillRect(x - w, y - h, w * 2, h + 10); g.globalAlpha = 1;
+  const Sh = T.sh; if (!Sh) return; const x = Sh.x, y = Sh.y - Sh.h + 40 + MOUTH[Sh.el] * Sh.h, r = 34 + 30 * p;
+  const gr = g.createRadialGradient(x, y, 2, x, y, r); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); const pulse = .75 + .25 * Math.sin(S.t * 12);
+  g.save(); g.globalAlpha = .5 + .5 * p * pulse; g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.restore();
+  // and its light spills out round the mouth, brighter as it comes, so the warning reads at phone size (QA, 2026-10-06)
+  add(() => glowAt(x, y, r * 3.4, col, .35 + .55 * p * pulse));
 }
 // the temple traps at work: the wall of water, the jet of flame and the great iron boulder
 function drawTempleTraps() {
@@ -6750,6 +6890,8 @@ function drawTempleTraps() {
         fireBall(g, x - T.uy * side, y + T.ux * side, 12 + 10 * q, -T.ux, -T.uy * .55, pulse, S.t + i); } g.restore(); }
     else if (T.k === 'boulder') { const x = T.x + T.ux * T.f, y = T.y + T.uy * T.f, R = TRAP.earth.r, rot = T.f / R;
       g.fillStyle = 'rgba(0,0,0,.4)'; g.beginPath(); g.ellipse(x, y + 6, R * 1.05, R * .4, 0, 0, TAU); g.fill();
+      // the painted boulder from the doorway, rolling out of it
+      if (spr('x-boulder', x, y - R, R * 2.5, rot)) { if (Math.random() < .5) fx({ k:'smoke', x:x + rnd(-30, 30), y:y + 4, vx:-T.ux * 50, vy:-T.uy * 50 - 15, drag:2, life:.7, s:rnd(20, 30), c:'170,140,100' }); continue; }
       const gr = g.createRadialGradient(x - R * .35, y - R - R * .35, R * .1, x, y - R, R); gr.addColorStop(0, '#E2C48A'); gr.addColorStop(.6, '#B08A52'); gr.addColorStop(1, '#5A4024');
       g.fillStyle = gr; g.beginPath(); g.arc(x, y - R, R, 0, TAU); g.fill(); g.strokeStyle = '#2A1E10'; g.lineWidth = 4; g.stroke();
       g.save(); g.beginPath(); g.arc(x, y - R, R, 0, TAU); g.clip(); g.strokeStyle = 'rgba(70,46,20,.6)'; g.lineWidth = 5;
@@ -6809,13 +6951,18 @@ function trapPic(k) {
   if (TRAP_PIC[k]) return TRAP_PIC[k];
   const el = { flood:'water', thorns:'wood', flames:'fire', boulder:'earth', darts:'metal' }[k], cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d');
   c.fillStyle = elemTile(el, true); c.fillRect(0, 0, 480, 320); c.fillStyle = 'rgba(10,10,16,.25)'; c.fillRect(0, 0, 480, 320);
-  const im = IMG['x-tower-metal']; if (im && ok(im)) { const th = 230, tw = th * im.naturalWidth / im.naturalHeight; c.drawImage(shrineNight(im, el), 20, 250 - th, tw, th); }
+  const tmp = IMG['x-temple-' + el], im = tmp && ok(tmp) ? tmp : IMG['x-tower-metal'], th = 230, my = 260 - th + (MOUTH[el] || .6) * th; let mx = 125;
+  if (im && ok(im)) { const tw = th * im.naturalWidth / im.naturalHeight; mx = 10 + tw / 2; c.drawImage(im === tmp ? im : shrineNight(im, el), 10, 260 - th, tw, th); }
   const red = (a, f) => { c.fillStyle = `rgba(255,40,30,${a})`; f(); c.fill(); c.strokeStyle = 'rgba(255,40,30,.6)'; c.lineWidth = 6; c.stroke(); };
   if (k === 'thorns') for (const [x, y] of [[230, 250], [330, 270], [430, 245]]) red(.25, () => { c.beginPath(); c.ellipse(x, y, 46, 26, 0, 0, TAU); });
-  else if (k === 'darts') for (let i = -2; i <= 2; i++) { c.save(); c.translate(150, 200); c.rotate(i * .12); c.fillStyle = '#E8EEF4'; c.strokeStyle = 'rgba(255,70,50,.9)'; c.lineWidth = 3; for (let j = 0; j < 3; j++) { c.beginPath(); c.arc(80 + j * 90, 0, 8, 0, TAU); c.fill(); c.stroke(); } c.restore(); }
-  else red(.2, () => { c.beginPath(); c.roundRect(150, 205, 330, 70, 35); });
-  const kim = IMG['k' + keeper + 'dash'] || IMG['k' + keeper]; if (kim && ok(kim)) { const h = 104, w = h * kim.naturalWidth / kim.naturalHeight, ky = k === 'thorns' ? 190 : 175;
-    c.fillStyle = 'rgba(0,0,0,.4)'; c.beginPath(); c.ellipse(390, ky, 34, 10, 0, 0, TAU); c.fill(); c.drawImage(kim, 390 - w / 2, ky + 4 - h, w, h); }
+  // the darts: a fan flying forward from the slit wall down a red path, the Keeper clear of it
+  else if (k === 'darts') { red(.18, () => { c.beginPath(); c.moveTo(mx - 20, my); c.lineTo(mx + 20, my); c.lineTo(mx + 120, 320); c.lineTo(mx - 10, 320); c.closePath(); });
+    for (let i = -2; i <= 2; i++) { c.save(); c.translate(mx, my); c.rotate(1.2 + i * .1); for (let j = 0; j < 2; j++) { const d = 60 + j * 70 + Math.abs(i) * 6; c.fillStyle = '#E8EEF4'; c.strokeStyle = 'rgba(255,70,50,.95)'; c.lineWidth = 3; c.beginPath(); c.ellipse(d, 0, 14, 6, 0, 0, TAU); c.fill(); c.stroke(); } c.restore(); } }
+  else { red(.2, () => { c.beginPath(); c.moveTo(mx - 34, my); c.lineTo(mx + 34, my); c.lineTo(mx + 90, 320); c.lineTo(mx - 10, 320); c.closePath(); });
+    if (k === 'boulder' && ok(IMG['x-boulder'])) c.drawImage(IMG['x-boulder'], mx - 4, 236, 70, 70); }
+  // the Keeper stepping clear: out of the lane, to the side of the temple's front
+  const kim = IMG['k' + keeper + 'dash'] || IMG['k' + keeper]; if (kim && ok(kim)) { const h = 104, w = h * kim.naturalWidth / kim.naturalHeight, ky = k === 'thorns' ? 190 : 300, kx = k === 'thorns' ? 390 : 380;
+    c.fillStyle = 'rgba(0,0,0,.4)'; c.beginPath(); c.ellipse(kx, ky, 34, 10, 0, 0, TAU); c.fill(); c.drawImage(kim, kx - w / 2, ky + 4 - h, w, h); }
   return TRAP_PIC[k] = cv.toDataURL('image/png');
 }
 // the dark, in two passes (design review, 2026-10-06: drawn over everything, it dimmed warnings, words and danger).
@@ -7467,6 +7614,7 @@ const TIP_ART = { enemy:'tip-rings', bloom:'tip-bloom' };
 function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'firebar') return `<div class="fbdemo"><img src="${firebarPic()}" alt=""></div>`;
+  if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic()}" alt=""></div>`;
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
   if (id.startsWith('call_')) { const cid = id.slice(5), D = CALL[cid], src = `art4/calls/${D.img}.png?v=9`;
@@ -7490,7 +7638,7 @@ function tipArt(id) {
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar' };
+const CARD_VO = { move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
@@ -7891,9 +8039,9 @@ function defeatTip() {
   if (H.src === 'spikes') return { img:null, t:BOSS.spikes[0], p:BOSS.spikes[1] };
   // the fire bars teach their own way past, never an element lesson (design review, 2026-10-06)
   // the Silver City's temple traps all speak the danger language the game already teaches
-  if (H.src === 'boulder' || H.src === 'flood' || H.src === 'flames') return { img:trapPic(H.src), t:'Step out of the red lane', p:'The tower warns you first. Leave the red lane before it fires.' };
+  if (H.src === 'boulder' || H.src === 'flood' || H.src === 'flames') return { img:trapPic(H.src), t:'Step out of the red lane', p:'The temple warns you first. Leave the red lane before it fires.' };
   if (H.src === 'thorns') return { img:trapPic('thorns'), t:'Step off the thorn holes', p:'Thorns spring up from the holes where the red circles show. Keep moving.' };
-  if (H.src === 'darts') return { img:trapPic('darts'), t:'Watch the tower\'s slits', p:'When they glint red, step sideways out of the darts\' path.' };
+  if (H.src === 'darts') return { img:trapPic('darts'), t:'Watch the temple\'s slits', p:'When they glint red, step sideways out of the darts\' path.' };
   if (H.src === 'fire bar') return { img:firebarPic(), t:'Fire bars spin', p:'Wait for the fire to pass, then run in behind it.' };
   if (H.el && eff(H.el, keeperEl) > 1) {
     const cs = weakTo(H.el), pw = Object.keys(POW).filter(id => cs.includes(POW[id].e)).slice(0, 2);
@@ -8007,10 +8155,11 @@ function lose(fell) {
   S.over = true; running = false; AU.music(false); if (!fell) SFX.stomp();
   const B = S.boss && !S.boss.dead ? S.boss : null, WV = LV().waves, tip = defeatTip(); let title, line, frac;
   if (B) { const left = B.hp / B.max; frac = 1 - left; const nm = bossOf(B).name; title = left < .34 ? 'So close!' : 'Keep going, Keeper!'; line = left < .34 ? `${nm} is almost free` : left < .67 ? `${nm} is half beaten` : `${nm} is still strong`; }
-  else if (S.waveIdx) { frac = S.waveIdx / (WV.length + 1); title = S.waveIdx >= WV.length ? 'Almost there!' : 'Keep going, Keeper!'; line = `You reached wave ${S.waveIdx} of ${WV.length}`; }
+  else if (S.waveIdx) { frac = S.waveIdx / (WV.length + 1); title = S.waveIdx >= WV.length ? 'Almost there!' : 'Keep going, Keeper!'; line = `You reached wave ${Math.min(S.waveIdx, WV.length)} of ${WV.length}`; }
   else { frac = Math.min(1, S.t / 120) * .2; title = 'Keep going, Keeper!'; line = `You held on for ${Math.floor(S.t / 60)}:${String(Math.floor(S.t % 60)).padStart(2, '0')}`; }
   $('#riseImg').src = `art4/rise/k${keeper}.jpg?v=8`; $('#riseT').textContent = title; $('#riseProg').textContent = line;
-  const ti = $('#riseTipImg'); ti.hidden = !tip.img; if (tip.img) ti.src = tip.img; $('#riseTipT').textContent = tip.t; $('#riseTipP').textContent = tip.p;
+  // a lesson picture (drawn from the game) is shown big enough to read; a creature or power is a small icon
+  const ti = $('#riseTipImg'); ti.hidden = !tip.img; if (tip.img) ti.src = tip.img; ti.classList.toggle('pic', !!tip.img && tip.img.startsWith('data:')); $('#riseTipT').textContent = tip.t; $('#riseTipP').textContent = tip.p;
   const left = S.rises, all = RISES[S.level - 1], face = `art4/k${keeper}-face.png?v=8`;
   $('#riseLives').innerHTML = Array.from({ length:all + (S.lightUsed ? 1 : 0) }, (_, i) => `<img src="${face}" alt="" class="${i < left ? '' : 'used'}">`).join('');
   $('#riseLives').setAttribute('aria-label', `${left} ${left === 1 ? 'rise' : 'rises'} left`);
@@ -8080,7 +8229,7 @@ function results() {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
