@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MorQi Tester Feedback</title>
+<meta name="description" content="Tell DP Media how your MorQi playtest went. Mostly taps, about two minutes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* layout: one night-glass column, one question per card, the send button fixed at the foot */
+:root{
+  --night:#0B1033; --deep:#070920; --card:rgba(255,255,255,.06); --line:rgba(255,255,255,.14);
+  --text:#F4F1FF; --muted:rgba(244,241,255,.72); --faint:rgba(244,241,255,.5);
+  --pick:#6FF2CF; --go:#3FCF6E; --go-2:#25A955;
+  --round:"Nunito",ui-rounded,"SF Pro Rounded",-apple-system,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--deep)}
+body{margin:0;background:radial-gradient(120% 60% at 50% 0%,#1A2260 0%,var(--deep) 60%) var(--deep);color:var(--text);font:600 16px/1.5 var(--round);-webkit-font-smoothing:antialiased;padding-inline:16px;padding-block:calc(20px + env(safe-area-inset-top,0px)) calc(120px + env(safe-area-inset-bottom,0px))}
+main{max-width:560px;margin:0 auto;display:grid;gap:14px}
+header{display:grid;gap:6px;text-align:center;padding-block:8px 6px}
+header img{width:min(62%,240px);margin:0 auto;filter:drop-shadow(0 6px 14px rgba(10,20,60,.5))}
+h1{margin:0;font-size:26px;font-weight:900;text-wrap:balance}
+.lede{margin:0;color:var(--muted)}
+.grown{margin:0;color:var(--faint);font-size:14px}
+fieldset{margin:0;border:0;border-radius:20px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);padding:16px;display:grid;gap:10px;min-width:0}
+legend{float:left;width:100%;padding:0;font-weight:900;font-size:18px;text-wrap:balance}
+legend small{display:block;font-weight:700;font-size:13px;color:var(--faint);margin-top:2px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{position:relative;cursor:pointer}
+.opts input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opts span{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:800}
+.opts input:checked + span{background:rgba(111,242,207,.16);box-shadow:inset 0 0 0 2px var(--pick)}
+.opts input:focus-visible + span{outline:3px solid var(--pick);outline-offset:2px}
+.opts.keepers span{padding:6px 12px 6px 6px}
+.opts.keepers img{width:34px;height:34px;border-radius:50%;background:#1C2452}
+.opts.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.opts.scale span{justify-content:center;flex-direction:column;gap:0;padding:8px 4px;border-radius:14px;width:100%;font-size:20px;line-height:1.1}
+.opts.scale small{font-size:11px;color:var(--faint);font-weight:700}
+textarea{width:100%;min-height:76px;resize:vertical;border-radius:14px;border:0;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--text);font:600 16px/1.45 var(--round);padding:10px 12px}
+textarea:focus-visible{outline:3px solid var(--pick);outline-offset:1px}
+textarea::placeholder{color:var(--faint)}
+.foot{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(7,9,32,0),rgba(7,9,32,.92) 30%);display:grid;justify-items:center;gap:6px}
+.send{display:block;width:min(100%,420px);text-align:center;text-decoration:none;color:#fff;font:900 18px var(--round);padding:15px 18px;border-radius:999px;background:linear-gradient(180deg,#5FE08A,var(--go) 55%,var(--go-2));box-shadow:0 4px 0 #1B7E3F,0 8px 22px rgba(0,0,0,.35);border:0;cursor:pointer}
+.send:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.alt{font-size:13px;color:var(--faint);text-align:center}
+.alt button{background:none;border:0;color:var(--pick);font:800 13px var(--round);text-decoration:underline;cursor:pointer;padding:6px}
+.done{display:none;text-align:center;color:var(--pick);font-weight:800}
+.done.on{display:block}
+@media (prefers-reduced-motion:no-preference){.opts span{transition:background .15s,box-shadow .15s}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="../level1/art4/logo-morqi.png?v=11" alt="MorQi">
+    <h1>How did your playtest go?</h1>
+    <p class="lede">About two minutes, mostly taps. Thank you for playing!</p>
+    <p class="grown">Players under 13: fill this in together with a grown-up. Please don't write any names.</p>
+  </header>
+
+  <fieldset><legend>How old is the player?</legend>
+    <div class="opts" data-q="Age">
+      <label><input type="radio" name="age" value="Under 6"><span>Under 6</span></label>
+      <label><input type="radio" name="age" value="6-8"><span>6–8</span></label>
+      <label><input type="radio" name="age" value="9-12"><span>9–12</span></label>
+      <label><input type="radio" name="age" value="13-17"><span>13–17</span></label>
+      <label><input type="radio" name="age" value="Adult"><span>Adult</span></label>
+    </div></fieldset>
+
+  <fieldset><legend>Played games like this before?</legend>
+    <div class="opts" data-q="Played before">
+      <label><input type="radio" name="before" value="Never"><span>Never</span></label>
+      <label><input type="radio" name="before" value="A little"><span>A little</span></label>
+      <label><input type="radio" name="before" value="A lot"><span>A lot</span></label>
+    </div></fieldset>
+
+  <fieldset><legend>Which levels did you play?<small>Tap all that apply</small></legend>
+    <div class="opts" data-q="Levels" data-multi>
+      <label><input type="checkbox" value="1 Pearl Shore"><span>1 · Pearl Shore</span></label>
+      <label><input type="checkbox" value="2 Bamboo Grove"><span>2 · Bamboo Grove</span></label>
+      <label><input type="checkbox" value="3 Lantern Ridge"><span>3 · Lantern Ridge</span></label>
+      <label><input type="checkbox" value="4 Harvest Hills"><span>4 · Harvest Hills</span></label>
+      <label><input type="checkbox" value="5 Silver City"><span>5 · Silver City</span></label>
+    </div></fieldset>
+
+  <fieldset><legend>Which Keeper did you pick?</legend>
+    <div class="opts keepers" data-q="Keeper" id="keepers"></div></fieldset>
+
+  <fieldset><legend>How fun was it?</legend>
+    <div class="opts scale" data-q="Fun (1-5)">
+      <label><input type="radio" name="fun" value="1"><span>1<small>Not fun</small></span></label>
+      <label><input type="radio" name="fun" value="2"><span>2<small>&nbsp;</small></span></label>
+      <label><input type="radio" name="fun" value="3"><span>3<small>OK</small></span></label>
+      <label><input type="radio" name="fun" value="4"><span>4<small>&nbsp;</small></span></label>
+      <label><input type="radio" name="fun" value="5"><span>5<small>So fun</small></span></label>
+    </div></fieldset>
+
+  <fieldset><legend>How hard was it?</legend>
+    <div class="opts" data-q="Difficulty">
+      <label><input type="radio" name="hard" value="Too easy"><span>Too easy</span></label>
+      <label><input type="radio" name="hard" value="Just right"><span>Just right</span></label>
+      <label><input type="radio" name="hard" value="Too hard"><span>Too hard</span></label>
+    </div></fieldset>
+
+  <fieldset><legend>What was the coolest part?<small>Tap all that apply</small></legend>
+    <div class="opts" data-q="Coolest" data-multi>
+      <label><input type="checkbox" value="Going Omni"><span>Going Omni</span></label>
+      <label><input type="checkbox" value="A Star Call"><span>A Star Call</span></label>
+      <label><input type="checkbox" value="Beating a boss"><span>Beating a boss</span></label>
+      <label><input type="checkbox" value="Waking a temple"><span>Waking a temple</span></label>
+      <label><input type="checkbox" value="The giants"><span>The giants</span></label>
+      <label><input type="checkbox" value="My spirit animal"><span>My spirit animal</span></label>
+      <label><input type="checkbox" value="The music"><span>The music</span></label>
+      <label><input type="checkbox" value="The world waking up"><span>The world waking up</span></label>
+    </div></fieldset>
+
+  <fieldset><legend>Where did you get stuck or confused?<small>Tap all that apply</small></legend>
+    <div class="opts" data-q="Stuck" data-multi>
+      <label><input type="checkbox" value="Where to go"><span>Where to go</span></label>
+      <label><input type="checkbox" value="Which element to use"><span>Which element to use</span></label>
+      <label><input type="checkbox" value="The temples"><span>The temples</span></label>
+      <label><input type="checkbox" value="A boss"><span>A boss</span></label>
+      <label><input type="checkbox" value="The powers to pick"><span>The powers to pick</span></label>
+      <label><input type="checkbox" value="Nowhere"><span>Nowhere</span></label>
+    </div>
+    <textarea id="stuckMore" data-q="Stuck, more" placeholder="Tell us more (optional)"></textarea></fieldset>
+
+  <fieldset><legend>Did anything feel unfair or broken?</legend>
+    <textarea id="unfair" data-q="Unfair or broken" placeholder="For example: I got hit and didn't see it coming"></textarea></fieldset>
+
+  <fieldset><legend>Would you play again tomorrow?</legend>
+    <div class="opts" data-q="Play again">
+      <label><input type="radio" name="again" value="Yes!"><span>Yes!</span></label>
+      <label><input type="radio" name="again" value="Maybe"><span>Maybe</span></label>
+      <label><input type="radio" name="again" value="No"><span>No</span></label>
+    </div></fieldset>
+
+  <fieldset><legend>What did you play on?</legend>
+    <div class="opts" data-q="Device">
+      <label><input type="radio" name="dev" value="iPhone"><span>iPhone</span></label>
+      <label><input type="radio" name="dev" value="Android phone"><span>Android phone</span></label>
+      <label><input type="radio" name="dev" value="Tablet"><span>Tablet</span></label>
+      <label><input type="radio" name="dev" value="Computer"><span>Computer</span></label>
+    </div></fieldset>
+
+  <fieldset><legend>Anything else you want to tell us?</legend>
+    <textarea id="more" data-q="Anything else" placeholder="What you loved, what you'd change, what you want next"></textarea></fieldset>
+
+  <p class="done" id="done" role="status"></p>
+</main>
+
+<div class="foot">
+  <a class="send" id="send" href="#">Text my answers to DP Media</a>
+  <div class="alt">No texting here? <button type="button" id="copy">Copy my answers</button> and send them to <span>347-414-2753</span></div>
+</div>
+
+<script>
+// the seven Keepers, with their own faces from the game
+const KEEPERS = ['Amara', 'Kai', 'Priya', 'Mateo', 'Ruby', 'Malik', 'Sina'];
+document.getElementById('keepers').innerHTML = KEEPERS.map((n, i) =>
+  `<label><input type="radio" name="keeper" value="${n}"><span><img src="../level1/art4/k${i + 1}-face.png?v=13" alt="">${n}</span></label>`).join('');
+
+const NUMBER = '+13474142753';
+// one short message, a line per answered question, so it reads well in a text thread
+function summary() {
+  const lines = ['MorQi playtest'];
+  for (const g of document.querySelectorAll('[data-q]')) {
+    let v;
+    if (g.tagName === 'TEXTAREA') v = g.value.trim();
+    else v = [...g.querySelectorAll('input:checked')].map(i => i.value).join(', ');
+    if (v) lines.push(`${g.dataset.q}: ${v}`);
+  }
+  return lines.join('\n');
+}
+const send = document.getElementById('send'), done = document.getElementById('done');
+function refresh() { send.href = `sms:${NUMBER}?&body=${encodeURIComponent(summary())}`; }
+document.addEventListener('input', refresh); document.addEventListener('change', refresh); refresh();
+send.addEventListener('click', () => { done.textContent = 'Your Messages app should open with your answers. Tap send. Thank you!'; done.classList.add('on'); });
+document.getElementById('copy').addEventListener('click', async () => {
+  const text = summary();
+  try { await navigator.clipboard.writeText(text); done.textContent = 'Copied! Paste it into a text to 347-414-2753.'; }
+  catch (e) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done.textContent = 'Copied! Paste it into a text to 347-414-2753.'; } catch (e2) { done.textContent = 'Select and copy your answers above, then text them to 347-414-2753.'; } t.remove(); }
+  done.classList.add('on');
+});
+</script>
+</body>
+</html>
