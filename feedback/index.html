@@ -50,7 +50,10 @@ textarea::placeholder{color:var(--faint)}
 .alt button{background:none;border:0;color:var(--pick);font:800 13px var(--round);text-decoration:underline;cursor:pointer;padding:6px}
 .done{display:none;text-align:center;color:var(--pick);font-weight:800}
 .done.on{display:block}
-@media (prefers-reduced-motion:no-preference){.opts span{transition:background .15s,box-shadow .15s}}
+@media (prefers-reduced-motion:no-preference){.opts span{transition:background .15s,box-shadow .15s}
+  /* the form rises out of the night the Stillmaker's gate left behind */
+  body::before{content:"";position:fixed;inset:0;background:#04061A;z-index:50;pointer-events:none;animation:rise .7s ease-out forwards}
+  @keyframes rise{to{opacity:0;visibility:hidden}}}
 </style>
 </head>
 <body>
