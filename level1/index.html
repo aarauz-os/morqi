@@ -1425,6 +1425,73 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .gr-call > img{filter:drop-shadow(0 0 8px rgba(228,234,255,.5))}
 #resGift em{font-style:normal;font-weight:900;margin-left:4px;opacity:.8}
 .crv-demo video{display:block;width:100%;height:100%;object-fit:cover}
+
+/* ===== Victory, rebuilt bright (A, 2026-10-07: "flat, dark, and dated. doesnt feel and look fresh and fun and wanted") =====
+   The realm in daylight in its own colours (--sky1 top, --sky2 horizon), soft turning light, drifting clouds; a hill of its
+   thawed ground where its freed creatures hop; the Keeper jumping for joy beside the person freed; a big glossy title that
+   slams in and catches the light once; the stars, numbers and buttons on a frosted card the day shows through. No flashes. */
+#results{--sky1:#7FD3FF;--sky2:#D9F6FF;--acc:#2BB6E8;--ink:#17306E;background:linear-gradient(180deg,var(--sky1),var(--sky2) 58%)!important;
+  justify-content:flex-start!important;gap:0!important;padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))!important;isolation:isolate}
+#results .vic-sky{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+#results .vic-beams{position:absolute;left:50%;top:26%;width:220vmax;height:220vmax;translate:-50% -50%;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.28) 0 7deg,rgba(255,255,255,0) 7deg 20deg);
+  -webkit-mask:radial-gradient(circle,#000 4%,transparent 34%);mask:radial-gradient(circle,#000 4%,transparent 34%);animation:spin 40s linear infinite}
+#results .vic-beams::after{content:"";position:absolute;inset:44%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,240,.85),rgba(255,255,240,0) 70%)}
+#results .vic-cloud{position:absolute;width:150px;height:46px;border-radius:40px;background:rgba(255,255,255,.75);filter:blur(1px);animation:cloudDrift 46s linear infinite}
+#results .vic-cloud::before,#results .vic-cloud::after{content:"";position:absolute;bottom:14px;border-radius:50%;background:inherit}
+#results .vic-cloud::before{left:22px;width:58px;height:58px}#results .vic-cloud::after{left:62px;width:72px;height:72px}
+#results .vic-cloud.c1{top:9%;left:-20%;animation-duration:52s}#results .vic-cloud.c2{top:20%;left:40%;scale:.7;opacity:.8;animation-duration:64s;animation-delay:-30s}
+#results .vic-cloud.c3{top:4%;left:70%;scale:.55;opacity:.7;animation-duration:58s;animation-delay:-12s}
+@keyframes cloudDrift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+#results .vic-hill{position:absolute;left:-15%;right:-15%;top:clamp(230px,34vh,300px);bottom:0;z-index:-1;border-radius:50% 50% 0 0/90px 90px 0 0;
+  background:var(--ground) center/240px repeat;box-shadow:inset 0 10px 0 rgba(255,255,255,.35),inset 0 26px 40px rgba(255,255,255,.18)}
+#results .vic-hill::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,0) 30%,color-mix(in srgb,var(--sky1) 35%,rgba(10,20,60,.35)))}
+#results .vic-top{display:grid;justify-items:center;gap:6px;z-index:2;text-align:center}
+#results .vicT{position:relative;margin:0;font:900 clamp(54px,17vw,72px)/1 var(--round);letter-spacing:-.01em;color:#fff;background:none;filter:none;
+  -webkit-text-stroke:11px var(--ink);paint-order:stroke fill;text-shadow:0 7px 0 var(--ink),0 14px 26px rgba(20,40,110,.35);animation:vicSlam .7s cubic-bezier(.2,1.6,.4,1) .15s both}
+#results .vicT::after{content:attr(data-t);position:absolute;inset:0;-webkit-text-stroke:0;text-shadow:none;color:transparent;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%) -160% 0/240% 100% no-repeat;-webkit-background-clip:text;background-clip:text;animation:vicShine 1.1s ease-in-out 1.1s both}
+#results .vicT::before{content:attr(data-t);position:absolute;inset:0;-webkit-text-stroke:0;text-shadow:none;color:transparent;
+  background:linear-gradient(180deg,#FFFFFF 40%,color-mix(in srgb,var(--acc) 30%,#FFFFFF) 100%);-webkit-background-clip:text;background-clip:text}
+@keyframes vicSlam{0%{transform:scale(2.3);opacity:0}60%{transform:scale(.92);opacity:1}100%{transform:none}}
+@keyframes vicShine{from{background-position:-160% 0}to{background-position:260% 0}}
+#results .resQ{margin:0;padding:6px 16px;border-radius:99px;font:800 15px/1.3 var(--round);font-style:normal;color:#fff;max-width:none;
+  background:color-mix(in srgb,var(--ink) 78%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.3);animation:vicUp .5s ease-out .6s both}
+@keyframes vicUp{from{transform:translateY(10px);opacity:0}}
+#results .vic-stage{position:relative;z-index:1;width:min(100%,380px);height:clamp(150px,25vh,210px);margin:4px 0 -22px;flex:none}
+#results .vic-keeper{position:absolute;left:8%;bottom:6px;height:100%;width:auto;filter:drop-shadow(0 8px 10px rgba(20,40,90,.35));animation:vicJump 1.1s ease-in-out .4s infinite;transform-origin:50% 100%}
+#results .victory{position:absolute!important;right:6%;bottom:2px;width:auto!important;height:88%!important;margin:0!important;display:block}
+#results .victory img{height:100%;width:auto!important;filter:drop-shadow(0 8px 10px rgba(20,40,90,.35))!important;animation:vicSway 2.4s ease-in-out infinite!important}
+@keyframes vicJump{0%,100%{transform:translateY(0) scale(1,1)}15%{transform:translateY(0) scale(1.06,.93)}45%{transform:translateY(-22px) scale(.97,1.04)}75%{transform:translateY(0) scale(1.03,.97)}}
+@keyframes vicSway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-4px)}}
+#results .vic-pals{position:absolute;inset:0}
+#results .vic-pals img{position:absolute;bottom:0;height:var(--h);filter:drop-shadow(0 5px 6px rgba(20,40,90,.3));animation:vicHop var(--t) ease-in-out var(--d) infinite}
+@keyframes vicHop{0%,60%,100%{transform:translateY(0)}75%{transform:translateY(-16px) rotate(-6deg)}}
+#results .res{position:relative;z-index:2;margin-top:0;padding:30px 16px 14px!important;border-radius:30px;width:100%;max-width:380px;gap:11px!important;
+  background:linear-gradient(180deg,rgba(22,34,92,.8),rgba(14,22,64,.88))!important;-webkit-backdrop-filter:blur(14px)!important;backdrop-filter:blur(14px)!important;
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.14),0 18px 40px rgba(10,20,60,.35)!important}
+#results .stars3{margin-top:-6px;gap:4px}#results .res{padding-top:14px!important;margin-top:18px}
+#results .st3 svg{width:74px;height:74px}#results .st3.got svg{filter:drop-shadow(0 6px 8px rgba(10,20,60,.35))}#results .st3:nth-child(2) svg{width:74px;height:74px}#results .st3.got:nth-child(2) svg{width:94px;height:94px}#results .st3:nth-child(2){margin-bottom:0}#results .st3.got:nth-child(2){margin-bottom:14px}
+#results .st3 span{font-size:12px;color:rgba(255,255,255,.75)}#results .st3.got span{color:#FFE08A}
+#results .st3.in svg{animation:starLand .55s cubic-bezier(.2,1.6,.4,1)}
+@keyframes starLand{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+#results .st3 svg > path{fill:rgba(255,255,255,.08);stroke:rgba(255,255,255,.4)}
+#results .chips3{gap:8px!important}
+#results .chip3{height:36px!important;padding:0 14px 0 10px!important;border-radius:99px;font:900 16px var(--round)!important;color:#fff!important;
+  background:linear-gradient(180deg,var(--a),var(--b))!important;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,40,.25),0 4px 10px rgba(0,0,0,.25)!important}
+#results .chip3 + .chip3::before{content:none!important}
+#results .chip3 img{width:20px;height:20px}
+#results .chip3.glass{background:rgba(255,255,255,.12)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),inset 0 1.5px 0 rgba(255,255,255,.3)!important}
+#results #petProg .bar i{background:linear-gradient(90deg,#3CC46A,#8FF0A0)}
+#results .res-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px 18px;width:100%}
+#results .res-row #againBtn.quiet{margin:0;width:auto!important;flex:none}#results .res-row #resHomeBtn{width:auto!important;flex:none;margin:0}
+#results .res-row #againBtn:not(.quiet){flex-basis:100%}
+/* short screens (a real iPhone loses ~80 px to the notch and the home bar): the scene gives way so the card fits whole */
+#results.tight .vic-stage{height:clamp(110px,18vh,160px)}#results.tight .vicT{font-size:clamp(46px,14vw,58px);-webkit-text-stroke-width:9px}#results.tight .res{gap:8px!important}#results.tight .stars3{margin-top:-6px}#results.tight .st3 svg{width:62px;height:62px}#results.tight .st3.got:nth-child(2) svg{width:78px;height:78px}#results.tight .vic-top{gap:4px}
+#results .sparks{z-index:0}
+#results .sparks i{clip-path:none;border-radius:2px;width:calc(var(--s) * .7);height:var(--s);animation-name:confettiFall}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0) rotateY(0);opacity:0}8%{opacity:1}100%{transform:translateY(110vh) rotate(2turn) rotateY(3turn);opacity:.9}}
+@media (prefers-reduced-motion:reduce){#results .vic-beams,#results .vic-cloud,#results .vic-keeper,#results .victory img,#results .vic-pals img,#results .vicT,#results .vicT::after,#results .resQ{animation:none!important}}
 </style>
 
 <div id="stage">
@@ -1650,19 +1717,29 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     </div>
   </section>
   <section class="scr" id="results" hidden>
+    <!-- Victory, rebuilt bright (A, 2026-10-07: "flat, dark, and dated ... doesnt feel and look fresh and fun"): the realm in
+         daylight, its freed creatures hopping on a hill of its thawed ground, the Keeper jumping for joy beside the person freed -->
+    <div class="vic-sky" aria-hidden="true"><i class="vic-beams"></i><i class="vic-cloud c1"></i><i class="vic-cloud c2"></i><i class="vic-cloud c3"></i></div>
+    <div class="vic-hill" id="resHill" aria-hidden="true"></div>
     <div class="sparks" id="resSparks" aria-hidden="true"></div>
-    <div class="victory"><span class="rays"></span><img src="art4/b-fisher.png?v=8" alt="The fisherman, freed, holding a glowing lantern."></div>
-    <div class="panel pop res">
-      <h2 class="vicT">Victory!</h2>
+    <div class="vic-top">
+      <h2 class="vicT" data-t="Victory!">Victory!</h2>
       <p class="resQ">"I had stopped feeling anything at all. Thank you, Keeper."</p>
-      <div class="resGift" id="resGift" hidden></div>
+    </div>
+    <div class="vic-stage">
+      <div class="vic-pals" id="resPals" aria-hidden="true"></div>
+      <img class="vic-keeper" id="resKeeper" src="art4/k1-cheer.png?v=13" alt="Your Keeper jumping for joy">
+      <div class="victory"><img src="art4/b-fisher.png?v=8" alt="The fisherman, freed, holding a glowing lantern."></div>
+    </div>
+    <div class="panel pop res">
       <div class="stars3" id="resStars"></div>
+      <div class="resGift" id="resGift" hidden></div>
       <div class="resBloom" id="resBloom" hidden></div>
       <div class="chips3" id="resChips"></div>
       <div id="petProg"></div>
       <button class="btn green" id="nextLvBtn" hidden>Level 2</button>
-      <button class="btn green" id="againBtn">Play again</button>
-      <button class="btn quietb hbtn" id="resHomeBtn"><img src="art4/tabs/tab-sanctuary.png?v=9" alt=""><span>Home</span></button>
+      <div class="res-row"><button class="btn green" id="againBtn">Play again</button>
+      <button class="btn quietb hbtn" id="resHomeBtn"><img src="art4/tabs/tab-sanctuary.png?v=9" alt=""><span>Home</span></button></div>
     </div>
   </section>
 
@@ -1902,7 +1979,7 @@ const KIND = {
 };
 Object.keys(KIND).forEach(k => { load('e-' + k, `art4/e-${k}.png?v=8`); if (!KIND[k].minion) load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=8`); });
 const lookSrc = p => p;   // the bold look is the only look now; kept so image paths have one place to change
-if (!/[?&]towers=0/.test(location.search)) { ['wood', 'fire', 'earth', 'water'].forEach(el => { load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`); load('x-temple-' + el + '-alive', `art4/props/x-temple-${el}-alive.png?v=1`); }); ['wood', 'fire'].forEach(r => load('sf-' + r, `art4/story/story-frost-${r}.jpg?v=8`)); }
+if (!/[?&]towers=0/.test(location.search)) { ['wood', 'fire', 'earth', 'water', 'metal'].forEach(el => { load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`); load('x-temple-' + el + '-alive', `art4/props/x-temple-${el}-alive.png?v=1`); }); ['wood', 'fire', 'earth'].forEach(r => load('sf-' + r, `art4/story/story-frost-${r}.jpg?v=8`)); }
 ['x-stone-wood','x-stone-fire','x-stone-earth','x-stone-metal','x-stone-water','x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water','x-tower-metal'].forEach(n => load(n, `art4/props/${n}.png?v=8`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=8'), texM = load('tm', 'art4/t-meadow.jpg?v=8');
 // the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
@@ -2118,7 +2195,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l5temples'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -3090,7 +3167,7 @@ function renderStory() {
     // the Silver City's own last page (A, 2026-10-06, taking up the design review's line): the forge that still glows
     realm === 'metal' ? { img:'story-forge', t:'The old forge still glows', p:`Under the frozen city, the old forge still glows. Wake its five temples one by one, water first, and each will fight for you. Wake all five, and ${B.name.replace(/^The /, 'the ')} will rise.`,
       alt:'The frozen Silver City at night: the Great Tower with five empty sockets, the five temples round it, and the old forge glowing under the streets.' } :
-    towersLevel(LVL) ? { pic:templeStory(realm, HOLD_ELS[LVL][0]), img:realm === 'water' ? 'story-frost' : 'story-frost-' + realm, t:LVL === 2 ? 'The temple has gone cold' : 'The temples have gone cold', p:`${LVL === 2 ? 'A temple' : 'Three temples'} kept ${place} warm. Now ${LVL === 2 ? 'it stands' : 'they stand'} frozen, and ${LVL === 2 ? 'its guardians serve' : 'their guardians serve'} ${B.name.replace(/^The /, 'the ')}. Wake ${LVL === 2 ? 'it' : 'them'}, and ${B.name.replace(/^The /, 'the ')} will have to face you.`, alt:'A frozen temple standing cold in the realm, its boss rising behind it.',
+    towersLevel(LVL) ? { pic:templeStory(realm, HOLD_ELS[LVL][0]), img:realm === 'water' ? 'story-frost' : 'story-frost-' + realm, t:LVL === 2 ? 'The temple has gone cold' : 'The temples have gone cold', p:`${LVL === 2 ? 'A temple' : 'Three temples'} kept ${place} warm. Now ${LVL === 2 ? 'it stands' : 'they stand'} frozen, and ${LVL === 2 ? 'its guardians serve' : 'their guardians serve'} ${B.name.replace(/^The /, 'the ')}. Wake ${LVL === 2 ? 'it' : LVL === 4 ? 'them in order, fire first,' : 'them'} and ${B.name.replace(/^The /, 'the ')} will have to face you.`, alt:'A frozen temple standing cold in the realm, its boss rising behind it.',
       over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } :
     { img:'story-stones', t:'Gather the Qi Stones', p:`Free creatures to earn ${LVL === 1 ? 'two' : 'the five'} Qi Stones. Gather ${LVL === 1 ? 'both' : 'them all'}, and ${B.name.replace(/^The /, 'the ')} will rise${realm === 'water' ? ' from the sea' : ''}.`, alt:'Five glowing Qi Stones above a frozen horizon.',
       over:`<img class="st-b" src="art4/bosses/${realm}.png?v=9" alt="${B.name}, rising from the mist." style="--c:${B.glow}">` } ];
@@ -3361,7 +3438,7 @@ function spawnBoss() {
   // Level 5's swarms carry the Keeper past level 40, but a maxed Keeper hits no harder past about 28, so the boss stops
   // growing there (the long Level 5 left a boss that took two and a half minutes to reach half its life)
   const blv = S.level === 5 ? Math.min(S.lv, 28) : S.lv;
-  e.hp = e.max = Math.round((1 + .15 * (S.hard || 0)) * 10500 * Math.pow(Math.max(8, blv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1] * (S.out ? 1.8 : S.l5 ? 2.8 : 1));   // a real fight: about a minute
+  e.hp = e.max = Math.round((1 + .15 * (S.hard || 0)) * 10500 * Math.pow(Math.max(8, blv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1] * (S.out ? (S.level === 4 ? 3.3 : 1.8) : S.l5 ? 2.8 : 1));   // a real fight: about a minute
   S.en.push(e); S.boss = e;
   if (eff(e.el, keeperEl) > 1) S.items.push({ x:S.p.x + 80, y:S.p.y + 40, kind:'ward', t:0, z:10, vz:260 });
   // room to dodge, so the boss can really attack; the whole arena always sits inside the world (playtest 2: a boss that
@@ -5378,7 +5455,7 @@ function spikeTick(dt) {
    - all taken: Ascended, then the boss rises at the hearth in the middle and every temple fires on it.
    An arrow at the screen's edge shows each temple off screen, its ring filling round it (design review, 2026-10-06). */
 const towersOn = () => !/[?&]towers=0/.test(location.search);
-const towersLevel = lv => towersOn() && (lv === 2 || lv === 3);
+const towersLevel = lv => towersOn() && (lv === 2 || lv === 3 || lv === 4);
 // the ring is a place to stand your ground (A, 2026-10-06: "the circles are kind of small for the 'tower defense' part maybe we
 // give each tower a considerable amount of buff so it allows breathing room for the player to stand their ground and defend
 // their space"): a wide ring of warm ground where creatures wade, and a temple that breathes them back out to its edge
@@ -5387,8 +5464,12 @@ const towersLevel = lv => towersOn() && (lv === 2 || lv === 3);
 // temple's breath only pushes; a taken temple heals slowly and stops healing when the boss rises, so the arena's hearts matter
 const HOLD = { need:215, R:290, front:220, wake:.7, pack:3, cap:44, wolf:.4, heal:.02, fire:.5, bossFire:1.2, reach:800, dmg:(lv) => 22 + 5 * lv, ally:12, squad:5, help:1.2,
   wade:.25, pulse:5, heldPulse:2.5, wakeHit:.15, heart:.006,
-  gHp:{ 2:1.7, 3:1.15 }, gRush:{ 2:1.3, 3:1.15 } };   // Level 2's guardians were freed before they ever reached you (bot, 2026-10-06)
-const HOLD_ELS = { 2:['wood'], 3:['wood', 'fire', 'earth'] };
+  gHp:{ 2:1.7, 3:1.15, 4:1.1 }, gRush:{ 2:1.3, 3:1.15, 4:1.15 } };   // Level 2's guardians were freed before they ever reached you (bot, 2026-10-06)
+const HOLD_ELS = { 2:['wood'], 3:['wood', 'fire', 'earth'], 4:['fire', 'earth', 'metal'] };
+/* Level 4 holds three temples woken in order (A, 2026-10-07: "lets go on level 4 temples"): fire, earth, metal, the
+   generating order round the earth realm, as Level 3's are round fire. The order is the step between Level 3 (any order)
+   and Level 5 (all five in order): a temple not yet in turn sleeps, its ring cold, and taking one wakes the next. */
+const HOLD_ORDERED = { 4:true };
 function makeOutposts(lv) {
   // the hearth in the middle (where the Keeper starts and the boss rises); the first temple stands north, its ring in view
   const els = HOLD_ELS[lv] || HOLD_ELS[3], hub = { hub:true, x:1800, y:els.length === 1 ? 1880 : 1800 };
@@ -5399,7 +5480,8 @@ function makeOutposts(lv) {
   els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`));
   // one temple on its own takes longer, so Level 2 is as long as a level should be
   // the Keeper starts in the middle of the first temple's ring, so the whole temple stands on screen under the HUD
-  return { hub, towers, els, need:els.length === 1 ? 500 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy } };
+  // Level 4's rings ask a little more than Level 3's, so each level is longer than the last (bot, 2026-10-07: same need, same 3.5 min)
+  return { hub, towers, els, ordered:!!HOLD_ORDERED[lv], need:els.length === 1 ? 500 : lv === 4 ? 275 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy } };
 }
 const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? S.out.towers : [];
 /* Level 5 holds the temples too, evolved (A, 2026-10-07: "Go on level 5 temple rules"; Claude's proposal: five rings in
@@ -5412,12 +5494,12 @@ const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? S.out
 const L5_NEED = [440, 510, 580, 650, 720];
 function makeL5() {
   for (const Sh of SHRINES) Object.assign(Sh, { cx:Sh.x, cy:Sh.y + HOLD.front, fill:0, held:false, cd:0, wake:0, souls:[], fireCd:0, allyCd:4, flare:0, pulseCd:2, heldAt:null, thawAt:null, thawR:null, paintCd:0 });
-  return { l5:true, hub:{ x:TOWER.x, y:TOWER.y + 20 }, towers:SHRINES, els:TOWER.order, march:[], bolts:[], won:0 };
+  return { l5:true, ordered:true, hub:{ x:TOWER.x, y:TOWER.y + 20 }, towers:SHRINES, els:TOWER.order, march:[], bolts:[], won:0 };
 }
 const OUT = () => S && (S.out || S.l5);
 const needOf = T => S.l5 ? L5_NEED[T.i] : S.out.need;
-// the tower that can be woken now: any open one on Levels 2-3; on Level 5 only the next in order
-const openOf = O => O.l5 ? O.towers.filter(t => !t.held).slice(0, 1) : O.towers.filter(t => !t.held);
+// the tower that can be woken now: any open one on Levels 2-3; on Levels 4 and 5 only the next in order
+const openOf = O => O.ordered ? O.towers.filter(t => !t.held).slice(0, 1) : O.towers.filter(t => !t.held);
 /* Difficulty (A, 2026-10-06: "the 'play' button to start the run should be color coded by how difficult it is"): four
    tiers, named to say easily and coloured without red (red is danger): Calm, Brave, Fierce, Legend. */
 // (design review, 2026-10-06: no element colour and no reward gold: Calm keeps the standard green, then indigo, violet and a night aurora)
@@ -5495,6 +5577,9 @@ function outpostTick(dt) {
   if (O.l5 && !O.taught && S.t > 3) { O.taught = true; if (!SEEN.has('_l5temples')) { markSeen('_l5temples'); const T0 = openOf(O)[0];
     // the card points where the edge arrow is, so it teaches the arrow too (design review, 2026-10-07)
     coach('l5temples', 'Wake the five temples!', 'Wake them in order, water first. Each one you wake turns its traps on the creatures and takes Omni a step higher.', () => ({ sx:clamp((T0.cx - camX) * Z, 30, W - 30), sy:clamp((T0.cy - camY) * Z, 150, H - 120) })); } }
+  // Level 4: its own card the first time, pointing at the fire temple's ring (the order is the generating cycle)
+  if (O.ordered && !O.l5 && !O.taught && S.t > 3) { O.taught = true; if (!SEEN.has('_l4temples')) { markSeen('_l4temples'); markSeen('_outposts'); const T0 = openOf(O)[0];
+    coach('l4temples', 'Wake them in order!', 'Fire first, then earth, then metal: each element feeds the next. Stand in the fire temple\'s ring and free its creatures. A cold ring waits its turn.', () => ({ sx:clamp((T0.cx - camX) * Z, 30, W - 30), sy:clamp((T0.cy - camY) * Z, 150, H - 120) })); } }
   // the first time: a card shows the ring, and Luma explains it
   if (!O.taught && S.t > 3) { O.taught = true; if (!SEEN.has('_outposts')) { markSeen('_outposts'); const T0 = O.towers.slice().sort((p, q) => Math.hypot(p.cx - P.x, p.cy - P.y) - Math.hypot(q.cx - P.x, q.cy - P.y))[0];
     coach('outposts', 'Wake the temple!', 'Stand in the temple\'s ring and free its creatures. Fill the ring and the temple is yours, and it fights for you.', () => ({ sx:(T0.cx - camX) * Z, sy:(T0.cy - camY) * Z })); } }
@@ -5506,8 +5591,8 @@ function outpostTick(dt) {
     fx({ k:'star', x, y, vx:rnd(-20, 20), vy:rnd(-30, -8), drag:.1, life:rnd(1.6, 2.8), s:rnd(6, 11), c:['#FFF3A0', '#C8FF9A', '#FFC8E8', '#A8E8FF'][(Math.random() * 4) | 0] }); }
   const open = openOf(O), fight = !S.bossSpawned && !S.over;
   for (const T of O.towers) {
-    // Level 5: a tower not yet in turn sleeps; its ring is cold and nothing happens there
-    if (O.l5 && !T.held && !open.includes(T)) { T.wake = 0; T.souls = [];
+    // Levels 4 and 5: a tower not yet in turn sleeps; its ring is cold and nothing happens there
+    if (O.ordered && !T.held && !open.includes(T)) { T.wake = 0; T.souls = [];
       const inC = fight && inRing(T, P.x, P.y); if (!inC) T.inCold = false;
       // once per step in, a low frost knock (never a high ting on repeat)
       if (inC && !T.inCold) { T.inCold = true; O.nudgeAt = S.t; SFX.thud(); for (let i = 0; i < 10; i++) fx({ k:'smoke', x:P.x + rnd(-40, 40), y:P.y + rnd(-10, 20), vx:rnd(-40, 40), vy:rnd(-60, -20), drag:1.5, life:rnd(.6, 1), s:rnd(18, 30), c:'220,236,255', a:.7 }); }
@@ -7711,6 +7796,33 @@ function l5Pic() {
   { const p = pos[0], y = Math.max(16, p.y - 70); c.fillStyle = '#FFFFFF'; c.strokeStyle = 'rgba(14,20,40,.8)'; c.lineWidth = 3; c.beginPath(); c.moveTo(p.x, y + 22); c.lineTo(p.x - 14, y + 4); c.lineTo(p.x - 6, y + 4); c.lineTo(p.x - 6, y - 10); c.lineTo(p.x + 6, y - 10); c.lineTo(p.x + 6, y + 4); c.lineTo(p.x + 14, y + 4); c.closePath(); c.fill(); c.stroke(); }
   const url = cv.toDataURL('image/png'); if (all) L5_PIC = url; return url;
 }
+// Level 4's card picture: the three temples as they stand round the seal, fire lit with an arrow over it, earth and metal
+// asleep in cold rings, a path of light from each to the next (the order is the generating cycle)
+let L4_PIC = null;
+function l4Pic() {
+  if (L4_PIC) return L4_PIC;
+  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d'), els = HOLD_ELS[4];
+  const bgr = c.createLinearGradient(0, 0, 0, 320); bgr.addColorStop(0, '#3A3428'); bgr.addColorStop(1, '#25221C'); c.fillStyle = bgr; c.fillRect(0, 0, 480, 320);
+  const cx = 240, cy = 178, pos = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / 3; return { el, x:cx + Math.cos(a) * 158, y:cy + Math.sin(a) * 92 }; });
+  // the seal in the middle
+  // the seal in the middle, as in play: a carved stone disc with a socket for each temple's stone, fire's lit
+  c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(cx, cy + 6, 50, 22, 0, 0, TAU); c.fill();
+  { const sg = c.createRadialGradient(cx, cy - 8, 4, cx, cy, 48); sg.addColorStop(0, '#9AA3B4'); sg.addColorStop(1, '#5D6577'); c.fillStyle = sg; c.beginPath(); c.ellipse(cx, cy, 46, 20, 0, 0, TAU); c.fill();
+    c.strokeStyle = 'rgba(230,240,255,.5)'; c.lineWidth = 2; c.beginPath(); c.ellipse(cx, cy, 38, 15, 0, 0, TAU); c.stroke();
+    els.forEach((el, i) => { const a = -Math.PI / 2 + i * TAU / 3, sx = cx + Math.cos(a) * 20, sy = cy + Math.sin(a) * 8, st = IMG['x-stone-' + el];
+      c.fillStyle = 'rgba(20,26,40,.7)'; c.beginPath(); c.ellipse(sx, sy + 2, 9, 5, 0, 0, TAU); c.fill();
+      if (ok(st)) { c.globalAlpha = i ? .45 : 1; c.drawImage(st, sx - 8, sy - 12, 16, 16); c.globalAlpha = 1; } }); }
+  c.lineCap = 'round'; for (let i = 0; i < 2; i++) { const p = pos[i], q = pos[i + 1]; c.strokeStyle = i === 0 ? 'rgba(255,255,255,.75)' : 'rgba(220,236,255,.25)'; c.lineWidth = i === 0 ? 5 : 3; c.setLineDash(i === 0 ? [] : [8, 10]); c.beginPath(); c.moveTo(p.x, p.y + 12); c.lineTo(q.x, q.y + 12); c.stroke(); } c.setLineDash([]);
+  let all = true;
+  const temple = (p, i) => { const t = IMG['x-temple-' + p.el], col = GROUND_RING[p.el], first = i === 0;
+    c.fillStyle = 'rgba(10,16,32,.4)'; c.beginPath(); c.ellipse(p.x, p.y + 24, 54, 17, 0, 0, TAU); c.fill();
+    if (first) { c.strokeStyle = col; c.lineWidth = 7; c.stroke(); }
+    else { c.strokeStyle = 'rgba(176,196,222,.55)'; c.lineWidth = 6; c.stroke(); c.fillStyle = 'rgba(240,248,255,.75)'; for (let j = 0; j < 10; j++) { const b = j / 10 * TAU; c.beginPath(); c.ellipse(p.x + Math.cos(b) * 54, p.y + 24 + Math.sin(b) * 17, 3.5, 2.5, 0, 0, TAU); c.fill(); } }
+    if (ok(t)) { const h = 100, w = h * t.naturalWidth / t.naturalHeight; c.drawImage(first ? t : frozenArt(t, p.el), p.x - w / 2, p.y - h + 20, w, h); } else all = false; };
+  pos.map((p, i) => [p, i]).sort((a, b) => a[0].y - b[0].y).forEach(([p, i]) => temple(p, i));
+  { const p = pos[0], y = Math.max(16, p.y - 104); c.fillStyle = '#FFFFFF'; c.strokeStyle = 'rgba(14,20,40,.8)'; c.lineWidth = 3; c.beginPath(); c.moveTo(p.x, y + 22); c.lineTo(p.x - 14, y + 4); c.lineTo(p.x - 6, y + 4); c.lineTo(p.x - 6, y - 10); c.lineTo(p.x + 6, y - 10); c.lineTo(p.x + 6, y + 4); c.lineTo(p.x + 14, y + 4); c.closePath(); c.fill(); c.stroke(); }
+  const url = cv.toDataURL('image/png'); if (all) L4_PIC = url; return url;
+}
 function outpostPic(el = 'wood') {
   if (OUTPOST_PIC[el]) return OUTPOST_PIC[el];
   const cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d'), col = GROUND_RING[el], t = IMG['x-temple-' + el], mw = IMG['e-' + el + '-a'], k = IMG['k' + keeper];
@@ -7766,7 +7878,7 @@ function drawOutpostRings(O, inView) {
     // a Level 5 tower not yet in turn: only a cold, frosted ring, so the player sees what is coming
     // (design review, 2026-10-07: a faint dashed line read as a district edge or a Star Call mark): the same band as an open
     // ring, frozen slate under rounded ice, so it reads "asleep, not yet"
-    if (O.l5 && !T.held && !open.includes(T)) { const R = HOLD.R, ry = R / 1.6; g.save(); g.fillStyle = 'rgba(10,16,32,.3)'; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, 0, TAU); g.fill();
+    if (O.ordered && !T.held && !open.includes(T)) { const R = HOLD.R, ry = R / 1.6; g.save(); g.fillStyle = 'rgba(10,16,32,.3)'; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, 0, TAU); g.fill();
       g.strokeStyle = 'rgba(14,20,40,.65)'; g.lineWidth = 36; g.stroke(); g.strokeStyle = 'rgba(176,196,222,.35)'; g.lineWidth = 24; g.stroke(); g.strokeStyle = 'rgba(235,244,255,.45)'; g.lineWidth = 4; g.stroke();
       const n = 22; for (let i = 0; i < n; i++) { const a = i / n * TAU, x = T.cx + Math.cos(a) * R, y = T.cy + Math.sin(a) * ry, r = 9 + 5 * Math.sin(i * 1.7); g.fillStyle = 'rgba(240,248,255,.6)'; g.beginPath(); g.ellipse(x, y, r, r * .7, a, 0, TAU); g.fill(); }
       g.restore(); g.lineWidth = 1; continue; }
@@ -7777,7 +7889,7 @@ function drawOutpostRings(O, inView) {
     if (!T.held && T.wake > 0) { g.globalAlpha = .16 * T.wake * (.6 + .4 * pu); g.fillStyle = col; g.fill(); g.globalAlpha = 1; }
     g.strokeStyle = 'rgba(14,20,40,.65)'; g.lineWidth = 36; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, 0, TAU); g.stroke();
     // Level 5's ring to wake breathes in its element's colour, so it is the loudest ring on the map (design review, 2026-10-07)
-    if (!T.held) { g.globalAlpha = O.l5 ? .45 + .2 * pu : .22; g.strokeStyle = col; g.lineWidth = 28; g.stroke(); g.globalAlpha = 1; if (O.l5) add(() => glowAt(T.cx, T.cy, R * 1.05, col, .2 + .12 * pu)); }
+    if (!T.held) { g.globalAlpha = O.ordered ? .45 + .2 * pu : .22; g.strokeStyle = col; g.lineWidth = 28; g.stroke(); g.globalAlpha = 1; if (O.ordered) add(() => glowAt(T.cx, T.cy, R * 1.05, col, .2 + .12 * pu)); }
     g.strokeStyle = T.held ? col : `rgba(220,236,255,${.35 + .3 * (here ? pu : 0)})`; g.lineWidth = T.held ? 8 : 4; g.stroke();
     if (T.held) { g.globalAlpha = .75 + .25 * pu; g.strokeStyle = col; g.lineWidth = 28; g.stroke(); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 7; g.stroke(); g.globalAlpha = 1; }
     if (!T.held && f > 0) { const up = Math.PI * f; g.lineCap = 'round';
@@ -8793,6 +8905,7 @@ function tipArt(id) {
   if (id === 'firebar') return `<div class="fbdemo"><img src="${firebarPic()}" alt=""></div>`;
   if (id.startsWith('giant_')) { const k = id.slice(6), e = S && S.en.find(q => q.giant === k), im = e && IMG[e.img]; return `<div class="fbdemo"><img src="${im ? giantPic(im) : 'art4/e-golem.png'}" alt=""></div>`; }
   if (id === 'storm') return `<div class="fbdemo"><img src="${stormPic()}" alt=""></div>`;
+  if (id === 'l4temples') return `<div class="fbdemo"><img src="${l4Pic()}" alt=""></div>`;
   if (id === 'l5temples') return `<div class="fbdemo"><img src="${l5Pic()}" alt=""></div>`;
   if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic(S && S.out ? S.out.els[0] : S && S.l5 ? (openOf(S.l5)[0] || SHRINES[0]).el : 'wood')}" alt=""></div>`;
   if (id === 'surge') return `<div class="fbdemo"><img src="${surgePic()}" alt=""></div>`;
@@ -8819,7 +8932,7 @@ function tipArt(id) {
   return `<div class="hsdemo logo"><img class="logo-pic" src="art4/logo-morqi.png?v=11" alt=""></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', l5temples:'l5temples', surge:'surge' };
+const CARD_VO = { giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', l4temples:'l4temples', l5temples:'l5temples', surge:'surge' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
@@ -9053,7 +9166,7 @@ const HUD_TIPS = {
     return el ? [weakTo(el).map(x => tipEl(x)).join('') + tipGt + tipEl(el, true), 'The next wave', `${ELNAME[el]} creatures are coming. ${weakTo(el).map(x => ELNAME[x]).join(' and ')} beat them.`]
       : [EL5.map(x => tipEl(x)).slice(0, 3).join(''), 'The next wave', 'Creatures are coming. Use the elements that beat them.']; },
   stoneRow:() => S.l5 ? [`<img src="art4/props/x-stone-${(openOf(S.l5)[0] || SHRINES[4]).el}.png?v=8" alt="">`, 'The five temples', 'Wake them in order, water first. Each temple you wake sends its stone home to the Great Tower.']
-    : S.out ? [`<img src="art4/props/x-temple-${S.out.els[0]}${S.out.towers[0].held ? '-alive' : ''}.png?v=${S.out.towers[0].held ? 1 : 12}" alt="">`, 'The temples', 'Each ring shows how awake its temple is. Wake them all, and the boss must face you.']
+    : S.out ? [`<img src="art4/props/x-temple-${S.out.els[0]}${S.out.towers[0].held ? '-alive' : ''}.png?v=${S.out.towers[0].held ? 1 : 12}" alt="">`, 'The temples', S.out.ordered ? `Wake them in order: ${S.out.els.map(el => ELNAME[el].toLowerCase()).join(', then ')}. Each ring shows how awake its temple is. Wake them all, and the boss must face you.` : 'Each ring shows how awake its temple is. Wake them all, and the boss must face you.']
     : [`<img src="art4/props/x-stone-${stoneEls()[0]}.png?v=8" alt="">`, 'Qi Stones', 'Free creatures of each element to fill its stone. Gather them all, and the boss rises.'],
   ultBtn:() => [`<img src="${$('#ultImg').src}" alt="">`, `${ANIMAL[animal].y} · Lv ${S.ultInfo.lv}`, `Your companion. It charges as you free creatures, then strikes with ${S.ultInfo.name} on its own.`],
   bossWrap:() => S.boss ? [weakTo(S.boss.el).map(x => tipEl(x)).join('') + tipGt + tipEl(S.boss.el, true), bossOf(S.boss).name, `Its health. ${weakTo(S.boss.el).map(x => ELNAME[x]).join(' and ')} hit it hardest.`] : ['', '', ''] };
@@ -9118,7 +9231,7 @@ function hud() {
   { const key = (freeMore ? 'F' : '') + stoneEls().map(el => S.qiStones[el] ? 'S' : Math.min(20, Math.floor((S.qi[el] || 0) / stoneNeed(el) * 20))).join(',');
     const row = $('#stoneRow'); if (row.dataset.k !== key) { row.dataset.k = key;
       // Level 5: water first, as the temples are woken; the next one to wake pulses (design review, 2026-10-07)
-      const nx = S.l5 && openOf(S.l5)[0];
+      const nx = OUT() && OUT().ordered && !S.bossSpawned && openOf(OUT())[0];
       row.innerHTML = (S.l5 ? TOWER.order : ELS).filter(el => stoneEls().includes(el)).map(el => `<i class="sk${S.qiStones[el] ? ' got' : freeMore || (nx && nx.el === el) ? ' need' : ''}" style="--c:${EL[el]};--p:${Math.min(1, (S.qi[el] || 0) / stoneNeed(el)).toFixed(2)}">${S.qiStones[el] ? `<img src="art4/props/x-stone-${el}.png?v=8" alt="${ELNAME[el]} stone">` : ''}</i>`).join(''); } }
   if (S.boss) { const bw = Math.max(0, S.boss.hp / S.boss.max * 100) + '%', hk = Math.max(0, 1 - (S.t - (S.boss.hitAt ?? -9)) / .15); $('#bossBar i').style.width = bw; $('#bossBar b').style.width = bw; $('#bossWrap').style.transform = hk ? `translateX(${((Math.random() * 2 - 1) * 3 * hk).toFixed(1)}px)` : ''; $('#bossName').textContent = bossOf(S.boss).name; $('#bossBar i').style.background = EL[S.boss.el]; }
 }
@@ -9421,11 +9534,22 @@ function petProgHTML(r) {
     <div><b>${A.y} · Lv ${a.lv}${up ? ` <i>+${up}</i>` : ''}</b><div class="bar"><i style="--w:${Math.round(a.into / a.need * 100)}%"></i></div>
     <span>${evolved ? `Ultimate evolved: <strong>${a.name}</strong>!` : a.next ? `Lv ${a.next} unlocks <strong>${a.nextName}</strong>` : `${a.name} is fully evolved`}</span></div></div>`;
 }
+// each realm's daylight for Victory: sky top, horizon, the title's tint, and the deep ink of its outline (fire's sky is a warm
+// sunset, never red: red is danger)
+const VIC_SKY = { water:['#6FCBFF', '#D6F5FF', '#2BB6E8', '#123A7A'], wood:['#7FD8FF', '#DDFBD0', '#4CC86A', '#14466A'], fire:['#FFB36B', '#FFE9C2', '#FF9A3D', '#5A2A6E'],
+  earth:['#FFC96A', '#FFF0C8', '#E6A93A', '#4E3466'], metal:['#A9BDFF', '#EEF2FF', '#9FB4E8', '#26306E'] };
 function results(quiet) {
   $('#hud').hidden = true; S.quietPay = !!quiet;
   // the home theme comes in under Victory, so the screen is never silent and it carries you home (A's playthrough, 2026-10-05)
   if (S.won) setTimeout(() => { if (S && S.over && !$('#results').hidden) { AU.music(true); AU.song('home'); } }, 1600);
   { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (!quiet && r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
+  // the realm in daylight: its sky, its thawed ground, the Keeper jumping for joy, its freed creatures hopping (A, 2026-10-07)
+  { const realm = S.boss ? S.boss.realm || S.boss.el : worldOf(), R = $('#results'), SK = VIC_SKY[realm] || VIC_SKY.water;
+    R.style.setProperty('--sky1', SK[0]); R.style.setProperty('--sky2', SK[1]); R.style.setProperty('--acc', SK[2]); R.style.setProperty('--ink', SK[3]);
+    R.style.setProperty('--ground', `url(art4/${(GROUND_ART[realm] || GROUND_ART.water)[1]}.jpg?v=8)`);
+    $('#resKeeper').src = `art4/k${keeper}-cheer.png?v=13`;
+    $('#resPals').innerHTML = [['a', 9, 70, 1.9, 0], ['b', 24, 54, 2.3, .5], ['c', 80, 62, 2.1, .9], ['a', 93, 52, 2.6, .3]].map(([k, x, h, t, d]) =>
+      `<img src="art4/happy/e-${realm}-${k}.png?v=8" alt="" style="left:${x}%;--h:${h}px;--t:${t}s;--d:${d}s;translate:-50% 0">`).join(''); }
   { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `${PEOPLE[S.boss ? S.boss.realm || S.boss.el : worldOf()]} is free!`; }
   { const realm = S.boss ? S.boss.realm || S.boss.el : worldOf(), id = S.giftNew || Object.keys(CALL).find(k => CALL[k].from === realm && callOwned(k)), el = $('#resGift'); el.hidden = !id; el.classList.remove('in'); el.dataset.id = id || '';
     if (id && !quiet) { const D = CALL[id]; el.innerHTML = `<img src="art4/calls/${D.img}.png?v=9" alt=""><span><i>Star Call won!</i><b>${D.n}</b></span><em>▸</em>`;
@@ -9454,18 +9578,22 @@ function results(quiet) {
   // each with the orb (design review, 2026-10-05: the music chips read as extra on top of the total)
   payQi(); const orb = '<img src="art4/icons/icon-spark.png?v=9" alt="">', gold = 'style="--a:#FFD66E;--b:#E09A1E"';
   const parts = [S.qiMus > 10 ? ['New song', 300] : null, S.qiMus ? ['Music on', 10] : null, S.musMile ? [{ '1 week':'A week of music', '1 month':'A month of music', '3 months':'3 months of music', '6 months':'6 months of music', '1 year':'A year of music' }[S.musMile.label], S.musMile.n] : null].filter(Boolean);
-  $('#resChips').innerHTML = `<div class="crow"><span class="chip3" style="--a:#4FD8F0;--b:#1E8FC4">${S.thawed.toLocaleString()} freed</span>`
-    + `<span class="chip3" style="--a:#A99CFF;--b:#6F5CF0">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
+  $('#resChips').innerHTML = `<div class="crow"><span class="chip3 glass"><span data-n="${S.thawed}">${S.thawed.toLocaleString()}</span> freed</span>`
+    + `<span class="chip3 glass">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
     + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('') + '</div>'
-    + `<div class="crow"><span class="chip3 qi" ${gold}>${orb}+${S.qiGot.toLocaleString()}</span>${parts.map(([n, v]) => `<span class="chip3 qi sub" ${gold}>${orb}${n} +${v.toLocaleString()}</span>`).join('')}</div>`;
-  $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:18 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${8 + (i * 7) % 9}px;--c:${['#FFE08A', '#7FF0C0', '#FFFFFF', '#FFB8D0'][i % 4]};--t:${5 + (i * 3) % 5}s;--d:${(i * .43) % 4}s"></i>`).join('');
+    + `<div class="crow"><span class="chip3 qi" ${gold}>${orb}<span data-n="${S.qiGot}" data-f="+">+${S.qiGot.toLocaleString()}</span></span>${parts.map(([n, v]) => `<span class="chip3 qi sub" ${gold}>${orb}${n} +${v.toLocaleString()}</span>`).join('')}</div>`;
+  $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:36 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${10 + (i * 7) % 8}px;--c:${[EL.water, EL.wood, GROUND_RING.fire, EL.earth, EL.metal, '#FFFFFF'][i % 6]};--t:${4 + (i * 3) % 4}s;--d:${(i * .29) % 3.5}s"></i>`).join('');
+  // the numbers count up as the card lands
+  if (!reduce && !quiet) $('#resChips').querySelectorAll('[data-n]').forEach(el => { const n = +el.dataset.n, t0 = performance.now() + 900, fmt = el.dataset.f || '';
+    const tick = now => { const k = Math.min(1, Math.max(0, (now - t0) / 1100)), v = Math.round(n * (1 - Math.pow(1 - k, 3))); el.firstChild.nodeValue = fmt + v.toLocaleString(); if (k < 1 && !$('#results').hidden) requestAnimationFrame(tick); };
+    el.firstChild.nodeValue = fmt + '0'; requestAnimationFrame(tick); });
   const last = S.won && LVL === LEVELS.length, next = S.won && LVL < LEVELS.length || last;
   if (next && !last) { store.set('morqi.unlocked', Math.max(unlocked(), LVL + 1)); $('#nextLvBtn').textContent = `Level ${LVL + 1} ▶`; }
   // after the last level the green button leads to the thank-you for the whole demo
   if (last) { store.set('morqi.demoDone', '1'); $('#nextLvBtn').textContent = 'Continue ▶'; }
   // one green button: the next level when there is one
   $('#nextLvBtn').hidden = !next; $('#againBtn').classList.toggle('quiet', next);
-  if (!quiet) show('results');
+  if (!quiet) { show('results'); const R = $('#results'); R.classList.remove('tight'); requestAnimationFrame(() => R.classList.toggle('tight', R.scrollHeight > R.clientHeight + 2)); }
 }
 
 // a test hook: step the simulation without relying on animation frames

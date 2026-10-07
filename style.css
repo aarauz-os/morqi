@@ -244,7 +244,7 @@ html.paged #business .spath-track::before{top:25px}
 .rogue b{font-size:15px;line-height:1.2;color:var(--c)}
 .rogue span{font-size:13px;font-weight:800;color:var(--text)}
 .rogue small{font-size:12px;color:var(--faint)}
-/* page 6: headline and text side by side above the five; on phones the five come straight after the headline */
+/* #change: headline and text side by side above the five; on phones the five come straight after the headline */
 .vill{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:48px;align-items:end}
 .vill .rogues{grid-column:1/-1}
 @media (max-width:860px){html:not(.paged) .vill{grid-template-columns:minmax(0,1fr)}html:not(.paged) .vill .rogues{order:2}html:not(.paged) .vill .vt{order:3}}
@@ -301,7 +301,7 @@ html.paged #long .beats li span{font-size:13px;line-height:1.38}html.paged #long
 @media (max-width:600px){.op .foot .stack{justify-items:start!important}}
 /* print (A, 2026-10-07: pages 4, 8 and 11 of the PDF "need rework ... the alignment of everything is off"): Chrome prints big
    blurred shadows and glows as solid dark rectangles, so the paged layout keeps only crisp rings; page 4's realm cards grow to
-   fill the page, and page 11's two columns line up */
+   fill the page, and #business's two columns line up */
 html.paged figure.world{box-shadow:0 0 0 1px var(--line)}
 html.paged .tails i.on{box-shadow:inset 0 0 0 1.5px rgba(207,230,255,.6)}
 html.paged .spath-track .ring{box-shadow:0 0 0 3px var(--c)}
@@ -310,3 +310,25 @@ html.paged #worlds .worlds{grid-template-columns:repeat(5,minmax(0,1fr));justify
 html.paged #worlds .world b{font-size:17px}html.paged #worlds .han{font-size:26px}
 html.paged #worlds > .in{gap:18px}html.paged #worlds .lede{font-size:17px;max-width:70ch}
 html.paged #business .split{align-items:center}
+
+/* why we win (A, 2026-10-07): five reasons as the plan page's cards; jade for what is true today, gold for the market,
+   a quiet dashed card for what is planned */
+/* Why we win (design review, 2026-10-07: the text-only first draft was the flattest page in the deck): three claims, each
+   led by one big number, the future as a strip with Luma's tails, and the key art carrying the right half */
+#win .claims{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+#win .claims li{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:start}
+#win .claims li > b{font-size:38px;line-height:1;font-weight:900;letter-spacing:-.03em;color:var(--jade);font-variant-numeric:tabular-nums}
+#win .claims li > b small{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;margin-top:4px;color:var(--muted)}
+#win .claims strong{display:block;font-size:17px;margin-bottom:2px}
+#win .claims span{font-size:14.5px;line-height:1.45;color:var(--muted)}
+#win .later{display:grid;gap:6px;padding:12px 14px;border-radius:16px;outline:1px dashed rgba(255,255,255,.24);outline-offset:-1px}
+#win .later > span{font-size:13.5px;line-height:1.45;color:var(--muted)}
+#win .winart{margin:0;border-radius:24px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+/* win-art.jpg is the key art cropped to the Keepers and animals running in, so it doesn't read as the cover */
+#win .winart img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 60%}
+@media (max-width:700px){#win .claims li{grid-template-columns:1fr;gap:4px}#win .winart{order:-1}#win .winart img{aspect-ratio:16/10}}
+html.paged #win .split{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:stretch}
+html.paged #win .winart{height:580px}
+html.paged #win .h{font-size:44px}
+html.paged #win .lede{font-size:15.5px}
+.nw{white-space:nowrap}   /* a heading phrase that must not break mid-way (Sammy P.'s review, 2026-10-07) */
