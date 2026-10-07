@@ -2060,7 +2060,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=18`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-omni', 'vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-omni', 'vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -4472,6 +4472,16 @@ function landSpike(b, B, f) {
 // Each arrives with a quake and a roar, teaches itself once (a card and Luma's line), and pays a chest, a heart and gems.
 // Codex's art (brief 10) goes in art4/giants/; until then each stands in, scaled up, as a creature of its element.
 const GIANT_ART = true;   // Codex brief 10 landed (2026-10-06)
+// each giant's ten frames (five elements, base and weak-spot pose) come in one sheet, sliced as it loads (the shared link holds
+// at most 512 files): columns water, wood, fire, earth, metal; the top row base, the bottom row the pose
+const GIANT_SHEET = {};
+function giantSheet(k) {
+  if (GIANT_SHEET[k]) return; const im = new Image(), pose = { rammer:'stuck', colossus:'open', alpha:'howl' }[k]; GIANT_SHEET[k] = im;
+  im.onload = () => { const n = im.naturalHeight / 2; ['water', 'wood', 'fire', 'earth', 'metal'].forEach((el, i) => [0, 1].forEach(r => {
+    const c = document.createElement('canvas'); c.width = c.height = n; c.getContext('2d').drawImage(im, i * n, r * n, n, n, 0, 0, n, n);
+    Object.assign(c, { naturalWidth:n, naturalHeight:n, complete:true }); IMG['g-' + k + '-' + el + (r ? '-' + pose : '')] = c; })); };
+  im.src = `art4/giants-${k}.png?v=1`;
+}
 const GIANT = {
   rammer:{ n:'Rammer', hp:5, size:250, r:58, sp:52, dmg:30, stand:el => 'e-' + el + '-c',
     tip:'Its horns block your hits. Step aside when it charges, then hit its glowing back while it is stuck.' },
@@ -4506,7 +4516,7 @@ function spawnGiant(k, at) {
   const G = GIANT[k], P = S.p, a = rnd(0, TAU), d = Math.hypot(VW, VH) / 2 + 140, el = (pl => pl[(Math.random() * pl.length) | 0])(mixPool());
   const e = spawn('golem', at || { x:clamp(P.x + Math.cos(a) * d, 80, WORLD - 80), y:clamp(P.y + Math.sin(a) * d, 80, WORLD - 80) }, 1, el); if (!e) return null;
   const art = 'g-' + k + '-' + el, pose = art + '-' + { rammer:'stuck', colossus:'open', alpha:'howl' }[k];
-  if (GIANT_ART) for (const n of [art, pose]) if (!IMG[n]) load(n, `art4/giants/${n}.png?v=1`);
+  if (GIANT_ART) giantSheet(k);
   Object.assign(e, { type:'giant', giant:k, gst:'walk', gcd:2.4, howl:.6, size:G.size, r:G.r, sp:G.sp * (1 + .04 * (S.hard || 0)), dmg:G.dmg, heavy:true, xp:40, tagT:3.5,
     gart:art, gpose:pose, img:GIANT_ART && ok(IMG[art]) ? art : G.stand(el), K:{ ...e.K, n:G.n, tip:null, beh:'giant', face:-1 } });
   e.own = e.img !== 'e-golem' && e.img !== 'e-wolf'; e.hp = e.max = e.max * G.hp * (S.level === 1 ? .6 : 1);
