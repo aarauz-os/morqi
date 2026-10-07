@@ -4748,7 +4748,9 @@ const GIANT = {
     tip:'Its pack shields it. Free the pack first, then the Alpha takes full hits.' } };
 // when they come (seconds into the run); each harder skill tier adds one more; never during the boss, Ascended or a Bloom;
 // one at a time through Level 3, two after
-const GIANT_PLAN = [[['rammer', 95]], [['rammer', 35], ['alpha', 70]], [['alpha', 40], ['rammer', 80], ['colossus', 120]],
+// Level 1's Rammer comes at 45 s, so the level tests dodging before the boss (Sammy P.'s notes, 2026-10-07: "no meaningful damage before the
+// boss, then an instant death"; at 95 s it never came, the boss arrives near 80 s)
+const GIANT_PLAN = [[['rammer', 45]], [['rammer', 35], ['alpha', 70]], [['alpha', 40], ['rammer', 80], ['colossus', 120]],
   [['rammer', 40], ['alpha', 80], ['colossus', 115], ['rammer', 150], ['alpha', 185], ['colossus', 220]],
   [['rammer', 60], ['alpha', 120], ['colossus', 180], ['rammer', 250], ['alpha', 320], ['colossus', 390]]];
 function giantPlan() {
@@ -8825,7 +8827,11 @@ function applyPick(o, quiet) {
     if (!quiet) { cue(FUSE[o.id].n, 'Fusion!', 2400); SFX.power(); S.flashT = .3; S.flashC = '236,242,255'; }
     ring(P.x, P.y, 20, 460, EL[o.id], .7, 18, true); ring(P.x, P.y, 40, 520, EL[FEEDS[o.id]], .8, 14, true); stars(P.x, P.y - 30, 40, '#F4F8FF', 480); }
   else if (o.kind === 'evo') { S.evo[o.id] = true; S.skills[o.id] = Math.max(S.skills[o.id], 5); if (!quiet) { SFX.power(); S.flashT = .25; S.flashC = '255,236,180'; } ring(P.x, P.y, 20, 420, '#FFE58A', .7, 18, true); stars(P.x, P.y - 30, 40, '#FFE58A', 480); }
-  else if (o.kind === 'active') { S.skills[o.id] = (S.skills[o.id] || 0) + 1; }
+  else if (o.kind === 'active') { S.skills[o.id] = (S.skills[o.id] || 0) + 1;
+    // evolving is taught once, in play, the first time a power reaches level 3 (Sammy P.'s notes, 2026-10-07: the "Evolved a power" star
+    // was never taught); the banner names the gift that evolves it
+    if (S.skills[o.id] === 3 && !S.evo[o.id] && !SEEN.has('_evoteach')) { markSeen('_evoteach'); const gn = GIFT[evoGift(o.id)].n;
+      BANNER.q.unshift({ id:'evoteach', title:`${POW[o.id].n} can evolve!`, text:S.gifts[evoGift(o.id)] ? 'Pick Evolve at your next level-up.' : `Take the ${gn} gift to evolve it.` }); BANNER.t = Math.min(BANNER.t, 1.5); } }
   else if (o.kind === 'gift') { S.gifts[o.id] = (S.gifts[o.id] || 0) + 1; }
   else if (o.kind === 'lode') { S.lode++; }
   else { P.hp = P.max; SFX.heal(); }
@@ -8934,7 +8940,9 @@ const BANNER = { q:[], t:0 };
 const bannerTip = id => /^(gem|enemy|shrine|bloom|chest|ult|giant_|k)/.test(id) && !/^l[45]temples$/.test(id);
 function coach(id, title, text, where, secs, place = 'above') {
   if (!S || S.taught['c_' + id]) return; S.taught['c_' + id] = 1;
-  if (bannerTip(id)) { BANNER.q.push({ id, title, text }); return; }
+  // a giant is danger arriving now: its banner goes first and within two seconds, never behind the queue (QA, 2026-10-07: the Rammer
+  // charged 20 s before its banner showed)
+  if (bannerTip(id)) { if (id.startsWith('giant_')) { BANNER.q.unshift({ id, title, text }); BANNER.t = Math.min(BANNER.t, 2); } else BANNER.q.push({ id, title, text }); return; }
   COACH.q.push({ id, title, text, where, place });
 }
 function domPt(sel) { const r = $(sel).getBoundingClientRect(), b = stage.getBoundingClientRect(); return { sx:r.left - b.left + r.width / 2, sy:r.bottom - b.top }; }
