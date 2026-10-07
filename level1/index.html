@@ -714,6 +714,19 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
    something: the five element colours, gold for growing. Everything else is glass and white. */
 #hud{--glass:rgba(12,16,44,.42)}
 #hud .top{padding:calc(8px + env(safe-area-inset-top)) 10px 0;gap:7px;z-index:8}
+/* Level 1's glimpse of Omni (A, 2026-10-07) */
+#tease{position:absolute;inset:0;z-index:40;display:grid;place-items:center;align-content:center;gap:10px;background:rgba(6,8,26,.93);opacity:0;transition:opacity .35s;overflow:hidden;cursor:pointer}
+#tease.on{opacity:1}
+#tease .tz-light{position:absolute;left:50%;top:44%;width:150vmin;height:150vmin;translate:-50% -50%;border-radius:50%;background:conic-gradient(#4E9BE0,#6FBF4A,#FF9A4A,#E6B23A,#E8EEF6,#4E9BE0);filter:blur(40px);opacity:.38;-webkit-mask:radial-gradient(circle,#000 16%,transparent 52%);mask:radial-gradient(circle,#000 16%,transparent 52%);animation:spin 14s linear infinite}
+#tease img{position:relative;width:min(66vw,300px);height:auto;filter:drop-shadow(0 0 22px rgba(255,255,255,.35));animation:teaseIn 1.2s ease-out both}
+#tease p{position:relative;margin:0;text-align:center;font:800 17px/1.35 var(--round);color:rgba(255,255,255,.85);animation:teaseIn 1s ease-out .5s both}
+#tease p b{display:block;font:900 26px/1.15 var(--round);color:#fff;margin-top:2px}
+@keyframes teaseIn{from{opacity:0;transform:translateY(10px) scale(.96)}}
+@media (prefers-reduced-motion:reduce){#tease .tz-light,#tease img,#tease p{animation:none}}
+/* the goal line (A, 2026-10-07: "where to go next"): one short sentence on night glass, its element's dot before it */
+#hud #goal{align-self:center;display:flex;align-items:center;gap:7px;max-width:calc(100% - 20px);min-height:28px;padding:3px 13px 3px 9px;border-radius:14px;background:rgba(14,20,52,.8);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);font:800 13px/1.2 var(--round);color:#fff;pointer-events:none}
+#hud #goal[hidden]{display:none}
+#hud #goal i{flex:none;width:11px;height:11px;border-radius:50%;background:var(--c,#fff);box-shadow:0 0 0 2px rgba(255,255,255,.35)}
 #hud .hstrip,#hud #wavePill,#hud #stoneRow,#hud #mapBtn{background:var(--glass);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),0 6px 18px rgba(8,10,34,.18);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4)}
 #hud .hstrip{position:relative;display:flex;align-items:center;gap:8px;height:46px;padding:0 6px;border-radius:23px;overflow:hidden}
 #hud #pauseBtn{width:40px;height:40px;background:rgba(255,255,255,.16);box-shadow:none}
@@ -854,6 +867,10 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .ks-name{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
 .ks-name b{font:900 30px/1.05 var(--round);color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.4)}
 .ks-name span{font-size:15px;font-weight:700;color:rgba(255,255,255,.78)}
+/* a Keeper whose transformations aren't painted yet: grey, and the button waits (A, 2026-10-07) */
+#ksImg.soon,#keepers .kp.soon img{filter:grayscale(1) brightness(.72)}
+#keepers .kp.soon{position:relative}#keepers .kp.soon::after{content:"Soon";position:absolute;left:50%;bottom:3px;translate:-50% 0;padding:0 4px;border-radius:6px;background:rgba(14,20,52,.92);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);font:900 8px/1.5 var(--round);letter-spacing:.05em;text-transform:uppercase;color:#fff}
+#keeperNext:disabled,#yearNext:disabled{opacity:.45;filter:grayscale(.6);pointer-events:none}
 .ks-row{display:flex;align-items:center;gap:6px;width:100%;max-width:400px;justify-content:center}
 .ks-row .ks-arrow{position:static;transform:none;flex:none;width:36px;height:36px;font-size:24px;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
 .ks-row .ks-arrow:active{transform:scale(.9)}
@@ -1508,6 +1525,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <div class="xp" id="xpBar"><i></i></div>
       </div>
       <div class="hrow"><span id="wavePill" role="status"></span><div id="stoneRow" aria-label="Qi Stones"></div></div>
+      <div id="goal" role="status" hidden><i></i><span></span></div>
       <div id="bossWrap"><div class="bossname" id="bossName"></div><div id="bossBar"><b></b><i></i></div></div>
     </div>
     <div id="hudTip" role="status" hidden><div class="ti"></div><div class="tx"><b></b><span></span></div></div>
@@ -3077,7 +3095,7 @@ const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(
 // dark; on the home, barely there until the player has met him, then a little clearer
 const stillSky = () => document.documentElement.classList.toggle('met-still', SEEN.has('_stillmaker'));
 stillSky();
-function show(id) { document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); if (id) guardTaps();
+function show(id) { if (id === 'pickKeeper') markKeepers(); document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); if (id) guardTaps();
   const tb = document.getElementById('tabs'); if (tb) { tb.hidden = !FRONT.includes(id); tb.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.tab === id)); } }
 const FRONT = ['home', 'map', 'book', 'season'];
 // a sheet that opens under a thumb still dragging (a level-up, a teaching card, a chest) ignores taps until that finger
@@ -3098,11 +3116,20 @@ const KEEPER_INFO = [
   { n:'Priya', l:'“I’ve got a plan.” Thinks three moves ahead.', c:'#B98AFF' }, { n:'Mateo', l:'“I got you.” Never gives up on a friend.', c:'#6FDB8F' },
   { n:'Ruby', l:'“Too slow!” All heart, all speed.', c:'#FF7A5C' }, { n:'Malik', l:'“Not moving.” Steady as a mountain.', c:'#4FD3C4' },
   { n:'Sina', l:'“It’s okay, little one.” Kind to every creature.', c:'#FFD45A' }];
+// a Keeper can be picked once their transformations are painted: Omni, and every Surge form another Keeper already has (A, 2026-10-07:
+// "grey out the keepers as an option to play with that dont have a complete set of surge and omni visuals"; "dont toss the
+// transformation code ... just pause or disable the ones that arent available"). As Codex delivers forms the rule follows itself
+function keeperReady(k) { const all = new Set(Object.values(SURGE_ART).flat()); return !!OMNI_PAINTED[k] && [...all].every(f => (SURGE_ART[k] || []).includes(f)); }
+// grey the not-yet-painted Keepers whenever the picker shows (QA, 2026-10-07: Sina only greyed after the first tap)
+function markKeepers() { const ready = keeperReady(keeper); [...kb.children].forEach((c, i) => c.classList.toggle('soon', !keeperReady(i + 1)));
+  ksImg.classList.toggle('soon', !ready); $('#keeperNext').disabled = !ready;
+  $('#ksLine').textContent = ready ? KEEPER_INFO[keeper - 1].l : `Coming soon: ${KEEPER_INFO[keeper - 1].n}'s transformations are still being painted.`; }
 function pickKeeper(k, dir) {
   keeper = ((k - 1 + KEEPERS) % KEEPERS) + 1;
   { const I = KEEPER_INFO[keeper - 1]; $('#ksName').textContent = I.n; $('#ksLine').textContent = I.l; $('#pickKeeper').style.setProperty('--kc', I.c); }
   [...kb.children].forEach((c, i) => { c.classList.toggle('on', i === keeper - 1); c.setAttribute('aria-checked', i === keeper - 1); });
   ksImg.src = lookSrc(`art4/k${keeper}-hi.png?v=13`); ksImg.alt = KEEPER_INFO[keeper - 1].n;
+  markKeepers();
   ksImg.style.setProperty('--dx', (dir || 1) * 40 + 'px'); ksImg.classList.remove('swap'); void ksImg.offsetWidth; ksImg.classList.add('swap');
   SFX.pop();
 }
@@ -3119,13 +3146,18 @@ ksImg.addEventListener('animationend', e => { if (e.animationName === 'swapIn') 
 let swipeX = null;
 $('#ksStage').addEventListener('pointerdown', e => { swipeX = e.clientX; });
 $('#ksStage').addEventListener('pointerup', e => { if (swipeX == null) return; const dx = e.clientX - swipeX; swipeX = null; if (Math.abs(dx) > 40) pickKeeper(keeper + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); });
-const ys = $('#year'), nowY = new Date().getFullYear();
-for (let y = nowY; y >= 1940; y--) { const o = document.createElement('option'); o.value = y; o.textContent = y; if (y === 2015) o.selected = true; ys.appendChild(o); }
-['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].forEach((n, i) => { const o = document.createElement('option'); o.value = i + 1; o.textContent = n; if (i === 5) o.selected = true; $('#bmonth').appendChild(o); });
-for (let d = 1; d <= 31; d++) { const o = document.createElement('option'); o.value = d; o.textContent = d; if (d === 1) o.selected = true; $('#bday').appendChild(o); }
+// no birthday is filled in for you: each box starts empty and the button waits for all three (Sammy P.'s notes, 2026-10-07: a
+// default of June 1, 2015 let players click straight through, and it weakens the screen as an age check)
+const ys = $('#year'), nowY = new Date().getFullYear(), blank = (sel, t) => { const o = document.createElement('option'); o.value = ''; o.textContent = t; o.disabled = true; o.selected = true; sel.appendChild(o); };
+blank(ys, 'Year'); blank($('#bmonth'), 'Month'); blank($('#bday'), 'Day');
+for (let y = nowY; y >= 1940; y--) { const o = document.createElement('option'); o.value = y; o.textContent = y; ys.appendChild(o); }
+['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].forEach((n, i) => { const o = document.createElement('option'); o.value = i + 1; o.textContent = n; $('#bmonth').appendChild(o); });
+for (let d = 1; d <= 31; d++) { const o = document.createElement('option'); o.value = d; o.textContent = d; $('#bday').appendChild(o); }
+const bdayDone = () => ys.value && $('#bmonth').value && $('#bday').value;
 const ANIMAL_BASE = JSON.parse(JSON.stringify(ANIMAL));
 // the zodiac ring lights the animal your birthday gives you, live, so the reveal is felt before the tap
 function ringPick() {
+  $('#yearNext').disabled = !bdayDone(); if (!bdayDone()) { document.querySelectorAll('.zspin i').forEach(i => i.classList.remove('on')); return; }
   const y = lunarYear(+ys.value, +$('#bmonth').value, +$('#bday').value), z = ((y - 1900) % 12 + 12) % 12;
   document.querySelectorAll('.zspin i').forEach((i, n) => i.classList.toggle('on', n === z));
 }
@@ -3135,6 +3167,7 @@ ringPick();
 $('#playBtn').onclick = () => { if (LVL > unlocked()) return; AU.init(); SFX.select(); AU.music(true); AU.song('home'); show('pickKeeper'); };
 $('#keeperNext').onclick = () => { SFX.select(); if (editingKeeper) { editingKeeper = false; saveProfile(); goTab('home'); return; } show('pickYear'); };
 $('#yearNext').onclick = () => {
+  if (!bdayDone()) return;
   // the Chinese year begins at Lunar New Year; its stem gives the element, its branch the animal (a 2014 birthday after
   // January 31st is a Wood Horse). The companion carries the year's element first and its own nature second, so a
   // Wood Horse fights with Wood and keeps the horse's Fire (playtest 2: "she's actually a wood horse ... I need that accuracy")
@@ -3364,7 +3397,8 @@ function toast(m, ms = 2400) { const t = $('#toast'); t.textContent = m; t.class
 let cueT = 0;
 function pickupPop(name, col) { floatText(S.p.x, S.p.y - 96, name, col, 24); }
 // big banners sit just under whatever the top bar is showing, so they never cover it
-function cue(big, small, ms = 1800, warn) { const c = $('#cue'), top = $('#hud .top'); if (top) c.style.top = (top.getBoundingClientRect().bottom - stage.getBoundingClientRect().top + 14) + 'px'; c.className = warn ? 'warn' : ''; c.innerHTML = `<b>${big}</b>${small ? `<span>${small}</span>` : ''}`; c.style.opacity = 1; clearTimeout(cueT); cueT = setTimeout(() => { c.style.opacity = 0; }, ms); }
+// below the top bar and below the minimap and companion buttons under it, so nothing covers its words (QA, 2026-10-07)
+function cue(big, small, ms = 1800, warn) { const c = $('#cue'), top = $('#hud .top'); if (top) { const st = stage.getBoundingClientRect().top, y = Math.max(top.getBoundingClientRect().bottom, ...['#mapBtn', '#ultBtn'].map(q => { const e = $(q); const r = e && !e.hidden && e.offsetParent ? e.getBoundingClientRect() : null; return r && r.height ? r.bottom : 0; })); c.style.top = (y - st + 10) + 'px'; } c.className = warn ? 'warn' : ''; c.innerHTML = `<b>${big}</b>${small ? `<span>${small}</span>` : ''}`; c.style.opacity = 1; clearTimeout(cueT); cueT = setTimeout(() => { c.style.opacity = 0; }, ms); }
 
 /* ================= enemies ================= */
 const ETYPE = {
@@ -3462,7 +3496,7 @@ function spawnBoss() {
   // the first time a player meets each boss, one card names it and how to beat its signature attack
   // (the spirit animal's awakening follows that card; without a card it comes 1.4 s in, and never later than 12 s)
   const card = !SEEN.has('_boss-' + realm);
-  if (card) setTimeout(() => { if (!S || S.over) return; coach('boss-' + realm, B.name, B.tip, () => ({ sx:W / 2, sy:H * .4 })); COACH.gap = 0; }, 1100);
+  if (card) setTimeout(() => { if (!S || S.over) return; coach('boss-' + realm, B.name, `${PEOPLE[realm].replace(/^The /, 'A ')}, stuck in ${FEEL[realm]}. ${B.tip}`, () => ({ sx:W / 2, sy:H * .4 })); COACH.gap = 0; }, 1100);
   const wake = () => { if (S && !S.over && !S.bossWoke) { S.bossWoke = true; awaken(); } };
   setTimeout(wake, card ? 12000 : 1400);
   setTimeout(() => luma('vo-boss-' + realm, true), 1500);
@@ -3559,7 +3593,7 @@ function gems(dt) {
     if (q.vz !== undefined && !q.pull) { q.vz -= 900 * dt; q.z = Math.max(0, q.z + q.vz * dt); q.x += q.vx * dt; q.y += q.vy * dt; q.vx *= .9; q.vy *= .9; if (q.z === 0) q.vz = 0; }
     const d = Math.hypot(P.x - q.x, P.y - q.y) || 1;
     if (d < mag || q.pull) { if (!q.pull && d > 140) S.pullN = (S.pullN || 0) + 1; q.pull = true; q.sp = Math.min(1400, (q.sp || 250) + 1800 * dt); q.x += (P.x - q.x) / d * q.sp * dt; q.y += (P.y - q.y) / d * q.sp * dt; q.z = 0; }
-    if (d < 26) { q.got = true; gainXp(q.v); if (S.rises === 0 && !S.lightUsed) S.lastLight += 1; SFX.gem(); fx({ k:'star', x:P.x + rnd(-14, 14), y:P.y - 30 + rnd(-14, 14), vx:0, vy:-40, life:.3, s:7, c:['#7DFFA0', '#7FC4FF', '#FFE58A'][q.kind] }); }
+    if (d < 26) { q.got = true; gainXp(q.v); if (S.surge && S.surge.ready) surgeStart(); if (S.rises === 0 && !S.lightUsed) S.lastLight += 1; SFX.gem(); fx({ k:'star', x:P.x + rnd(-14, 14), y:P.y - 30 + rnd(-14, 14), vx:0, vy:-40, life:.3, s:7, c:['#7DFFA0', '#7FC4FF', '#FFE58A'][q.kind] }); }
   }
   if (S.pullN >= 6) palmPull(P);   // a big magnet pull draws air in to the palm
   S.gems = S.gems.filter(q => !q.got);
@@ -5109,8 +5143,10 @@ const OMNI_ROLL = { 1:18, 2:20, 3:14, 4:16, 5:19, 6:23, 7:18 };   // (these two 
 // the strip's height), so the first sliver is closed lashes, never forehead
 const OMNI_PAINTED = { 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1 };   // brief 11b landed 2026-10-07: all seven
 const LID_Y = { 1:.7, 2:.7, 3:.7, 4:.76, 5:.76, 6:.72, 7:.7 };
+// Omni comes only once every element is gathered, so its first time is Level 5 (A, 2026-10-07: "Omni should only come on after ALL of
+// the elements are collected. so really should only have its first appearance at level 5")
 function hsStart(final, tier = 5, finisher = false) {
-  if (S.omni || hsOn()) return;
+  if (S.omni || hsOn() || S.level < 5) return;
   // a Surge is the player's own once-a-run nine seconds: Omni waits for it to end, then comes (design review, 2026-10-07)
   if (surgeOn()) { S.omniAfter = [final, tier, finisher]; return; } closeSeal(); S.hs.used = true;
   const seen = +(store.get('morqi.omniSeen') || 0), chained = S.t - (S.hs.endAt ?? -99) < 3;
@@ -5168,6 +5204,9 @@ const FORM_PAL = { fire:['#FF8A3A', '#FFB35A', '#FF6A2A', '#FFD08A', '#FF9A4A'],
 // Chrome); until a form's art lands, its poster and its ride show the Keeper in the element's light
 const SURGE_ART = { 1:['nova', 'tidal'], 2:['nova', 'tidal'], 3:['nova', 'tidal'], 4:['nova', 'tidal'], 5:['nova', 'tidal'], 6:['nova', 'tidal'], 7:['nova'] };
 const formKey = () => FORM[keeperEl].toLowerCase();
+// a form only surges once Codex has painted it; until then this Keeper and element have no Surge at all (A, 2026-10-07: "since
+// none of the images are done we can hold off on the transformations that dont have them yet")
+const surgeArt = () => (SURGE_ART[keeper] || []).includes(formKey());
 function formArt() {
   const k = formKey(), n = 'k' + keeper + '-' + k;
   if ((SURGE_ART[keeper] || []).includes(k)) { if (!IMG[n]) load(n, `art4/surge/k${keeper}-${k}.png?v=2`); if (ok(IMG[n])) return IMG[n]; }
@@ -5178,22 +5217,25 @@ const surgeOn = () => !!(S && S.surge && S.surge.on);
 // Titan's stone skin takes two thirds off every hit, whatever lands it (QA, 2026-10-07: touches and shots got through), and
 // a chip of stone flies off to show it
 const titanSkin = () => { if (!surgeOn() || S.surge.on.el !== 'earth') return 1; debris(S.p.x, S.p.y - 40, 6, 240, '#B08A52'); SFX.thud(); return .35; };
-const surgeFade = () => { const O = S.surge.on; return O ? Math.min(1, Math.max(0, (O.life - O.t) / .45)) : 0; };
+// the form fades in from .12 s to .32 s (the light from the body first) and pours back out over the last .45 s
+const surgeFade = () => { const O = S.surge.on; return O ? Math.min(1, Math.max(0, (O.life - O.t) / .45), Math.max(0, (O.t - .12) / .2)) : 0; };
 function surgeCharge(e) {
-  const G = SG(); if (S.level < SURGE.from || G.used || G.on || G.ready || e.horde) return;
+  const G = SG(); if (S.level < SURGE.from || !surgeArt() || G.used || G.on || G.ready || e.horde) return;
   G.q++; if (G.q < SURGE.need) return;
   G.ready = true; SFX.charge(); ring(S.p.x, S.p.y - 30, 20, 260, FORM_PAL[keeperEl][0], .6, 12, true);
   G.pulse = 1;
-  if (!SEEN.has('_surge')) { markSeen('_surge'); coach('surge', `${FORM[keeperEl]} is ready!`, `Tap your face to go ${FORM[keeperEl]}, your ${ELNAME[keeperEl]} form, for nine seconds. Once a run.`, () => { const r = $('#livesImg').getBoundingClientRect(); return { sx:r.left + r.width / 2, sy:r.top + r.height / 2 }; }); }
+  // no card and no tap: the next gem the Keeper takes sets it off (A, 2026-10-07: "it should just do it automatically when a gem is consumed")
 }
 function surgeStart() {
   const G = SG(), P = S.p;
   if (!G.ready || G.used || G.on || S.omni || S.omniSnap || hsOn() || S.over || !running || P.hp <= 0 || S.fall) return false;
   G.ready = false; G.used = true; G.on = { t:0, life:SURGE.life, auraT:.3, el:keeperEl };
-  // the poster and the glide (drawOmniSnap), in the element's own light; the world holds still under it
-  S.snapForm = { im:formArt(), el:keeperEl }; S.omniSnapLen = 2.0; S.omniWhoosh = 0; S.omniSnap = performance.now(); S.hitstop = 1.75;
-  for (const e of S.en) { e.flash = 0; e.hitAt = -9; }
-  AU.song('omni', 1); SFX.power(); SFX.omniZing();
+  // no introduction (A, 2026-10-07: "just a quick flash of light coming from his cutout body image and it turns into their
+  // respective surge form"): the Keeper's own figure lights up in the element's light, a burst rings out, and the form fades in
+  // over a third of a second; play never stops. A local light, never a full-screen flash
+  const L = FORM_PAL[keeperEl][3]; flash(P.x, P.y - 50, 300, L, .45); ring(P.x, P.y - 30, 20, 320, FORM_PAL[keeperEl][0], .5, 14, true);
+  for (let i = 0; i < 16; i++) { const a = i / 16 * TAU; fx({ k:'star', x:P.x + Math.cos(a) * 20, y:P.y - 50 + Math.sin(a) * 30, vx:Math.cos(a) * 260, vy:Math.sin(a) * 200 - 40, drag:3, life:.5, s:rnd(7, 11), c:FORM_PAL[keeperEl][i % 5] }); }
+  AU.song('omni', 1); SFX.power();
   return true;
 }
 function surgeEnd() {
@@ -5380,10 +5422,11 @@ function collectStone(el) {
   // the stone's district thaws: its plants and lights come back to life
   if (S.level === 5) { const Sh = SHRINES[TOWER.order.indexOf(el)]; paintThaw(Sh.x, Sh.y, Sh.R + 60); }
   if (S.level === 5) { const n = stoneEls().filter(k => S.qiStones[k]).length;
-    if (n < 5) { if (hsOn() || S.omni) (S.ascQ = S.ascQ || []).push(n); else hsStart(false, n); }
-    else if (hsOn() || S.omni) S.towerDone = 1; else { S.towerDone = 2; towerFinish(); }
+    // the first four stones go home quietly; the fifth calls Omni, and the Warden wakes as it ends (A, 2026-10-07: Omni only after
+    // all the elements; a stone used to start an Omni each, and freeing in a ring during it never counted)
+    if (n === 5) { S.towerDone = 1; hsStart(false, 5); if (!S.omni && !hsOn() && !surgeOn()) { S.towerDone = 2; towerFinish(); } }
     return; }
-  if (allStones() && !S.hs.used) hsStart(true);
+  if (allStones() && !S.bossSpawned && !S.bossAt) towerFinish();
 }
 // the Silver City's tower: its five sockets hold the stones in the order of the realms, water at the bottom, metal on top
 // (A, 2026-10-06: "we started in the middle of the map which is also where the tower should be. and i or no one should
@@ -5564,26 +5607,26 @@ function captureOutpost(T) {
   S.qiStones[T.el] = true;
   const O = S.out, last = allStones(); O.won++;
   const solo = O.towers.length === 1;
-  if (!last || solo) { SFX.fanfare(false); AU.vo(O.won === 1 ? 'vo-temple-won' : 'vo-temple-won2', 1.1, .5, false); }
+  SFX.fanfare(false); AU.vo(O.won === 1 ? 'vo-temple-won' : 'vo-temple-won2', 1.1, .5, false);
   // everything its door sent out is freed with it
   for (const e of S.en) if (!e.dead && e.from === T) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, GROUND_RING[T.el], 160); }
   T.thawAt = S.t + 2.6; ring(T.cx, T.cy, 20, 760, GROUND_RING[T.el], 1.1, 20, true); stars(T.x, T.y - 160, 44, GROUND_RING[T.el], 560);
   // a level with one temple still teaches its heal: Luma speaks, then Ascended comes (design review, 2026-10-06)
-  if (last && !S.hs.used) O.ascAt = S.t + (solo ? 5.9 : 5);
+  if (last) O.ascAt = S.t + (solo ? 5.9 : 4);
 }
 function outpostTick(dt) {
   const O = OUT(), P = S.p;
   // Level 5: its own card the first time, pointing at the first ring (the order is the generating cycle)
   if (O.l5 && !O.taught && S.t > 3) { O.taught = true; if (!SEEN.has('_l5temples')) { markSeen('_l5temples'); const T0 = openOf(O)[0];
     // the card points where the edge arrow is, so it teaches the arrow too (design review, 2026-10-07)
-    coach('l5temples', 'Wake the five temples!', 'Wake them in order, water first. Each one you wake turns its traps on the creatures and takes Omni a step higher.', () => ({ sx:clamp((T0.cx - camX) * Z, 30, W - 30), sy:clamp((T0.cy - camY) * Z, 150, H - 120) })); } }
+    coach('l5temples', 'Wake the five temples!', 'Wake them in order, water first. Each one you wake turns its traps on the creatures. Wake all five and you go Omni.', () => ({ sx:clamp((T0.cx - camX) * Z, 30, W - 30), sy:clamp((T0.cy - camY) * Z, 150, H - 120) })); } }
   // Level 4: its own card the first time, pointing at the fire temple's ring (the order is the generating cycle)
   if (O.ordered && !O.l5 && !O.taught && S.t > 3) { O.taught = true; if (!SEEN.has('_l4temples')) { markSeen('_l4temples'); markSeen('_outposts'); const T0 = openOf(O)[0];
     coach('l4temples', 'Wake them in order!', 'Fire first, then earth, then metal: each element feeds the next. Stand in the fire temple\'s ring and free its creatures. A cold ring waits its turn.', () => ({ sx:clamp((T0.cx - camX) * Z, 30, W - 30), sy:clamp((T0.cy - camY) * Z, 150, H - 120) })); } }
   // the first time: a card shows the ring, and Luma explains it
   if (!O.taught && S.t > 3) { O.taught = true; if (!SEEN.has('_outposts')) { markSeen('_outposts'); const T0 = O.towers.slice().sort((p, q) => Math.hypot(p.cx - P.x, p.cy - P.y) - Math.hypot(q.cx - P.x, q.cy - P.y))[0];
     coach('outposts', 'Wake the temple!', 'Stand in the temple\'s ring and free its creatures. Fill the ring and the temple is yours, and it fights for you.', () => ({ sx:(T0.cx - camX) * Z, sy:(T0.cy - camY) * Z })); } }
-  if (O.ascAt && S.t >= O.ascAt) { O.ascAt = 0; if (!S.hs.used) hsStart(true); }
+  if (O.ascAt && S.t >= O.ascAt) { O.ascAt = 0; if (!S.bossSpawned && !S.bossAt) towerFinish(); }
   // every temple awake: the thaw sweeps the whole realm from the seal outward, and the land comes fully alive
   if (!O.l5 && O.towers.every(t => t.held)) { if (O.wonderR == null) O.wonderR = 200; if (O.wonderR < 2900) { O.wonderR += dt * 900; if ((O.wPaint = (O.wPaint || 0) - dt) <= 0) { O.wPaint = .08; paintThaw(O.hub.x, O.hub.y, O.wonderR); } } }
   // fireflies and blossoms drift over every thawed patch near the Keeper
@@ -6859,6 +6902,12 @@ function draw() {
   }
   if (S.level === 5) drawForgeGround();
   if (S.out) drawOutposts(inView); else if (S.l5) drawOutpostRings(S.l5, inView);
+  // the trail to the goal: soft dots on the ground in its colour, drifting toward it, when it is far (A, 2026-10-07: "where to go next")
+  { const G = S.goal, P = S.p; if (G && G.x != null) { const dx = G.x - P.x, dy = G.y - P.y, d = Math.hypot(dx, dy);
+    if (d > 380) { const ux = dx / d, uy = dy / d, col = G.el ? (GROUND_RING[G.el] || EL[G.el]) : '#FFFFFF', n = Math.min(12, Math.floor((d - 160) / 58)), ph = (S.t * 1.6) % 1;
+      for (let i = 0; i < n; i++) { const s = 90 + (i + ph) * 58, x = P.x + ux * s, y = P.y + 20 + uy * s, a = Math.min(1, (i + ph) / 1.2) * (1 - (i + ph) / (n + 1) * .7);
+        g.globalAlpha = a * .35; g.fillStyle = col; g.beginPath(); g.ellipse(x, y, 30, 15, 0, 0, TAU); g.fill(); g.globalAlpha = a; g.beginPath(); g.ellipse(x, y, 17, 9, 0, 0, TAU); g.fill(); g.fillStyle = '#FFFFFF'; g.beginPath(); g.ellipse(x, y - 1, 7, 3.5, 0, 0, TAU); g.fill(); }
+      g.globalAlpha = 1; } } }
   // the towers' shadows lie on the ground; the towers themselves stand among the creatures, drawn in depth order
   if (S.level === 5) for (const T of [TOWER, ...SHRINES]) if (inView(T.x, T.y, 300)) { g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(T.x, T.y - 6, T.rx * 1.25, T.ry * 1.1, 0, 0, TAU); g.fill(); }
   for (const it of S.items) if (inView(it.x, it.y, 40)) drawItem(it);
@@ -7118,6 +7167,8 @@ function draw() {
     { const rim = silhouette(kName, EL[keeperEl]); if (rim) add(() => { g.globalAlpha = .6; g.drawImage(rim, -ks * .53, kTop(ks) - ks * .03, ks * 1.06, ks * 1.06); g.globalAlpha = 1; }); }
     g.drawImage(kim, -ks / 2, kTop(ks), ks, ks);   // feet on the shadow
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
+    // a Surge begins as light from the Keeper's own figure (A, 2026-10-07)
+    if (sgo && S.surge.on.t < .35) { const lt = silhouette(kName, FORM_PAL[S.surge.on.el][3]); if (lt) { g.globalAlpha = Math.sin(Math.min(1, S.surge.on.t / .35) * Math.PI) * .95; g.drawImage(lt, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
     if (S.storm && S.storm.out > 0) { const ic = silhouette(kName, '#DCEEFF'); if (ic) { g.globalAlpha = Math.min(.85, S.storm.out / STORM.out); g.drawImage(ic, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
   if (hs) drawOmniForm(kx, ky, hsIm, formK);
@@ -8876,8 +8927,14 @@ const COACH = { q:[], cur:null, gap:0 };
 const NOTES = { q:[], t:0 };
 // play stays quiet (A, 2026-10-04): no text toasts while you play; sound, flashes and the HUD carry the information
 function note(id) { if (S) S.taught['c_' + id] = 1; }
+/* Small tips never stop play (Sammy P.'s Level 1 notes, 2026-10-07: "about 7 stops in the first minute, right when the game needs to
+   hook"; A chose "small tips become toasts"): only the big moments still pause with a card (moving, the first Qi Stone, the boss,
+   the temples, a Star Call, the frost wall). Everything else is a banner under the top bar with Luma's line, at least 20 s apart */
+const BANNER = { q:[], t:0 };
+const bannerTip = id => /^(gem|enemy|shrine|bloom|chest|ult|giant_|k)/.test(id) && !/^l[45]temples$/.test(id);
 function coach(id, title, text, where, secs, place = 'above') {
   if (!S || S.taught['c_' + id]) return; S.taught['c_' + id] = 1;
+  if (bannerTip(id)) { BANNER.q.push({ id, title, text }); return; }
   COACH.q.push({ id, title, text, where, place });
 }
 function domPt(sel) { const r = $(sel).getBoundingClientRect(), b = stage.getBoundingClientRect(); return { sx:r.left - b.left + r.width / 2, sy:r.bottom - b.top }; }
@@ -8886,6 +8943,12 @@ function hideCoach() { ['#coach', '#coachDim', '#coachRing', '#moveGhost'].forEa
 // a tip freezes the game, spotlights what it explains, and waits for OK (or Next when more are waiting)
 function coachTick(dt) {
   NOTES.t -= dt; if (NOTES.t <= 0 && NOTES.q.length && !COACH.cur && !popupOpen()) { toast(NOTES.q.shift(), 4200); NOTES.t = 5.5; }
+  // creature cards become banners too: the creature's name and what beats it (the red-shapes warning the first time)
+  for (let i = COACH.q.length - 1; i >= 0; i--) { const c = COACH.q[i]; if (c.card) { COACH.q.splice(i, 1); const K = KIND[c.card], el = c.card.split('-')[0], red = !SEEN.has('_redtip');
+    if (red) markSeen('_redtip'); BANNER.q.push({ id:c.id, card:c.card, title:`A new creature: ${K.n}`, text:red ? 'Red shapes on the ground mean an attack. Step out!' : `${andList(weakTo(el).map(k => ELNAME[k]))} beat it.`, red }); } }
+  BANNER.t -= dt;
+  if (BANNER.t <= 0 && BANNER.q.length && !COACH.cur && !popupOpen() && !S.over && !hsOn() && !S.omni && !S.omniSnap && !callBusy()) { const b = BANNER.q.shift();
+    cue(b.title, b.text, 3800); if (b.card) AU.vo(b.red ? 'vo-card-beast' : 'vo-newcreature'); else if (CARD_VO[b.id]) AU.vo('vo-card-' + CARD_VO[b.id]); BANNER.t = 20; }
   if (COACH.cur) return;
   COACH.gap -= dt;
   if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel || hsOn() || surgeOn() || S.omni || S.omniSnap || callBusy()) return;
@@ -8958,7 +9021,7 @@ function coachOk() {
   // two new creatures met at once are introduced a little apart, never card after card (QA, 2026-10-05)
   const both = was && was.startsWith('k') && COACH.q.length && COACH.q[0].card;
   if (COACH.q.length && !popupOpen() && !both) { showCoach(COACH.q.shift()); return; }
-  COACH.gap = both ? 10 : 6;
+  COACH.gap = both ? 10 : 6; BANNER.t = Math.max(BANNER.t, 6);
   if (S && !S.over && !popupOpen()) startLoop();
 }
 $('#coachOk').onclick = coachOk;
@@ -9186,7 +9249,7 @@ function hudTip(id) {
   t.t = setTimeout(() => { t.classList.remove('on'); hudTipFor = null; }, 3200);
 }
 // a ready Surge takes the tap on the Keeper's face; otherwise the face explains the Rises
-for (const id of Object.keys(HUD_TIPS)) $('#' + id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (id === 'livesPill' && S && S.surge && S.surge.ready && surgeStart()) return; hudTip(id); });
+for (const id of Object.keys(HUD_TIPS)) $('#' + id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); hudTip(id); });
 // the thin XP bar is too small to tap, so the empty part of the top bar explains it (design review, 2026-10-06)
 $('#hud .hstrip').addEventListener('pointerdown', e => { if (e.target !== e.currentTarget) return; e.preventDefault(); e.stopPropagation(); hudTip('xpBar'); });
 $('#mapBtn').onclick = openShore;
@@ -9198,12 +9261,32 @@ function waveChip(el) {
   const beat = weakTo(el);
   return `<span class="wbeat">${beat.map(k => `<i style="--c:${EL[k]}"></i>`).join('')}</span><svg class="warr" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1.5l4 3.5-4 3.5"/></svg><i class="wico" style="--c:${EL[el]}">${stoneIcon(el)}</i><span class="wsay">Next: <b style="color:${EL[el]}">${ELNAME[el]}</b> &middot; beat it with ${andList(beat.map(k => `<b style="color:${EL[k]}">${ELNAME[k]}</b>`))}</span>`;
 }
+/* What to do now, in a few words, and where (A, 2026-10-07: "as a user i feel confused as to whats going on sometimes and where to go
+   next"): one goal line under the top bar, and the place it points to, which the ground trail leads to when it is far.
+   It stays through a Surge (you still need to know where to go); nothing during Omni or a cut scene, while a card is up, or
+   in a boss fight, where the boss bar already names who to free (QA, 2026-10-07: the third row made the top too tall). */
+function goalOf() {
+  if (!S || S.over || hsOn() || S.omni || S.omniSnap || COACH.cur) return null;
+  const P = S.p, B = S.boss && !S.boss.dead ? S.boss : null;
+  if (B) return null;
+  if (S.bossAt && !S.bossSpawned) return { t:'Get ready: the boss is coming!', el:worldOf() };
+  const st = S.items.find(it => it.kind === 'stone' && !it.got);
+  if (st) return { t:`Grab the ${ELNAME[st.el].toLowerCase()} stone!`, el:st.el, x:st.x, y:st.y };
+  const O = OUT();
+  if (O) { const open = openOf(O); if (!open.length) return null;
+    const T = open.slice().sort((a, b) => Math.hypot(a.cx - P.x, a.cy - P.y) - Math.hypot(b.cx - P.x, b.cy - P.y))[0], nm = ELNAME[T.el].toLowerCase();
+    if (inRing(T, P.x, P.y)) return { t:`Hold the ${nm} ring: ${Math.floor(T.fill / needOf(T) * 100)}%`, el:T.el };
+    return { t:`Go to the ${nm} temple`, el:T.el, x:T.cx, y:T.cy }; }
+  const el = behind(); if (el) return { t:`Free creatures to fill the ${ELNAME[el].toLowerCase()} stone`, el };
+  return null;
+}
 function hud() {
   $('#lvPill').textContent = S.lv;
+  { const G = goalOf(), el = $('#goal'); S.goal = G; el.hidden = !G; if (G) { const k = G.t + G.el; if (el.dataset.k !== k) { el.dataset.k = k; el.querySelector('span').textContent = G.t; el.style.setProperty('--c', GROUND_RING[G.el] || EL[G.el]); } } }
   $('#hud').classList.toggle('boss', !!(S.boss && !S.boss.dead));
   { const G = S.surge, sp = G ? (G.on ? 1 - G.on.t / G.on.life : G.ready ? 1 : G.used ? 0 : Math.min(1, G.q / SURGE.need)) : 0, lpS = $('#livesPill');
     lpS.style.setProperty('--sp', sp.toFixed(3)); lpS.style.setProperty('--sc', FORM_PAL[keeperEl][0]); lpS.classList.toggle('surge', !!(G && G.ready)); if (G && G.pulse && !COACH.cur) { G.pulse = 0; lpS.classList.remove('bump'); void lpS.offsetWidth; lpS.classList.add('bump'); } $('#surgeTag').hidden = !(G && G.ready); $('#surgeTag').textContent = FORM[keeperEl] + '!';
-    $('#surgeRing').hidden = S.level < SURGE.from; }
+    $('#surgeRing').hidden = S.level < SURGE.from || !surgeArt(); }
   { const lp = $('#livesPill'), last = S.rises === 0 && !S.lightUsed; $('#livesN').textContent = S.rises; lp.classList.toggle('last', last); lp.classList.toggle('none', S.rises === 0 && S.lightUsed);
     lp.style.setProperty('--p', last ? (S.lastLight / LAST_LIGHT).toFixed(3) : 1); }
   { const ub = $('#ultBtn'), U = S.ult, ready = U.charge >= 1 && !U.cast; ub.style.setProperty('--p', U.charge.toFixed(3)); ub.classList.toggle('ready', ready); ub.classList.toggle('cast', !!U.cast);
@@ -9316,7 +9399,7 @@ function win() {
     S.flashT = Math.max(0, S.flashT - dt); S.shake = Math.max(0, S.shake - dt * 1.5);
     updateFX(dt); S.en = []; if (fin && T.t > 7.1) floatStep(T, dt); draw(); drawChange(T);
     if (T.done) return;
-    if (T.t < 6.4 || fin) requestAnimationFrame(step); else results();
+    if (T.t < 6.4 || fin) requestAnimationFrame(step); else if (S.level === 1) omniTease(results); else results();
   };
   requestAnimationFrame(step);
 }
@@ -9514,7 +9597,9 @@ function lose(fell) {
   // a lesson picture (drawn from the game) is shown big enough to read; a creature or power is a small icon
   const ti = $('#riseTipImg'); ti.hidden = !tip.img; if (tip.img) ti.src = tip.img; ti.classList.toggle('pic', !!tip.img && tip.img.startsWith('data:')); $('#riseTipT').textContent = tip.t; $('#riseTipP').textContent = tip.p;
   const left = S.rises, all = RISES[S.level - 1], face = `art4/k${keeper}-face.png?v=13`;
-  $('#riseLives').innerHTML = Array.from({ length:all + (S.lightUsed ? 1 : 0) }, (_, i) => `<img src="${face}" alt="" class="${i < left ? '' : 'used'}">`).join('');
+  // only the Rises still left, so the count matches the top bar (Sammy P.'s notes, 2026-10-07: six tokens showed after lives dropped
+  // to five; the dimmed used ones were counted)
+  $('#riseLives').innerHTML = Array.from({ length:left }, () => `<img src="${face}" alt="">`).join('');
   $('#riseLives').setAttribute('aria-label', `${left} ${left === 1 ? 'rise' : 'rises'} left`);
   const qp = 100 * (1 + (S.qiRises || 0)), canQi = left <= 0 && (S.qiRises || 0) < 2 && qi() >= qp;
   $('#qiRiseBtn').hidden = !canQi; $('#qiRiseP').textContent = qp;
@@ -9550,7 +9635,7 @@ function results(quiet) {
     $('#resKeeper').src = `art4/k${keeper}-cheer.png?v=13`;
     $('#resPals').innerHTML = [['a', 9, 70, 1.9, 0], ['b', 24, 54, 2.3, .5], ['c', 80, 62, 2.1, .9], ['a', 93, 52, 2.6, .3]].map(([k, x, h, t, d]) =>
       `<img src="art4/happy/e-${realm}-${k}.png?v=8" alt="" style="left:${x}%;--h:${h}px;--t:${t}s;--d:${d}s;translate:-50% 0">`).join(''); }
-  { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; $('#results .resQ').textContent = `${PEOPLE[S.boss ? S.boss.realm || S.boss.el : worldOf()]} is free!`; }
+  { const f = freedOf(S.boss ? S.boss.realm || S.boss.el : worldOf()), im = $('#results .victory img'); im.src = `art4/${f.img}.png?v=8`; im.alt = f.alt; { const r = S.boss ? S.boss.realm || S.boss.el : worldOf(); $('#results .resQ').textContent = `${PEOPLE[r]} is free from ${FEEL[r]}!`; } }
   { const realm = S.boss ? S.boss.realm || S.boss.el : worldOf(), id = S.giftNew || Object.keys(CALL).find(k => CALL[k].from === realm && callOwned(k)), el = $('#resGift'); el.hidden = !id; el.classList.remove('in'); el.dataset.id = id || '';
     if (id && !quiet) { const D = CALL[id]; el.innerHTML = `<img src="art4/calls/${D.img}.png?v=9" alt=""><span><i>Star Call won!</i><b>${D.n}</b></span><em>▸</em>`;
       setTimeout(() => { el.classList.add('in'); SFX.bx('call-seal', 2, 0); }, reduce ? 0 : 1500);
@@ -10153,6 +10238,19 @@ function bookOf() { try { return JSON.parse(store.get('morqi.book') || '{}') || 
 function bookSave() { if (!S || !S.book) return; const b = bookOf(); for (const k in S.book) { if (!b[k]) store.set('morqi.bookNew', '1'); b[k] = (b[k] || 0) + S.book[k]; } S.book = {}; store.set('morqi.book', JSON.stringify(b)); }
 let bkTab = 'c';
 const PEOPLE = { water:'The fisherman', wood:'The woodcarver', fire:'The drummer', earth:'The grandmother', metal:'The bell ringer' };
+// the feeling each boss is frozen in, said before the fight and after it (Sammy P.'s notes, 2026-10-07: "the feelings story is invisible
+// in play"; one line before the boss and one after)
+/* A glimpse of Omni after Level 1's boss, not the power (A, 2026-10-07, after Sammy P.'s notes: "Omni never showed up" in the level
+   investors play; Omni itself stays a Level 5 payoff): the night darkens, the Keeper's Omni form shows through a slow five-colour
+   light, and one line promises it. About three seconds; a tap skips it; with reduced motion it is a still. */
+function omniTease(next) {
+  const d = document.createElement('div'); d.id = 'tease';
+  d.innerHTML = `<i class="tz-light"></i><img src="art4/k${keeper}-omni.png?v=1" alt="Your Keeper as Omni"><p>Gather all five stones…<b>and you'll go Omni.</b></p>`;
+  $('#stage').appendChild(d); requestAnimationFrame(() => d.classList.add('on')); SFX.sweep();
+  let done = false; const end = () => { if (done) return; done = true; d.classList.remove('on'); setTimeout(() => { d.remove(); next(); }, 350); };
+  d.addEventListener('pointerdown', end); setTimeout(end, reduce ? 2200 : 3400);
+}
+const FEEL = { water:'fear', wood:'anger', fire:'restless excitement', earth:'worry', metal:'grief' };
 function renderBook() {
   const b = bookOf(), ORD = ['a', 'b', 'c', 'm'], kinds = Object.keys(KIND).sort((x, y) => REALM.indexOf(x.split('-')[0]) - REALM.indexOf(y.split('-')[0]) || ORD.indexOf(x.split('-')[1]) - ORD.indexOf(y.split('-')[1]));
   const got = kinds.filter(k => b[k]).length, freed = REALM.filter(el => SEEN.has('_freed-' + el));
@@ -10258,8 +10356,11 @@ if (PITCH) document.querySelectorAll('#tabs [data-tab="book"], #tabs [data-tab="
 function openReveal(id) { const D = CALL[id]; if (!D || !S) return; S.revealed = true;
   $('#crvArt').src = `art4/calls/${D.img}.png?v=9`; $('#crvArt').alt = D.gift; $('#crvName').textContent = D.n; $('#crvFrom').textContent = D.giver;
   // a short clip of the call in real play; the card's drawing stands in if the clip can't load
-  $('#crvDemo').innerHTML = `<video src="art4/calls/clip-${id}.mp4?v=1" autoplay muted loop playsinline aria-label="${D.n} in play"></video>`;
-  $('#crvDemo video').onerror = () => { $('#crvDemo').innerHTML = tipArt('call_' + id); };
+  // Tide Call's clip opens on a Blade Mantis name tag and read as the wrong scene (Sammy P.'s notes, 2026-10-07): it shows its
+  // drawn demo until the clip is recut
+  if (id === 'tide') $('#crvDemo').innerHTML = tipArt('call_' + id);
+  else { $('#crvDemo').innerHTML = `<video src="art4/calls/clip-${id}.mp4?v=1" autoplay muted loop playsinline aria-label="${D.n} in play"></video>`;
+    $('#crvDemo video').onerror = () => { $('#crvDemo').innerHTML = tipArt('call_' + id); }; }
   $('#crvArt').closest('.crv').querySelector('.crv-k').textContent = S.giftNew === id ? 'New Star Call!' : 'Star Call'; show('callReveal'); SFX.bx('call-seal', 1, 0); }
 $('#crvGo').onclick = () => { SFX.select(); show('results'); };
 $('#ascBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (!S || S.over || hsOn() || S.omni || S.finisherUsed) return; S.finisherUsed = true; $('#ascBtn').hidden = true; hsStart(false, 5, true); });
