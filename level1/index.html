@@ -744,6 +744,26 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #hud .sk.need{animation:skNeed 1.1s ease-in-out infinite}
 @keyframes skNeed{50%{box-shadow:0 0 0 2px var(--c),0 0 14px var(--c);transform:scale(1.12)}}
 /* the HUD steps aside for Omni's arrival, so the moment fills the whole screen */
+/* info bubbles (A, 2026-10-06: "info bubbles pop up for when players press on the UI areas where the lives and gems collected
+   etc are"): tap a number or meter in the top bar and a small night-glass bubble says what it is, then fades */
+#lvPill,#livesPill,#xpBar,#wavePill,#stoneRow,#bossWrap{pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+/* a finger-sized hit area round each, and a tall strip for the thin XP bar (design review, 2026-10-06) */
+#lvPill::before,#livesPill::before{content:"";position:absolute;inset:-9px -5px -6px}
+#wavePill::before,#stoneRow::before{content:"";position:absolute;inset:-2px -5px -9px}
+#hud .hstrip{pointer-events:auto}   /* the empty part of the top bar answers too: it explains the XP bar along its bottom */
+#hudTip{position:absolute;z-index:31;max-width:250px;padding:10px 13px 11px 10px;border-radius:15px;background:rgba(12,16,44,.9);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 8px 22px rgba(4,6,22,.45);display:flex;gap:10px;align-items:center;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);pointer-events:none;opacity:0;transform:translateY(-4px);transition:opacity .18s,transform .18s}
+#hudTip.on{opacity:1;transform:none}
+#hudTip .tx b{display:block;font:900 15px var(--round);color:#fff;margin-bottom:2px}
+#hudTip .tx span{display:block;font:700 13.5px/1.35 var(--round);color:#D8DCF4;text-wrap:pretty}
+#hudTip .tx{min-width:0}
+#hudTip .ti{flex:none;display:flex;align-items:center;gap:4px}
+#hudTip .ti img{width:40px;height:40px;object-fit:contain;border-radius:50%}
+#hudTip .ti .n{font:900 15px var(--round);font-style:normal;color:#fff}
+#hudTip .ti .el{width:26px;height:26px;border-radius:50%;background:var(--c);color:#fff;font:900 13px/26px var(--round);text-align:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+#hudTip .ti .el.big{width:36px;height:36px;font-size:17px;line-height:36px}
+#hudTip .ti .sep{width:1px;height:28px;background:rgba(255,255,255,.25);margin:0 2px}
+#hudTip .ti svg{width:34px;height:34px}
+#hudTip .ti svg.gt{width:12px;height:12px;fill:none;stroke:rgba(255,255,255,.75);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #hud{transition:opacity .25s}#hud.cine,#hud.cine *{opacity:0;pointer-events:none!important}
 #hud #bossWrap{margin:0 8px;background:rgba(12,16,44,.55);border-radius:15px;padding:4px 10px 7px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 /* the white chunk of health just lost drains away behind the bar (A, 2026-10-06: feel every hit land) */
@@ -1125,7 +1145,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
    the timer was; the timer and the freed count leave play (Victory shows both). The minimap steps aside in the boss
    arena, where the boss bar would push it down over the fight. It moves down with the strip by the phone's top inset (A's
    iPhone recording, 2026-10-06: without it the ring floated alone above the strip) */
-#ultBtn{top:calc(9px + env(safe-area-inset-top, 0px))!important;left:calc(50% - 37px);transform:scale(.6);transform-origin:50% 0;pointer-events:none;z-index:30}
+#ultBtn{top:calc(9px + env(safe-area-inset-top, 0px))!important;left:calc(50% - 37px);transform:scale(.6);transform-origin:50% 0;pointer-events:auto;cursor:pointer;z-index:30}
 #ultBtn em,#timePill,#freedPill{display:none!important}
 /* in the top bar the companion pulses inside its own slot (design review, 2026-10-05: the old pulse reset it to full size
    and covered the element dots) */
@@ -1399,6 +1419,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <div class="hrow"><span id="wavePill" role="status"></span><div id="stoneRow" aria-label="Qi Stones"></div></div>
       <div id="bossWrap"><div class="bossname" id="bossName"></div><div id="bossBar"><b></b><i></i></div></div>
     </div>
+    <div id="hudTip" role="status" hidden><div class="ti"></div><div class="tx"><b></b><span></span></div></div>
     <div class="skills" id="skills"></div>
     <div class="slottip" id="slotTip" hidden></div>
     <button id="ultBtn" aria-label="Companion ultimate"><span class="ur"></span><img id="ultImg" alt=""><em id="ultLv"></em><b id="ultName"></b></button>
@@ -8574,6 +8595,41 @@ function openShore() {
   show('shoreMap');
 }
 $('#mapBtn').addEventListener('pointerdown', e => { e.stopPropagation(); });
+// info bubbles on the top bar: what each number or meter means, in a sentence, with the player's own numbers
+// the same chevron as the wave marker, so the bubble's picture reads in the marker's order: what beats it › it
+const tipGt = '<svg class="gt" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1.5l4 3.5-4 3.5"/></svg>';
+const tipEl = (el, big) => `<i class="el${big ? ' big' : ''}" style="--c:${EL[el]}">${CHAR[el]}</i>`;
+const tipGem = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 20 11 12 22 4 11Z" fill="#5CF2FF" stroke="#0B3A52" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 2 15.5 9.5 12 11Z" fill="#fff" opacity=".85"/></svg>';
+// each bubble: [picture, title, line] — the picture carries it for a child who can't read yet (design review, 2026-10-06)
+const HUD_TIPS = {
+  lvPill:() => [tipGem, `Level ${S.lv}`, 'Gems fill your green bar. Each time it fills, you pick a new power.'],
+  xpBar:() => [tipGem, `Level ${S.lv}`, 'Gems fill this bar. Each time it fills, you pick a new power.'],
+  livesPill:() => [`<img src="${$('#livesImg').src}" alt=""><i class="n">×${S.rises}</i>`, `${S.rises} ${S.rises === 1 ? 'Rise' : 'Rises'} left`, S.rises ? 'If you fall, you rise again where you stood.' : 'No Rises left. Catch gems and the light will give you another.'],
+  wavePill:() => { const w = LEVELS[S.level - 1].waves[S.waveIdx] || (S.warn && S.warn.w), el = w && w.el !== 'mix' ? w.el : null;   // the same wave its marker shows
+    return el ? [weakTo(el).map(x => tipEl(x)).join('') + tipGt + tipEl(el, true), 'The next wave', `${ELNAME[el]} creatures are coming. ${weakTo(el).map(x => ELNAME[x]).join(' and ')} beat them.`]
+      : [EL5.map(x => tipEl(x)).slice(0, 3).join(''), 'The next wave', 'Creatures are coming. Use the elements that beat them.']; },
+  stoneRow:() => S.out ? [`<img src="art4/props/x-temple-${S.out.els[0]}${S.out.towers[0].held ? '-alive' : ''}.png?v=${S.out.towers[0].held ? 1 : 12}" alt="">`, 'The temples', 'Each ring shows how awake its temple is. Wake them all, and the boss must face you.']
+    : [`<img src="art4/props/x-stone-${stoneEls()[0]}.png?v=8" alt="">`, 'Qi Stones', 'Free creatures of each element to fill its stone. Gather them all, and the boss rises.'],
+  ultBtn:() => [`<img src="${$('#ultImg').src}" alt="">`, `${ANIMAL[animal].y} · Lv ${S.ultInfo.lv}`, `Your companion. It charges as you free creatures, then strikes with ${S.ultInfo.name} on its own.`],
+  bossWrap:() => S.boss ? [weakTo(S.boss.el).map(x => tipEl(x)).join('') + tipGt + tipEl(S.boss.el, true), bossOf(S.boss).name, `Its health. ${weakTo(S.boss.el).map(x => ELNAME[x]).join(' and ')} hit it hardest.`] : ['', '', ''] };
+let hudTipFor = null;
+function hudTip(id) {
+  const t = $('#hudTip'); clearTimeout(t.t);
+  if (!S || S.omni || S.omniSnap || hudTipFor === id && t.classList.contains('on')) { t.classList.remove('on'); hudTipFor = null; return; }
+  const [pic, title, line] = HUD_TIPS[id](); if (!title) return; hudTipFor = id;
+  t.querySelector('.ti').innerHTML = pic; t.querySelector('.tx b').textContent = title; t.querySelector('.tx span').textContent = line; t.hidden = false;
+  const r = $(id === 'xpBar' ? '#hud .hstrip' : '#' + id).getBoundingClientRect(), b = stage.getBoundingClientRect(), w = Math.min(270, b.width - 24), top = r.bottom - b.top + 8;
+  let left = clamp(r.left - b.left + r.width / 2 - w / 2, 12, b.width - w - 12);
+  // never over the minimap: a bubble beside it stops short of it
+  const mb = $('#mapBtn'), mr = mb && !mb.hidden && mb.offsetParent ? mb.getBoundingClientRect() : null;
+  if (mr && top < mr.bottom - b.top) left = Math.max(12, Math.min(left, mr.left - b.left - 8 - w));
+  t.style.left = left + 'px'; t.style.top = top + 'px'; t.style.width = Math.min(w, mr && top < mr.bottom - b.top ? mr.left - b.left - 8 - left : w) + 'px';
+  requestAnimationFrame(() => t.classList.add('on')); SFX.select();
+  t.t = setTimeout(() => { t.classList.remove('on'); hudTipFor = null; }, 3200);
+}
+for (const id of Object.keys(HUD_TIPS)) $('#' + id).addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); hudTip(id); });
+// the thin XP bar is too small to tap, so the empty part of the top bar explains it (design review, 2026-10-06)
+$('#hud .hstrip').addEventListener('pointerdown', e => { if (e.target !== e.currentTarget) return; e.preventDefault(); e.stopPropagation(); hudTip('xpBar'); });
 $('#mapBtn').onclick = openShore;
 $('#shoreMap').onclick = () => { SFX.select(); resume(); };
 
