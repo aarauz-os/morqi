@@ -265,8 +265,8 @@ html.paged .rogue .was{box-shadow:none}
 .rogue .gift.next{padding-left:10px;border-style:dashed;color:var(--faint);background:none}
 
 /* the long game: the frozen world beyond the five realms, and Luma's nine tails as the years-long spine */
-.world{margin:0;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.4)}
-.world img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+figure.world{margin:0;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.4)}
+figure.world img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
 .tails{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .tails i{width:16px;height:30px;border-radius:50% 50% 50% 50%/70% 70% 30% 30%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1.5px rgba(207,230,255,.35)}
 .tails i.on{background:linear-gradient(180deg,#F4FBFF,#9ED4FF);box-shadow:0 0 12px rgba(158,212,255,.7)}
@@ -299,3 +299,14 @@ html.paged #long .beats li span{font-size:13px;line-height:1.38}html.paged #long
 .terms{margin-top:2px}
 .op .foot .stack{gap:10px!important}
 @media (max-width:600px){.op .foot .stack{justify-items:start!important}}
+/* print (A, 2026-10-07: pages 4, 8 and 11 of the PDF "need rework ... the alignment of everything is off"): Chrome prints big
+   blurred shadows and glows as solid dark rectangles, so the paged layout keeps only crisp rings; page 4's realm cards grow to
+   fill the page, and page 11's two columns line up */
+html.paged figure.world{box-shadow:0 0 0 1px var(--line)}
+html.paged .tails i.on{box-shadow:inset 0 0 0 1.5px rgba(207,230,255,.6)}
+html.paged .spath-track .ring{box-shadow:0 0 0 3px var(--c)}
+html.paged .stat,html.paged .spath,html.paged .foes{box-shadow:inset 0 0 0 1px var(--line)}
+html.paged #worlds .worlds{grid-template-columns:repeat(5,minmax(0,1fr));justify-content:stretch}html.paged #worlds .world .phone{width:146px}html.paged #worlds .world b{white-space:nowrap}
+html.paged #worlds .world b{font-size:17px}html.paged #worlds .han{font-size:26px}
+html.paged #worlds > .in{gap:18px}html.paged #worlds .lede{font-size:17px;max-width:70ch}
+html.paged #business .split{align-items:center}
