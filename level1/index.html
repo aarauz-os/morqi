@@ -5164,13 +5164,13 @@ const FORM = { fire:'Nova', water:'Tidal', wood:'Wild', earth:'Titan', metal:'Ch
 const FORM_PAL = { fire:['#FF8A3A', '#FFB35A', '#FF6A2A', '#FFD08A', '#FF9A4A'], water:['#4E9BE0', '#8FD0FF', '#2F78C8', '#BFE6FF', '#5FB0F0'],
   wood:['#6FBF4A', '#A8E07A', '#4E9A34', '#C8F09A', '#7CCB5A'], earth:['#E6B23A', '#F5D27A', '#C8902A', '#FFE2A0', '#E8B85A'],
   metal:['#C9D3DB', '#E8EEF6', '#9AA8B8', '#FFFFFF', '#B8C4D8'] };
-// the forms Codex has painted so far (briefs 15 and 16 bring the rest); until a form's art lands, its poster and its ride
-// show the Keeper in the element's light
-const SURGE_ART = { 1:['nova'] };
+// the forms Codex has painted so far (brief 15: every Nova, and every Tidal but Sina's; brief 16 brings Wild, Titan and
+// Chrome); until a form's art lands, its poster and its ride show the Keeper in the element's light
+const SURGE_ART = { 1:['nova', 'tidal'], 2:['nova', 'tidal'], 3:['nova', 'tidal'], 4:['nova', 'tidal'], 5:['nova', 'tidal'], 6:['nova', 'tidal'], 7:['nova'] };
 const formKey = () => FORM[keeperEl].toLowerCase();
 function formArt() {
   const k = formKey(), n = 'k' + keeper + '-' + k;
-  if ((SURGE_ART[keeper] || []).includes(k)) { if (!IMG[n]) load(n, `art4/surge/k${keeper}-${k}.png?v=1`); if (ok(IMG[n])) return IMG[n]; }
+  if ((SURGE_ART[keeper] || []).includes(k)) { if (!IMG[n]) load(n, `art4/surge/k${keeper}-${k}.png?v=2`); if (ok(IMG[n])) return IMG[n]; }
   return IMG['k' + keeper];
 }
 const SG = () => S.surge || (S.surge = { q:0, ready:false, used:false, on:null });
