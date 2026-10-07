@@ -2037,7 +2037,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=18`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -3299,6 +3299,7 @@ function hurt(e, dmg, el, o = {}) {
   // the words teach, so they show the first few times in a run; after that the coloured hit says it
   if (strong && S.level < 3 && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
   if (weak && S.level < 3 && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
+  if (e.giant) m *= giantArmour(e);
   const dealt = dmg * m;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
@@ -3312,12 +3313,12 @@ function hurt(e, dmg, el, o = {}) {
   // a boss feels every hit (A, 2026-10-06: "i would also like it if we can see the boss react to our attacks ... right now it
   // feel like we dont know or feel if our attacks are landing"): it rocks back from you, sparks fly off where you struck in
   // your element's colour, an impact cracks, and every 8% of its health it staggers with a freeze-frame and a shockwave
-  if (e.boss) { const P = S.p, dd = Math.hypot(e.x - P.x, e.y - P.y) || 1, c = GROUND_RING[el] || '#FFFFFF'; e.hitEl = el; e.rdx = (e.x - P.x) / dd; e.rdy = (e.y - P.y) / dd;
+  if (e.boss || e.giant) { const P = S.p, dd = Math.hypot(e.x - P.x, e.y - P.y) || 1, c = e.giant && giantArmour(e) > 1 ? '#FFE08A' : GROUND_RING[el] || '#FFFFFF'; e.hitEl = el; e.rdx = (e.x - P.x) / dd; e.rdy = (e.y - P.y) / dd;
     if ((e.flashCd || 0) <= S.t) { e.flashCd = S.t + .2; e.pulseAt = S.t; }   // a pulse of light, never a strobe that bleaches it
     if ((e.thkCd || 0) <= S.t) { e.thkCd = S.t + .09; SFX.bhit(strong);
       for (let i = 0; i < (strong ? 8 : 5); i++) fx({ k:'spark', x:e.x - e.rdx * e.r * .7 + rnd(-16, 16), y:e.y - e.size * .3 - e.rdy * e.r * .4 + rnd(-16, 16), vx:-e.rdx * rnd(90, 280) + rnd(-140, 140), vy:-e.rdy * rnd(90, 280) - rnd(40, 180), drag:4, life:rnd(.25, .42), s:rnd(3, 6), c:i % 2 ? '#FFFFFF' : c }); }
     e.stag = (e.stag || 0) + dealt;
-    if (e.stag >= e.max * .08 && e.hp - dealt > 0) { e.stag = 0; e.stagAt = S.t; S.hitstop = Math.max(S.hitstop || 0, .07); S.shake = Math.max(S.shake, .32);
+    if (e.boss && e.stag >= e.max * .08 && e.hp - dealt > 0) { e.stag = 0; e.stagAt = S.t; S.hitstop = Math.max(S.hitstop || 0, .07); S.shake = Math.max(S.shake, .32);
       ring(e.x, e.y - e.size * .3, 20, e.size * .95, c, .45, 14, true); stars(e.x, e.y - e.size * .4, 16, '#FFFFFF', 400); SFX.thud(true); } }
   // damage numbers only on the Warden, where they show the fight going your way
   if (e.boss && S.nums.length < 28 && (e.numCd || 0) <= S.t) { e.numCd = S.t + .45; S.nums.push({ x:e.x + rnd(-10, 10), y:e.y - e.size * .55, v:Math.round(dealt), t:0, strong, weak }); }
@@ -3357,6 +3358,9 @@ function kill(e) {
     SFX.shatter();
   }
   paintThaw(e.x, e.y, e.type === 'golem' ? 190 : e.boss ? 900 : 84);
+  // a giant felled pays out: a chest, a heart and a fountain of gems
+  if (e.giant) { S.shake = .6; S.hitstop = Math.max(S.hitstop || 0, .12); ring(e.x, e.y, 30, 420, col, .7, 18, true); stars(e.x, e.y - 80, 40, '#FFE58A', 520); dropChest(e.x, e.y);
+    S.items.push({ x:e.x + 50, y:e.y, kind:'heart', t:0, z:10, vz:260 }); for (let i = 0; i < 16; i++) S.gems.push({ x:e.x, y:e.y, z:6, vz:rnd(240, 380), vx:rnd(-200, 200), vy:rnd(-200, 200), v:4, kind:1, t:0 }); }
   if (e.type === 'golem') {
     S.shake = .35; ring(e.x, e.y, 20, 200, col, .5, 10, true);
     // Spirit Chests are earned: the first brute on each shore guards one; later brutes rarely do, and spill qi instead
@@ -4432,11 +4436,118 @@ function landSpike(b, B, f) {
   else { sp('#BFE6FF', 6, 42); shards(f.x, f.y, '#DDF1FF', 8, 260); SFX.spikes(); }
 }
 
+/* ================= giants ================= */
+// A, 2026-10-06, after the huge armoured enemies of a co-op shooter he loves: "gigantic and harder to kill enemies ... they just
+// required all types of different tactics maybe 1 or 2 of each of them come in every level with more appearing with the
+// difficulty". Three giants, each beaten a different way:
+// - the Rammer: its horns take a third of your hits; bait its charge, step aside, and hit its glowing back while it's stuck
+// - the Colossus: lobs blobs onto red circles from afar and stomps up close; its heart opens after each volley (triple hits)
+// - the Pack Alpha: howls up a pack, and takes half damage while three of them stand near it; free the pack first
+// Each arrives with a quake and a roar, teaches itself once (a card and Luma's line), and pays a chest, a heart and gems.
+// Codex's art (brief 10) goes in art4/giants/; until then each stands in, scaled up, as a creature of its element.
+const GIANT_ART = false;
+const GIANT = {
+  rammer:{ n:'Rammer', hp:5, size:250, r:58, sp:52, dmg:30, stand:el => 'e-' + el + '-c',
+    tip:'Its horns block your hits. Step aside when it charges, then hit its glowing back while it is stuck.' },
+  colossus:{ n:'Colossus', hp:7, size:300, r:64, sp:34, dmg:34, stand:() => 'e-golem',
+    tip:'It throws big blobs onto red circles. Keep moving, and hit it hard when its heart glows.' },
+  alpha:{ n:'Pack Alpha', hp:4, size:220, r:52, sp:92, dmg:24, stand:() => 'e-wolf',
+    tip:'Its pack shields it. Free the pack first, then the Alpha takes full hits.' } };
+// when they come (seconds into the run); each harder skill tier adds one more; never during the boss, Ascended or a Bloom;
+// one at a time through Level 3, two after
+const GIANT_PLAN = [[['rammer', 95]], [['rammer', 35], ['alpha', 70]], [['alpha', 40], ['rammer', 80], ['colossus', 120]],
+  [['rammer', 40], ['alpha', 80], ['colossus', 115], ['rammer', 150], ['alpha', 185], ['colossus', 220]],
+  [['rammer', 60], ['alpha', 120], ['colossus', 180], ['rammer', 250], ['alpha', 320], ['colossus', 390]]];
+function giantPlan() {
+  const p = (GIANT_PLAN[S.level - 1] || []).map(([k, t]) => ({ k, t })), kinds = Object.keys(GIANT), last = p.length ? p[p.length - 1].t : 80;
+  for (let i = 0; i < (S.hard || 0); i++) p.push({ k:kinds[(Math.random() * kinds.length) | 0], t:last * rnd(.45, .95) });
+  return p.sort((a, b) => a.t - b.t);
+}
+function giantsTick(dt) {
+  if (!S.gi) S.gi = { plan:giantPlan() };
+  if (S.bossSpawned) S.gi.plan = [];
+  const live = S.en.filter(e => e.giant && !e.dead).length, nx = S.gi.plan[0];
+  // a giant never walks in on top of a teaching card (QA, 2026-10-06: Level 1's Rammer card came straight after the Bloom Seed's)
+  if (nx && S.t >= nx.t && !hsOn() && !S.bloom && !S.over && !S.storm && !COACH.cur && !COACH.q.length && live < (S.level >= 4 ? 2 : 1)) { S.gi.plan.shift(); spawnGiant(nx.k); }
+  // the Colossus's blobs arc over and land on their red circles
+  S.gfx = (S.gfx || []).filter(f => f.t < f.wind + .3);
+  for (const f of S.gfx) { f.t += dt; if (f.done || f.t < f.wind) continue; f.done = true;
+    ring(f.x, f.y, 20, f.r * 1.1, GROUND_RING[f.el], .45, 12, true); debris(f.x, f.y, 8, 300); SFX.thud(true);
+    if (f.el === 'water') drops(f.x, f.y, 14, 360); else if (f.el === 'wood') leaves(f.x, f.y, 10, 300); else if (f.el === 'fire') flames(f.x, f.y, 8, f.r * .5, 34); else if (f.el === 'metal') stars(f.x, f.y, 12, '#FFFFFF', 320);
+    if (inGround(S.p.x, S.p.y, f.x, f.y, f.r + S.p.r * .5)) ouch(22, f.x, f.y, { push:100, el:f.el, src:'colossus', shake:.35 }); }
+}
+function spawnGiant(k, at) {
+  const G = GIANT[k], P = S.p, a = rnd(0, TAU), d = Math.hypot(VW, VH) / 2 + 140, el = (pl => pl[(Math.random() * pl.length) | 0])(mixPool());
+  const e = spawn('golem', at || { x:clamp(P.x + Math.cos(a) * d, 80, WORLD - 80), y:clamp(P.y + Math.sin(a) * d, 80, WORLD - 80) }, 1, el); if (!e) return null;
+  const art = 'g-' + k + '-' + el; if (GIANT_ART && !IMG[art]) load(art, `art4/giants/${art}.png?v=1`);
+  Object.assign(e, { type:'giant', giant:k, gst:'walk', gcd:2.4, howl:.6, size:G.size, r:G.r, sp:G.sp * (1 + .04 * (S.hard || 0)), dmg:G.dmg, heavy:true, xp:40, tagT:3.5,
+    img:GIANT_ART && ok(IMG[art]) ? art : G.stand(el), K:{ ...e.K, n:G.n, tip:null, beh:'giant' } });
+  e.own = e.img !== 'e-golem' && e.img !== 'e-wolf'; e.hp = e.max = e.max * G.hp * (S.level === 1 ? .6 : 1);
+  S.shake = Math.max(S.shake, .5); SFX.roar(); SFX.stomp();
+  if (!SEEN.has('_giant-' + k)) { markSeen('_giant-' + k); coach('giant_' + k, 'A giant ' + G.n + '!', G.tip, () => ({ x:e.x, y:e.y - e.size * .3, r:e.size * .55 }), 6); }
+  return e;
+}
+// how hard a hit lands on a giant: its weak spot takes triple, its armour a fraction
+const giantArmour = e => e.giant === 'rammer' ? (e.gst === 'stuck' ? 3 : .33) : e.giant === 'colossus' ? (giantOpen(e) ? 3 : .55) : e.shield ? .5 : 1;
+const giantOpen = e => S.t >= (e.openAt ?? 1e9) && S.t < e.openAt + 2.2;
+function giantMove(e, P, d, dt, s) {
+  const ux = (P.x - e.x) / d, uy = (P.y - e.y) / d, a = e.act, chase = stop => { if (d > stop) { e.x += ux * s * dt; e.y += uy * s * dt; } };
+  if (e.giant === 'rammer') {
+    if (e.gst === 'walk') { chase(e.r + P.r - 6); if ((e.gcd -= dt) <= 0 && d < 720 && d > 170) { e.gst = 'aim'; e.act = { k:'lane', ph:0, t:0, wind:1.1, dx:ux, dy:uy, len:900, w:150 }; SFX.roar(); } }
+    else if (e.gst === 'aim') { if ((a.t += dt) >= a.wind) { e.gst = 'charge'; a.k = 'ram'; a.ph = 1; a.t = 0; a.go = 0; SFX.charge(); S.shake = Math.max(S.shake, .3); } }
+    else if (e.gst === 'charge') { const v = 950, A = S.arena; e.x += a.dx * v * dt; e.y += a.dy * v * dt; a.go += v * dt;
+      if ((e.dustT = (e.dustT || 0) - dt) <= 0) { e.dustT = .04; smoke(e.x, e.y + 40, 2, 30, '200,190,170'); }
+      if (!a.hit && Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r) { a.hit = true; ouch(30, e.x, e.y, { push:280, el:e.el, src:'rammer', shake:.45 }); }
+      const out = e.x < 70 || e.x > WORLD - 70 || e.y < 70 || e.y > WORLD - 70 || (A && Math.hypot(e.x - A.x, e.y - A.y) > A.r - 70);
+      if (a.go >= a.len || out) { e.gst = 'stuck'; e.gt = 2.6; e.act = null; e.stuckDx = a.dx; e.stuckDy = a.dy; S.shake = Math.max(S.shake, .45); debris(e.x + a.dx * 50, e.y + 30 + a.dy * 30, 16, 340); SFX.thud(true); ring(e.x, e.y, 20, 220, GROUND_RING[e.el], .4, 12, true); } }
+    else if ((e.gt -= dt) <= 0) { e.gst = 'walk'; e.gcd = 3; }
+    return true; }
+  if (e.giant === 'colossus') {
+    if (e.gst === 'stomp') { if ((a.t += dt) >= a.wind) { e.act = null; e.gst = 'walk'; e.gcd2 = 3.2; e.stompAt = S.t; ring(e.x, e.y, 20, 260, GROUND_RING[e.el], .5, 16, true); debris(e.x, e.y, 18, 380); SFX.stomp(); S.shake = Math.max(S.shake, .45);
+        if (inGround(P.x, P.y, e.x, e.y, 250 + P.r * .5)) ouch(28, e.x, e.y, { push:230, el:e.el, src:'colossus', shake:.45 }); } return true; }
+    chase(380); e.gcd -= dt; e.gcd2 = (e.gcd2 || 0) - dt;
+    if (d < 240 && e.gcd2 <= 0) { e.gst = 'stomp'; e.act = { k:'circle', ph:0, t:0, wind:.85, x:e.x, y:e.y, r:250 }; SFX.roar(); }
+    else if (e.gcd <= 0 && d < 950) { e.gcd = 5; e.castAt = S.t; e.openAt = S.t + 1.7; SFX.roar();
+      for (let i = 0; i < 3; i++) { const an = rnd(0, TAU), r = i ? rnd(110, 190) : 0; S.gfx = S.gfx || []; S.gfx.push({ sx:e.x, sy:e.y - e.size * .6, x:P.x + Math.cos(an) * r + (P.mx || 0) * 90, y:P.y + Math.sin(an) * r + (P.my || 0) * 90, r:95, t:-i * .25, wind:1.15, el:e.el }); } }
+    return true; }
+  // the Pack Alpha
+  if ((e.howl -= dt) <= 0) { e.howl = 10; e.howlAt = S.t; SFX.roar(); ring(e.x, e.y, 20, 320, GROUND_RING[e.el], .5, 12, true);
+    for (let i = 0; i < 5; i++) { const an = i / 5 * TAU, m = spawn('wolf', { x:e.x + Math.cos(an) * 150, y:e.y + Math.sin(an) * 150 }, 1.2, e.el); if (m) m.packOf = e; } }
+  e.shield = S.en.filter(m => m.packOf === e && !m.dead && Math.hypot(m.x - e.x, m.y - e.y) < 380).length >= 3;
+  if (e.gst === 'lunge') { if (a.ph === 0) { if ((a.t += dt) >= a.wind) { a.ph = 1; a.k = 'ram'; a.go = 0; SFX.charge(); } }
+    else { const v = 900; e.x += a.dx * v * dt; e.y += a.dy * v * dt; a.go += v * dt; if (!a.hit && Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r) { a.hit = true; ouch(22, e.x, e.y, { push:170, el:e.el, src:'alpha' }); }
+      if (a.go >= a.len) { e.act = null; e.gst = 'walk'; e.gcd = 2.8; } }
+    return true; }
+  chase(e.r + P.r - 6);
+  if ((e.gcd -= dt) <= 0 && d < 340 && d > 120) { e.gst = 'lunge'; e.act = { k:'lane', ph:0, t:0, wind:.55, dx:ux, dy:uy, len:380, w:120 }; }
+  return true;
+}
+// what a giant looks like on top of its body: its weak spot glowing, its pack's shield, its long health bar
+function drawGiant(e) {
+  const s = e.size, c = GROUND_RING[e.el], T = S.t, top = e.y - s * .62;
+  if (e.giant === 'rammer' && e.gst === 'stuck') { const x = e.x - (e.stuckDx || 0) * e.r * .6, y = e.y - s * .32 - (e.stuckDy || 0) * 20, p = .7 + .3 * Math.sin(T * 14);
+    add(() => { glowAt(x, y, s * .55, '#FFE08A', .8 * p); glowAt(x, y, s * .22, '#FFFFFF', .7 * p); }); }
+  if (e.giant === 'colossus' && giantOpen(e)) { const p = .7 + .3 * Math.sin(T * 14); add(() => { glowAt(e.x, e.y - s * .38, s * .5, '#FFE08A', .85 * p); glowAt(e.x, e.y - s * .38, s * .18, '#FFFFFF', .8 * p); }); }
+  if (e.giant === 'alpha') { if (S.t - (e.howlAt ?? -9) < .8) add(() => glowAt(e.x, e.y - s * .4, s * .9, c, .5));
+    if (e.shield) { g.save(); g.globalAlpha = .55 + .15 * Math.sin(T * 6); g.strokeStyle = c; g.lineWidth = 5; g.beginPath(); g.ellipse(e.x, e.y - s * .3, s * .5, s * .52, 0, 0, TAU); g.stroke();
+      g.globalAlpha = .12; g.fillStyle = c; g.fill(); g.globalAlpha = .35; g.lineWidth = 2; g.setLineDash([10, 10]); g.lineDashOffset = -T * 40;
+      for (const m of S.en) if (m.packOf === e && !m.dead && Math.hypot(m.x - e.x, m.y - e.y) < 380) { g.beginPath(); g.moveTo(e.x, e.y - s * .3); g.lineTo(m.x, m.y - m.size * .3); g.stroke(); }
+      g.setLineDash([]); g.restore(); } }
+  const w = 170; g.fillStyle = 'rgba(10,14,40,.7)'; g.beginPath(); g.roundRect(e.x - w / 2 - 3, top - 22, w + 6, 14, 7); g.fill();
+  g.fillStyle = c; g.beginPath(); g.roundRect(e.x - w / 2, top - 19, w * Math.max(0, e.hp / e.max), 8, 4); g.fill();
+}
+// the Colossus's blobs in the air and their red circles on the ground
+function drawGiantFx() {
+  for (const f of S.gfx || []) { if (f.done || f.t < 0) continue; const q = Math.min(1, f.t / f.wind); warnCircle(f.x, f.y, f.r, q);
+    const x = f.sx + (f.x - f.sx) * q, y = f.sy + (f.y - f.sy) * q - Math.sin(q * Math.PI) * 300, c = GROUND_RING[f.el];
+    add(() => glowAt(x, y, 70, c, .6)); g.fillStyle = c; g.strokeStyle = '#FFFFFF'; g.lineWidth = 4; g.beginPath(); g.arc(x, y, 20, 0, TAU); g.fill(); g.stroke(); }
+}
+
 /* ================= creature tricks ================= */
 // every attack winds up first, with a red circle or lane on the ground, so a watchful player can always step clear
 // A, after play: "the boss hits feel too inconsequential … makes it unnecessary to look for lives". A charge now takes about
 // a quarter of your health on Level 1 and a third by Level 5, so four or five hits end it and the arena hearts matter.
-const BOSS_SRC = new Set(['shove', 'spikes', 'stomp', 'charge', 'undertow', 'roots', 'mortar', 'drums', 'boulders', 'toll', 'blink']);
+const BOSS_SRC = new Set(['rammer', 'colossus', 'alpha', 'shove', 'spikes', 'stomp', 'charge', 'undertow', 'roots', 'mortar', 'drums', 'boulders', 'toll', 'blink']);
 const bossHit = () => [1.5, 1.7, 1.9, 2, 2.1][S.level - 1];   // the first bosses teach; the later ones punish
 const lvHit = () => S.level === 1 ? .8 : 1.1;              // level 1's creatures bite softer while you learn
 // tap to break out (playtest 1: "I want one way to create a big hole through the middle", and Abby kept tapping to see
@@ -4490,6 +4601,7 @@ function armourVs(el) { let m = auraGuard() * (1 - (S.gifts.rooted || 0) * .08) 
 const SHOT_HIT = { bubble:'#7FC4FF', thorn:'#7FCF4A', ember:'#FFB050', pebble:'#C8A060', blade:'#E6EEF4' };
 function hazard(k, x, y, r, life, dmg) { if (S.hz.length < 60) S.hz.push({ k, x, y, r, life, t:0, dmg, tick:0, rot:rnd(0, TAU) }); }
 function brain(e, P, d, dt, s) {
+  if (e.giant) return giantMove(e, P, d, dt, s);
   const K = e.K, a = e.act, ux = (P.x - e.x) / d, uy = (P.y - e.y) / d;
   if (a) {
     a.t += dt;
@@ -4984,7 +5096,10 @@ const LEVEL_DIFF = [0, 0, 1, 2, 3], diffOf = lv => DIFF[LEVEL_DIFF[lv - 1] ?? 0]
    temple's warmth holds it off, and that warmth is a circle round the temple that the Still pushes in on as the fight goes.
    Outside it the frost takes the Keeper: six seconds of ice creeping over them, then they freeze and fall. Step back into the
    warmth and the ice melts off. At the end the circle is the temple's own healing ring. */
-const STORM = { shrink:70, out:6 };
+// the frost bites instead of freezing you outright (A, 2026-10-06: "being outside in the 'storm' should cause health damage
+// (loosened in the beginning but getting slightly more detrimental up to a max of 30% of the health bar"): each heartbeat
+// outside takes 5% of the health bar while the storm is young, climbing to 30% as it closes to its smallest
+const STORM = { shrink:70, out:6, bite0:.05, bite1:.3 };
 // centred on the temple itself, never shrinking below a roomy arena round it (design review: the boss, the Keeper, the ring and
 // the seal must all fit; A, 2026-10-04: the arena must not feel congested)
 function stormStart(T) { const D = diffOf(S.level); S.storm = { x:T.x, y:T.y + 60, r0:D.storm, r:D.storm, min:D.min, t:0, out:0, beat:0, el:T.el }; }
@@ -4996,15 +5111,17 @@ function stormTick(dt) {
   if (S.arena) S.arena.r = St.r + 30;
   const P = S.p, outside = Math.hypot(P.x - St.x, P.y - St.y) > St.r;
   if (outside && !hsOn() && P.hp > 0) { St.out += dt;
-    // six heartbeats, one a second, one for each frost mark; at the sixth the Keeper freezes and falls
-    if ((St.beat -= dt) <= 0) { St.beat = 1; SFX.heartbeat(); }
-    if (St.out >= STORM.out) { St.out = 0; S.lastHit = { src:'still' }; P.hp = 0; SFX.freeze(); } }
+    // a heartbeat a second; each one bites, harder as the storm closes; the frost marks fill over six of them
+    St.out = Math.min(St.out, STORM.out);
+    if ((St.beat -= dt) <= 0) { St.beat = 1; SFX.heartbeat(); const k = Math.min(1, St.t / STORM.shrink), d = Math.hypot(P.x - St.x, P.y - St.y) || 1;
+      P.hp -= P.max * (STORM.bite0 + (STORM.bite1 - STORM.bite0) * k); P.hitAt = S.t; S.lastHit = { src:'still' }; S.shake = Math.max(S.shake, .15 + .25 * k);
+      keeperHit(P.x + (P.x - St.x) / d * 100, P.y + (P.y - St.y) / d * 100, 'water', k > .5); shards(P.x, P.y - 40, '#DDF1FF', 8, 220); if (P.hp <= 0) SFX.freeze(); } }
   else { St.out = Math.max(0, St.out - dt * 2.5); St.beat = 0; }
   // taught once, on the game's clock: after the boss has settled in, when the frost wall first comes into view or the Keeper
   // first steps out (design review, 2026-10-06), pointing at the wall itself
   const wallSeen = St.r - Math.hypot(P.x - St.x, P.y - St.y) < Math.hypot(VW, VH) / 2;
   if (!SEEN.has('_storm') && St.t > 8 && (wallSeen || St.out > 0) && !COACH.cur) { markSeen('_storm'); const a = Math.atan2(P.y - St.y, P.x - St.x), wx = St.x + Math.cos(a) * St.r, wy = St.y + Math.sin(a) * St.r;
-    coach('storm', 'Stay in the warm light!', 'The frost is closing in. Stay in the temple\'s warm light. Outside it, you freeze.', () => ({ sx:clamp((wx - camX) * Z, 40, W - 40), sy:clamp((wy - camY) * Z, 160, H - 140) })); }
+    coach('storm', 'Stay in the warm light!', 'The frost is closing in. Stay in the temple\'s warm light. Outside it, the frost hurts you, more and more as it closes in.', () => ({ sx:clamp((wx - camX) * Z, 40, W - 40), sy:clamp((wy - camY) * Z, 160, H - 140) })); }
 }
 const inRing = (T, x, y) => Math.hypot(x - T.cx, (y - T.cy) * 1.6) < HOLD.R;
 // a temple's own guardians fill it wherever they are freed; any other creature only when freed inside an open ring
@@ -5717,7 +5834,7 @@ function update(dt) {
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.004, dt); P.ry = (P.ry || 0) * Math.pow(.004, dt);
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); spikeTick(dt); finisherTick(); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
@@ -6326,6 +6443,7 @@ function draw() {
   if (S.bossFx) for (const f of S.bossFx) if (f.t >= 0) drawBossFx(f);
   // attack warnings: a red light fills up on the ground, then the attack lands
   for (const T of S.traps || []) if (!T.done) warnCircle(T.x, T.y, T.r, Math.min(1, T.t / T.wind));
+  drawGiantFx();
   if (S.level === 5) drawTempleWarn();
   for (const e of S.en) { const a = e.act; if (!a || a.ph !== 0 || e.dead) continue; const p = Math.min(1, a.t / a.wind);
     if (a.k === 'circle') warnCircle(a.x, a.y, a.r, p);
@@ -6376,6 +6494,7 @@ function draw() {
       // the name stays inside the safe part of the screen, clear of the top bar and the minimap (A's playthrough, 2026-10-05)
       const tx = clamp(e.x, cx + 74 / Z, cx + (W - 74) / Z); let ty = Math.max(y, cy + 178 / Z); if ((tx - cx) * Z > W - 160 && (ty - cy) * Z < 290) ty = cy + 290 / Z;
       g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, tx, ty); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, tx, ty); g.globalAlpha = 1; g.lineWidth = 1; });
+    if (e.giant) drawGiant(e);
     if (e.type === 'golem') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(e.x - 42, e.y - s * .62 - 14, 84, 10); g.fillStyle = EL[e.el]; g.fillRect(e.x - 40, e.y - s * .62 - 12, 80 * Math.max(0, e.hp / e.max), 6); }
   };
   for (const e of list) { towersTo(e.y + e.r * .5); drawCreature(e); }
@@ -8055,6 +8174,7 @@ const TIP_ART = { enemy:'tip-rings', bloom:'tip-bloom' };
 function tipArt(id) {
   if (id === 'move') return '<div class="dragdemo"><i></i></div>';
   if (id === 'firebar') return `<div class="fbdemo"><img src="${firebarPic()}" alt=""></div>`;
+  if (id.startsWith('giant_')) { const k = id.slice(6), e = S && S.en.find(q => q.giant === k), im = e && IMG[e.img]; return `<div class="fbdemo"><img src="${im ? im.src : 'art4/e-golem.png'}" alt=""></div>`; }
   if (id === 'storm') return `<div class="fbdemo"><img src="${stormPic()}" alt=""></div>`;
   if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic(S && S.out ? S.out.els[0] : 'wood')}" alt=""></div>`;
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-highest.png?v=8" alt=""></div>`;
@@ -8080,7 +8200,7 @@ function tipArt(id) {
   return `<div class="hsdemo"><img src="art4/logo-morqi.png?v=8" alt="" style="height:auto;width:70%"></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts' };
+const CARD_VO = { giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
@@ -8481,6 +8601,9 @@ function defeatTip() {
     toll:['Leave the bell\'s ring', 'When the big red ring appears, run out of it before the bell rings.'],
     blink:['It appears behind you', 'When it vanishes, keep moving: it slashes the spot where it lands.'],
     fan:['Blades fly in fans', 'Move sideways into a gap between the blades.'],
+    rammer:['Step aside from the Rammer', 'When the red lane shows, step out of it. Then hit its glowing back while it is stuck.'],
+    colossus:['Keep moving round the Colossus', 'Its blobs land on red circles. Keep moving, and hit it when its heart glows.'],
+    alpha:['Free the pack first', 'The Pack Alpha is shielded while its pack is near. Free them, then hit it.'],
     shove:['It pushes you off', 'Stay right on top of it and it blasts you back. Hit it from the edge of your reach.'],
     hug:['Keep your distance', "Your powers reach far. Circle it from outside its reach."] };
   if (B && BOSS[H.src]) return { img:src(B.img), t:BOSS[H.src][0], p:BOSS[H.src][1] };
@@ -8682,7 +8805,7 @@ function results(quiet) {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
