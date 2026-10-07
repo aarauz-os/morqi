@@ -2,7 +2,7 @@
 </head><body>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MorQi Level 1</title>
+<title>MorQi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Shippori+Mincho+B1:wght@700;800&display=swap">
@@ -743,7 +743,9 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #hud .sk img{left:-4px;top:-5px;width:30px;height:30px}
 #hud .sk.need{animation:skNeed 1.1s ease-in-out infinite}
 @keyframes skNeed{50%{box-shadow:0 0 0 2px var(--c),0 0 14px var(--c);transform:scale(1.12)}}
-#hud #bossWrap{margin:0 8px}
+#hud #bossWrap{margin:0 8px;background:rgba(12,16,44,.55);border-radius:15px;padding:4px 10px 7px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+/* the white chunk of health just lost drains away behind the bar (A, 2026-10-06: feel every hit land) */
+#bossBar{position:relative}#bossBar b{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:99px;background:rgba(255,255,255,.85);transition:width .5s ease-out .35s}#bossBar i{position:relative}
 #hud .bossname{font-size:13px;margin-bottom:4px;text-shadow:0 1px 6px rgba(0,0,0,.4)}
 #hud #bossBar{height:8px;background:rgba(12,16,44,.5);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
 #hud #bossBar i{background:linear-gradient(90deg,#FF9A7A,#E8553F)}
@@ -1119,8 +1121,9 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #ultName{display:none!important}
 /* ergonomics review, 2026-10-05. The companion strikes on its own, so its meter is a small ring in the top strip where
    the timer was; the timer and the freed count leave play (Victory shows both). The minimap steps aside in the boss
-   arena, where the boss bar would push it down over the fight */
-#ultBtn{top:9px!important;left:calc(50% - 37px);transform:scale(.6);transform-origin:50% 0;pointer-events:none;z-index:30}
+   arena, where the boss bar would push it down over the fight. It moves down with the strip by the phone's top inset (A's
+   iPhone recording, 2026-10-06: without it the ring floated alone above the strip) */
+#ultBtn{top:calc(9px + env(safe-area-inset-top, 0px))!important;left:calc(50% - 37px);transform:scale(.6);transform-origin:50% 0;pointer-events:none;z-index:30}
 #ultBtn em,#timePill,#freedPill{display:none!important}
 /* in the top bar the companion pulses inside its own slot (design review, 2026-10-05: the old pulse reset it to full size
    and covered the element dots) */
@@ -1379,7 +1382,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 </style>
 
 <div id="stage">
-  <canvas id="cv" aria-label="MorQi Level 1 gameplay"></canvas>
+  <canvas id="cv" aria-label="MorQi gameplay"></canvas>
 
   <div id="hud" hidden>
     <div class="top">
@@ -1392,14 +1395,14 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <div class="xp" id="xpBar"><i></i></div>
       </div>
       <div class="hrow"><span id="wavePill" role="status"></span><div id="stoneRow" aria-label="Qi Stones"></div></div>
-      <div id="bossWrap"><div class="bossname" id="bossName"></div><div id="bossBar"><i></i></div></div>
+      <div id="bossWrap"><div class="bossname" id="bossName"></div><div id="bossBar"><b></b><i></i></div></div>
     </div>
     <div class="skills" id="skills"></div>
     <div class="slottip" id="slotTip" hidden></div>
     <button id="ultBtn" aria-label="Companion ultimate"><span class="ur"></span><img id="ultImg" alt=""><em id="ultLv"></em><b id="ultName"></b></button>
     <button id="ascBtn" aria-label="Ascend: finish the boss" hidden><span class="asc-ring"></span><img src="art4/props/x-stone-fire.png?v=8" alt=""><img src="art4/props/x-stone-earth.png?v=8" alt=""><img src="art4/props/x-stone-metal.png?v=8" alt=""><img src="art4/props/x-stone-water.png?v=8" alt=""><img src="art4/props/x-stone-wood.png?v=8" alt=""><b>Ascend!</b></button>
     <button id="callBtn" aria-label="Star Call" hidden><span class="ur"></span><img id="callImg" alt=""><em id="callPips"></em></button>
-    <button id="mapBtn" aria-label="Shore map"><canvas id="mapCv"></canvas></button>
+    <button id="mapBtn" aria-label="Map"><canvas id="mapCv"></canvas></button>
     <div id="combo"><b id="comboN">×0</b><span>combo</span></div>
     <div id="cue"></div>
     <div id="joy"><i></i></div>
@@ -1849,7 +1852,7 @@ const KIND = {
 };
 Object.keys(KIND).forEach(k => { load('e-' + k, `art4/e-${k}.png?v=8`); if (!KIND[k].minion) load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=8`); });
 const lookSrc = p => p;   // the bold look is the only look now; kept so image paths have one place to change
-if (/[?&]towers=1/.test(location.search)) { ['wood', 'fire', 'earth', 'water'].forEach(el => load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`)); ['wood', 'fire'].forEach(r => load('sf-' + r, `art4/story/story-frost-${r}.jpg?v=8`)); }
+if (!/[?&]towers=0/.test(location.search)) { ['wood', 'fire', 'earth', 'water'].forEach(el => { load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`); load('x-temple-' + el + '-alive', `art4/props/x-temple-${el}-alive.png?v=1`); }); ['wood', 'fire'].forEach(r => load('sf-' + r, `art4/story/story-frost-${r}.jpg?v=8`)); }
 ['x-stone-wood','x-stone-fire','x-stone-earth','x-stone-metal','x-stone-water','x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water','x-tower-metal'].forEach(n => load(n, `art4/props/${n}.png?v=8`));
 const texF = load('tf', 'art4/t-frozen.jpg?v=8'), texM = load('tm', 'art4/t-meadow.jpg?v=8');
 // the metal shore is a city (Demaris, playtest one: "the metal place … just city … industrial"): frosted silver streets that warm into lit, mossy ones
@@ -1928,6 +1931,7 @@ const AU = (() => {
     bloop() { if (!gate('bloop', 80)) return; tone({ f:300, f1:780, dur:.12, vol:.1 }); },
     whip() { if (!gate('whip', 90)) return; noise({ ft:'highpass', f:2400, dur:.08, vol:.22, att:.001 }); tone({ f:1800, f1:400, type:'square', dur:.03, vol:.05 }); },
     thwip() { if (!gate('thwip', 55)) return; noise({ ft:'bandpass', f:2500, f1:6000, q:2, dur:.07, vol:.1 }); },
+    bhit(strong) { if (!gate('bhit', 90)) return; tone({ f:strong ? 260 : 210, f1:60, dur:.11, vol:strong ? .3 : .22 }); noise({ ft:'bandpass', f:strong ? 2400 : 1700, f1:600, dur:.06, vol:strong ? .24 : .16 }); },
     thud(big) { if (!gate('thud', 60)) return; tone({ f:big ? 120 : 160, f1:40, dur:big ? .4 : .22, vol:big ? .5 : .28 }); noise({ f:500, f1:120, dur:big ? .3 : .14, vol:big ? .3 : .16 }); },
     bell(big) { if (!gate('bell', 120)) return; const b = big ? 330 : 520;
       [[1, 1.6, .16], [2.76, .9, .07], [5.4, .5, .045], [8.93, .3, .03]].forEach(([r, d, v]) => tone({ f:b * r, dur:d * (big ? 1.6 : 1), vol:v * (big ? 1.6 : 1), att:.002 })); },
@@ -2032,7 +2036,7 @@ const AU = (() => {
   }
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
-    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=17`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
+    for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=18`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
   const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm'].map(k => 'vo-card-' + k), 'vo-given-tide', 'vo-given-root', 'vo-given-ember', 'vo-given-bell', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
@@ -2086,15 +2090,22 @@ const AU = (() => {
      is enraged the Warden theme switches up too. Low health muffles the music under the heartbeat. */
   const SIX = 60 / 144 / 4;  // one sixteenth; the groove is half-time, so it feels like 72
   const M = { timer:null, next:0, step:0, song:'path', tier:0, want:0, threat:0, hold:0, sw:-1, low:false, built:false, world:null, rest:0 };
-  let mBus, mLow, padF, rev, dly, drv;
+  let mBus, mLow, padF, rev, dly, drv, pump = null;
+  let irBuf;
   function mBuild() {
     if (M.built) return; M.built = true;
     mLow = c.createBiquadFilter(); mLow.type = 'lowpass'; mLow.frequency.value = 18000; mLow.connect(mus);
-    mBus = c.createGain(); mBus.connect(mLow);
+    const L = c.sampleRate * 2.6 | 0; irBuf = c.createBuffer(2, L, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const d = irBuf.getChannelData(ch); for (let i = 0; i < L; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / L, 3.4); }
+    deck();
+  }
+  // a deck: the song's own bus, pad filter, room, echo and drive. An event theme gets a fresh deck, so the level song
+  // fades out on its own with its reverb tail and never plays under the theme (A, 2026-10-06: "transitioning music ... so
+  // they're not fighting for space")
+  function deck() {
+    mBus = c.createGain(); mBus.connect(mLow); pump = null;
     padF = c.createBiquadFilter(); padF.type = 'lowpass'; padF.frequency.value = 900; padF.Q.value = 1; padF.connect(mBus);
-    rev = c.createConvolver(); const L = c.sampleRate * 2.6 | 0, ir = c.createBuffer(2, L, c.sampleRate);
-    for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < L; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / L, 3.4); }
-    rev.buffer = ir; const rg = c.createGain(); rg.gain.value = .55; rev.connect(rg).connect(mBus);
+    rev = c.createConvolver(); rev.buffer = irBuf; const rg = c.createGain(); rg.gain.value = .55; rev.connect(rg).connect(mBus);
     dly = c.createDelay(1); dly.delayTime.value = SIX * 3; const fb = c.createGain(), df = c.createBiquadFilter(); fb.gain.value = .36; df.type = 'lowpass'; df.frequency.value = 2400;
     dly.connect(df).connect(fb).connect(dly); const dg = c.createGain(); dg.gain.value = .5; df.connect(dg).connect(mBus);
     drv = c.createWaveShaper(); const cv = new Float32Array(1024); for (let i = 0; i < 1024; i++) cv[i] = Math.tanh((i / 511.5 - 1) * 3.2); drv.curve = cv;
@@ -2615,7 +2626,6 @@ const AU = (() => {
     hook:[[[0, 440], [3, 440], [6, 523.25], [8, 493.88], [10, 440], [12, 392], [20, 587.33], [22, 587.33], [24, 523.25], [27, 440]],
           [[0, 440], [3, 440], [6, 523.25], [8, 493.88], [10, 440], [12, 392], [20, 523.25], [22, 493.88], [24, 440], [27, 392], [30, 329.63]]],
     surp:[116.54, 146.83, 174.61, 220] };
-  let pump = null;
   const pumpDuck = t => { pump.gain.cancelScheduledValues(t); pump.gain.setValueAtTime(.25, t); pump.gain.linearRampToValueAtTime(1, t + H6 * 3.4); };
   // warm chords, three detuned saws spread across the stereo field, breathing with the kick
   const chords = (t, notes, dur, v) => { for (const f of notes) for (const [d, pn] of [[-10, -.6], [0, 0], [10, .6]]) mv({ t, f, det:d, type:'sawtooth', dur, vol:v, att:.04, hold:Math.max(.01, dur - .4), to:pump, pan:pn }); };
@@ -2738,9 +2748,22 @@ const AU = (() => {
       if (musOn) { mv({ t, f:110, f1:26, gl1:1.8, dur:2.2, vol:.5, to:mLow }); mn({ t, f:5000, f1:300, dur:1.6, vol:.08, to:mLow }); crash(t, .1); }
     } else { mBus.gain.setValueAtTime(1, t); filt(900, t); }
   }
-  // 'path' or 'lantern' start a level calm, at once; 'boss' waits for the next bar with a riser, so it lands on the beat
+  // 'path' or 'lantern' start a level calm, at once; 'boss' waits for the next bar with a riser, so it lands on the beat.
+  // An event theme (the Ascended anthem, the Element Bloom, a Surge) never starts on top of the level song: the old deck
+  // chokes in a tenth of a second, a riser fills half a second of air, and the theme's first hit lands on a fresh deck,
+  // with the camera's hitstop. Leaving a theme, it fades out over a beat while the next song comes up from under it.
+  const EVENT = { highest:1, omni:1, blossom:1 };
+  function swap(name, tier, into) {
+    const t = c.currentTime, old = mBus, out = into ? .1 : SIX * 6, gap = into ? SIX * 5 : SIX * 2;
+    old.gain.cancelScheduledValues(t); old.gain.setValueAtTime(old.gain.value, t); old.gain.linearRampToValueAtTime(0, t + out);
+    setTimeout(() => { try { old.disconnect(); } catch (e) {} }, (out + 3) * 1000);
+    if (into && musOn) { riser(t, gap, .08); mv({ t:t + gap * .3, f:55, f0:90, gl:gap * .6, dur:gap * .75, vol:.16, att:gap * .5, to:mLow }); }
+    deck(); M.pend = null; const t1 = t + gap; startSong(name, t1); M.tier = M.want = tier; if (tier) filt(2600, t1); M.next = t1;
+    if (name !== 'boss') { mBus.gain.cancelScheduledValues(t); mBus.gain.setValueAtTime(0, t); mBus.gain.setValueAtTime(0, t1 - .01); mBus.gain.linearRampToValueAtTime(1, t1 + (into ? .02 : SIX * 8)); }
+  }
   function song(name, tier = 0) {
     if (name === M.song && name !== 'boss' && c && M.built && M.timer) { M.want = tier; M.threat = 0; M.world = null; M.rest = 0; return; }   // already playing: keep the groove, let it settle
+    if (c && M.built && M.timer && (EVENT[name] || EVENT[M.song])) return swap(name, tier, !!EVENT[name]);
     if (name === 'boss' && c && M.built && M.timer) {
       const left = (16 - (M.step & 15)) % 16 * SIX; M.pend = 'boss';
       if (musOn && left > .2) { riser(c.currentTime, left, .1); breath(c.currentTime + Math.max(0, left - SIX * 2), SIX * 2); }
@@ -3275,7 +3298,7 @@ function hurt(e, dmg, el, o = {}) {
   m *= k;
   // the words teach, so they show the first few times in a run; after that the coloured hit says it
   if (strong && S.level < 3 && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
-  if (weak && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
+  if (weak && S.level < 3 && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
   const dealt = dmg * m;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
@@ -3286,6 +3309,16 @@ function hurt(e, dmg, el, o = {}) {
     if (o.kb && o.kb > 40) { e.kx = (e.x - (o.fx ?? P.x)) / d * o.kb; e.ky = (e.y - (o.fy ?? P.y)) / d * o.kb; e.kb = .16; }
     else { e.x += (e.x - P.x) / d * k; e.y += (e.y - P.y) / d * k; }
   }
+  // a boss feels every hit (A, 2026-10-06: "i would also like it if we can see the boss react to our attacks ... right now it
+  // feel like we dont know or feel if our attacks are landing"): it rocks back from you, sparks fly off where you struck in
+  // your element's colour, an impact cracks, and every 8% of its health it staggers with a freeze-frame and a shockwave
+  if (e.boss) { const P = S.p, dd = Math.hypot(e.x - P.x, e.y - P.y) || 1, c = GROUND_RING[el] || '#FFFFFF'; e.hitEl = el; e.rdx = (e.x - P.x) / dd; e.rdy = (e.y - P.y) / dd;
+    if ((e.flashCd || 0) <= S.t) { e.flashCd = S.t + .2; e.pulseAt = S.t; }   // a pulse of light, never a strobe that bleaches it
+    if ((e.thkCd || 0) <= S.t) { e.thkCd = S.t + .09; SFX.bhit(strong);
+      for (let i = 0; i < (strong ? 8 : 5); i++) fx({ k:'spark', x:e.x - e.rdx * e.r * .7 + rnd(-16, 16), y:e.y - e.size * .3 - e.rdy * e.r * .4 + rnd(-16, 16), vx:-e.rdx * rnd(90, 280) + rnd(-140, 140), vy:-e.rdy * rnd(90, 280) - rnd(40, 180), drag:4, life:rnd(.25, .42), s:rnd(3, 6), c:i % 2 ? '#FFFFFF' : c }); }
+    e.stag = (e.stag || 0) + dealt;
+    if (e.stag >= e.max * .08 && e.hp - dealt > 0) { e.stag = 0; e.stagAt = S.t; S.hitstop = Math.max(S.hitstop || 0, .07); S.shake = Math.max(S.shake, .32);
+      ring(e.x, e.y - e.size * .3, 20, e.size * .95, c, .45, 14, true); stars(e.x, e.y - e.size * .4, 16, '#FFFFFF', 400); SFX.thud(true); } }
   // damage numbers only on the Warden, where they show the fight going your way
   if (e.boss && S.nums.length < 28 && (e.numCd || 0) <= S.t) { e.numCd = S.t + .45; S.nums.push({ x:e.x + rnd(-10, 10), y:e.y - e.size * .55, v:Math.round(dealt), t:0, strong, weak }); }
   if (o.spark !== false && (e.sparkCd || 0) <= S.t) { e.sparkCd = S.t + .1; fx({ k:'hit', x:e.x + rnd(-6, 6), y:e.y - e.size * .3, life:.16, s:e.r * 1.6, c:EL[el], rot:rnd(0, TAU) }); }
@@ -3303,7 +3336,7 @@ function kill(e) {
     const n = S.burst.length, tier = n >= 100 ? 3 : n >= 50 ? 2 : n >= 25 ? 1 : 0;
     if (n < 10) S.burstTier = 0;
     if (tier > (S.burstTier || 0) && !hsOn()) { S.burstTier = tier; floatText(S.p.x, S.p.y - 120, ['', 'Great!', 'Amazing!', 'Unstoppable!'][tier], '#FFE14A', 30); stars(S.p.x, S.p.y - 60, 16 + tier * 8, '#FFE58A', 360); SFX.combo(tier * 3); }
-    if (Math.random() < (e.type === 'golem' ? 1 / 3 : .003)) S.items.push({ x:e.x, y:e.y, kind:'heart', t:0, z:10, vz:240 }); }
+    if (Math.random() < (e.type === 'golem' ? 1 / 3 : S.out && e.from ? HOLD.heart : .003)) S.items.push({ x:e.x, y:e.y, kind:'heart', t:0, z:10, vz:240 }); }
   const col = EL[e.el];
   if (!e.boss) {
     shards(e.x, e.y - e.size * .25, col, e.type === 'golem' ? 16 : FX.length > 900 ? 3 : 7, e.type === 'golem' ? 320 : 220);
@@ -3382,6 +3415,8 @@ function crates(dt) {
     if (it.kind === 'stone' && it.t > 8 && !it.told) { it.told = true; luma('vo-wait-' + (Math.random() < .5 ? 1 : 2)); }
     if (it.kind === 'stone' && it.t > (it.tower ? 40 : 20)) { if (!it.flying) { it.flying = true; SFX.sweep(); ring(it.x, it.y, 10, 120, EL[it.el], .4, 10, true); } const d = Math.hypot(P.x - it.x, P.y - it.y) || 1, v = Math.min(1400, 700 + (it.t - (it.tower ? 40 : 20)) * 1400) * dt;
       it.x += (P.x - it.x) / d * Math.min(d, v); it.y += (P.y - it.y) / d * Math.min(d, v); if (Math.random() < .6) fx({ k:'glow', x:it.x, y:it.y - 20, s:40, s1:6, c:EL[it.el], life:.35 }); }
+    // the evolved Lodestone pulls hearts as well as gems (A, 2026-10-06: "the lodestone can evolve into a heart and gem stone magnet")
+    if (S.lode >= 3 && (it.kind === 'heart' || it.kind === 'dumpling') && !it.vz) { const d = Math.hypot(P.x - it.x, P.y - it.y) || 1; if (d < LODE.r[3] || it.pull) { it.pull = true; it.sp = Math.min(1100, (it.sp || 220) + 1400 * dt); it.x += (P.x - it.x) / d * Math.min(d, it.sp * dt); it.y += (P.y - it.y) / d * Math.min(d, it.sp * dt); if (Math.random() < .4) fx({ k:'glow', x:it.x, y:it.y - 18, s:30, s1:6, c:'#FF7BA9', life:.3 }); } }
     // the reach covers the item as drawn (it floats above its spot), not only its spot on the ground (A, 2026-10-05)
     if (Math.hypot(it.x - P.x, it.y - 18 - P.y) < 84) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
@@ -4293,6 +4328,12 @@ function bossFight(b, ph, dt) {
       if (Math.hypot(b.x - A.x, b.y - A.y) > A.r - 70 || a.t >= a.dur) { b.act = null; S.shake = Math.max(S.shake, .35); debris(b.x, b.y + 40, 10, 300); SFX.thud(true); } }
     return; }
   b.atk -= dt; b.summon -= dt;
+  // crowd it and it pushes you off (A, 2026-10-06: "to push us off him he either throws energy attacks or spears or energy
+  // balls or fire balls or minions"): stay close for about a second and it rears up over a red ring, then blasts you back
+  // and sprays its own shots (orbs, thorn spears, fireballs, stones, blades) all round it
+  const near = Math.hypot(P.x - b.x, P.y - b.y); b.close = near < 290 ? (b.close || 0) + dt : Math.max(0, (b.close || 0) - dt * 2); b.shoveCd = (b.shoveCd ?? 0) - dt;
+  if (b.close > (enraged ? .7 : 1) && b.shoveCd <= 0 && !b.spiral && !b.fan && !b.blink && !S.bossFx.some(f => f.k === 'quake' && !f.done)) {
+    b.shoveCd = enraged ? 3 : 4; b.close = 0; b.atk = Math.max(b.atk, 1.3); S.bossFx.push({ k:'quake', shove:1, x:b.x, y:b.y, r:280, t:0, wind:enraged ? .5 : .65 }); SFX.bx(B.snd.charge, 1, 200); }
   // its living presence: mist off the Lantern, leaves off the Tyrant, embers off the Drummer, dust off the Matron, glints off the Sentinel
   if ((b.wispT = (b.wispT || 0) - dt) <= 0) { b.wispT = el === 'fire' ? .08 : .06;
     if (el === 'fire') flames(b.x + rnd(-60, 60), b.y + rnd(-30, 30), 1, 10, 26, 160);
@@ -4377,8 +4418,8 @@ function bossFxTick(b, B, f, ph, dt) {
   else { b.slamAt = S.t; ring(f.x, f.y, 20, f.r * 1.15, B.glow, .5, 16, true); SFX.stomp(); SFX.bx(B.snd.slam, 1, 200); S.shake = Math.max(S.shake, .45);
     if (el === 'water') drops(f.x, f.y, 26, 460); else if (el === 'wood') leaves(f.x, f.y, 18, 380); else if (el === 'fire') flames(f.x, f.y, 14, f.r * .6, 40); else if (el === 'metal') stars(f.x, f.y, 20, '#FFFFFF', 420);
     debris(f.x, f.y, el === 'earth' ? 26 : 12, 360);
-    if (inside && ouch(28, f.x, f.y, { push:110, el, src:'stomp' })) S.hitstop = .09;
-    const n = 10 + ph * 4; for (let i = 0; i < n; i++) { const an = i / n * TAU; S.eshots.push({ k:B.shot, x:b.x, y:b.y, vx:Math.cos(an) * 230, vy:Math.sin(an) * 230, life:2.6, rot:an, el, boss:1 }); } }
+    if (inside && ouch(f.shove ? 18 : 28, f.x, f.y, { push:f.shove ? 320 : 110, el, src:f.shove ? 'shove' : 'stomp', shake:f.shove ? .4 : .12 })) S.hitstop = .09;
+    const n = (f.shove ? 9 : 10) + ph * (f.shove ? 3 : 4), v = f.shove ? 320 : 230; for (let i = 0; i < n; i++) { const an = i / n * TAU + (f.shove ? rnd(0, .3) : 0); S.eshots.push({ k:B.shot, x:b.x, y:b.y - (f.shove ? 50 : 0), vx:Math.cos(an) * v, vy:Math.sin(an) * v, life:2.6, rot:an, el, boss:1 }); } }
 }
 // a ground strike, dressed in its boss's element
 function landSpike(b, B, f) {
@@ -4395,7 +4436,7 @@ function landSpike(b, B, f) {
 // every attack winds up first, with a red circle or lane on the ground, so a watchful player can always step clear
 // A, after play: "the boss hits feel too inconsequential … makes it unnecessary to look for lives". A charge now takes about
 // a quarter of your health on Level 1 and a third by Level 5, so four or five hits end it and the arena hearts matter.
-const BOSS_SRC = new Set(['spikes', 'stomp', 'charge', 'undertow', 'roots', 'mortar', 'drums', 'boulders', 'toll', 'blink']);
+const BOSS_SRC = new Set(['shove', 'spikes', 'stomp', 'charge', 'undertow', 'roots', 'mortar', 'drums', 'boulders', 'toll', 'blink']);
 const bossHit = () => [1.5, 1.7, 1.9, 2, 2.1][S.level - 1];   // the first bosses teach; the later ones punish
 const lvHit = () => S.level === 1 ? .8 : 1.1;              // level 1's creatures bite softer while you learn
 // tap to break out (playtest 1: "I want one way to create a big hole through the middle", and Abby kept tapping to see
@@ -4419,12 +4460,22 @@ function breakOut() {
   S.shake = Math.max(S.shake, .25); S.hitstop = Math.max(S.hitstop || 0, .04); SFX.whip(); SFX.boom(false);
   return true;
 }
+// the Keeper reacts to every hit from where it came (A, 2026-10-06: "even i should react to being hit by anything from the
+// direction the energetic or physical push came from"): the body snaps back, the top lagging, sparks in the attacker's colour
+// burst on the side that was hit, and a big push is a slide with dust at the feet, never a jump
+function keeperHit(sx, sy, el, heavy, slid) {
+  const P = S.p, d = Math.hypot(P.x - sx, P.y - sy) || 1, ux = (P.x - sx) / d, uy = (P.y - sy) / d, m = heavy ? 32 : 20, c = (el && GROUND_RING[el]) || '#FFFFFF';
+  P.hdx = ux; P.hdy = uy; P.hitHeavy = !!heavy; P.rx = ux * m - (slid ? slid.x : 0); P.ry = uy * m * .7 - (slid ? slid.y : 0);
+  for (let i = 0; i < (heavy ? 10 : 6); i++) fx({ k:'spark', x:P.x - ux * 22 + rnd(-8, 8), y:P.y - 40 - uy * 16 + rnd(-8, 8), vx:-ux * rnd(60, 220) + rnd(-110, 110), vy:-uy * rnd(60, 220) - rnd(30, 140), drag:4, life:rnd(.22, .38), s:rnd(3, 5), c:i % 3 ? c : '#FFFFFF' });
+  if (heavy || slid) smoke(P.x, P.y + 26, slid ? 6 : 3, 24, '210,200,180');
+}
 function ouch(dmg, fx, fy, o = {}) {
   const P = S.p; if (P.hurt > 0 || P.safe > 0 || S.bloom || hsOn()) return false;
   const hit = dmg * armourVs(o.el) * (BOSS_SRC.has(o.src) ? bossHit() : lvHit());
-  P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1; P.rx = (P.x - fx) / d * 14; P.ry = (P.y - fy) / d * 14;
+  P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1, x0 = P.x, y0 = P.y;
   if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30);
     if (S.arena) { const A = S.arena, q = Math.hypot(P.x - A.x, P.y - A.y), lim = (S.storm ? S.storm.r0 + 400 : A.r) - 34; if (q > lim) { P.x = A.x + (P.x - A.x) / q * lim; P.y = A.y + (P.y - A.y) / q * lim; } } }
+  keeperHit(fx, fy, o.el, (o.push || 0) >= 100 || o.shake > .3, o.push ? { x:P.x - x0, y:P.y - y0 } : null);
   if (o.slow) P.slowT = Math.max(P.slowT || 0, o.slow);
   P.hp -= hit; S.shake = Math.max(S.shake, o.shake || .12); S.pet.hitAt = S.t; S.lastHit = { src:o.src || 'trap', el:o.el, kid:o.kid };
   SFX.hurt();
@@ -4664,7 +4715,7 @@ function hsStart(final, tier = 5, finisher = false) {
   // never in how long they last (A, 2026-10-06: "ascended feels shorter to use when it's supposed to be 15s each time")
   H.on = { t:0, final, tier:ti + 1, finisher, life:15, q0:0, fired:-1, warn:-1, waves:[], nodeT:[], lit:0, born:performance.now(), horde:300, gx:P.x, gy:P.y - 150 };
   S.capBoost = H.on.horde + 20;   // ten times the usual crowd comes for the first two seconds (A, 2026-10-05)
-  S.eshots = []; S.flashT = .12; S.flashC = '255,224,160'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); H.on.q0 = beatPos();   // Omni (all five elements) keeps the approved anthem; the `omni` song is the Elemental forms' theme (A, 2026-10-06)
+  S.eshots = []; S.flashT = .12; S.flashC = '255,224,160'; S.shake = .6; AU.bloom(true); AU.song('highest', 2); H.on.q0 = Math.max(0, beatPos());   // the anthem starts half a beat from now, on a clean deck   // Omni (all five elements) keeps the approved anthem; the `omni` song is the Elemental forms' theme (A, 2026-10-06)
   // the world stops for half a second while the camera pushes in on the anthem's first hit
   S.hitstop = .55; S.hsZoom = performance.now(); SFX.power(); SFX.jackpot(true); SFX.genie(true); SFX.tier(H.on.tier); AU.vo('vo-ascended', .35, .8);
   ring(P.x, P.y, 20, 900, '#FFE6A3', 1, 26, true);
@@ -4882,7 +4933,8 @@ function spikeTick(dt) {
 }
 /* Hold the temple (A, 2026-10-06, Option A, after playing the first tower prototype: "nothing visually is telling me my
    progress on freeing a certain amount of elementals and i feel like if im freeing them i must stand near their towers";
-   "option A for sure!"). Behind ?towers=1 while A tries it, following the agreed rollout: Level 2 has one temple, Level 3
+   "option A for sure!"). On by default since 2026-10-06 (A played the shared link and the towers were missing: the link
+   cannot carry ?towers=1); ?towers=0 brings back the old free-roam levels. The agreed rollout: Level 2 has one temple, Level 3
    three (the Level 3–4 version, with the tubes and the boss at the hearth). Each temple has a ring on the ground before
    its door:
    - standing in the ring wakes the temple: its guardians come back in from the realm round it to drive the Keeper out
@@ -4894,21 +4946,29 @@ function spikeTick(dt) {
      its freed down the glass tubes to fill the next temple's ring;
    - all taken: Ascended, then the boss rises at the hearth in the middle and every temple fires on it.
    An arrow at the screen's edge shows each temple off screen, its ring filling round it (design review, 2026-10-06). */
-const towersOn = () => /[?&]towers=1/.test(location.search);
+const towersOn = () => !/[?&]towers=0/.test(location.search);
 const towersLevel = lv => towersOn() && (lv === 2 || lv === 3);
-const HOLD = { need:215, R:230, front:180, wake:.7, pack:2, cap:32, heal:.02, fire:.8, bossFire:1.5, reach:650, dmg:(lv) => 16 + 4 * lv, ally:12, squad:5, help:1.2 };
+// the ring is a place to stand your ground (A, 2026-10-06: "the circles are kind of small for the 'tower defense' part maybe we
+// give each tower a considerable amount of buff so it allows breathing room for the player to stand their ground and defend
+// their space"): a wide ring of warm ground where creatures wade, and a temple that breathes them back out to its edge
+// ...but never a place to rest (A, 2026-10-06: "i dont want it to be too easy ... enough that i should be looking for those
+// hearts ... feel the challenge but not ever lose the fun"): the guardians come three at a time, more of them wolves; a waking
+// temple's breath only pushes; a taken temple heals slowly and stops healing when the boss rises, so the arena's hearts matter
+const HOLD = { need:215, R:290, front:220, wake:.7, pack:3, cap:44, wolf:.4, heal:.02, fire:.5, bossFire:1.2, reach:800, dmg:(lv) => 22 + 5 * lv, ally:12, squad:5, help:1.2,
+  wade:.25, pulse:5, heldPulse:2.5, wakeHit:.15, heart:.006,
+  gHp:{ 2:1.7, 3:1.15 }, gRush:{ 2:1.3, 3:1.15 } };   // Level 2's guardians were freed before they ever reached you (bot, 2026-10-06)
 const HOLD_ELS = { 2:['wood'], 3:['wood', 'fire', 'earth'] };
 function makeOutposts(lv) {
   // the hearth in the middle (where the Keeper starts and the boss rises); the first temple stands north, its ring in view
   const els = HOLD_ELS[lv] || HOLD_ELS[3], hub = { hub:true, x:1800, y:els.length === 1 ? 1880 : 1800 };
   // (design review, 2026-10-06: Level 2's one temple sits close, so its ring is a home base inside the boss arena; Level 3's
   // three sit far enough that their rings stay clear of it)
-  const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / els.length, d = els.length === 1 ? 420 : 950, x = Math.round(hub.x + Math.cos(a) * d), y = Math.round(hub.y + Math.sin(a) * d);
-    return { el, x, y, h:340, rx:128, ry:54, cx:x, cy:y + HOLD.front, fill:0, held:false, cd:0, wake:0, souls:[], fireCd:0, allyCd:4, flare:0 }; });
+  const towers = els.map((el, i) => { const a = -Math.PI / 2 + i * TAU / els.length, d = els.length === 1 ? 520 : 950, x = Math.round(hub.x + Math.cos(a) * d), y = Math.round(hub.y + Math.sin(a) * d);
+    return { el, x, y, h:340, rx:128, ry:54, cx:x, cy:y + HOLD.front, fill:0, held:false, cd:0, wake:0, souls:[], fireCd:0, allyCd:4, flare:0, pulseCd:2 }; });
   els.forEach(el => IMG['x-temple-' + el] || load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`));
   // one temple on its own takes longer, so Level 2 is as long as a level should be
   // the Keeper starts in the middle of the first temple's ring, so the whole temple stands on screen under the HUD
-  return { hub, towers, els, need:els.length === 1 ? 430 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy } };
+  return { hub, towers, els, need:els.length === 1 ? 500 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy } };
 }
 const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? S.out.towers : [];
 /* Difficulty (A, 2026-10-06: "the 'play' button to start the run should be color coded by how difficult it is"): four
@@ -4972,8 +5032,8 @@ function captureOutpost(T) {
 function outpostTick(dt) {
   const O = S.out, P = S.p;
   // the first time: a card shows the ring, and Luma explains it
-  if (!O.taught && S.t > 3) { O.taught = true; const T0 = O.towers.slice().sort((p, q) => Math.hypot(p.cx - P.x, p.cy - P.y) - Math.hypot(q.cx - P.x, q.cy - P.y))[0];
-    coach('outposts', 'Wake the temple!', 'Stand in the temple\'s ring and free its creatures. Fill the ring and the temple is yours, and it fights for you.', () => ({ sx:(T0.cx - camX) * Z, sy:(T0.cy - camY) * Z })); }
+  if (!O.taught && S.t > 3) { O.taught = true; if (!SEEN.has('_outposts')) { markSeen('_outposts'); const T0 = O.towers.slice().sort((p, q) => Math.hypot(p.cx - P.x, p.cy - P.y) - Math.hypot(q.cx - P.x, q.cy - P.y))[0];
+    coach('outposts', 'Wake the temple!', 'Stand in the temple\'s ring and free its creatures. Fill the ring and the temple is yours, and it fights for you.', () => ({ sx:(T0.cx - camX) * Z, sy:(T0.cy - camY) * Z })); } }
   if (O.ascAt && S.t >= O.ascAt) { O.ascAt = 0; if (!S.hs.used) hsStart(true); }
   // every temple awake: the thaw sweeps the whole realm from the seal outward, and the land comes fully alive
   if (O.towers.every(t => t.held)) { if (O.wonderR == null) O.wonderR = 200; if (O.wonderR < 2900) { O.wonderR += dt * 900; if ((O.wPaint = (O.wPaint || 0) - dt) <= 0) { O.wPaint = .08; paintThaw(O.hub.x, O.hub.y, O.wonderR); } } }
@@ -4982,13 +5042,21 @@ function outpostTick(dt) {
     fx({ k:'star', x, y, vx:rnd(-20, 20), vy:rnd(-30, -8), drag:.1, life:rnd(1.6, 2.8), s:rnd(6, 11), c:['#FFF3A0', '#C8FF9A', '#FFC8E8', '#A8E8FF'][(Math.random() * 4) | 0] }); }
   const open = O.towers.filter(t => !t.held), fight = !S.bossSpawned && !S.over;
   for (const T of O.towers) {
+    // the ring the Keeper stands in is warm ground: creatures wade through it, and the temple breathes them back out to its
+    // edge (a waking temple every 4 s, a taken one every 2.5 s and harder). The boss is never pushed
+    if (fight && P.hp > 0 && inRing(T, P.x, P.y)) {
+      for (const e of S.en) if (!e.dead && !e.boss && inRing(T, e.x, e.y)) e.slow = Math.max(e.slow || 0, HOLD.wade);
+      if ((T.pulseCd -= dt) <= 0) { T.pulseCd = T.held ? HOLD.heldPulse : HOLD.pulse; const k = T.held ? 1 : HOLD.wakeHit;
+        for (const e of S.en) if (!e.dead && !e.boss && Math.hypot(e.x - T.cx, (e.y - T.cy) * 1.6) < HOLD.R * 1.05) hurt(e, HOLD.dmg(S.lv) * k, T.el, { kb:T.held ? 520 : 380, fx:T.cx, fy:T.cy });
+        fx({ k:'ring', x:T.cx, y:T.cy, r0:30, r1:HOLD.R * 1.05, c:GROUND_RING[T.el], life:T.held ? .7 : .45, w:T.held ? 12 : 8, add:true, sy:1.6 }); T.flare = Math.max(T.flare, k); }
+    } else T.pulseCd = Math.min(T.pulseCd, 1);
     // the light of each creature freed in the ring flies into the temple
     for (const s of T.souls) { s.t += dt; if (s.t >= .7 && !s.home) { s.home = true; T.flare = 1; } } T.souls = T.souls.filter(s => s.t < .7); T.flare = Math.max(0, T.flare - dt * 3);
     if (!T.held) {
       // standing in the ring wakes the temple: its own element pours out of its door at the Keeper
       const inside = fight && inRing(T, P.x, P.y); T.wake = Math.max(0, Math.min(1, T.wake + (inside ? dt * 2 : -dt)));
       if (inside && !hsOn() && (T.cd -= dt) <= 0) { T.cd = HOLD.wake;
-        for (let i = 0; i < HOLD.pack; i++) if (S.en.filter(e => !e.dead && e.from === T).length < HOLD.cap) { const away = Math.atan2(P.y - T.y, P.x - T.x), a = away + rnd(-1, 1), d = Math.hypot(VW, VH) / 2 + 60; const e = spawn(Math.random() < .25 ? 'wolf' : 'critter', { x:P.x + Math.cos(a) * d, y:P.y + Math.sin(a) * d }, 1.15, T.el); if (e) e.from = T; } }
+        for (let i = 0; i < HOLD.pack; i++) if (S.en.filter(e => !e.dead && e.from === T).length < HOLD.cap) { const away = Math.atan2(P.y - T.y, P.x - T.x), a = away + rnd(-1, 1), d = Math.hypot(VW, VH) / 2 + 60; const e = spawn(Math.random() < HOLD.wolf ? 'wolf' : 'critter', { x:P.x + Math.cos(a) * d, y:P.y + Math.sin(a) * d }, HOLD.gRush[S.level] || 1.15, T.el); if (e) { e.from = T; e.hp = e.max = e.max * (HOLD.gHp[S.level] || 1); } } }
       continue; }
     // its part of the realm thaws in a wave rolling out from it, and comes alive (A, 2026-10-06: "each tower activated clears
     // up their section of the frost and getting all of them will clear all the frost ... alive ... like Super Mario Wonder")
@@ -5000,7 +5068,7 @@ function outpostTick(dt) {
     // alive again: its element's light drifts up off it
     if (Math.random() < dt * 5) fx({ k:'star', x:T.x + rnd(-110, 110), y:T.y - rnd(40, 300), vx:rnd(-15, 15), vy:rnd(-60, -30), drag:.2, life:rnd(1, 1.8), s:rnd(8, 14), c:GROUND_RING[T.el] });
     // a taken temple heals the Keeper in its ring
-    if (inRing(T, P.x, P.y) && P.hp > 0) { P.hp = Math.min(P.max, P.hp + P.max * HOLD.heal * dt); if (Math.random() < dt * 6) fx({ k:'plus', x:P.x + rnd(-20, 20), y:P.y - 10, vx:0, vy:-60, life:.6, s:8, c:'#8FF0A0' }); }
+    if (!S.bossSpawned && inRing(T, P.x, P.y) && P.hp > 0) { P.hp = Math.min(P.max, P.hp + P.max * HOLD.heal * dt); if (Math.random() < dt * 6) fx({ k:'plus', x:P.x + rnd(-20, 20), y:P.y - 10, vx:0, vy:-60, life:.6, s:8, c:'#8FF0A0' }); }
     // and fires its element at creatures near it; when the boss comes, at the boss and its crowd from anywhere
     if ((T.fireCd -= dt) <= 0 && !S.over) { T.fireCd = S.bossSpawned ? HOLD.bossFire : HOLD.fire;
       const reach = S.bossSpawned ? 2600 : HOLD.reach; let best = null, bd = reach;
@@ -5648,7 +5716,7 @@ function update(dt) {
     AU.world(worldOf(), S.bossSpawned ? 1 : S.waveIdx / LV().waves.length);
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
-  P.rx = (P.rx || 0) * Math.pow(.0005, dt); P.ry = (P.ry || 0) * Math.pow(.0005, dt);
+  P.rx = (P.rx || 0) * Math.pow(.004, dt); P.ry = (P.ry || 0) * Math.pow(.004, dt);
   direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); spikeTick(dt); finisherTick(); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
@@ -5660,15 +5728,15 @@ function update(dt) {
     if (S.bloom && !e.boss) { bloomCreature(e, Math.hypot(P.x - e.x, P.y - e.y), dt); continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
     if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
-    if (d < e.r + P.r && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .55; P.hitAt = S.t; P.rx = (P.x - e.x) / d * 14; P.ry = (P.y - e.y) / d * 14; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
+    if (d < e.r + P.r && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .55; P.hitAt = S.t; const x0 = P.x, y0 = P.y; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
       const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el); P.hp -= hit; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
-      if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? (S.storm ? S.storm.r0 + 400 : A.r) - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } floatText(P.x, P.y - 60, '-' + Math.round(hit), '#FF8A7A', 16); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
+      if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? (S.storm ? S.storm.r0 + 400 : A.r) - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } keeperHit(e.x, e.y, e.el, e.boss || e.heavy, e.boss ? { x:P.x - x0, y:P.y - y0 } : null); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
   for (const s of S.eshots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; s.rot += dt * 8;
-    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; P.rx = s.vx * .05; P.ry = s.vy * .05; S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.src || (s.boss ? 'spiral' : 'shot'), el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, SHOT_HIT[s.k] || '#CFE9FF', 4, 160); SFX.hurt(); } }
+    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; keeperHit(P.x - s.vx, P.y - s.vy, s.el, s.boss); S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.src || (s.boss ? 'spiral' : 'shot'), el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, SHOT_HIT[s.k] || '#CFE9FF', 4, 160); SFX.hurt(); } }
   S.eshots = S.eshots.filter(s => s.life > 0);
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
@@ -5889,13 +5957,18 @@ function drawBoss(b, hk) {
   if (mode === 'cast') { sx += .04; sy += .05; bob += 6; }
   if (mode === 'blink') { const kk = b.blink; al = kk.ph === 0 ? Math.max(0, 1 - kk.t / .38) : Math.min(1, kk.t / .3); ox = Math.sin(T * 60) * 6 * (1 - al); }
   sx += hk * .05; sy -= hk * .04;
+  // hit: it rocks back away from you; stagger: a hard flinch
+  const rk = Math.max(0, 1 - (T - (b.hitAt ?? -9)) / .12), st = Math.max(0, 1 - (T - (b.stagAt ?? -9)) / .45);
+  ox += (b.rdx || 0) * 11 * rk + Math.sin(T * 55) * 9 * st; bob -= (b.rdy || 0) * 6 * rk; rot += Math.sin(T * 38) * .1 * st; sx += st * .1; sy -= st * .12;
   // its aura, brighter when enraged, and a shadow that shrinks as it rises
   add(() => glowAt(b.x, b.y - s * .35 - bob, s * (b.enraged ? 2.3 : 1.8) * (1 + .05 * Math.sin(T * 5)), col, (b.enraged ? .7 : .45) * (bossOf(b).aura || 1) * al));
   g.globalAlpha = al; g.fillStyle = 'rgba(0,10,30,.34)'; g.beginPath(); g.ellipse(b.x, b.y + b.r * .55, b.r * (1.6 - Math.max(0, bob) / 120), b.r * .48, 0, 0, TAU); g.fill(); g.globalAlpha = 1;
   const top = -s * .94, drawIm = (n, o) => { const im = IMG[n]; if (!ok(im) || o <= 0) return; g.globalAlpha = o * al; g.drawImage(im, -s / 2, top, s, s); };
   g.save(); g.translate(b.x + ox, b.y + b.r * .55 - bob); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
   if (k < 1 && b.prev) drawIm(b.prev, 1 - k); drawIm(name, k < 1 && b.prev ? k : 1); g.globalAlpha = 1;
-  if (hk > 0) { const wh = silhouette(name, '#FFFFFF'); if (wh) { g.globalAlpha = hk * .22 * al; g.drawImage(wh, -s / 2, top, s, s); } }
+  const pk = Math.max(0, 1 - (T - (b.pulseAt ?? -9)) / .1);
+  if (pk > 0 || st > 0) { const wh = silhouette(name, '#FFFFFF'); if (wh) { g.globalAlpha = Math.max(pk * .28, st * .55) * al; g.drawImage(wh, -s / 2, top, s, s); }
+    const tc = b.hitEl && silhouette(name, GROUND_RING[b.hitEl] || '#FFFFFF'); if (tc && pk > 0) { g.globalAlpha = pk * .2 * al; g.drawImage(tc, -s / 2, top, s, s); } }
   if (mode === 'coil' || mode === 'rise' || mode === 'beat') { const rd = silhouette(name, '#FF3A2A'); if (rd) { g.globalAlpha = .3 * (.6 + .4 * Math.sin(T * 30)) * al; g.drawImage(rd, -s / 2, top, s, s); } }
   // (a silver boss on pale stone would wash to white, so the Sentinel rages in steel and keeps a fainter aura)
   if (b.enraged) { const rg = silhouette(name, bossOf(b).rage || col); if (rg) { g.globalAlpha = (.18 + .1 * Math.sin(T * 12)) * al; g.drawImage(rg, -s / 2, top, s, s); } }
@@ -6452,7 +6525,7 @@ function draw() {
     add(() => glowAt(kx, ky - 50, 170 + Math.sin(S.t * 6) * 14, '#FFE08A', .5 * k));
     drawAscendStones(kx, ky);
   }
-  if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob); g.rotate(lean - (P.rx || 0) * .012); if (P.face < 0) g.scale(-1, 1);
+  if (ok(kim)) { g.save(); g.translate(kx, ky + 30 - bob); { const rk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .35); g.rotate(lean - (P.hdx || 0) * (P.hitHeavy ? .32 : .2) * rk * rk); } if (P.face < 0) g.scale(-1, 1);
     g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1));
     // the look's signature: a soft rim of light in the Keeper's element colour
     { const rim = silhouette(kName, EL[keeperEl]); if (rim) add(() => { g.globalAlpha = .6; g.drawImage(rim, -ks * .53, -ks * .75 - 24, ks * 1.06, ks * 1.06); g.globalAlpha = 1; }); }
@@ -6509,8 +6582,8 @@ function draw() {
       g.restore(); } }
   // damage numbers and callouts
   g.textAlign = 'center'; g.lineJoin = 'round';
-  for (const n of S.nums) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 28 : n.weak ? 15 : 19) * pk;
-    g.globalAlpha = Math.min(1, (.65 - n.t) * 5); g.font = `900 ${sz}px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif`; g.lineWidth = 3.5; g.strokeStyle = 'rgba(16,22,34,.72)'; g.strokeText(n.v, n.x, y); g.fillStyle = n.strong ? '#FFF4E0' : n.weak ? '#AEB8C0' : '#FFFFFF'; g.fillText(n.v, n.x, y); }
+  for (const n of S.nums) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 32 : n.weak ? 19 : 25) * pk / Z;
+    g.globalAlpha = Math.min(1, (.65 - n.t) * 5); g.font = `900 ${sz}px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif`; g.lineWidth = 4.5 / Z; g.strokeStyle = 'rgba(16,22,34,.72)'; g.strokeText(n.v, n.x, y); g.fillStyle = n.strong ? '#FFF4E0' : n.weak ? '#AEB8C0' : '#FFFFFF'; g.fillText(n.v, n.x, y); }
   for (const t of S.txt) { g.globalAlpha = Math.min(1, (1.1 - t.t) * 3); g.font = `900 ${Math.round(t.size / Z)}px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif`; g.lineWidth = 5; g.strokeStyle = 'rgba(16,22,34,.72)'; const y = t.y - t.t * 50; g.strokeText(t.s, t.x, y); g.fillStyle = t.c; g.fillText(t.s, t.x, y); }
   g.globalAlpha = 1; g.lineWidth = 1;
   // edge arrows never sit on the HUD's buttons, the skills bar or the top bar (QA, 2026-10-05): they slide along their
@@ -7110,12 +7183,13 @@ function drawTowerAt(T, cx, cy) {
       g.fillStyle = gr; g.fillRect(T.x - 26 - Math.sin(S.t * 4) * 4, top - 500, 52 + Math.sin(S.t * 4) * 8, 540); }
     // Hold the temple: it stays frozen until its ring is whole (A, 2026-10-06), then comes back to life from its base up in
     // a breath of its own light; each freed light still makes the frost flicker, so the temple answers the ring
-    const OT = S.out && art && S.out.towers.includes(T), wake = OT && T.held ? Math.min(1, (S.t - (T.heldAt ?? -9)) / 2.6) : 1;
+    // what climbs is Codex's thawed temple (brief 7: no snow, warm windows, its element alive on it), drawn over the frozen one
+    const OT = S.out && art && S.out.towers.includes(T), wake = OT && T.held ? Math.min(1, (S.t - (T.heldAt ?? -9)) / 2.6) : 1, alive = OT && ok(IMG['x-temple-' + T.el + '-alive']) ? IMG['x-temple-' + T.el + '-alive'] : art;
     if (OT && !T.held) { g.drawImage(frozenArt(art, T.el), T.x - tw / 2, top, tw, th); if (T.flare > 0) add(() => glowAt(T.x, top + th * .55, tw * .55, GROUND_RING[T.el], .35 * T.flare)); }
     else if (OT && wake < 1) { const e = wake * wake * (3 - 2 * wake), cy0 = top + th * (1 - e); g.drawImage(frozenArt(art, T.el), T.x - tw / 2, top, tw, th);
-      g.save(); g.beginPath(); g.rect(T.x - tw / 2, cy0, tw, top + th - cy0); g.clip(); g.drawImage(art, T.x - tw / 2, top, tw, th); g.restore();
+      g.save(); g.beginPath(); g.rect(T.x - tw / 2, cy0, tw, top + th - cy0); g.clip(); g.drawImage(alive, T.x - tw / 2, top, tw, th); g.restore();
       add(() => { glowAt(T.x, cy0, tw * .7, GROUND_RING[T.el], .9); glowAt(T.x, cy0, tw * .3, '#FFFFFF', .6); if (wake > .85) glowAt(T.x, top + th * .1, tw * (wake - .85) * 6, '#FFFFFF', .8); }); }
-    else g.drawImage(art || shrineNight(im, T.el), T.x - tw / 2, top, tw, th);
+    else g.drawImage(OT && T.held ? alive : art || shrineNight(im, T.el), T.x - tw / 2, top, tw, th);
     if (S.out && T.held) add(() => glowAt(T.x, top + th * .25, th * .35, GROUND_RING[T.el], .45 + .1 * Math.sin(S.t * 3)));
     // the trap winding up glows in the painted mouth; while the boulder rolls, the earth temple's doorway stands empty
     for (const Tr of S.ttraps || []) if (Tr.sh === T) { if (Tr.t < Tr.wind) trapMouth(Tr, Tr.t / Tr.wind, { flood:'#5FB0FF', flame:'#FF8A2A', boulder:'#FFC870', darts:'#DDE6F4' }[Tr.k]);
@@ -7635,7 +7709,7 @@ function drawFX(top) {
     // readable (design review, 2026-10-05): it flickers, rises and burns out
     else if (p.k === 'cflame') { const w = p.s * (1 - k * .5) * (1 + Math.sin(S.t * 34 + p.x) * .1), h = w * 1.7; g.globalAlpha = Math.pow(a, .7) * .9; g.drawImage(tongue(p.c), p.x - w / 2, p.y - h * .78, w, h); g.globalAlpha = 1; }
     else if (p.k === 'plus') { g.globalAlpha = a; g.fillStyle = p.c; g.fillRect(p.x - p.s / 2, p.y - p.s / 6, p.s, p.s / 3); g.fillRect(p.x - p.s / 6, p.y - p.s / 2, p.s / 3, p.s); g.globalAlpha = 1; }
-    else if (p.k === 'ring' && !p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
+    else if (p.k === 'ring' && !p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); if (p.sy) g.ellipse(p.x, p.y, r, r / p.sy, 0, 0, TAU); else arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'hit') { g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = `rgba(255,255,255,${a})`; const s = p.s * (.6 + k * .6); g.beginPath(); for (let i = 0; i < 8; i++) { const r = i % 2 ? s * .25 : s * .6; g.lineTo(Math.cos(i * TAU / 8) * r, Math.sin(i * TAU / 8) * r); } g.closePath(); g.fill(); g.restore(); }
   }
   if (!top) return;
@@ -7644,7 +7718,7 @@ function drawFX(top) {
     const k = p.t / p.life, a = 1 - k;
     if (p.k === 'glow') glowAt(p.x, p.y, p.s + ((p.s1 ?? p.s) - p.s) * k, p.c, a);
     else if (p.k === 'hit') glowAt(p.x, p.y, p.s * 1.6, p.c, a);
-    else if (p.k === 'ring' && p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
+    else if (p.k === 'ring' && p.add) { const r = p.r0 + (p.r1 - p.r0) * (1 - Math.pow(1 - k, 2)); g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.w * a + 1; g.beginPath(); if (p.sy) g.ellipse(p.x, p.y, r, r / p.sy, 0, 0, TAU); else arc0(p.x, p.y, r, 0, TAU); g.stroke(); g.globalAlpha = 1; }
     else if (p.k === 'ember') { const y = p.y - p.z, sz = p.s * (1 - k * .35); glowAt(p.x, y, sz * 6, p.c || '#FF8A2A', a * .85); glowAt(p.x, y, sz * 2.4, p.c2 || '#FFD27A', a); }
 
     else if (p.k === 'spark') { g.strokeStyle = p.c; g.globalAlpha = a; g.lineWidth = p.s; g.lineCap = 'round'; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(p.x - p.vx * .04, p.y - p.vy * .04); g.stroke(); g.globalAlpha = 1; }
@@ -7837,8 +7911,8 @@ function renderCards(opts) {
         <span class="txt">${starRow(lv)}<p>${NEXT[o.id](lv)}</p><small>${mine.length ? `Evolves your ${mine.map(k => POW[k].n).join(' and ')}` : `${ELNAME[el]} gift · evolves ${feeds.map(k => POW[k].n).join(' and ')}`}</small></span></span>`;
     } else if (o.kind === 'lode') {
       const n = S.lode + 1; b.className = 'card gift';
-      html = `<span class="tile"><img src="${icon('g-lodestone')}" alt=""><i>${CHAR.metal}</i></span><span class="body"><span class="tab"><b>Lodestone</b><span class="flag">RARE</span></span>
-        <span class="txt"><span class="stars">${[0, 1, 2].map(i => `<s class="${i < S.lode ? 'f' : i === S.lode ? 'n' : ''}"></s>`).join('')}</span><p>Gems within ${n * 10}% of the screen fly to you.</p><small>Offered once · takes no slot</small></span></span>`;
+      html = `<span class="tile"><img src="${icon('g-lodestone')}" alt=""><i>${CHAR.metal}</i></span><span class="body"><span class="tab"><b>${n >= 3 ? 'Heart Lodestone' : 'Lodestone'}</b><span class="flag">${n >= 3 ? 'EVOLVE' : 'RARE'}</span></span>
+        <span class="txt"><span class="stars">${[0, 1, 2].map(i => `<s class="${i < S.lode ? 'f' : i === S.lode ? 'n' : ''}"></s>`).join('')}</span><p>${n >= 3 ? 'Gems and hearts fly to you.' : `Gems within ${n * 10}% of the screen fly to you.`}</p><small>Offered once · takes no slot</small></span></span>`;
     } else { b.className = 'card gift'; html = `<span class="tile"><img src="${icon('g-spring')}" alt=""><i>${CHAR.earth}</i></span><span class="body"><span class="tab"><b>Warm Tea</b></span><span class="txt"><p>Heal fully.</p></span></span>`; }
     const cc = CARDC[el]; b.style.setProperty('--c', EL[el]); b.style.setProperty('--c1', cc[0]); b.style.setProperty('--c2', cc[1]); b.style.setProperty('--d', idx * .09 + 's'); b.innerHTML = html;
     b.onclick = () => {
@@ -8265,7 +8339,7 @@ function hud() {
   { const key = (freeMore ? 'F' : '') + stoneEls().map(el => S.qiStones[el] ? 'S' : Math.min(20, Math.floor((S.qi[el] || 0) / stoneNeed(el) * 20))).join(',');
     const row = $('#stoneRow'); if (row.dataset.k !== key) { row.dataset.k = key;
       row.innerHTML = ELS.filter(el => stoneEls().includes(el)).map(el => `<i class="sk${S.qiStones[el] ? ' got' : freeMore ? ' need' : ''}" style="--c:${EL[el]};--p:${Math.min(1, (S.qi[el] || 0) / stoneNeed(el)).toFixed(2)}">${S.qiStones[el] ? `<img src="art4/props/x-stone-${el}.png?v=8" alt="${ELNAME[el]} stone">` : ''}</i>`).join(''); } }
-  if (S.boss) { $('#bossBar i').style.width = Math.max(0, S.boss.hp / S.boss.max * 100) + '%'; $('#bossName').textContent = bossOf(S.boss).name; $('#bossBar i').style.background = EL[S.boss.el]; }
+  if (S.boss) { const bw = Math.max(0, S.boss.hp / S.boss.max * 100) + '%', hk = Math.max(0, 1 - (S.t - (S.boss.hitAt ?? -9)) / .15); $('#bossBar i').style.width = bw; $('#bossBar b').style.width = bw; $('#bossWrap').style.transform = hk ? `translateX(${((Math.random() * 2 - 1) * 3 * hk).toFixed(1)}px)` : ''; $('#bossName').textContent = bossOf(S.boss).name; $('#bossBar i').style.background = EL[S.boss.el]; }
 }
 function loop(now, id) {
   if (!running || id !== loopId) return;
@@ -8407,6 +8481,7 @@ function defeatTip() {
     toll:['Leave the bell\'s ring', 'When the big red ring appears, run out of it before the bell rings.'],
     blink:['It appears behind you', 'When it vanishes, keep moving: it slashes the spot where it lands.'],
     fan:['Blades fly in fans', 'Move sideways into a gap between the blades.'],
+    shove:['It pushes you off', 'Stay right on top of it and it blasts you back. Hit it from the edge of your reach.'],
     hug:['Keep your distance', "Your powers reach far. Circle it from outside its reach."] };
   if (B && BOSS[H.src]) return { img:src(B.img), t:BOSS[H.src][0], p:BOSS[H.src][1] };
   // the Silver City's floor grates (not the boss): the same lesson as the boss's spikes
