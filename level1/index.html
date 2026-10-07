@@ -3091,7 +3091,7 @@ function startRun() {
   if (LVL === 5) { S.p.x = L5_START.x; S.p.y = L5_START.y; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
   S.out = towersLevel(LVL) ? makeOutposts(LVL) : null;
   if (S.out) { S.p.x = S.out.start.x; S.p.y = S.out.start.y; S.pet.x = S.p.x - 40; S.pet.y = S.p.y + 30; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
-  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=2`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=1`; new Image().src = `art4/k${keeper}-hurt.png?v=8`; } renderSkills(); startLoop();
+  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=8`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=8`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=1`; new Image().src = `art4/k${keeper}-hurt.png?v=8`; } renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -4471,7 +4471,7 @@ function landSpike(b, B, f) {
 // - the Pack Alpha: howls up a pack, and takes half damage while three of them stand near it; free the pack first
 // Each arrives with a quake and a roar, teaches itself once (a card and Luma's line), and pays a chest, a heart and gems.
 // Codex's art (brief 10) goes in art4/giants/; until then each stands in, scaled up, as a creature of its element.
-const GIANT_ART = false;
+const GIANT_ART = true;   // Codex brief 10 landed (2026-10-06)
 const GIANT = {
   rammer:{ n:'Rammer', hp:5, size:250, r:58, sp:52, dmg:30, stand:el => 'e-' + el + '-c',
     tip:'Its horns block your hits. Step aside when it charges, then hit its glowing back while it is stuck.' },
@@ -4505,9 +4505,10 @@ function giantsTick(dt) {
 function spawnGiant(k, at) {
   const G = GIANT[k], P = S.p, a = rnd(0, TAU), d = Math.hypot(VW, VH) / 2 + 140, el = (pl => pl[(Math.random() * pl.length) | 0])(mixPool());
   const e = spawn('golem', at || { x:clamp(P.x + Math.cos(a) * d, 80, WORLD - 80), y:clamp(P.y + Math.sin(a) * d, 80, WORLD - 80) }, 1, el); if (!e) return null;
-  const art = 'g-' + k + '-' + el; if (GIANT_ART && !IMG[art]) load(art, `art4/giants/${art}.png?v=1`);
+  const art = 'g-' + k + '-' + el, pose = art + '-' + { rammer:'stuck', colossus:'open', alpha:'howl' }[k];
+  if (GIANT_ART) for (const n of [art, pose]) if (!IMG[n]) load(n, `art4/giants/${n}.png?v=1`);
   Object.assign(e, { type:'giant', giant:k, gst:'walk', gcd:2.4, howl:.6, size:G.size, r:G.r, sp:G.sp * (1 + .04 * (S.hard || 0)), dmg:G.dmg, heavy:true, xp:40, tagT:3.5,
-    img:GIANT_ART && ok(IMG[art]) ? art : G.stand(el), K:{ ...e.K, n:G.n, tip:null, beh:'giant' } });
+    gart:art, gpose:pose, img:GIANT_ART && ok(IMG[art]) ? art : G.stand(el), K:{ ...e.K, n:G.n, tip:null, beh:'giant', face:-1 } });
   e.own = e.img !== 'e-golem' && e.img !== 'e-wolf'; e.hp = e.max = e.max * G.hp * (S.level === 1 ? .6 : 1);
   S.shake = Math.max(S.shake, .5); SFX.roar(); SFX.stomp();
   if (!SEEN.has('_giant-' + k)) { markSeen('_giant-' + k); coach('giant_' + k, 'A giant ' + G.n + '!', G.tip, () => ({ x:e.x, y:e.y - e.size * .3, r:e.size * .55 }), 6); }
@@ -4517,6 +4518,9 @@ function spawnGiant(k, at) {
 const giantArmour = e => e.giant === 'rammer' ? (e.gst === 'stuck' ? 3 : .33) : e.giant === 'colossus' ? (giantOpen(e) ? 3 : .55) : e.shield ? .5 : 1;
 const giantOpen = e => S.t >= (e.openAt ?? 1e9) && S.t < e.openAt + 2.2;
 function giantMove(e, P, d, dt, s) {
+  // Codex's art once loaded, in its weak-spot pose while the weak spot is open (stuck, core open, howling)
+  if (GIANT_ART && ok(IMG[e.gart])) { const posed = e.giant === 'rammer' ? e.gst === 'stuck' : e.giant === 'colossus' ? giantOpen(e) : S.t - (e.howlAt ?? -9) < .8;
+    e.img = posed && ok(IMG[e.gpose]) ? e.gpose : e.gart; e.own = true; }
   const ux = (P.x - e.x) / d, uy = (P.y - e.y) / d, a = e.act, chase = stop => { if (d > stop) { e.x += ux * s * dt; e.y += uy * s * dt; } };
   if (e.giant === 'rammer') {
     if (e.gst === 'walk') { chase(e.r + P.r - 6); if ((e.gcd -= dt) <= 0 && d < 720 && d > 170) { e.gst = 'aim'; e.act = { k:'lane', ph:0, t:0, wind:1.1, dx:ux, dy:uy, len:900, w:150 }; SFX.roar(); } }
@@ -4554,7 +4558,7 @@ function drawGiant(e) {
   if (e.giant === 'rammer' && e.gst === 'stuck') { const x = e.x - (e.stuckDx || 0) * e.r * .6, y = e.y - s * .32 - (e.stuckDy || 0) * 20, p = .7 + .3 * Math.sin(T * 14);
     add(() => { glowAt(x, y, s * .55, '#FFE08A', .8 * p); glowAt(x, y, s * .22, '#FFFFFF', .7 * p); }); }
   if (e.giant === 'colossus' && giantOpen(e)) { const p = .7 + .3 * Math.sin(T * 14); add(() => { glowAt(e.x, e.y - s * .38, s * .5, '#FFE08A', .85 * p); glowAt(e.x, e.y - s * .38, s * .18, '#FFFFFF', .8 * p); }); }
-  if (e.giant === 'alpha') { if (S.t - (e.howlAt ?? -9) < .8) add(() => glowAt(e.x, e.y - s * .4, s * .9, c, .5));
+  if (e.giant === 'alpha') { if (S.t - (e.howlAt ?? -9) < .8) add(() => glowAt(e.x, e.y - s * .4, s * .9, e.el === 'metal' ? '#8E9AA6' : c, e.el === 'metal' ? .35 : .5));   // silver added on pale ground washes white
     if (e.shield) { g.save(); g.globalAlpha = .55 + .15 * Math.sin(T * 6); g.strokeStyle = c; g.lineWidth = 5; g.beginPath(); g.ellipse(e.x, e.y - s * .3, s * .5, s * .52, 0, 0, TAU); g.stroke();
       g.globalAlpha = .12; g.fillStyle = c; g.fill(); g.globalAlpha = .35; g.lineWidth = 2; g.setLineDash([10, 10]); g.lineDashOffset = -T * 40;
       for (const m of S.en) if (m.packOf === e && !m.dead && Math.hypot(m.x - e.x, m.y - e.y) < 380) { g.beginPath(); g.moveTo(e.x, e.y - s * .3); g.lineTo(m.x, m.y - m.size * .3); g.stroke(); }
@@ -4868,8 +4872,8 @@ const OMNI_ROLL = { 1:18, 2:20, 3:14, 4:16, 5:19, 6:23, 7:18 };   // (these two 
 // Codex's painted Omni eyes in use (brief 11); k1, k2, k3, k7 wait for a re-pass with child-like brows and lashes (design review,
 // 2026-10-06), and show the interim strip until then. Each painted pair opens from its closed lash line (LID_Y, a fraction of
 // the strip's height), so the first sliver is closed lashes, never forehead
-const OMNI_PAINTED = { 4:1, 5:1, 6:1 };
-const LID_Y = { 1:.77, 2:.62, 3:.65, 4:.76, 5:.76, 6:.72, 7:.7 };
+const OMNI_PAINTED = { 1:1, 2:1, 3:1, 4:1, 5:1, 6:1, 7:1 };   // brief 11b landed 2026-10-07: all seven
+const LID_Y = { 1:.7, 2:.7, 3:.7, 4:.76, 5:.76, 6:.72, 7:.7 };
 function hsStart(final, tier = 5, finisher = false) {
   if (S.omni || hsOn()) return; closeSeal(); S.hs.used = true;
   const seen = +(store.get('morqi.omniSeen') || 0), chained = S.t - (S.hs.endAt ?? -99) < 3;
@@ -6540,7 +6544,7 @@ function draw() {
   const drawCreature = (e, again) => {
     // during a Bloom the creatures wear their happy faces, freed of the spell for a moment
     const art = S.bloom && !e.boss && e.own && ok(IMG[e.img + '-happy']) ? e.img + '-happy' : e.img;
-    const im = e.boss ? (ok(IMG[e.img]) ? IMG[e.img] : null) : e.own ? tinted(art, '#000', 0) : tinted(art, EL[e.el]), s = e.size, wind = e.act && e.act.ph === 0 ? Math.min(1, e.act.t / e.act.wind) : 0, rolling = e.act && e.act.ph === 1 && e.act.k === 'lane';
+    const im = e.boss || (e.giant && e.own) ? (ok(IMG[e.img]) ? IMG[e.img] : null) : e.own ? tinted(art, '#000', 0) : tinted(art, EL[e.el]), s = e.size, wind = e.act && e.act.ph === 0 ? Math.min(1, e.act.t / e.act.wind) : 0, rolling = e.act && e.act.ph === 1 && e.act.k === 'lane';
     if (!im) return;
     const hk = Math.max(0, 1 - (S.t - (e.hitAt ?? -9)) / .16), bk = Math.max(0, 1 - (S.t - (e.biteAt ?? -9)) / .2), froz = e.frozen > 0;
     const step = froz ? 0 : Math.sin(e.wob * 1.7), toward = S.p.x > e.x ? 1 : -1;
@@ -6560,7 +6564,8 @@ function draw() {
     if (e.boss) { drawBoss(e, hk); return; }
     g.save(); g.translate(e.x, e.y + e.r * .5 - hop); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
     g.drawImage(im, -s / 2, -s * .62 - e.r * .5, s, s);
-    if (hk > 0) { const wh = silhouette(art, '#FFFFFF'); if (wh) { g.globalAlpha = hk * (e.boss ? .22 : .9); g.drawImage(wh, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
+    const fk = e.giant ? Math.max(0, 1 - (S.t - (e.pulseAt ?? -9)) / .1) : hk;
+    if (fk > 0) { const wh = silhouette(art, '#FFFFFF'); if (wh) { g.globalAlpha = fk * (e.boss || e.giant ? .25 : .9); g.drawImage(wh, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
     if (froz) { const ic = silhouette(art, '#BFE8FF'); if (ic) { g.globalAlpha = .55; g.drawImage(ic, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
     if (wind) { const rd = silhouette(art, '#FF3A2A'); if (rd) { g.globalAlpha = wind * .45 * (.6 + .4 * Math.sin(S.t * 30)); g.drawImage(rd, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
     g.restore();
@@ -6569,7 +6574,8 @@ function draw() {
     if (e.tagT > 0 && !again && !S.omni && !S.omniSnap) tagsLater.push(() => { const k = Math.min(1, e.tagT * 2, (3.5 - e.tagT) * 6), y = e.y - s * .62 - 30; g.globalAlpha = k;
       g.strokeStyle = GROUND_RING[e.el]; g.lineWidth = 4; g.beginPath(); g.ellipse(e.x, e.y + e.r * .5, e.r * 1.8 + Math.sin(S.t * 8) * 4, e.r * .8, 0, 0, TAU); g.stroke();
       // the name stays inside the safe part of the screen, clear of the top bar and the minimap (A's playthrough, 2026-10-05)
-      const tx = clamp(e.x, cx + 74 / Z, cx + (W - 74) / Z); let ty = Math.max(y, cy + 178 / Z); if ((tx - cx) * Z > W - 160 && (ty - cy) * Z < 290) ty = cy + 290 / Z;
+      const tx = clamp(e.x, cx + 74 / Z, cx + (W - 74) / Z); let ty = Math.max(e.giant ? y - 22 : y, cy + 178 / Z); if ((tx - cx) * Z > W - 160 && (ty - cy) * Z < 290) ty = cy + 290 / Z;
+      if (e.giant && ty > e.y - s * .62 - 30) ty = e.y + s * .38 + 24;   // never across a giant's body: below its painted feet
       g.font = '900 21px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif'; g.textAlign = 'center'; g.lineWidth = 4; g.strokeStyle = 'rgba(16,22,34,.7)'; g.strokeText(e.K.n, tx, ty); g.fillStyle = '#FFFFFF'; g.fillText(e.K.n, tx, ty); g.globalAlpha = 1; g.lineWidth = 1; });
     if (e.giant) drawGiant(e);
     if (e.type === 'golem') { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(e.x - 42, e.y - s * .62 - 14, 84, 10); g.fillStyle = EL[e.el]; g.fillRect(e.x - 40, e.y - s * .62 - 12, 80 * Math.max(0, e.hp / e.max), 6); }
