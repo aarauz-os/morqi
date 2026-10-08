@@ -280,7 +280,8 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .rt img{width:80%;height:80%;object-fit:cover;border-radius:16px}
 .rt.lit{box-shadow:0 0 0 3px var(--jade),0 0 24px 4px rgba(22,199,154,.55);transform:scale(1.08)}
 .rt.won{box-shadow:0 0 0 3px var(--sun),0 0 30px 8px rgba(255,197,74,.75);transform:scale(1.12)}
-.rt.center{opacity:1!important;transform:none!important;background:none;box-shadow:none}
+/* the chest itself, never clipped to the tile's rounded square (meeting 3, Sammy, 2026-10-08: "it should just be the chest") */
+.rt.center{opacity:1!important;transform:none!important;background:none!important;box-shadow:none!important;overflow:visible}
 .rt.center img{width:120%;height:120%;object-fit:contain;border-radius:0;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35))}
 .chestwrap:not(.open) .rt.center img{animation:jiggle .6s ease-in-out infinite}
 @keyframes jiggle{25%{transform:rotate(-6deg) scale(1.04)}75%{transform:rotate(6deg) scale(1.04)}}
@@ -576,6 +577,40 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 .rtitle b{font:900 19px var(--round);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis}
 .rtitle em{font:800 11.5px var(--round);font-style:normal;opacity:.78;overflow:hidden;text-overflow:ellipsis}
 .rtitle[hidden]{display:none}
+/* the breath of life (meeting 3, 2026-10-08): after the boss is freed, the person stands grey and still in their own realm, the
+   ground still frozen; each breath the player takes (hold to breathe in, let go to breathe out) carries the five colours from the
+   Keeper's palms to them, and the colour, the dawn and the thawed ground come back. Calm: a slow pearl orb, no timer, no score
+   (design review, 2026-10-08: staged in the realm, one ground line, the breath seen to travel, never a water-blue orb) */
+#breathe{--sky1:#7FD3FF;--sky2:#D9F6FF;--acc:#2BB6E8;--warm:0;--grey:1;overflow:hidden;justify-content:flex-start;gap:0;padding:calc(env(safe-area-inset-top,0px) + 26px) 20px calc(env(safe-area-inset-bottom,0px) + 22px)}
+#breathe .br-sky{position:absolute;inset:0;background:linear-gradient(180deg,var(--sky1),var(--sky2) 60%)}
+#breathe .br-frost{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(150,175,215,.72),rgba(205,222,245,.55));opacity:var(--grey);transition:opacity 1.6s ease-out}
+#breathe .br-hill{position:absolute;left:-15%;right:-15%;top:66%;bottom:0;border-radius:50% 50% 0 0/80px 80px 0 0;background:var(--ground) center/240px repeat;box-shadow:inset 0 10px 0 rgba(255,255,255,.35)}
+#breathe .br-cold{background-image:var(--ground-cold)}#breathe .br-warm{background-image:var(--ground-warm);opacity:var(--warm);transition:opacity 1.6s ease-out}
+#breathe .br-top{position:relative;z-index:2;margin-top:13vh;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+#breathe .br-top b{font:900 25px/1.15 var(--round);color:#fff;text-wrap:balance;max-width:16ch;text-shadow:0 2px 0 rgba(20,30,70,.35),0 6px 18px rgba(20,30,70,.3)}
+#breathe .br-dots{display:flex;gap:8px}#breathe .br-dots i{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.35);box-shadow:inset 0 0 0 2px rgba(255,255,255,.75);transition:background .5s,transform .5s var(--spring)}
+#breathe .br-dots i.on{background:#FFF6DE;transform:scale(1.25);box-shadow:0 0 12px rgba(255,236,180,.9)}
+#breathe .br-stage{position:absolute;left:0;right:0;top:35%;height:32%;z-index:1}
+#breathe .br-fig{position:absolute;bottom:0;height:100%;display:flex;align-items:flex-end;justify-content:center}
+#breathe .br-p{left:0;width:52%}#breathe .br-k{right:0;width:48%;height:84%}
+#breathe .br-fig img{position:relative;height:100%;max-width:none;object-fit:contain;object-position:bottom;transform:translateY(var(--pad,0%))}
+#breathe .br-p img{filter:grayscale(var(--grey)) brightness(calc(.75 + .25 * (1 - var(--grey))));transition:filter 1.4s ease-out}
+#breathe .br-k img{transform:translateY(var(--pad,0%)) scaleX(-1)}
+#breathe .br-sh{position:absolute;bottom:-6px;left:22%;right:22%;height:14px;border-radius:50%;background:rgba(20,30,60,.28);filter:blur(2px)}
+#breathe .br-p.alive img{animation:brHop .55s var(--spring) 2}
+@keyframes brHop{50%{translate:0 -14%}}
+#breathe .br-puffs{position:absolute;inset:0;pointer-events:none}
+#breathe .br-puffs i{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--c);box-shadow:0 0 12px var(--c);opacity:0}
+#breathe .br-puffs b{position:absolute;width:140px;height:140px;margin:-70px 0 0 -70px;border-radius:50%;background:radial-gradient(circle,rgba(255,246,222,.85),rgba(255,246,222,0) 65%);opacity:0}
+#breathe .br-ctl{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px}
+#breathe .br-orb{position:relative;width:150px;height:150px;border:0;background:none;display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;user-select:none;-webkit-user-select:none}
+#breathe .br-orb i{position:absolute;inset:0;margin:auto;width:54%;height:54%;border-radius:50%;background:radial-gradient(circle at 38% 32%,#FFFFFF,#FBF7EE 42%,rgba(255,240,215,.55) 70%,rgba(255,240,215,0) 74%);
+  box-shadow:0 0 0 2px rgba(255,255,255,.8),0 0 44px rgba(255,226,170,calc(.35 + .45 * var(--warm)));transform:scale(var(--s,1));transition:transform var(--dur,.6s) ease-in-out}
+#breathe .br-finger{position:absolute;width:40px;height:52px;left:58%;top:56%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.3));animation:brPress 1.4s ease-in-out infinite;pointer-events:none}
+#breathe .br-orb.touched .br-finger{display:none}
+@keyframes brPress{0%,100%{transform:translate(0,0) scale(1)}45%,60%{transform:translate(-6px,-8px) scale(.9)}}
+/* the words a reading child acts on sit on a night-glass pill, readable on ice and on grass alike */
+#breathe .br-say{font:900 17px var(--round);color:#fff;padding:7px 16px;border-radius:99px;background:rgba(14,20,52,.8);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}#breathe .br-say:empty{visibility:hidden}
 .rtitle.in{animation:titleIn .55s var(--spring) both}
 @keyframes titleIn{0%{transform:scale(1.8) rotate(-6deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
 .res.titled{position:relative}
@@ -778,7 +813,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #hud .timer{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);margin:0;padding:0;background:none;box-shadow:none;font-size:21px;text-shadow:0 1px 6px rgba(0,0,0,.25)}
 #hud .count{margin-left:auto;padding:0 8px 0 0;gap:4px;font-size:16px;background:none;box-shadow:none;text-shadow:0 1px 6px rgba(0,0,0,.25)}
 #hud .count i,#hud .count i svg{width:19px;height:19px;filter:none}
-#hud .xp{position:absolute;left:20px;right:20px;bottom:0;height:3px;margin:0;border-radius:3px;background:rgba(255,255,255,.14);box-shadow:none;overflow:hidden}
+/* the level-up bar is thick enough to read at a glance (meeting 3: "how close am I to my next power up?") */
+#hud .xp{position:absolute;left:20px;right:20px;bottom:0;height:7px;margin:0;border-radius:3px;background:rgba(255,255,255,.14);box-shadow:none;overflow:hidden}
 #hud .xp i{background:linear-gradient(90deg,#6FF2CF,#FFE08A);box-shadow:0 0 8px rgba(255,224,138,.8)}
 #hud .xp i::after{display:none}
 #hud .hrow{display:flex;justify-content:center;align-items:center;gap:8px;min-height:0}
@@ -1717,7 +1753,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <div class="rb"><span class="ribbon">How to play</span></div>
       <div class="howto">
         <div class="how"><span class="ic"><span class="ghost"><i></i></span></span><div><b>Move</b><span>Drag anywhere. Your powers <em>fire on their own</em>. <em>Tap</em> to dash.</span></div></div>
-        <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="rgba(255,255,255,.55)" stroke-width="1.6" fill="none"><path d="M28 9L46 22L39 45L17 45L10 22Z"/><path d="M28 9L39 45L10 22L46 22L17 45Z" stroke="rgba(255,255,255,.3)"/></g><g stroke="#0B1033" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g></svg></span><div><b>Match the element</b><span>Every creature is weak to two elements. Hit it with one and it frees <em>twice as fast</em>.</span><button class="btn blue small" id="chartBtn">See the wheel</button></div></div>
+        <div class="how"><span class="ic"><svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true"><g stroke="rgba(255,255,255,.55)" stroke-width="1.6" fill="none"><path d="M28 9L46 22L39 45L17 45L10 22Z"/><path d="M28 9L39 45L10 22L46 22L17 45Z" stroke="rgba(255,255,255,.3)"/></g><g stroke="#0B1033" stroke-width="2"><circle cx="28" cy="9" r="7" fill="#6FBF4A"/><circle cx="46" cy="22" r="7" fill="#E8553F"/><circle cx="39" cy="45" r="7" fill="#E6B23A"/><circle cx="17" cy="45" r="7" fill="#C9D3DB"/><circle cx="10" cy="22" r="7" fill="#4E9BE0"/></g></svg></span><div><b>Match the element</b><span>Every creature has one element that beats it. Hit it with that and it frees <em>twice as fast</em>.</span><button class="btn blue small" id="chartBtn">See the wheel</button></div></div>
         <div class="how"><span class="ic stones5"><img src="art4/props/x-stone-water.png?v=8" alt=""><img src="art4/props/x-stone-fire.png?v=8" alt=""><img src="art4/props/x-stone-wood.png?v=8" alt=""></span><div><b>Gather the stones</b><span>Free creatures of each element to earn its <em>Qi Stone</em>. Hold them all and the realm's boss comes.</span></div></div>
       </div>
       <button class="btn green" id="howtoGo">Let's go!</button>
@@ -1783,6 +1819,16 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <button class="btn fbk" id="thxFeedback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v10H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>Tell us what you think</button>
       <button class="th-no" id="thxAgain">Play the Silver City again</button>
     </div>
+  </section>
+  <section class="scr" id="breathe" hidden aria-label="Breathe life back into them">
+    <div class="br-sky"></div><div class="br-hill br-cold"></div><div class="br-hill br-warm"></div><div class="br-frost"></div>
+    <div class="br-top"><b id="brTitle"></b><span class="br-dots" id="brDots"></span></div>
+    <div class="br-stage" id="brStage">
+      <div class="br-fig br-p"><i class="br-sh"></i><img id="brPerson" alt=""></div>
+      <div class="br-fig br-k"><i class="br-sh"></i><img id="brKeeper" alt=""></div>
+      <div class="br-puffs" id="brPuffs" aria-hidden="true"></div>
+    </div>
+    <div class="br-ctl"><button class="br-orb" id="brOrb" aria-label="Hold to breathe in, let go to breathe out"><i></i><svg class="br-finger" viewBox="0 0 40 52" aria-hidden="true"><path d="M15 6a4 4 0 0 1 8 0v18l9 2.5a5 5 0 0 1 3.6 5.7L33 46H14L5.5 34a3.6 3.6 0 0 1 5.4-4.7L15 33z" fill="#fff" stroke="#3A3550" stroke-width="2.5" stroke-linejoin="round"/></svg></button><span class="br-say" id="brSay"></span></div>
   </section>
   <section class="scr" id="results" hidden>
     <!-- Victory, rebuilt bright (A, 2026-10-07: "flat, dark, and dated ... doesnt feel and look fresh and fun"): the realm in
@@ -1896,12 +1942,14 @@ const ELNAME = { wood:'Wood', fire:'Fire', earth:'Earth', metal:'Metal', water:'
 const CHAR = { wood:'木', fire:'火', earth:'土', metal:'金', water:'水' };
 const CONTROLS = { water:'fire', fire:'metal', metal:'wood', wood:'earth', earth:'water' };   // key keeps value in check
 const FED_BY = { wood:'water', fire:'wood', earth:'fire', metal:'earth', water:'metal' };      // key is fed by value
-// the type chart, in the classic creature-battler shape: every element beats two, is weak to two, and resists itself.
-// It beats the element it keeps in check (water puts out fire) and the element that feeds it, which it uses up (fire burns wood).
+// the type chart: beat one, feed one (A, 2026-10-08, choosing D's rule from meeting 3: "wood should barely hurt water, because
+// water feeds wood"). Each element beats only the element it keeps in check (water puts out fire), twice as hard; it barely hurts
+// the element that feeds it (wood can't harm the water it drinks from); it resists its own element a little; everything else is
+// an even hit. One rule for a child: controlling beats, feeding helps. The feeding pairs combine in reactions instead.
 const EL5 = ['water', 'wood', 'fire', 'earth', 'metal'];
-const beats = el => [CONTROLS[el], FED_BY[el]];
+const beats = el => [CONTROLS[el]];
 const weakTo = el => EL5.filter(k => beats(k).includes(el));
-const eff = (atk, def) => beats(atk).includes(def) ? 2 : .6;   // super effective, or resisted
+const eff = (atk, def) => CONTROLS[atk] === def ? 2 : FED_BY[atk] === def ? .35 : atk === def ? .7 : 1;
 const VERB = {   // [what the attacker does, how the loser hears it]
   water:{ fire:['puts out', 'put out'], metal:['rusts', 'rusted'] },
   wood: { earth:['breaks up', 'broken up'], water:['drinks up', 'drunk up'] },
@@ -3378,7 +3426,9 @@ const keys = {}; let joy = null;
 addEventListener('keydown', e => {
   keys[e.key.toLowerCase()] = true;
   if (e.key === 'Escape' && running) pause();
-  if ((e.key === 'e' || e.key === 'E') && running) fireUlt();
+  // keyboard play (meeting 3, Sammy, 2026-10-08: "WASD … J and K"): J throws the Star Call, K (or E) fires the spirit animal
+  if ((e.key === 'e' || e.key === 'E' || e.key === 'k' || e.key === 'K') && running) fireUlt();
+  if ((e.key === 'j' || e.key === 'J') && running && !COACH.cur) quickCall();
   if (e.key === ' ' && running && !COACH.cur) { e.preventDefault(); breakOut(); }
   if (!$('#pickKeeper').hidden) { if (e.key === 'ArrowRight') pickKeeper(keeper + 1, 1); if (e.key === 'ArrowLeft') pickKeeper(keeper - 1, -1); }
 });
@@ -3507,7 +3557,11 @@ function spawn(type, at, rush, el) {
   }
   x = clamp(x, 30, WORLD - 30); y = clamp(y, 30, WORLD - 30);
   // the trickle leans toward the element you are furthest behind on, so every stone stays within reach
-  const E = el && el !== 'mix' ? el : (!S.bossSpawned && Math.random() < .4 && behind()) || (pl => pl[(Math.random() * pl.length) | 0])(mixPool());
+  // Level 1 opens with one lesson at a time (meeting 3, Sammy, 2026-10-08): for its first 25 s every creature is one your element
+  // beats, so "Fire beats Metal!" is the first thing a new player learns, before anything else arrives
+  // ...and after it, two in three of the trickle are still the element you beat (QA, 2026-10-08: it drifted to a third)
+  const firstLesson = S.level === 1 && !S.bossSpawned && (S.t < 25 || Math.random() < .67);
+  const E = el && el !== 'mix' ? el : firstLesson ? CONTROLS[keeperEl] : (!S.bossSpawned && Math.random() < .4 && behind()) || (pl => pl[(Math.random() * pl.length) | 0])(mixPool());
   if (type === 'wolf' && !LEVELS[S.level - 1].allow.includes(E + '-b')) type = 'critter';   // only this level's specialists
   T = ETYPE[type];
   const kid = E + '-' + ROLE[type], K = KIND[kid];
@@ -3587,6 +3641,9 @@ function hurt(e, dmg, el, o = {}) {
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
   if (strong && e.hp <= 0 && !e.boss && !e.wise && !e.horde) { e.wise = 1; S.wise = (S.wise || 0) + 1; }
+  // the third star counts only creatures the player could have beaten: ones whose weakness is an element they have a power in
+  // (beat one, feed one, 2026-10-08: a creature's one counter is often an element not yet learned, so the old share fell to 5%)
+  if (e.hp <= 0 && !e.boss && !e.horde && !e.wiseN && (strong || canBeat(e.el))) { e.wiseN = 1; S.wiseN = (S.wiseN || 0) + 1; }
   if (!e.boss) {
     const P = S.p, d = Math.hypot(e.x - P.x, e.y - P.y) || 1, k = (o.kb || 5) * (e.heavy ? .25 : 1);
     if (e.heavy && o.kb) o = { ...o, kb:o.kb * .3 };
@@ -4484,14 +4541,16 @@ const LV = () => LEVELS[S.level - 1];
 // just the two elements your element beats, so a new player feels strong. It grows by numbers and by role (swarm, then a
 // brute), never by variety. Nine waves, every 15 to 18 seconds; elements that beat you first arrive in Level 2.
 function shapeLevel1(me) {
-  const [A, B] = beats(me), sw = el => { const n = KIND[el + '-a'].n; return n.endsWith('y') ? n.slice(0, -1) + 'ies' : n + 's'; }, br = el => KIND[el + '-c'].n;
+  // (beat one, feed one: mostly the element you beat, with some of the one your element feeds, which takes an even hit, so the
+  // weakness star stays earnable and a new player still feels strong; 2026-10-08)
+  const A = CONTROLS[me], B = FEEDS[me], sw = el => { const n = KIND[el + '-a'].n; return n.endsWith('y') ? n.slice(0, -1) + 'ies' : n + 's'; }, br = el => KIND[el + '-c'].n;
   Object.assign(LEVELS[0], { els:[A, B], boss:[A, B, A], waves:[
     { t:15,  el:A, form:'line',   mix:[['critter', 12]], name:`${sw(A)} race in` },
-    { t:30,  el:B, form:'line',   mix:[['critter', 15]], name:`${sw(B)} race in` },
+    { t:30,  el:A, form:'line',   mix:[['critter', 15]], name:`${sw(A)} race in` },
     { t:45,  el:A, form:'ring',   mix:[['critter', 18]], name:`A ring of ${sw(A)}` },
     { t:60,  el:B, form:'pincer', mix:[['critter', 21]], name:`${sw(B)} from both sides` },
     { t:78,  el:A, form:'elite',  mix:[['golem', 1], ['critter', 9]], name:`A ${br(A)} and its ${sw(A)}` },
-    { t:96,  el:B, form:'column', mix:[['critter', 24]], name:`${sw(B)} charge` },
+    { t:96,  el:A, form:'column', mix:[['critter', 24]], name:`${sw(A)} charge` },
     { t:114, el:A, form:'ring',   mix:[['critter', 27]], name:`A ring of ${sw(A)}` },
     { t:132, el:B, form:'elite',  mix:[['golem', 1], ['critter', 12]], name:`A ${br(B)} and its ${sw(B)}` },
     { t:150, el:'mix', form:'storm', mix:[['critter', 36], ['golem', 1]], name:`${sw(A)} and ${sw(B)} together` } ] });
@@ -8353,6 +8412,10 @@ function drawOutpostRings(O, inView) {
       for (const [s0, s1] of [[Math.PI / 2, Math.PI / 2 + up], [Math.PI / 2 - up, Math.PI / 2]]) { g.strokeStyle = col; g.lineWidth = 28; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, s0, s1); g.stroke(); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 7; g.stroke(); }
       g.lineCap = 'butt'; for (const a of [Math.PI / 2 + up, Math.PI / 2 - up]) add(() => glowAt(T.cx + Math.cos(a) * R, T.cy + Math.sin(a) * ry, 80, col, .6 + .3 * T.flare)); }
     if (T.held) add(() => glowAt(T.cx, T.cy, R * 1.1, col, .25 + .1 * pu));
+    // standing in a ring you are filling, it pulses out from the middle in its element's colour, and stops when you step out, so a
+    // player knows the ring is working (meeting 3, Sammy, 2026-10-08)
+    if (here && !T.held && T.wake > 0) for (let i = 0; i < 2; i++) { const q = ((S.t + i * .6) % 1.2) / 1.2; g.globalAlpha = (1 - q) * .55; g.strokeStyle = col; g.lineWidth = 7; g.beginPath(); g.ellipse(T.cx, T.cy, R * q, ry * q, 0, 0, TAU); g.stroke(); }
+    g.globalAlpha = 1;
     g.restore(); g.lineWidth = 1;
   }
   // the freed marching down the tubes to help, in squads, happy and haloed in their temple's light
@@ -9423,13 +9486,13 @@ function tipArt(id) {
   if (id.startsWith('call_')) { const cid = id.slice(5), D = CALL[cid], src = `art4/calls/${D.img}.png?v=9`;
     // Stone Shelter's card shows what it does: a tap, standing stones rising round your own Keeper, creatures held at
     // the walls, then the burst (QA, 2026-10-05: the shared picture showed a strike far away)
-    if (cid === 'stone') { const [b1, b2] = beats(D.el), st = Array.from({ length:8 }, (_, i) => { const a = i * TAU / 8 + .2, x = 50 + 30 * Math.cos(a), y = 60 + 13 * Math.sin(a);
+    if (cid === 'stone') { const b1 = CONTROLS[D.el], b2 = b1, st = Array.from({ length:8 }, (_, i) => { const a = i * TAU / 8 + .2, x = 50 + 30 * Math.cos(a), y = 60 + 13 * Math.sin(a);
         return `<i class="sst" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;--dx:${(Math.cos(a) * 160).toFixed(0)}%;--dy:${(Math.sin(a) * 120).toFixed(0)}%;z-index:${Math.round(y)}"></i>`; }).join('');
       return `<div class="calldemo cd-stone"><i class="sring"></i><img class="cd-k" src="art4/k${keeper}.png?v=13" alt="" style="z-index:60">${st}`
         + [[b1, 'a', 14, 46, -60, -30], [b2, 'a', 76, 50, 60, -20], [b1, 'b', 44, 78, 0, 60]].map(([el, k, x, y, kx, ky], i) => `<img class="cd-c cd-s${i}" src="art4/e-${el}-${k}.png?v=8" alt="" style="left:${x}%;top:${y}%;--kx:${kx}%;--ky:${ky}%">`).join('')
         + `<div class="cd-btn"><img src="${src}" alt=""></div><i class="cd-f"></i></div>`; }
     // the creatures in the picture are ones this call's element beats, so the card teaches the real chart
-    const [b1, b2] = beats(D.el);
+    const b1 = CONTROLS[D.el], b2 = b1;
     return `<div class="calldemo cd-${cid}"><img class="cd-c cd-c1" src="art4/e-${b1}-a.png?v=8" alt=""><img class="cd-c cd-c2" src="art4/e-${b2}-a.png?v=8" alt=""><img class="cd-c cd-c3" src="art4/e-${b1}-b.png?v=8" alt=""><i class="beam"></i>`
       + (cid === 'ember' ? '<i class="cd-tap"></i><i class="cd-lane"><b></b><b></b><b></b></i><i class="cd-embers"><i><svg viewBox="-10 -10 20 20" aria-hidden="true"><ellipse cx="5.4" cy="0.0" rx="4" ry="2.2" transform="rotate(0 5.4 0.0)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="3.82" cy="3.82" rx="4" ry="2.2" transform="rotate(45 3.82 3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-0.0" cy="5.4" rx="4" ry="2.2" transform="rotate(90 -0.0 5.4)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-3.82" cy="3.82" rx="4" ry="2.2" transform="rotate(135 -3.82 3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-5.4" cy="-0.0" rx="4" ry="2.2" transform="rotate(180 -5.4 -0.0)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-3.82" cy="-3.82" rx="4" ry="2.2" transform="rotate(225 -3.82 -3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="0.0" cy="-5.4" rx="4" ry="2.2" transform="rotate(270 0.0 -5.4)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="3.82" cy="-3.82" rx="4" ry="2.2" transform="rotate(315 3.82 -3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><circle r="2.6" fill="#FFF2D0"/></svg></i><i><svg viewBox="-10 -10 20 20" aria-hidden="true"><ellipse cx="5.4" cy="0.0" rx="4" ry="2.2" transform="rotate(0 5.4 0.0)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="3.82" cy="3.82" rx="4" ry="2.2" transform="rotate(45 3.82 3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-0.0" cy="5.4" rx="4" ry="2.2" transform="rotate(90 -0.0 5.4)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-3.82" cy="3.82" rx="4" ry="2.2" transform="rotate(135 -3.82 3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-5.4" cy="-0.0" rx="4" ry="2.2" transform="rotate(180 -5.4 -0.0)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-3.82" cy="-3.82" rx="4" ry="2.2" transform="rotate(225 -3.82 -3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="0.0" cy="-5.4" rx="4" ry="2.2" transform="rotate(270 0.0 -5.4)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="3.82" cy="-3.82" rx="4" ry="2.2" transform="rotate(315 3.82 -3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><circle r="2.6" fill="#FFF2D0"/></svg></i><i><svg viewBox="-10 -10 20 20" aria-hidden="true"><ellipse cx="5.4" cy="0.0" rx="4" ry="2.2" transform="rotate(0 5.4 0.0)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="3.82" cy="3.82" rx="4" ry="2.2" transform="rotate(45 3.82 3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-0.0" cy="5.4" rx="4" ry="2.2" transform="rotate(90 -0.0 5.4)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-3.82" cy="3.82" rx="4" ry="2.2" transform="rotate(135 -3.82 3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-5.4" cy="-0.0" rx="4" ry="2.2" transform="rotate(180 -5.4 -0.0)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="-3.82" cy="-3.82" rx="4" ry="2.2" transform="rotate(225 -3.82 -3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="0.0" cy="-5.4" rx="4" ry="2.2" transform="rotate(270 0.0 -5.4)" fill="#FFC27A" stroke="#7A2E10" stroke-width=".8"/><ellipse cx="3.82" cy="-3.82" rx="4" ry="2.2" transform="rotate(315 3.82 -3.82)" fill="#FF9A4A" stroke="#7A2E10" stroke-width=".8"/><circle r="2.6" fill="#FFF2D0"/></svg></i></i>' : '') + (cid === 'root' ? '<i class="cd-hold"></i><i class="cd-roots"><svg viewBox="0 0 100 60" aria-hidden="true"><path d="M8,58 C6,30 22,12 34,10" fill="none" stroke="#2A1A0C" stroke-width="7" stroke-linecap="round"/><path d="M8,58 C6,30 22,12 34,10" fill="none" stroke="#7A4E2A" stroke-width="4" stroke-linecap="round"/><path d="M30,58 C30,26 44,8 52,10" fill="none" stroke="#2A1A0C" stroke-width="7" stroke-linecap="round"/><path d="M30,58 C30,26 44,8 52,10" fill="none" stroke="#7A4E2A" stroke-width="4" stroke-linecap="round"/><path d="M58,58 C60,28 52,10 46,8" fill="none" stroke="#2A1A0C" stroke-width="7" stroke-linecap="round"/><path d="M58,58 C60,28 52,10 46,8" fill="none" stroke="#7A4E2A" stroke-width="4" stroke-linecap="round"/><path d="M82,58 C86,30 74,12 64,10" fill="none" stroke="#2A1A0C" stroke-width="7" stroke-linecap="round"/><path d="M82,58 C86,30 74,12 64,10" fill="none" stroke="#7A4E2A" stroke-width="4" stroke-linecap="round"/><path d="M94,58 C96,36 88,22 80,18" fill="none" stroke="#2A1A0C" stroke-width="7" stroke-linecap="round"/><path d="M94,58 C96,36 88,22 80,18" fill="none" stroke="#7A4E2A" stroke-width="4" stroke-linecap="round"/><ellipse cx="35" cy="9" rx="5" ry="2.6" fill="#6FBF4A"/><ellipse cx="64" cy="9" rx="5" ry="2.6" fill="#6FBF4A"/></svg></i>' : '') + (cid === 'tide' ? '<i class="cd-wave"><img src="art4/calls/whale-spirit.png?v=9" alt=""></i>' : cid === 'bell' ? `<img class="cd-bell" src="${src}" alt="">` : '')
       + `<div class="cd-btn"><img src="${src}" alt=""></div><span class="sealrow">${[...D.seal, 'throw'].map(d => `<i><svg viewBox="0 0 24 24">${SEAL_SVG[d]}</svg>${d === 'beat' ? '<b class="beats"><em></em><em></em><em></em></b>' : ''}</i>`).join('')}</span><i class="cd-f"></i></div>`; }
@@ -9796,13 +9859,68 @@ const CYCLE = ['wood', 'fire', 'earth', 'metal', 'water'];
 // thirds was out of reach even playing well, since each element beats only two of five). Ascended's summoned horde is
 // left out of the count, and a missed star says how close it came.
 const WISE = .5;
-const wiseShare = () => { const n = S.thawed - (S.hordeFreed || 0); return n > 0 ? Math.min(1, (S.wise || 0) / n) : 0; };
+// an element the player can hit with: their Keeper's own, or any power they have taken
+const canBeat = el => { const c = weakTo(el)[0]; return !!c && (c === keeperEl || Object.keys(S.skills || {}).some(id => S.skills[id] > 0 && POW[id].e === c)); };
+const wiseShare = () => { const n = S.wiseN || 0; return n > 0 ? Math.min(1, (S.wise || 0) / n) : 0; };
 
 // The change, about six seconds with no words: the Warden shudders as light breaks through it (two heartbeats, the
 // fear slowing), the five elements light up around it one by one in the order they feed each other, the star of how
 // they hold each other in check appears inside, everything pulls into the Warden, a white flash shatters the ice,
 // a dark mist drifts off, and the person it was stands there in warm light while the shore turns green and night
 // lifts into dawn. Then the Victory card.
+/* The breath of life (A, D and Sammy, meeting 3, 2026-10-08: "maybe you defeat the boss, right? And then it's your breath of life
+   that actually revives him"; three solid breaths, more after a harder fight). The freed person stands grey and still; the player
+   holds to breathe in (the Keeper kneels, palms rising) and lets go to breathe out (the Keeper pushes the breath out), and each
+   full breath brings back a share of their colour. After the last one they thank you, and the Victory card follows. A breath in
+   shorter than 2 s asks for a longer one; if nobody touches it for 8 s, the Keeper breathes on their own, so no child is stuck. */
+function breatheLife(realm) {
+  const f = freedOf(realm), used = RISES[LVL - 1] - S.rises, again = SEEN.has('_breathed-' + realm);
+  // the full breath the first time each person is freed; one breath on a replay (design review, 2026-10-08: 18-30 s on every win)
+  const N = again ? 1 : Math.min(5, 3 + (S.p.hp < S.p.max * .5 ? 1 : 0) + (used > 0 ? 1 : 0));
+  const scr = $('#breathe'), orb = $('#brOrb'), say = $('#brSay'), kim = $('#brKeeper'), pim = $('#brPerson'), who = PEOPLE[realm].replace(/^The/, 'the');
+  const SK = VIC_SKY[realm] || VIC_SKY.water, G = GROUND_ART[realm] || GROUND_ART.water;
+  scr.style.setProperty('--sky1', SK[0]); scr.style.setProperty('--sky2', SK[1]); scr.style.setProperty('--acc', SK[2]);
+  scr.style.setProperty('--ground-cold', `url(art4/${G[0]}.jpg?v=8)`); scr.style.setProperty('--ground-warm', `url(art4/${G[1]}.jpg?v=8)`);
+  $('#brTitle').textContent = `Breathe life into ${who}`; $('#brDots').innerHTML = Array.from({ length:N }, () => '<i></i>').join('');
+  // feet on one ground line: each picture is lowered by the empty rows under its figure
+  const seat = im => { const go = () => { try { const c = document.createElement('canvas'), w = c.width = 64, h = c.height = 64, x = c.getContext('2d', { willReadFrequently:true }); x.drawImage(im, 0, 0, w, h);
+      const d = x.getImageData(0, 0, w, h).data; let r = h - 1; for (; r > 0; r--) { let hit = false; for (let q = 0; q < w; q++) if (d[(r * w + q) * 4 + 3] > 40) { hit = true; break; } if (hit) break; }
+      im.style.setProperty('--pad', ((h - 1 - r) / h * 100).toFixed(1) + '%'); } catch (e) {} }; if (im.complete && im.naturalWidth) go(); else im.onload = go; };
+  const pose = n => { kim.src = `art4/k${keeper}${n ? '-' + n : ''}.png?v=13`; seat(kim); };
+  pim.src = `art4/${f.img}.png?v=8`; pim.alt = f.alt; seat(pim); pose(''); $('.br-p').classList.remove('alive'); orb.classList.remove('touched');
+  let done = 0, phase = 'rest', t0 = 0, idle, autoT, finished = false;
+  const fast = window.__qaFast;   // the scripted playtest breathes at once
+  // (each breath brings some colour back, and the last one brings it all, with the hop: the payoff lands at the end; design review)
+  const paint = () => { const k = done >= N ? 1 : .55 * done / N; scr.style.setProperty('--grey', String(1 - k)); scr.style.setProperty('--warm', String(k)); [...$('#brDots').children].forEach((d, i) => d.classList.toggle('on', i < done)); };
+  const setOrb = (s, dur, text) => { orb.style.setProperty('--dur', dur + 's'); orb.style.setProperty('--s', s); say.textContent = text; };
+  // the breath, seen: five colours stream from the Keeper's palms to the person, and a warm glow blooms where it lands
+  const stream = () => { const box = $('#brPuffs'), st = $('#brStage').getBoundingClientRect(), k = kim.getBoundingClientRect(), p = pim.getBoundingClientRect();
+    const x0 = k.left - st.left + k.width * .22, y0 = k.top - st.top + k.height * .42, x1 = p.left - st.left + p.width * .55, y1 = p.top - st.top + p.height * .45;
+    const C = ['#4E9BE0', '#6FBF4A', '#FF9A4A', '#E6B23A', '#F4F6FA'];
+    for (let i = 0; i < 15; i++) { const d = document.createElement('i'); d.style.setProperty('--c', C[i % 5]); d.style.left = x0 + 'px'; d.style.top = y0 + 'px'; box.appendChild(d);
+      const lift = -30 - (i % 3) * 18; d.animate([{ opacity:0, transform:'translate(0,0) scale(.6)' }, { opacity:1, offset:.15 }, { opacity:1, transform:`translate(${(x1 - x0) * .5}px,${(y1 - y0) * .5 + lift}px) scale(1)`, offset:.55 }, { opacity:0, transform:`translate(${x1 - x0}px,${y1 - y0}px) scale(.4)` }],
+        { duration:fast ? 1 : 1300, delay:fast ? 0 : i * 60, easing:'ease-in-out', fill:'forwards' }).onfinish = () => d.remove(); }
+    const bl = document.createElement('b'); bl.style.left = x1 + 'px'; bl.style.top = y1 + 'px'; box.appendChild(bl);
+    bl.animate([{ opacity:0, transform:'scale(.4)' }, { opacity:1, transform:'scale(1)', offset:.4 }, { opacity:0, transform:'scale(1.3)' }], { duration:fast ? 1 : 900, delay:fast ? 0 : 1300, fill:'forwards' }).onfinish = () => bl.remove(); };
+  const end = () => { if (finished) return; finished = true; clearTimeout(idle); clearTimeout(autoT); markSeen('_breathed-' + realm);
+    $('#brTitle').textContent = `You brought ${who} back!`; setOrb(1, .6, ''); $('.br-p').classList.add('alive'); SFX.cleared();
+    AU.vo('vo-breathe-done', .2, .4); setTimeout(() => AU.vo('vo-thanks-' + realm, 0, .4, false), 2200);
+    setTimeout(() => { if (S && S.over) results(); }, fast ? 50 : 3600); };
+  const exhale = () => { phase = 'out'; pose('exhale'); setOrb(1, 3, 'Breathe out…'); SFX.sweep(); if (done === 0 && !again) AU.vo('vo-breathe-out', 0, .4);
+    stream(); setTimeout(() => { if (finished) return; done++; paint(); SFX.ting && SFX.ting(); }, fast ? 5 : 1800);
+    setTimeout(() => { if (finished) return; pose(''); phase = 'rest'; if (done >= N) end(); else { setOrb(1, .4, 'Hold to breathe in'); armIdle(); } }, fast ? 10 : 3000); };
+  const inhale = () => { if (phase !== 'rest' || finished) return; clearTimeout(idle); phase = 'in'; t0 = performance.now(); orb.classList.add('touched'); pose('inhale'); setOrb(2, 3, 'Breathe in…'); SFX.charge && SFX.charge(); };
+  const release = () => { if (phase !== 'in') return; const held = (performance.now() - t0) / 1000;
+    if (held < 2 && !fast) { phase = 'rest'; pose(''); setOrb(1, .5, 'A little longer…'); setTimeout(() => { if (phase === 'rest' && !finished) say.textContent = 'Hold to breathe in'; }, 1400); armIdle(); return; }
+    exhale(); };
+  // nobody touching it for 8 s: the Keeper takes the breath for them
+  const armIdle = () => { clearTimeout(idle); idle = setTimeout(() => { if (phase !== 'rest' || finished) return; inhale(); autoT = setTimeout(() => { t0 -= 3000; release(); }, fast ? 10 : 3000); }, fast ? 10 : 8000); };
+  orb.onpointerdown = e => { e.preventDefault(); AU.init(); inhale(); }; orb.onpointerup = orb.onpointerleave = orb.onpointercancel = () => release();
+  const kd = e => { if (scr.hidden) return removeEventListener('keydown', kd); if (e.key === ' ' && !e.repeat) { e.preventDefault(); inhale(); } }, ku = e => { if (scr.hidden) return removeEventListener('keyup', ku); if (e.key === ' ') release(); };
+  addEventListener('keydown', kd); addEventListener('keyup', ku);
+  paint(); setOrb(1, .4, 'Hold to breathe in'); show('breathe'); AU.music(true); AU.song('home'); if (!again) AU.vo('vo-breathe-in', .5, .4); armIdle();
+  if (fast) { inhale(); t0 -= 3000; release(); }
+}
 function win() {
   if (S.won) return; S.won = true; S.over = true; running = false; skillWin(S.t, S.falls || 0);
   // no hurt tint frozen on the Keeper through the slow freeing (A's playthrough, 2026-10-05)
@@ -9838,7 +9956,8 @@ function win() {
     at(9, 3.75, () => { SFX.heal(); stars(T.x, T.y - 120, 40, '#FFE58A', 420); });
     at(10, 4.3, () => { if (!fin) { floatText(T.x, T.y - T.s * .95, 'Victory!', '#FFE08A', 46); SFX.fanfare(true); } });
     // the person the boss was thanks you in their own voice, with the words the Victory card then shows (A, 2026-10-05)
-    at(11, 4.9, () => AU.vo('vo-thanks-' + (B.realm || worldOf()), 0, .4));
+    // (on Levels 1–4 the thanks comes after the breath of life brings them back; the finale keeps it here)
+    at(11, 4.9, () => { if (fin) AU.vo('vo-thanks-' + (B.realm || worldOf()), 0, .4); });
     // what the win earns is kept without the Victory screen: stars, Sparks, the companion's growth, the demo done
     at(12, 6.4, () => { if (fin) results(true); });
     if (T.t > 3.3 && T.r < 2600) { T.r += 70; paintThaw(T.x, T.y, T.r); for (let i = 0; i < 6; i++) paintThaw(rnd(0, WORLD), rnd(0, WORLD), 180); }
@@ -9848,7 +9967,7 @@ function win() {
     S.flashT = Math.max(0, S.flashT - dt); S.shake = Math.max(0, S.shake - dt * 1.5);
     updateFX(dt); S.en = []; if (fin && T.t > 7.1) floatStep(T, dt); draw(); drawChange(T);
     if (T.done) return;
-    if (T.t < 6.4 || fin) requestAnimationFrame(step); else results();
+    if (T.t < 6.4 || fin) requestAnimationFrame(step); else breatheLife(B.realm || worldOf());
   };
   requestAnimationFrame(step);
 }
@@ -10228,7 +10347,8 @@ function wheel(sel) {
   $('#wheel').innerHTML = g;
   $('#wheel').querySelectorAll('.node').forEach(n => { const go = () => { SFX.pop(); wheel(n.dataset.el); }; n.onclick = go; n.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }; });
   const b = beats(sel), w = weakTo(sel);
-  $('#wheelSay').innerHTML = `<b style="color:${EL[sel]}">${ELNAME[sel]}</b> <em>${VERB[sel][b[0]][0]} ${ELNAME[b[0]]} and ${VERB[sel][b[1]][0]} ${ELNAME[b[1]]}</em>. It is <s>${VERB[w[0]][sel][1]} by ${ELNAME[w[0]]} and ${VERB[w[1]][sel][1]} by ${ELNAME[w[1]]}</s>.`;
+  // beat one, feed one: what it beats, what beats it, and the element that feeds it, which it barely hurts (2026-10-08)
+  $('#wheelSay').innerHTML = `<b style="color:${EL[sel]}">${ELNAME[sel]}</b> <em>${VERB[sel][b[0]][0]} ${ELNAME[b[0]]}</em>. <s>${ELNAME[w[0]]} ${VERB[w[0]][sel][0]} ${ELNAME[sel]}</s>. ${ELNAME[FED_BY[sel]]} feeds it, so it barely hurts ${ELNAME[FED_BY[sel]]}.`;
 }
 function chart(from) {
   chartFrom = from;
