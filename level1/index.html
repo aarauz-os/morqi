@@ -2269,7 +2269,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach'].map(k => 'vo-card-' + k), ...['untouched', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -3335,7 +3335,7 @@ function startRun() {
   // Level 5 holds the temples too (A, 2026-10-07)
   S.l5 = LVL === 5 && towersOn() ? makeL5() : null; S.well = LVL === 5 ? makeWell() : null;
   if (S.out) { S.p.x = S.out.start.x; S.p.y = S.out.start.y; S.pet.x = S.p.x - 40; S.pet.y = S.p.y + 30; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
-  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=13`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); if (LVL >= SURGE.from) { formArt(); if (!IMG['k' + keeper + 'face']) load('k' + keeper + 'face', `art4/k${keeper}-face.png?v=13`); } if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=13`; new Image().src = `art4/k${keeper}-hurt.png?v=13`; } renderSkills(); startLoop();
+  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=13`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); if (!IMG['k' + keeper + 'breath']) load('k' + keeper + 'breath', `art4/k${keeper}-breath.png?v=13`); if (LVL >= SURGE.from) { formArt(); if (!IMG['k' + keeper + 'face']) load('k' + keeper + 'face', `art4/k${keeper}-face.png?v=13`); } if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=13`; new Image().src = `art4/k${keeper}-hurt.png?v=13`; } renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -3569,7 +3569,7 @@ function hurt(e, dmg, el, o = {}) {
   if (e.fade != null && e.fade < .7) return;
   if (e.K && e.K.beh === 'call' && (Math.abs(e.x - S.p.x) > VW * .5 || Math.abs(e.y - S.p.y) > VH * .5)) return;
   if (e.post && !e.posted) return;   // a shooter can't be freed on its way in, only once it holds its post (QA, 2026-10-08: they died before firing)
-  let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0)) * (surgeOn() ? SURGE.mul : 1);
+  let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0)) * (surgeOn() ? SURGE.mul : 1) * (lbOn() ? LB.mul : 1);
   const k = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), strong = k > 1, weak = k < 1;
   m *= k;
   // the words teach, so they show the first few times in a run; after that the coloured hit says it
@@ -5442,6 +5442,61 @@ const surgeOn = () => !!(S && S.surge && S.surge.on);
 const titanSkin = () => { if (!surgeOn() || S.surge.on.el !== 'earth') return 1; debris(S.p.x, S.p.y - 40, 6, 240, '#B08A52'); SFX.thud(); return .35; };
 // the form fades in from .12 s to .32 s (the light from the body first) and pours back out over the last .45 s
 const surgeFade = () => { const O = S.surge.on; return O ? Math.min(1, Math.max(0, (O.life - O.t) / .45), Math.max(0, (O.t - .12) / .2)) : 0; };
+/* Last Breath (the Legend Engine, Phase 2; A, 2026-10-08: "a burst of all the elements like a gohan from dbz moment when he was a
+   kid ... its still not Omni. maybe glimpse it ... only last for about 6s"). Kid Gohan's power slept until someone he loved was in
+   danger, then burst out in one moment he couldn't hold, and was gone again. Ours wakes the same way, at the brink, once a run,
+   but the trigger is a breath, never rage: the Keeper kneels, eyes closed, and takes one deep breath while the five colours pour
+   in (0.75 s); the eyes open on a burst of all five elements, with a glimpse of Omni's light for a heartbeat; then about five
+   seconds of raw, unsteady power that strikes each creature with the element that beats it; then the Keeper catches their breath
+   and it is gone. Never a full-screen flash, nothing can touch the Keeper while it plays, and the boss only feels the burst. */
+const LB = { at:.15, breath:.75, life:6.2, R:560, mul:1.5, every:.45 };
+const LB_COL = ['#4E9BE0', '#6FBF4A', '#FF9A4A', '#E6B23A', '#DDE6F4'];   // water, wood, fire, earth, metal
+// its bolts in each element's own light colour: fire is flame orange, never the coral red of danger (design review, 2026-10-08)
+const LB_ELC = { water:LB_COL[0], wood:LB_COL[1], fire:LB_COL[2], earth:LB_COL[3], metal:LB_COL[4] };
+const lbOn = () => !!(S && S.lb && S.lb.t < S.lb.life);
+// once a run, at the brink: a hit that takes the Keeper under 15%, or one that would fell them
+function lbCheck() {
+  const P = S.p; if (S.lb || S.over || S.fall || hsOn() || S.omni || S.omniSnap || surgeOn() || !running) return;
+  if (P.hp < P.max * LB.at) { if (P.hp <= 0) P.hp = 1; lbStart(); }
+}
+function lbStart() {
+  const P = S.p; S.lb = { t:0, life:LB.life, strikeT:LB.breath + .25, burst:false }; P.hurt = LB.life + .4;
+  if (!IMG['k' + keeper + 'breath']) load('k' + keeper + 'breath', `art4/k${keeper}-breath.png?v=13`);
+  SFX.heartbeat(); setTimeout(() => { if (lbOn()) SFX.heartbeat(); }, 380);
+}
+function lbBurst() {
+  const P = S.p, O = S.lb; O.burst = true; P.hp = Math.max(P.hp, P.max * .5);
+  S.shake = Math.max(S.shake, .7); S.hitstop = Math.max(S.hitstop || 0, .1); SFX.boom(true); SFX.power();
+  // one light event: a single ring, a soft local flash, and pieces of all five colours flung out (design review, 2026-10-08: five
+  // rings 70 ms apart were six bright events in 0.3 s)
+  ring(P.x, P.y - 20, 30, LB.R, '#FFF1C0', .6, 14, true); flash(P.x, P.y - 40, 300, '#FFF6DE', .22);
+  for (let i = 0; i < 25; i++) { const a = i / 25 * TAU, s = rnd(380, 620); fx({ k:'spark', x:P.x, y:P.y - 50, vx:Math.cos(a) * s, vy:Math.sin(a) * s * .7, drag:2.5, life:.6, s:4, c:LB_COL[i % 5] }); }
+  // the first time, the banner says it; after that, the name floats up (one place at a time)
+  if (SEEN.has('_lastbreath')) floatText(P.x, P.y - 150, 'Last Breath!', '#FFFFFF', 34);
+  // every creature near is struck by the element that beats it; the boss feels it once, like Raditz did
+  const d0 = 60 + 22 * S.lv;
+  for (const e of S.en) { if (e.dead) continue; const d = Math.hypot(e.x - P.x, e.y - P.y); if (d > LB.R + e.r) continue;
+    const el = weakTo(e.el)[0] || keeperEl;
+    // the boss loses a flat 6%, past every multiplier, and never its last point (QA, 2026-10-08: x1.5 and x2 made it 18%)
+    if (e.boss) { e.hp = Math.max(1, e.hp - e.max * .06); e.flash = .08; e.hitAt = S.t; e.pulseAt = S.t; }
+    // the crowd it reaches is freed outright, giants only shaken (QA, 2026-10-08: on Level 5 it freed 14 of 100)
+    else hurt(e, e.giant ? d0 * 2 : Math.max(d0, e.max * 1.2), el, { kb:820, fx:P.x, fy:P.y, react:true }); }
+  if (!SEEN.has('_lastbreath')) { markSeen('_lastbreath'); BANNER.q.unshift({ id:'lastbreath', title:'Last Breath!', text:'Your hidden power woke up!', pic:`art4/k${keeper}-face.png?v=13` }); BANNER.t = Math.min(BANNER.t, 1); }
+  S.lbUsed = (S.lbUsed || 0) + 1;
+}
+function lbTick(dt) {
+  const O = S.lb; if (!O || O.t >= O.life) return; const P = S.p; O.t += dt;
+  // the five colours pour in toward the Keeper as the breath comes in
+  if (!O.burst) { if (Math.random() < dt * 40) { const a = rnd(0, TAU), r = rnd(220, 320); fx({ k:'star', x:P.x + Math.cos(a) * r, y:P.y - 40 + Math.sin(a) * r * .7, vx:-Math.cos(a) * r / .5, vy:-Math.sin(a) * r * .7 / .5, drag:0, life:.5, s:rnd(5, 8), c:LB_COL[(Math.random() * 5) | 0] }); }
+    if (O.t >= LB.breath) lbBurst(); return; }
+  // unsteady power: every so often a bolt of the right element leaps to the nearest creatures; sparks of all five fly off the Keeper
+  if (O.t < O.life - .6 && (O.strikeT -= dt) <= 0) { O.strikeT = LB.every * rnd(.8, 1.25);
+    const near = S.en.filter(e => !e.dead && !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 420).sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y)).slice(0, 3);
+    for (const e of near) { const el = weakTo(e.el)[0] || keeperEl; bolt(P.x, P.y - 50, e.x, e.y - 30, LB_ELC[el] || '#FFFFFF', 3.5, false); hurt(e, 26 + 9 * S.lv, el, { kb:240, fx:P.x, fy:P.y, react:true }); }
+    if (near.length) SFX.ting && SFX.ting(); }
+  if (Math.random() < dt * 14) { const a = rnd(0, TAU); fx({ k:'spark', x:P.x + Math.cos(a) * 30, y:P.y - 50 + Math.sin(a) * 40, vx:Math.cos(a) * 220, vy:Math.sin(a) * 160 - 60, drag:3, life:.4, s:3, c:LB_COL[(Math.random() * 5) | 0] }); }
+  if (O.t >= O.life) { P.hurt = Math.max(P.hurt, 1.2); SFX.sweep(); for (let i = 0; i < 10; i++) fx({ k:'smoke', x:P.x + rnd(-40, 40), y:P.y - rnd(0, 60), vx:rnd(-40, 40), vy:rnd(-70, -30), drag:1.2, life:rnd(.6, .9), s:rnd(22, 32), c:'235,240,250', a:.5 }); }
+}
 function surgeCharge(e) {
   const G = SG(); if (S.level < SURGE.from || !surgeArt() || G.used || G.on || G.ready || e.horde) return;
   G.q++; if (G.q < SURGE.need) return;
@@ -6561,11 +6616,13 @@ function update(dt) {
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.004, dt); P.ry = (P.ry || 0) * Math.pow(.004, dt);
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); surgeTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); familiesTick(dt); dangerTick(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); surgeTick(dt); lbTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); familiesTick(dt); dangerTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
     if (e.frozen > 0) continue;
+    // the world holds still while a Last Breath comes in (no frost: nothing is frozen, it waits)
+    if (lbOn() && !S.lb.burst && !e.boss) continue;
     e.rooted = Math.max(0, (e.rooted || 0) - dt); if (e.rooted > 0) continue;
     e.dance = Math.max(0, (e.dance || 0) - dt); if (e.dance > 0) continue;
     if (e.kb > 0) { e.kb -= dt; e.x += e.kx * dt; e.y += e.ky * dt; continue; }
@@ -6587,6 +6644,7 @@ function update(dt) {
   for (const n of S.nums) n.t += dt; S.nums = S.nums.filter(n => n.t < .65);
   if (S.rises === 0 && !S.lightUsed && (S.lastLight += dt) >= LAST_LIGHT) { S.lightUsed = true; S.rises = 1; S.lastLight = LAST_LIGHT;
     ring(P.x, P.y, 20, 360, '#FFE6A3', .6, 12, true); stars(P.x, P.y - 40, 24, '#FFE58A', 320); SFX.levelup(); luma('vo-another', true); $('#livesPill').classList.remove('bump'); void $('#livesPill').offsetWidth; $('#livesPill').classList.add('bump'); }
+  lbCheck();
   if (P.hp <= 0 && !S.over) fall();
 }
 // a word that would land on one still showing lifts above it instead (A's playthrough, 2026-10-05: "Unstoppable!" over
@@ -7374,7 +7432,10 @@ function draw() {
   if (!S.fall && !S.noKeeper) {
   const runName = `k${keeper}r${[1, 2, 3, 2][Math.floor(S.t * 10) % 4]}`, useRun = P.moving && ok(IMG[runName]), hk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .28);
   const pose = n => ok(IMG['k' + keeper + n]) ? 'k' + keeper + n : null;
-  const posed = S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
+  // Last Breath: the Keeper stands and swells with one deep breath in (design review, 2026-10-08: the kneeling pose is the defeat
+  // pose, so it is kept for catching their breath at the end only)
+  const lbk = lbOn() && S.lb.t > S.lb.life - .5, lbIn = lbOn() && !S.lb.burst ? 1 + .07 * Math.sin(Math.min(1, S.lb.t / LB.breath) * Math.PI / 2) : 1;
+  const posed = lbk ? pose('breath') : S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
   // the Keeper is drawn at KEEPER_KS (above draw()), one scale for every pose
   const hs = hsOn(), hsIm = hs ? (IMG['k' + keeper + 'hs'] || load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`)) : null;
   // while Ascended the Keeper stays themself on the ground; the Ascended form rises out of them as a genie
@@ -7397,11 +7458,18 @@ function draw() {
   }
   // while Omni the Keeper IS the form (A, 2026-10-06: "I would rather if we never saw our keeper selves the Omni and surges
   // come from"): the small Keeper only shows again as the form pours back into them at the very end
+  // Last Breath's unsteady power glows round the Keeper, its colour never settling on one element
+  // (the colour drifts round the five in 2.5 s, a crossfade, and the glow breathes at about 1.4 Hz: never a strobe; design review, 2026-10-08)
+  if (lbOn() && S.lb.burst && S.lb.t < S.lb.life - .5) { const [c0, c1, f] = lbDrift(), k = Math.min(1, (S.lb.life - .5 - S.lb.t) / .4), r = 165 + Math.sin(S.t * 9) * 14; add(() => { glowAt(kx, ky - 45, r, c0, .7 * k * (1 - f)); glowAt(kx, ky - 45, r, c1, .7 * k * f); glowAt(kx, ky - 45, 80, '#FFFFFF', .3 * k); }); }
+  // the glimpse: for half a second as the eyes open, Omni stands behind the Keeper, a ghost, then is gone (it is still not Omni)
+  if (lbOn() && S.lb.burst && S.lb.t < LB.breath + .55) { const om = IMG['k' + keeper + 'hs']; if (ok(om)) { const q = (S.lb.t - LB.breath) / .55, w = ks * 1.55, h = w * om.height / om.width; g.globalAlpha = Math.sin(q * Math.PI) * .7; g.drawImage(om, kx - w / 2, ky + 34 - h, w, h); g.globalAlpha = 1; } }
   const sgo = !hs && surgeOn(), formK = hs ? omniFormFade() : sgo ? surgeFade() : 0;
   if (ok(kim) && formK < 1) { g.save(); g.globalAlpha = 1 - formK; g.translate(kx, ky + 30 - bob); { const rk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .35); g.rotate(lean - (P.hdx || 0) * (P.hitHeavy ? .32 : .2) * rk * rk); } if (P.face < 0) g.scale(-1, 1);
-    g.scale(ksx * (1 + hk * .08), ksy * (1 - hk * .1));
+    g.scale(ksx * (1 + hk * .08) * (1 + (lbIn - 1) * .4), ksy * (1 - hk * .1) * lbIn);
     // the look's signature: a soft rim of light in the Keeper's element colour
-    { const rim = silhouette(kName, EL[keeperEl]); if (rim) add(() => { g.globalAlpha = .6; g.drawImage(rim, -ks * .53, kTop(ks) - ks * .03, ks * 1.06, ks * 1.06); g.globalAlpha = 1; }); }
+    // (in a Last Breath's unsteady power the rim grows and shifts through all five colours, never settling)
+    { const lbp = lbOn() && S.lb.burst && S.lb.t < S.lb.life - .5, rs = lbp ? 1.14 + .03 * Math.sin(S.t * 9) : 1.06, [c0, c1, f] = lbp ? lbDrift() : [EL[keeperEl], EL[keeperEl], 0];
+      for (const [c, a] of lbp ? [[c0, 1 - f], [c1, f]] : [[c0, .6]]) { const rim = silhouette(kName, c); if (rim && a > .02) add(() => { g.globalAlpha = a; g.drawImage(rim, -ks * rs / 2, kTop(ks) - ks * (rs - 1) / 2, ks * rs, ks * rs); g.globalAlpha = 1; }); } }
     g.drawImage(kim, -ks / 2, kTop(ks), ks, ks);   // feet on the shadow
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
     // a Surge begins as light from the Keeper's own figure (A, 2026-10-07)
@@ -7458,7 +7526,9 @@ function draw() {
       g.restore(); } }
   // damage numbers and callouts
   g.textAlign = 'center'; g.lineJoin = 'round';
-  for (const n of S.omni || S.omniSnap ? [] : S.nums) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 32 : n.weak ? 19 : 25) * (n.sc || 1) * (n.big ? 1 : .82) * pk / Z;
+  // no numbers over a Last Breath's breath and burst, and none on the Keeper while it plays (one hero)
+  const lbHide = lbOn() && S.lb.t < LB.breath + .5, lbNear = n => lbOn() && Math.hypot(n.x - P.x, n.y - P.y + 40) < 160;
+  for (const n of S.omni || S.omniSnap || lbHide ? [] : S.nums.filter(n => !lbNear(n))) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 32 : n.weak ? 19 : 25) * (n.sc || 1) * (n.big ? 1 : .82) * pk / Z;
     g.globalAlpha = Math.min(1, (.65 - n.t) * 5); g.font = `900 ${sz}px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif`; g.lineWidth = 4.5 / Z; g.strokeStyle = 'rgba(16,22,34,.72)'; g.strokeText(n.v, n.x, y); if (n.strong && n.el) { g.lineWidth = 3 / Z; g.strokeStyle = n.el === 'earth' ? '#C8902A' : n.el === 'metal' ? '#9AA8B8' : GROUND_RING[n.el] || '#FFFFFF'; g.strokeText(n.v, n.x, y); } g.fillStyle = n.weak ? '#AEB8C0' : '#FFFFFF'; g.fillText(n.v, n.x, y); }
   for (const t of S.omni || S.omniSnap ? [] : S.txt) { g.globalAlpha = Math.min(1, (1.1 - t.t) * 3); g.font = `900 ${Math.round(t.size / Z)}px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif`; g.lineWidth = 5; g.strokeStyle = 'rgba(16,22,34,.72)'; const y = t.y - t.t * 50; g.strokeText(t.s, t.x, y); g.fillStyle = t.c; g.fillText(t.s, t.x, y); }
   g.globalAlpha = 1; g.lineWidth = 1;
@@ -7533,6 +7603,9 @@ function draw() {
   if (S.hsZoom) { const k = (performance.now() - S.hsZoom) / 700; if (k >= 1 || reduce) S.hsZoom = 0; else pushIn((P.x - camX) * Z, (P.y - 60 - camY) * Z, 1 + .32 * Math.sin(k * Math.PI)); }
   if (S.omni) drawOmniIntro(P, reduce);
   if (S.omniSnap) drawOmniSnap(P, reduce);
+  // the world dims while the Last Breath comes in
+  // (a spotlight: the Keeper, at the centre of the view, stays lit)
+  if (lbOn() && !S.lb.burst) { const k = .7 * Math.min(1, S.lb.t / .2), sx = (P.x - camX) * Z, sy = (P.y - 40 - camY) * Z, v = g.createRadialGradient(sx, sy, 70 * Z, sx, sy, H * .5); v.addColorStop(0, 'rgba(8,10,28,0)'); v.addColorStop(1, `rgba(8,10,28,${k})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
   if (S.freeze > 0) { g.fillStyle = `rgba(160,220,255,${Math.min(.18, S.freeze * .08)})`; g.fillRect(0, 0, W, H); }
   if (P.hp < P.max * .3 && !S.fall) { const v = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); v.addColorStop(0, 'rgba(200,40,30,0)'); v.addColorStop(1, `rgba(200,40,30,${.4 * (1 - P.hp / (P.max * .3)) * (.7 + .3 * Math.sin(S.t * 8))})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
 }
@@ -7737,6 +7810,8 @@ function drawSurgeForm(kx, ky, im, fade, O) {
   else if (el === 'earth' && S.p.moving && r < .5) fx({ k:'smoke', x:kx + rnd(-40, 40), y:fy + rnd(0, 8), vx:-(S.p.vx || 0) * .15, vy:-rnd(10, 30), drag:1.5, life:rnd(.5, .8), s:rnd(16, 26), c:'190,160,110', a:.5 });
   else if (el === 'metal' && r < .25) fx({ k:'spark', x:kx + rnd(-60, 60), y:fy - rnd(0, 30), vx:rnd(-60, 60), vy:-rnd(40, 90), drag:4, life:.3, s:2.5, c:'#E8EEF6' });
 }
+// Last Breath's colour now: the two neighbouring element colours and how far it has drifted from one to the next
+function lbDrift() { const u = (S.lb.t / 2.5 * 5) % 5, i = Math.floor(u); return [LB_COL[i], LB_COL[(i + 1) % 5], u - i]; }
 const mixHex = (a, b, k) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), x = p(a), y = p(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * k).toString(16).padStart(2, '0')).join(''); };
 const hexA = (h, a) => `rgba(${parseInt(h.slice(1, 3), 16)},${parseInt(h.slice(3, 5), 16)},${parseInt(h.slice(5, 7), 16)},${a})`;
 function drawOmniForm(kx, ky, im, fade, O = S.hs.on, cols = STORM_EL(), gs = 0, body = OMNI_BODY) {
@@ -9312,7 +9387,7 @@ function tipArt(id) {
   return `<div class="hsdemo logo"><img class="logo-pic" src="art4/logo-morqi.png?v=11" alt=""></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { react:'react', chesthold:'chesthold', lvhold:'lvhold', evoteach:'evoteach', giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', wall:'wall', shooters:'shooters', l4temples:'l4temples', l5temples:'l5temples', surge:'surge' };
+const CARD_VO = { lastbreath:'lastbreath', react:'react', chesthold:'chesthold', lvhold:'lvhold', evoteach:'evoteach', giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', wall:'wall', shooters:'shooters', l4temples:'l4temples', l5temples:'l5temples', surge:'surge' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
@@ -9954,10 +10029,13 @@ function runTitle() {
   if (wiseShare() >= .9 && S.thawed >= 40) return ['weakness', 'Weakness Finder', 'Used their weakness almost every time'];
   if (g === 1) return ['giants', 'Giant Hero', 'Freed a giant'];
   if (rx >= 3) return ['mixer', 'Element Mixer', `Mixed elements ${rx} times`];
+  // it wakes in most runs that get hard, so it ranks just above the floor (design review, 2026-10-08: rarest first)
+  if (S.lbUsed) return ['lastbreath', 'Last Breath', 'Your hidden power woke up'];
   return ['brave', 'Brave Keeper', `Freed ${S.thawed.toLocaleString()} creatures`];
 }
 function titlePic(k) {
   if (k === 'untouched') return '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l13 5v9c0 9-6 15-13 18C13 33 7 27 7 18V9z" fill="#EEF2F8" stroke="#C99A2E" stroke-width="3" stroke-linejoin="round"/><path d="M20 4l13 5v9c0 9-6 15-13 18C13 33 7 27 7 18V9z" fill="none" stroke="#5A6678" stroke-width="1.2" stroke-linejoin="round"/><path d="M20 8.5l9 3.5v6.5c0 6.5-4 11-9 13.5z" fill="#FFFFFF"/></svg>';
+  if (k === 'lastbreath') return `<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="6" fill="#FFFFFF"/>${['#4E9BE0', '#6FBF4A', '#FF9A4A', '#E6B23A', '#B8C4D8'].map((c, i) => { const a = -Math.PI / 2 + i * Math.PI * 2 / 5; return `<circle cx="${(20 + Math.cos(a) * 12.5).toFixed(1)}" cy="${(20 + Math.sin(a) * 12.5).toFixed(1)}" r="4.6" fill="${c}" stroke="#5A6678" stroke-width="1"/>`; }).join('')}</svg>`;
   if (k === 'comeback') return '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5l10 11h-6v14h-8V16h-6z" fill="#FFFFFF" stroke="#C99A2E" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 33h24" stroke="#5A6678" stroke-width="3" stroke-linecap="round"/><circle cx="9" cy="12" r="1.8" fill="#C99A2E"/><circle cx="31" cy="9" r="1.5" fill="#C99A2E"/></svg>';
   if (k === 'giants') { const im = IMG[S.lastGiantImg]; return `<img src="${im ? giantPic(im) : 'art4/e-golem.png?v=8'}" alt="">`; }
   if (k === 'mixer') { const [a, b] = Object.keys(S.reactSaid || { 'water|wood':1 }).sort((x, y) => S.reactSaid[y] - S.reactSaid[x])[0].split('|'); return `<img class="two" src="art4/props/x-stone-${a}.png?v=8" alt=""><img class="two b" src="art4/props/x-stone-${b}.png?v=8" alt="">`; }
@@ -10038,7 +10116,7 @@ function results(quiet) {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, react:(key, x, y) => react(key, REACT[key], x, y), reactKeys:() => Object.keys(REACT), giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, lb:() => ({ on:lbOn(), t:S.lb && S.lb.t, burst:S.lb && S.lb.burst, img:ok(IMG['k' + keeper + 'breath']), cam:[camX, camY, Z] }), react:(key, x, y) => react(key, REACT[key], x, y), reactKeys:() => Object.keys(REACT), giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
