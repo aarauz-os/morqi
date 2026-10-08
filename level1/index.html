@@ -552,6 +552,28 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
   filter:drop-shadow(0 3px 0 #9A5200) drop-shadow(0 10px 18px rgba(255,170,40,.45));animation:vicIn .8s var(--spring) both}
 @keyframes vicIn{0%{transform:scale(.4);opacity:0}100%{transform:none;opacity:1}}
 .resQ{margin:-4px 0 0;max-width:28ch;font-size:13.5px;font-style:italic;line-height:1.4;color:rgba(255,255,255,.7)}
+/* the Run Card's earned title: a gold ribbon with folded, notched tails tucked behind the card's top edge, a medal holding the
+   title's own picture, stamped in after the stars (design review, 2026-10-08: a capsule read as a chip or a button) */
+.rtitle{position:absolute;left:50%;top:-26px;translate:-50% 0;display:flex;align-items:center;gap:9px;max-width:calc(100% - 56px);padding:5px 20px 5px 6px;border-radius:6px;white-space:nowrap;cursor:pointer;z-index:2;
+  background:linear-gradient(180deg,#FFF1B8,#FFC94A 55%,#EE9A1E);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.8),inset 0 -2px 0 rgba(154,82,0,.35),0 8px 18px rgba(0,0,0,.3);color:#4A2500}
+.rtitle::before,.rtitle::after{content:'';position:absolute;top:12px;width:30px;height:100%;z-index:-1;background:linear-gradient(180deg,#E8A23A,#B86A08)}
+.rtitle::before{left:-20px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,30% 50%)}
+.rtitle::after{right:-20px;clip-path:polygon(0 0,100% 0,70% 50%,100% 100%,0 100%)}
+.rtitle>i{flex:none;width:40px;height:40px;margin:-4px 0;border-radius:50%;display:grid;place-items:center;overflow:hidden;position:relative;
+  background:radial-gradient(circle at 40% 35%,#FFFDF2,#FFE6A3 70%);box-shadow:inset 0 0 0 2.5px #B86A08,0 2px 0 #9A5200}
+.rtitle>i svg{width:28px;height:28px}
+.rtitle>i img{width:34px;height:34px;object-fit:contain}
+.rtitle>i img.face{width:40px;height:40px;object-fit:cover}
+.rtitle>i img.two{position:absolute;width:24px;height:24px;left:3px;top:9px;transform:rotate(-14deg)}
+.rtitle>i img.two.b{left:auto;right:3px;transform:rotate(14deg)}
+.rtitle span{display:flex;flex-direction:column;line-height:1.05;min-width:0}
+.rtitle b{font:900 19px var(--round);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis}
+.rtitle em{font:800 11.5px var(--round);font-style:normal;opacity:.78;overflow:hidden;text-overflow:ellipsis}
+.rtitle[hidden]{display:none}
+.rtitle.in{animation:titleIn .55s var(--spring) both}
+@keyframes titleIn{0%{transform:scale(1.8) rotate(-6deg);opacity:0}60%{opacity:1}100%{transform:none;opacity:1}}
+.res.titled{position:relative}
+#results .res.titled .stars3{margin-top:26px}
 .stars3{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin-top:2px}
 .st3{width:92px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
 .st3 svg{width:62px;height:62px;overflow:visible}
@@ -1771,6 +1793,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <div class="victory"><img src="art4/b-fisher.png?v=8" alt="The fisherman, freed, holding a glowing lantern."></div>
     </div>
     <div class="panel pop res">
+      <div class="rtitle" id="resTitle" hidden><i aria-hidden="true"></i><span><b></b><em></em></span></div>
       <div class="stars3" id="resStars"></div>
       <div class="resGift" id="resGift" hidden></div>
       <div class="resBloom" id="resBloom" hidden></div>
@@ -3553,7 +3576,7 @@ function hurt(e, dmg, el, o = {}) {
   if (strong && !surgeOn() && S.level < 3 && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
   if (weak && S.level < 3 && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
   if (e.giant) m *= giantArmour(e);
-  const dealt = dmg * m; e.lastHit = dealt;
+  const dealt = dmg * m; e.lastHit = dealt; if (!o.react && dealt > (S.bestHit || 0)) S.bestHit = dealt;   // the Run Card's best hit: the player's own, never a crush
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
   if (strong && e.hp <= 0 && !e.boss && !e.wise && !e.horde) { e.wise = 1; S.wise = (S.wise || 0) + 1; }
@@ -3617,7 +3640,7 @@ function kill(e) {
   }
   paintThaw(e.x, e.y, e.type === 'golem' ? 190 : e.boss ? 900 : 84);
   // a giant felled pays out: a chest, a heart and a fountain of gems
-  if (e.giant) { S.nums.push({ x:e.x, y:e.y - e.size * .7, v:Math.round(e.lastHit || 0), t:0, big:true, sc:1.9 });   // the giant felled: the killing blow, big (design review, 2026-10-08: its full HP read as a bug)
+  if (e.giant) { S.giantsFelled = (S.giantsFelled || 0) + 1; S.lastGiantImg = e.img; S.nums.push({ x:e.x, y:e.y - e.size * .7, v:Math.round(e.lastHit || 0), t:0, big:true, sc:1.9 });   // the giant felled: the killing blow, big (design review, 2026-10-08: its full HP read as a bug)
     if (e.giant === 'colossus') { S.shake = Math.max(S.shake, .8); debris(e.x, e.y, 26, 520); ring(e.x, e.y + 20, 30, 300, '#C8A060', .6, 18, false);
       inArea(e.x, e.y + 20, 280, c => { if (c !== e && !c.boss && !c.giant) hurt(c, c.max * 4, 'earth', { kb:620, fx:e.x, fy:e.y, react:true }); }); }   // it crushes the crowd it falls on (Phase 2)
     S.rainbowNext = true; SFX.cleared(); S.shake = .6; S.hitstop = Math.max(S.hitstop || 0, .12); ring(e.x, e.y, 30, 420, col, .7, 18, true); stars(e.x, e.y - 80, 40, '#FFE58A', 520); dropChest(e.x, e.y);
@@ -4984,7 +5007,7 @@ function ouch(dmg, fx, fy, o = {}) {
     if (S.arena) { const A = S.arena, q = Math.hypot(P.x - A.x, P.y - A.y), lim = (S.storm ? S.storm.r0 + 400 : A.r) - 34; if (q > lim) { P.x = A.x + (P.x - A.x) / q * lim; P.y = A.y + (P.y - A.y) / q * lim; } } }
   keeperHit(fx, fy, o.el, (o.push || 0) >= 100 || o.shake > .3, o.push ? { x:P.x - x0, y:P.y - y0 } : null);
   if (o.slow) P.slowT = Math.max(P.slowT || 0, o.slow);
-  P.hp -= hit; S.shake = Math.max(S.shake, o.shake || .12); S.pet.hitAt = S.t; S.lastHit = { src:o.src || 'trap', el:o.el, kid:o.kid };
+  P.hp -= hit; S.hitsTaken = (S.hitsTaken || 0) + 1; S.shake = Math.max(S.shake, o.shake || .12); S.pet.hitAt = S.t; S.lastHit = { src:o.src || 'trap', el:o.el, kid:o.kid };
   SFX.hurt();
   if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15);
   return true;
@@ -5777,7 +5800,7 @@ function stormTick(dt) {
     // a heartbeat a second; each one bites, harder as the storm closes; the frost marks fill over six of them
     St.out = Math.min(St.out, STORM.out);
     if ((St.beat -= dt) <= 0) { St.beat = 1; SFX.heartbeat(); const k = Math.min(1, St.t / STORM.shrink), d = Math.hypot(P.x - St.x, P.y - St.y) || 1;
-      P.hp -= P.max * (STORM.bite0 + (STORM.bite1 - STORM.bite0) * k); P.hitAt = S.t; S.lastHit = { src:'still' }; S.shake = Math.max(S.shake, .15 + .25 * k);
+      P.hp -= P.max * (STORM.bite0 + (STORM.bite1 - STORM.bite0) * k); S.hitsTaken = (S.hitsTaken || 0) + 1; P.hitAt = S.t; S.lastHit = { src:'still' }; S.shake = Math.max(S.shake, .15 + .25 * k);
       keeperHit(P.x + (P.x - St.x) / d * 100, P.y + (P.y - St.y) / d * 100, 'water', k > .5); shards(P.x, P.y - 40, '#DDF1FF', 8, 220); if (P.hp <= 0) SFX.freeze(); } }
   else { St.out = Math.max(0, St.out - dt * 2.5); St.beat = 0; }
   // taught once, on the game's clock: after the boss has settled in, when the frost wall first comes into view or the Keeper
@@ -6550,14 +6573,14 @@ function update(dt) {
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
     if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
     if (d < e.r + P.r && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .55; P.hitAt = S.t; const x0 = P.x, y0 = P.y; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
-      const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el) * titanSkin(); P.hp -= hit; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
+      const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + S.t / (S.level === 1 ? 270 : 180)) * lvHit()) * armourVs(e.el) * titanSkin(); P.hp -= hit; S.hitsTaken = (S.hitsTaken || 0) + 1; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
       if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? (S.storm ? S.storm.r0 + 400 : A.r) - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } keeperHit(e.x, e.y, e.el, e.boss || e.heavy, e.boss ? { x:P.x - x0, y:P.y - y0 } : null); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
     if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
   for (const s of S.eshots) { s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt; s.rot += dt * 8;
-    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; keeperHit(P.x - s.vx, P.y - s.vy, s.el, s.boss); S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= titanSkin() * (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.src || (s.boss ? 'spiral' : 'shot'), el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, SHOT_HIT[s.k] || '#CFE9FF', 4, 160); SFX.hurt(); } }
+    if (Math.hypot(s.x - P.x, s.y - P.y) < P.r + 10 && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .6; P.hitAt = S.t; S.hitsTaken = (S.hitsTaken || 0) + 1; keeperHit(P.x - s.vx, P.y - s.vy, s.el, s.boss); S.shake = Math.max(S.shake, .15); s.life = 0; P.hp -= titanSkin() * (s.dmg || 9) * (s.boss ? bossHit() : lvHit()) * armourVs(s.el); S.lastHit = { src:s.src || (s.boss ? 'spiral' : 'shot'), el:s.el }; if (s.slow) P.slowT = Math.max(P.slowT || 0, s.slow); shards(P.x, P.y - 20, SHOT_HIT[s.k] || '#CFE9FF', 4, 160); SFX.hurt(); } }
   S.eshots = S.eshots.filter(s => s.life > 0);
   S.en = S.en.filter(e => !e.dead);
   for (const t of S.txt) t.t += dt; S.txt = S.txt.filter(t => t.t < 1.1);
@@ -9920,6 +9943,27 @@ function petProgHTML(r) {
 // sunset, never red: red is danger)
 const VIC_SKY = { water:['#6FCBFF', '#D6F5FF', '#2BB6E8', '#123A7A'], wood:['#7FD8FF', '#DDFBD0', '#4CC86A', '#14466A'], fire:['#FFB36B', '#FFE9C2', '#FF9A3D', '#5A2A6E'],
   earth:['#FFC96A', '#FFF0C8', '#E6A93A', '#4E3466'], metal:['#A9BDFF', '#EEF2FF', '#9FB4E8', '#26306E'] };
+// the Run Card's title: the rarest thing this run did, checked rarest first. Each names how it was earned, in the game's own words
+// (free, rise, mix), and each has its own picture, never a star: stars are the level's rating (design review, 2026-10-08)
+function runTitle() {
+  const used = RISES[LVL - 1] - S.rises, g = S.giantsFelled || 0, rx = S.reacts || 0;
+  if (!(S.hitsTaken > 0)) return ['untouched', 'Untouched', 'Nothing touched you!'];
+  if (used > 0) return ['comeback', 'Comeback!', used > 1 ? `Rose ${used} times and won` : 'Rose again and won'];
+  if (g >= 2) return ['giants', 'Giant Hero', `Freed ${g} giants`];
+  if (rx >= 8) return ['mixer', 'Element Mixer', `Mixed elements ${rx} times`];
+  if (wiseShare() >= .9 && S.thawed >= 40) return ['weakness', 'Weakness Finder', 'Used their weakness almost every time'];
+  if (g === 1) return ['giants', 'Giant Hero', 'Freed a giant'];
+  if (rx >= 3) return ['mixer', 'Element Mixer', `Mixed elements ${rx} times`];
+  return ['brave', 'Brave Keeper', `Freed ${S.thawed.toLocaleString()} creatures`];
+}
+function titlePic(k) {
+  if (k === 'untouched') return '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4l13 5v9c0 9-6 15-13 18C13 33 7 27 7 18V9z" fill="#EEF2F8" stroke="#C99A2E" stroke-width="3" stroke-linejoin="round"/><path d="M20 4l13 5v9c0 9-6 15-13 18C13 33 7 27 7 18V9z" fill="none" stroke="#5A6678" stroke-width="1.2" stroke-linejoin="round"/><path d="M20 8.5l9 3.5v6.5c0 6.5-4 11-9 13.5z" fill="#FFFFFF"/></svg>';
+  if (k === 'comeback') return '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5l10 11h-6v14h-8V16h-6z" fill="#FFFFFF" stroke="#C99A2E" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 33h24" stroke="#5A6678" stroke-width="3" stroke-linecap="round"/><circle cx="9" cy="12" r="1.8" fill="#C99A2E"/><circle cx="31" cy="9" r="1.5" fill="#C99A2E"/></svg>';
+  if (k === 'giants') { const im = IMG[S.lastGiantImg]; return `<img src="${im ? giantPic(im) : 'art4/e-golem.png?v=8'}" alt="">`; }
+  if (k === 'mixer') { const [a, b] = Object.keys(S.reactSaid || { 'water|wood':1 }).sort((x, y) => S.reactSaid[y] - S.reactSaid[x])[0].split('|'); return `<img class="two" src="art4/props/x-stone-${a}.png?v=8" alt=""><img class="two b" src="art4/props/x-stone-${b}.png?v=8" alt="">`; }
+  if (k === 'weakness') return `<svg viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="24" rx="15" ry="8" fill="none" stroke="${GROUND_RING[worldOf()] || '#FFD24A'}" stroke-width="4"/><path d="M20 4v13m-5-5l5 6 5-6" fill="none" stroke="#B86A08" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  return `<img class="face" src="art4/k${keeper}-face.png?v=13" alt="">`;
+}
 function results(quiet) {
   $('#hud').hidden = true; S.quietPay = !!quiet;
   // the home theme comes in under Victory, so the screen is never silent and it carries you home (A's playthrough, 2026-10-05)
@@ -9938,6 +9982,19 @@ function results(quiet) {
       setTimeout(() => { el.classList.add('in'); SFX.bx('call-seal', 2, 0); }, reduce ? 0 : 1500);
       // a new Star Call gets its own full screen: the gift, its name, a picture of what it does, and the giver's voice
       if (S.giftNew) setTimeout(() => { if (!$('#results').hidden && !S.revealed) openReveal(id); }, reduce ? 600 : 3600); } }
+  // the Run Card (the Legend Engine, Phase 2): a won run earns one title, the rarest thing the player did, and the card is kept
+  // for the scrapbook. Titles name what was done, so a child knows how to earn another one next time.
+  // a quiet payout (the Level 5 finale) has no card
+  { const T = $('#resTitle'), R = $('#results .res'), t = S.won && !quiet ? runTitle() : null; T.hidden = !t; R.classList.toggle('titled', !!t); T.classList.remove('in');
+    if (t) { T.querySelector('i').innerHTML = titlePic(t[0]); T.querySelector('b').textContent = t[1]; T.querySelector('em').textContent = t[2];
+      // a tap stamps it again and says it (Luma's line once A records it)
+      T.onclick = () => { T.classList.remove('in'); void T.offsetWidth; T.classList.add('in'); SFX.ting(); AU.vo('vo-title-' + t[0]); };
+      if (!quiet) setTimeout(() => { T.classList.add('in'); SFX.ting(); AU.vo('vo-title-' + t[0], .3); }, reduce ? 0 : 1900); else T.classList.add('in');
+      if (!quiet) { const cards = JSON.parse(store.get('morqi.cards') || '[]'); cards.push({ lv:LVL, realm:worldOf(), title:t[0], line:t[2], freed:S.thawed, secs:Math.floor(S.t), best:Math.round(S.bestHit || 0), keeper, at:Date.now() });
+        store.set('morqi.cards', JSON.stringify(cards.slice(-60))); } } }
+  // a best hit shows only when it beats the saved best: the one moment the number means something (design review, 2026-10-08)
+  const best = Math.round(S.bestHit || 0), prevBest = +(store.get('morqi.bestHit') || 0), newBest = !quiet && S.won && prevBest > 0 && best > prevBest;
+  if (!quiet && best > prevBest) store.set('morqi.bestHit', best);
   // three stars, and each one rewards the five elements without a word: free the shore, evolve a power (the gift of the
   // element that feeds it: the feeding cycle), and free creatures with the element that beats them (the controlling cycle)
   const sec = Math.floor(S.t), evoIds = Object.keys(S.evo);
@@ -9962,6 +10019,7 @@ function results(quiet) {
   const parts = [S.qiMus > 10 ? ['New song', 300] : null, S.qiMus ? ['Music on', 10] : null, S.musMile ? [{ '1 week':'A week of music', '1 month':'A month of music', '3 months':'3 months of music', '6 months':'6 months of music', '1 year':'A year of music' }[S.musMile.label], S.musMile.n] : null].filter(Boolean);
   $('#resChips').innerHTML = `<div class="crow"><span class="chip3 glass"><span data-n="${S.thawed}">${S.thawed.toLocaleString()}</span> freed</span>`
     + `<span class="chip3 glass">${clock}${(sec / 60) | 0}:${String(sec % 60).padStart(2, '0')}</span>`
+    + (newBest ? `<span class="chip3 qi" style="--a:#FFD66E;--b:#E09A1E">New best hit! ${best.toLocaleString()}</span>` : '')
     + evoIds.map(k => `<span class="chip3 evo" style="--a:#3A2F7A;--b:#22194F"><img src="${icon(POW[k].evoIcon)}" alt="">${POW[k].evo}</span>`).join('') + '</div>'
     + `<div class="crow"><span class="chip3 qi" ${gold}>${orb}<span data-n="${S.qiGot}" data-f="+">+${S.qiGot.toLocaleString()}</span></span>${parts.map(([n, v]) => `<span class="chip3 qi sub" ${gold}>${orb}${n} +${v.toLocaleString()}</span>`).join('')}</div>`;
   $('#resSparks').innerHTML = reduce ? '' : Array.from({ length:36 }, (_, i) => `<i style="left:${(i * 37 + 11) % 100}%;--s:${10 + (i * 7) % 8}px;--c:${[EL.water, EL.wood, GROUND_RING.fire, EL.earth, EL.metal, '#FFFFFF'][i % 6]};--t:${4 + (i * 3) % 4}s;--d:${(i * .29) % 3.5}s"></i>`).join('');
