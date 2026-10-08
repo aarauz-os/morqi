@@ -356,3 +356,9 @@ html.paged.letter .op .pt img{aspect-ratio:16/9}
 #need .fig img.up{transform:scale(1.2)}   /* the freed grandmother's art has more empty margin than the boss's */
 #need .named .quote,#need .named .who{text-align:center;justify-self:center}
 html.paged #market .strip img{height:190px}
+/* the realms still to come, awake (Codex brief 18): a strip of six under the frozen world */
+#long .realms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#long .realms figure{margin:0;position:relative;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+#long .realms img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+#long .realms figcaption{position:absolute;left:0;right:0;bottom:0;padding:10px 6px 4px;font:800 10.5px/1.15 var(--round,inherit);color:#fff;background:linear-gradient(transparent,rgba(8,12,32,.82));text-align:center}
+html.paged #long figure.world img{aspect-ratio:16/8}
