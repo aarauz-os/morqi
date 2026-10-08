@@ -7570,7 +7570,12 @@ function drawSurgeForm(kx, ky, im, fade, O) {
   if (el === 'wood') roots();
   if (el === 'earth') for (let i = 0; i < 3; i++) { const cx = kx + (i - 1) * 62, cy = fy + 10 - (i === 1 ? 0 : 4); g.strokeStyle = '#5E4226'; g.lineWidth = 3; g.fillStyle = '#B07A3A'; g.beginPath(); g.ellipse(cx, cy - 10, 10, 17, (i - 1) * .4, 0, TAU); g.stroke(); g.fillStyle = '#C98D44'; g.beginPath(); g.ellipse(cx, cy - 10, 9, 16, (i - 1) * .4, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,246,214,.7)'; g.beginPath(); g.ellipse(cx - 3, cy - 16, 3, 6, (i - 1) * .4, 0, TAU); g.fill(); }
   // the form itself, standing, facing where the Keeper faces
-  g.save(); g.translate(kx, fy + 4 + bob); if (S.p.face < 0) g.scale(-1, 1); g.drawImage(im, -GS / 2, -GS * .94, GS, GS); g.restore();
+  // it walks, not skates (A, 2026-10-08: "Do they animate correctly?"): a bounce on each step, a lean into the way it goes, and a
+  // little squash as each foot lands, the same beat as the Keeper's own run
+  const P = S.p, run = P.moving, cyc = T * 11, step = run ? Math.abs(Math.sin(cyc)) * 7 : 0, lean = run ? (P.vx || 0) / MOVE * .1 : 0,
+    sx = run ? 1 - Math.abs(Math.cos(cyc)) * .04 : 1 - Math.sin(T * 2.6) * .01, sy = run ? 1 + Math.abs(Math.cos(cyc)) * .05 : 1 + Math.sin(T * 2.6) * .02;
+  if (run && Math.abs(Math.sin(cyc)) < .12 && (O.stepAt ?? -1) < T - .12) { O.stepAt = T; fx({ k:'smoke', x:kx + rnd(-14, 14), y:fy + 6, vx:-(P.vx || 0) * .15, vy:-rnd(8, 20), drag:2, life:.4, s:rnd(12, 18), c:FORM_BODY[el].smoke, a:.45 }); }
+  g.save(); g.translate(kx, fy + 4 + (run ? -step : bob)); g.rotate(lean); if (P.face < 0) g.scale(-1, 1); g.scale(sx, sy); g.drawImage(im, -GS / 2, -GS * .94, GS, GS); g.restore();
   for (const q of front) bit(q);
   g.restore();
   // the element in the air: embers rise off fire, drops splash on water, leaves drift on wood, dust on earth, glints on metal
