@@ -2232,7 +2232,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -4989,7 +4989,9 @@ function brain(e, P, d, dt, s) {
     case 'call': {
       if (e.flee > 0) { e.flee -= dt; go(-ux, -uy, 1.5); return true; }
       if (e.ringT != null) { e.ringT -= dt; if (e.ringT <= 0) { e.ringT = null; ringBell(e); e.flee = 5; e.cd = 9; } return true; }
-      if (d < 560 && Math.abs(e.x - P.x) < VW * .5 && Math.abs(e.y - P.y) < VH * .48 && e.cd <= 0) { e.ringT = 1.8; return true; }   // a long, readable wind-up: time to free it first   // rings once on screen, where it can be seen
+      if (d < 560 && Math.abs(e.x - P.x) < VW * .5 && Math.abs(e.y - P.y) < VH * .48 && e.cd <= 0) { e.ringT = 1.8;
+        // its banner comes as its first call starts (QA, 2026-10-08: Callers ring at the screen's edge, outside the new-creature check)
+        if (!SEEN.has(e.kid)) { markSeen(e.kid); S.taught['n_' + e.kid] = 1; e.tagT = 3.5; COACH.q.push({ id:'k' + e.kid, card:e.kid, now:true }); } return true; }   // a long, readable wind-up: time to free it first   // rings once on screen, where it can be seen
       return false; }
     case 'weave': case 'zigzag': case 'thorns': {
       let w = Math.sin(S.t * K.f + e.ph) * K.amp; if (K.beh === 'zigzag') w = Math.sign(w) * K.amp;
@@ -9053,10 +9055,11 @@ function coachTick(dt) {
   NOTES.t -= dt; if (NOTES.t <= 0 && NOTES.q.length && !COACH.cur && !popupOpen()) { toast(NOTES.q.shift(), 4200); NOTES.t = 5.5; }
   // creature cards become banners too: the creature's name and what beats it (the red-shapes warning the first time)
   for (let i = COACH.q.length - 1; i >= 0; i--) { const c = COACH.q[i]; if (c.card) { COACH.q.splice(i, 1); const K = KIND[c.card], el = c.card.split('-')[0], red = !SEEN.has('_redtip');
-    if (red) markSeen('_redtip'); BANNER.q.push({ id:c.id, card:c.card, title:`A new creature: ${K.n}`, text:red ? 'Red shapes on the ground mean an attack. Step out!' : `${andList(weakTo(el).map(k => ELNAME[k]))} beat it.`, red }); } }
+    if (red) markSeen('_redtip'); (c.now ? (BANNER.t = Math.min(BANNER.t, .5), BANNER.q.unshift.bind(BANNER.q)) : BANNER.q.push.bind(BANNER.q))({ id:c.id, card:c.card, title:`A new creature: ${K.n}`, text:red ? 'Red shapes on the ground mean an attack. Step out!' : `${andList(weakTo(el).map(k => ELNAME[k]))} beat it.`, red }); } }
   BANNER.t -= dt;
   if (BANNER.t <= 0 && BANNER.q.length && !COACH.cur && !popupOpen() && !S.over && !hsOn() && !S.omni && !S.omniSnap && !callBusy()) { const b = BANNER.q.shift();
-    banner(b); if (b.card) AU.vo(b.red ? 'vo-card-beast' : 'vo-newcreature'); else if (CARD_VO[b.id]) AU.vo('vo-card-' + CARD_VO[b.id]); BANNER.t = 20; }
+    // a new family says what to do about it (A recorded the lines, 2026-10-08)
+    banner(b); if (b.card) AU.vo(/-r$/.test(b.card) ? 'vo-card-caller' : /-w$/.test(b.card) ? 'vo-card-wisp' : b.red ? 'vo-card-beast' : 'vo-newcreature'); else if (CARD_VO[b.id]) AU.vo('vo-card-' + CARD_VO[b.id]); BANNER.t = 20; }
   if (COACH.cur) return;
   COACH.gap -= dt;
   if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel || hsOn() || surgeOn() || S.omni || S.omniSnap || callBusy()) return;
@@ -9103,7 +9106,7 @@ function tipArt(id) {
   return `<div class="hsdemo logo"><img class="logo-pic" src="art4/logo-morqi.png?v=11" alt=""></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', l4temples:'l4temples', l5temples:'l5temples', surge:'surge' };
+const CARD_VO = { giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', l4temples:'l4temples', l5temples:'l5temples', surge:'surge' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
