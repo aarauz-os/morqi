@@ -457,6 +457,11 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 #cue.bn{flex-direction:row;align-items:center;gap:10px;left:50%;right:auto;translate:-50% 0;width:max-content;max-width:calc(100% - 28px);padding:8px 16px 8px 8px;border-radius:20px;background:rgba(14,20,52,.88);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
 #cue.bn .bp{flex:none;width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.08);display:grid;place-items:center;overflow:hidden}
 #cue.bn .bp img{max-width:100%;max-height:100%;object-fit:contain}
+#cue.bn .bp.two{position:relative;overflow:visible}
+#cue.bn .bp.two img{position:absolute;width:34px;height:34px;top:9px}
+#cue.bn .bp.two img:first-child{left:-1px;transform:rotate(-14deg)}
+#cue.bn .bp.two img:last-child{right:-1px;transform:rotate(14deg)}
+#cue.bn .bp.two::after{content:'';position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;background:radial-gradient(circle,#fff 0 22%,rgba(255,240,190,.85) 38%,transparent 70%);z-index:1}
 #cue.bn div{display:grid;gap:1px;min-width:0}
 #cue.bn b,#cue.bn span{background:none!important;box-shadow:none!important;clip-path:none!important;padding:0!important;border-radius:0!important;max-width:none;text-shadow:none;animation:none}
 #cue.bn b{font:900 18px/1.15 var(--round);color:#fff}
@@ -3548,7 +3553,7 @@ function hurt(e, dmg, el, o = {}) {
   if (strong && !surgeOn() && S.level < 3 && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
   if (weak && S.level < 3 && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
   if (e.giant) m *= giantArmour(e);
-  const dealt = dmg * m;
+  const dealt = dmg * m; e.lastHit = dealt;
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
   if (strong && e.hp <= 0 && !e.boss && !e.wise && !e.horde) { e.wise = 1; S.wise = (S.wise || 0) + 1; }
@@ -3571,11 +3576,13 @@ function hurt(e, dmg, el, o = {}) {
   // damage numbers on bosses and giants only, never the swarm or the brutes (design review, 2026-10-08: brutes come in groups), so they show a fight going your way without
   // hiding the shots; they grow with the Keeper's level, and a hit with the element that beats it shows in that element's colour
   // (the Legend Engine, Phase 1; at most 25 at once)
-  if ((e.boss || e.giant) && S.nums.length < 25 && (e.numCd || 0) <= S.t) { e.numCd = S.t + (e.boss ? .45 : .3); S.nums.push({ x:e.x + rnd(-10, 10), y:e.y - e.size * .55, v:Math.round(dealt), t:0, strong, weak, el, big:e.boss || e.giant, sc:1 + Math.min(.35, (S.lv - 1) * .025) }); }
+  // the blow that fells a giant shows once, big, from kill() (design review, 2026-10-08: it showed twice)
+  if ((e.boss || (e.giant && e.hp > 0)) && S.nums.length < 25 && (e.numCd || 0) <= S.t) { e.numCd = S.t + (e.boss ? .45 : .3); S.nums.push({ x:e.x + rnd(-10, 10), y:e.y - e.size * .55, v:Math.round(dealt), t:0, strong, weak, el, big:e.boss || e.giant, sc:1 + Math.min(.35, (S.lv - 1) * .025) }); }
   if (o.spark !== false && (e.sparkCd || 0) <= S.t) { e.sparkCd = S.t + .1; fx({ k:'hit', x:e.x + rnd(-6, 6), y:e.y - e.size * .3, life:.16, s:e.r * 1.6, c:EL[el], rot:rnd(0, TAU) }); }
   // the finishing Ascended keeps the boss for its own finale: nothing else lands the last blow (QA, 2026-10-06: the
   // boss fell at seven seconds, so the five-element finale never played)
   if (e.boss && e.hp <= 0 && !o.gift && S.hs.on && S.hs.on.finisher) e.hp = 1;
+  if (!o.react && el && !e.boss) reactCheck(e, el);
   if (e.hp <= 0) kill(e);
 }
 function kill(e) {
@@ -3610,7 +3617,10 @@ function kill(e) {
   }
   paintThaw(e.x, e.y, e.type === 'golem' ? 190 : e.boss ? 900 : 84);
   // a giant felled pays out: a chest, a heart and a fountain of gems
-  if (e.giant) { S.rainbowNext = true; SFX.cleared(); S.shake = .6; S.hitstop = Math.max(S.hitstop || 0, .12); ring(e.x, e.y, 30, 420, col, .7, 18, true); stars(e.x, e.y - 80, 40, '#FFE58A', 520); dropChest(e.x, e.y);
+  if (e.giant) { S.nums.push({ x:e.x, y:e.y - e.size * .7, v:Math.round(e.lastHit || 0), t:0, big:true, sc:1.9 });   // the giant felled: the killing blow, big (design review, 2026-10-08: its full HP read as a bug)
+    if (e.giant === 'colossus') { S.shake = Math.max(S.shake, .8); debris(e.x, e.y, 26, 520); ring(e.x, e.y + 20, 30, 300, '#C8A060', .6, 18, false);
+      inArea(e.x, e.y + 20, 280, c => { if (c !== e && !c.boss && !c.giant) hurt(c, c.max * 4, 'earth', { kb:620, fx:e.x, fy:e.y, react:true }); }); }   // it crushes the crowd it falls on (Phase 2)
+    S.rainbowNext = true; SFX.cleared(); S.shake = .6; S.hitstop = Math.max(S.hitstop || 0, .12); ring(e.x, e.y, 30, 420, col, .7, 18, true); stars(e.x, e.y - 80, 40, '#FFE58A', 520); dropChest(e.x, e.y);
     S.items.push({ x:e.x + 50, y:e.y, kind:'heart', t:0, z:10, vz:260 }); for (let i = 0; i < 16; i++) S.gems.push({ x:e.x, y:e.y, z:6, vz:rnd(240, 380), vx:rnd(-200, 200), vy:rnd(-200, 200), v:4, kind:1, t:0 }); }
   if (e.type === 'golem') {
     S.shake = .35; ring(e.x, e.y, 20, 200, col, .5, 10, true);
@@ -4009,7 +4019,7 @@ function powersRun(dt) {
     z.t += dt; z.tick -= dt;
     if (z.k === 'fire') {
       if (Math.random() < dt * 8) { const a = rnd(0, TAU), rr = rnd(0, z.r * .8); fx({ k:'spark', x:z.x + Math.cos(a) * rr, y:z.y + Math.sin(a) * rr * .6 - 20, vx:rnd(-20, 20), vy:-rnd(120, 220), drag:1.5, life:rnd(.4, .7), s:3, c:'#FFC24A' }); }
-      if (z.tick <= 0) { z.tick = .35; inArea(z.x, z.y, z.r, e => hurt(e, z.dmg * (e.boss ? .4 : 1), 'fire', { spark:false })); SFX.crackle(); }
+      if (z.tick <= 0) { z.tick = .35; inArea(z.x, z.y, z.r, e => { if (!(z.react && e.boss)) hurt(e, z.dmg * (e.boss ? .4 : 1), 'fire', { spark:false, react:z.react }); }); SFX.crackle(); }
       if (z.festival && z.t >= z.life - .02 && !z.boomed) { z.boomed = true; explode(z.x, z.y, z.r * .9, 40, 'fire', true); const cols = ['#FF5A5A', '#FFD24A', '#7FC4FF', '#B6F07A', '#FF9AE8']; for (let i = 0; i < 24; i++) { const a = i / 24 * TAU; fx({ k:'spark', x:z.x, y:z.y - 60, vx:Math.cos(a) * 420, vy:Math.sin(a) * 420, drag:2.5, life:.8, s:4, c:cols[i % 5] }); } SFX.firework(); }
     }
   }
@@ -4882,6 +4892,8 @@ function giantMove(e, P, d, dt, s) {
     else if (e.gst === 'charge') { const v = 950, A = S.arena; e.x += a.dx * v * dt; e.y += a.dy * v * dt; a.go += v * dt;
       if ((e.dustT = (e.dustT || 0) - dt) <= 0) { e.dustT = .04; smoke(e.x, e.y + 40, 2, 30, '200,190,170'); }
       if (!a.hit && Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r) { a.hit = true; ouch(30, e.x, e.y, { push:280, el:e.el, src:'rammer', shake:.45 }); }
+      // it bowls straight through its own pack, flinging them aside and freeing them (Phase 2: the moments nobody scripts)
+      for (const c of S.en) if (!c.dead && c !== e && !c.boss && !c.giant && Math.hypot(c.x - e.x, c.y - e.y) < e.r + c.r + 10) { hurt(c, c.max * 3, e.el, { kb:700, fx:e.x - a.dy * 40, fy:e.y + a.dx * 40, react:true }); a.bowled = (a.bowled || 0) + 1; if (a.bowled === 6 && !S.strikeSaid) { S.strikeSaid = 1; floatText(e.x, e.y - e.size * .7, 'Strike!', '#FFFFFF', 30); } }   // once a run (design review, 2026-10-08)
       const out = e.x < 70 || e.x > WORLD - 70 || e.y < 70 || e.y > WORLD - 70 || (A && Math.hypot(e.x - A.x, e.y - A.y) > A.r - 70);
       if (a.go >= a.len || out) { e.gst = 'stuck'; e.gt = 2.6; e.act = null; e.stuckDx = a.dx; e.stuckDy = a.dy; S.shake = Math.max(S.shake, .45); debris(e.x + a.dx * 50, e.y + 30 + a.dy * 30, 16, 340); SFX.thud(true); ring(e.x, e.y, 20, 220, GROUND_RING[e.el], .4, 12, true); } }
     else if ((e.gt -= dt) <= 0) { e.gst = 'walk'; e.gcd = 3; }
@@ -5019,6 +5031,50 @@ function wellTick(dt) {
   else W.hold = Math.max(0, W.hold - dt * 2);
   if (d < 1300 && W.hold <= 0 && (W.cd -= dt) <= 0) { W.cd = 3.5; const aw = Math.atan2(W.y - P.y, W.x - P.x); for (let i = 0; i < 3; i++) { const a = aw + (i - 1) * .5; spawn('critter', { x:W.x + Math.cos(a) * 120, y:W.y + Math.sin(a) * 80 }, 1.1, W.el); }
     for (let i = 0; i < 6; i++) fx({ k:'smoke', x:W.x + rnd(-50, 50), y:W.y - 10, vx:rnd(-20, 20), vy:-rnd(40, 80), drag:1, life:rnd(.8, 1.3), s:rnd(20, 34), c:'220,236,255', a:.5 }); }
+}
+/* Element reactions (the Legend Engine, Phase 2; A, 2026-10-08: "Phase 2 only if phase 1 is completed"): when two elements meet on one
+   creature within two seconds they react, and the reaction spills onto the crowd round it. Only the five feeding pairs react (A,
+   2026-10-08: "I agree about the five feeding pairs"), so a child who knows the feeding circle can predict every one; the other
+   five pairs are the controlling pairs, which already have their job in the type chart (who beats whom). Wildfire (wood feeds
+   fire) sets the ground burning; Eruption (fire feeds earth) bursts the ground under the crowd; Magnet Pull (earth feeds metal)
+   drags the crowd into a knot and crushes it; Chain Shock (metal feeds water) leaps between five; Bloom Burst (water feeds wood)
+   roots the crowd in vines. Never the boss: boss fights stay as they are (QA, 2026-10-08: Mudslide slowed the boss). Each names
+   itself the first two times in a run; a creature reacts at most once every two seconds, at most three reactions start a second,
+   and the full picture plays at most every 0.6 s so reactions never fog the fight (design review, 2026-10-08). */
+const REACT = {
+  'fire|wood':   { n:'Wildfire',    c:'#FF9A4A' },
+  'earth|fire':  { n:'Eruption',    c:'#E6B23A' },
+  'earth|metal': { n:'Magnet Pull', c:'#C9D3DB' },
+  'metal|water': { n:'Chain Shock', c:'#8FD0FF' },
+  'water|wood':  { n:'Bloom Burst', c:'#7FD36B' } };
+function reactCheck(e, el) {
+  const m = e.mark, now = S.t; e.mark = { el, t:now };
+  if (!m || m.el === el || now - m.t > 2 || now - (e.reactAt ?? -9) < 2) return;
+  const key = [m.el, el].sort().join('|'), R = REACT[key]; if (!R) return;
+  S.reactT = (S.reactT || []).filter(t => now - t < 1); if (S.reactT.length >= 3) return; S.reactT.push(now);
+  e.reactAt = now; e.mark = null; react(key, R, e.x, e.y);
+}
+// how far a point lies from a line segment: Chain Shock never draws a bolt through the Keeper (design review, 2026-10-08)
+function segDist(px, py, x0, y0, x1, y1) { const dx = x1 - x0, dy = y1 - y0, L = dx * dx + dy * dy || 1, t = clamp(((px - x0) * dx + (py - y0) * dy) / L, 0, 1); return Math.hypot(px - x0 - dx * t, py - y0 - dy * t); }
+function react(key, R, x, y) {
+  const dmg = 22 + 7 * S.lv, P = S.p; S.reacts = (S.reacts || 0) + 1;
+  const full = S.t - (S.reactFxAt ?? -9) >= .6; if (full) S.reactFxAt = S.t;
+  const said = (S.reactSaid = S.reactSaid || {}); said[key] = (said[key] || 0) + 1;
+  if (said[key] <= 2) floatText(x, y - 90, R.n + '!', R.c, 24);
+  // the first reaction teaches the rule with the two elements that just met: which one feeds which
+  if (!SEEN.has('_react')) { markSeen('_react'); const [a, b] = key.split('|'), from = FEEDS[a] === b ? a : b, to = from === a ? b : a;
+    BANNER.q.unshift({ id:'react', title:`${ELNAME[from]} feeds ${ELNAME[to]}!`, text:'Hit one creature with both. They mix!', pics:[from, to] }); BANNER.t = Math.min(BANNER.t, 1); }
+  const crowd = (r, f) => inArea(x, y, r, c => { if (!c.boss) f(c); });
+  if (key === 'fire|wood') { firePatch(x, y, 140, 2.4, 8 + 3 * S.lv); S.zones[S.zones.length - 1].react = true; SFX.bx && SFX.bx('ember-burst', 1); }
+  else if (key === 'earth|fire') { crowd(170, c => hurt(c, dmg * 1.3, 'earth', { kb:380, fx:x, fy:y, react:true }));
+    debris(x, y, full ? 12 : 5, 360); if (full) { decal({ k:'crack', x, y:y + 10, r:120, a:rnd(0, TAU), life:1.6 }); ring(x, y + 10, 20, 170, '#E6B23A', .35, 10, false); } SFX.stomp(); }
+  else if (key === 'earth|metal') { const near = S.en.filter(c => !c.dead && !c.boss && !c.giant && Math.hypot(c.x - x, c.y - y) < 280); for (const c of near) { c.x += (x - c.x) * .7; c.y += (y - c.y) * .7; }
+    setTimeout(() => { if (!S || S.over) return; crowd(110, c => hurt(c, dmg * 1.4, 'metal', { kb:300, fx:x, fy:y, react:true })); debris(x, y, full ? 14 : 6, 320); SFX.stomp(); }, 220);
+    if (full) for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; fx({ k:'spark', x:x + Math.cos(a) * 220, y:y + Math.sin(a) * 140, vx:-Math.cos(a) * 600, vy:-Math.sin(a) * 380, drag:3, life:.35, s:3, c:'#C9D3DB' }); } }
+  else if (key === 'metal|water') { let from = { x, y }; const hit = new Set(); for (let k = 0; k < 5; k++) { let best = null, bd = 240; for (const c of S.en) { if (c.dead || c.boss || hit.has(c)) continue; const d = Math.hypot(c.x - from.x, c.y - from.y); if (d < bd && segDist(P.x, P.y, from.x, from.y, c.x, c.y) > 60) { bd = d; best = c; } }
+      if (!best) break; hit.add(best); bolt(from.x, from.y - 30, best.x, best.y - 30, '#8FD0FF', full ? 4 : 2.5, false); hurt(best, dmg * 1.2, 'metal', { react:true }); from = best; } SFX.ting && SFX.ting(); }
+  else if (key === 'water|wood') { crowd(170, c => { hurt(c, dmg * .9, 'wood', { react:true }); if (!c.giant) c.rooted = Math.max(c.rooted || 0, 1.5); });
+    if (full) fx({ k:'vine', x, y:y - 20, R:170, w:8, n:7, a:rnd(0, TAU), life:.5, seed:Math.random() * 100 }); leaves(x, y - 20, full ? 8 : 3, 160); SFX.bx && SFX.bx('root-burst', 1); }
 }
 function brain(e, P, d, dt, s) {
   if (e.giant) return giantMove(e, P, d, dt, s);
@@ -9160,7 +9216,8 @@ function banner(b) {
   const c = $('#cue'), top = $('#hud .top'), pic = bannerPic(b), say = BANNER_SAY[b.id] || b.text;
   if (top) { const st = stage.getBoundingClientRect().top, y = Math.max(top.getBoundingClientRect().bottom, ...['#mapBtn', '#ultBtn'].map(q => { const e = $(q); const r = e && !e.hidden && e.offsetParent ? e.getBoundingClientRect() : null; return r && r.height ? r.bottom : 0; })); c.style.top = (y - st + 10) + 'px'; }
   if (b.low) c.style.top = (stage.getBoundingClientRect().height - 210) + 'px';
-  c.className = 'bn'; c.innerHTML = `${pic ? `<i class="bp"><img src="${pic}" alt=""></i>` : ''}<div><b></b><span></span></div>`; c.querySelector('b').textContent = b.title; c.querySelector('span').textContent = say;
+  // two pictures meet in one tile when a banner is about two things together (an element reaction: the two stones, a spark between)
+  c.className = 'bn'; c.innerHTML = `${b.pics ? `<i class="bp two">${b.pics.map(el => `<img src="art4/props/x-stone-${el}.png?v=8" alt="">`).join('')}</i>` : pic ? `<i class="bp"><img src="${pic}" alt=""></i>` : ''}<div><b></b><span></span></div>`; c.querySelector('b').textContent = b.title; c.querySelector('span').textContent = say;
   c.style.opacity = 1; clearTimeout(cueT); cueT = setTimeout(() => { c.style.opacity = 0; }, 4800);
 }
 const bannerTip = id => /^(gem|enemy|shrine|bloom|chest|ult|giant_|k)/.test(id) && !/^l[45]temples$/.test(id);
@@ -9922,7 +9979,7 @@ function results(quiet) {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { au:AU, react:(key, x, y) => react(key, REACT[key], x, y), reactKeys:() => Object.keys(REACT), giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = options()[0]; applyPick(o, true); show(null); afterPick(); }
       if (!$('#chest').hidden) { if (!auto) break; finishChest(); }
