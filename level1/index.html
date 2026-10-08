@@ -7258,7 +7258,7 @@ function draw() {
     if (S.storm && S.storm.out > 0) { const ic = silhouette(kName, '#DCEEFF'); if (ic) { g.globalAlpha = Math.min(.85, S.storm.out / STORM.out); g.drawImage(ic, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
   if (hs) drawOmniForm(kx, ky, hsIm, formK);
-  else if (sgo) drawOmniForm(kx, ky, formArt(), formK, S.surge.on, FORM_PAL[S.surge.on.el], SURGE_GS, FORM_BODY[S.surge.on.el]);
+  else if (sgo) drawSurgeForm(kx, ky, formArt(), formK, S.surge.on);
   // the shield left by Ascended: a golden bubble that thins as its ring empties over six seconds
   { const f = afterShield(); if (f > 0 && !hs) { g.save(); g.globalAlpha = .25 + .6 * f; g.fillStyle = `rgba(255,224,138,${.12 * f})`; g.strokeStyle = 'rgba(255,224,138,.8)'; g.lineWidth = 3;
     g.beginPath(); g.ellipse(kx, ky - 44, 62, 72, 0, 0, TAU); g.fill(); g.stroke(); g.lineWidth = 5; g.lineCap = 'round'; g.strokeStyle = '#FFE08A';
@@ -7540,6 +7540,48 @@ function bolt(x0, y0, x1, y1, c, w, big) {   // a jagged bolt; a big one has a w
 }
 // O, the colours and the size are Omni's unless a Surge passes its own
 // body: the cloud's own colours (Omni's lavender night unless a Surge passes its element's)
+/* A Surge stands on the ground in its own element; the storm cloud is Omni's alone (A, 2026-10-08: "keeping the clouds only for
+   Omni" ... "Yes please"). Under its feet: a soft painted pool of its element's colour so it still stands out in a crowd, and its
+   element at its feet, never a closed ring (a ring under the player reads as a target): embers, a shallow pool, leaves and roots,
+   pebbles and crystal, or low orbiting rings and beads. */
+function drawSurgeForm(kx, ky, im, fade, O) {
+  if (!ok(im)) return;
+  const T = S.t, el = O.el, k = Math.min(1, O.t / .25, fade), GS = SURGE_GS, pal = FORM_PAL[el], bob = Math.sin(T * 3) * 2, fy = ky + 26;
+  O.bits = O.bits || Array.from({ length:12 }, (_, i) => ({ a:i / 12 * TAU + rnd(-.2, .2), r:rnd(.55, 1), s:rnd(.7, 1.3), ph:rnd(0, TAU) }));
+  g.save(); g.globalAlpha = k;
+  // the soft pool of the element's own colour under the feet (painted, not added light)
+  { const gr = g.createRadialGradient(kx, fy, 4, kx, fy, 120); gr.addColorStop(0, hexA(pal[0], .72)); gr.addColorStop(.55, hexA(pal[2], .42)); gr.addColorStop(1, hexA(pal[2], 0));
+    g.fillStyle = gr; g.beginPath(); g.ellipse(kx, fy, 130, 48, 0, 0, TAU); g.fill(); }
+  const back = [], front = [];
+  for (const b of O.bits) { const a = b.a + T * (el === 'metal' ? .9 : .25), x = kx + Math.cos(a) * 92 * b.r, y = fy + Math.sin(a) * 30 * b.r; (Math.sin(a) < 0 ? back : front).push({ b, a, x, y }); }
+  const bit = ({ b, a, x, y }) => {
+    if (el === 'water') { g.fillStyle = hexA(pal[3], .7); g.beginPath(); g.ellipse(x, y, 7 * b.s, 3 * b.s, 0, 0, TAU); g.fill(); }
+    else if (el === 'wood') { g.save(); g.translate(x, y - 6 - Math.sin(T * 2 + b.ph) * 6); g.rotate(a + T); g.fillStyle = ['#7CCB5A', '#A8E07A', '#FFC8E0'][(b.s * 10 | 0) % 3]; g.beginPath(); g.ellipse(0, 0, 7 * b.s, 3.5 * b.s, 0, 0, TAU); g.fill(); g.restore(); }
+    else if (el === 'earth') { const h = 8 + Math.sin(T * 2 + b.ph) * 4; g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.ellipse(x, y + 2, 7 * b.s, 2.5 * b.s, 0, 0, TAU); g.fill();
+      g.fillStyle = b.s > 1.1 ? '#A67C4E' : '#8E7456'; g.beginPath(); g.ellipse(x, y - h, 6 * b.s, 5 * b.s, 0, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,240,200,.6)'; g.beginPath(); g.ellipse(x - 2, y - h - 2, 2.2 * b.s, 1.6 * b.s, 0, 0, TAU); g.fill(); }
+    else if (el === 'metal') { const h = 14 + Math.sin(T * 3 + b.ph) * 4; if (b.s > 1) { g.strokeStyle = '#E8EEF6'; g.lineWidth = 2.5; g.beginPath(); g.ellipse(x, y - h, 8 * b.s, 4 * b.s, a, 0, TAU); g.stroke(); }
+      else { const gr = g.createRadialGradient(x - 2, y - h - 2, 0, x, y - h, 6); gr.addColorStop(0, '#FFFFFF'); gr.addColorStop(1, '#9AA8B8'); g.fillStyle = gr; g.beginPath(); g.arc(x, y - h, 5, 0, TAU); g.fill(); } }
+  };
+  for (const q of back) bit(q);
+  // wood: a few roots curling out of the ground behind the feet; earth: rounded amber crystals (no points that read as arrows)
+  const roots = () => { g.lineCap = 'round'; for (let i = 0; i < 5; i++) { const sx = kx + (i - 2) * 40, gr = .7 + .3 * Math.sin(T * 2 + i), ex = sx + (i % 2 ? 6 : -6), ey = fy - 44 * gr;
+      g.strokeStyle = '#4E3A26'; g.lineWidth = 9; g.beginPath(); g.moveTo(sx, fy + 8); g.quadraticCurveTo(sx + (i % 2 ? 22 : -22), fy - 22 * gr, ex, ey); g.stroke();
+      g.strokeStyle = '#8A6A44'; g.lineWidth = 5; g.stroke(); g.fillStyle = '#7CCB5A'; g.beginPath(); g.ellipse(ex, ey - 4, 8, 4, (i % 2 ? .6 : -.6), 0, TAU); g.fill(); } };
+  if (el === 'wood') roots();
+  if (el === 'earth') for (let i = 0; i < 3; i++) { const cx = kx + (i - 1) * 62, cy = fy + 10 - (i === 1 ? 0 : 4); g.strokeStyle = '#5E4226'; g.lineWidth = 3; g.fillStyle = '#B07A3A'; g.beginPath(); g.ellipse(cx, cy - 10, 10, 17, (i - 1) * .4, 0, TAU); g.stroke(); g.fillStyle = '#C98D44'; g.beginPath(); g.ellipse(cx, cy - 10, 9, 16, (i - 1) * .4, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,246,214,.7)'; g.beginPath(); g.ellipse(cx - 3, cy - 16, 3, 6, (i - 1) * .4, 0, TAU); g.fill(); }
+  // the form itself, standing, facing where the Keeper faces
+  g.save(); g.translate(kx, fy + 4 + bob); if (S.p.face < 0) g.scale(-1, 1); g.drawImage(im, -GS / 2, -GS * .94, GS, GS); g.restore();
+  for (const q of front) bit(q);
+  g.restore();
+  // the element in the air: embers rise off fire, drops splash on water, leaves drift on wood, dust on earth, glints on metal
+  const r = Math.random();
+  if (el === 'fire' && r < .7) fx({ k:'flame', x:kx + rnd(-60, 60), y:fy + rnd(-4, 6), vx:rnd(-15, 15), vy:-rnd(60, 110), drag:1.5, life:rnd(.35, .6), s:rnd(10, 16) });
+  else if (el === 'water' && r < .5) fx({ k:'drop', x:kx + rnd(-70, 70), y:fy + rnd(-4, 6), z:2, vx:rnd(-40, 40), vy:rnd(-20, 20), vz:rnd(140, 220), life:.5, s:rnd(3, 4.5) });
+  else if (el === 'wood' && r < .3) fx({ k:'leaf', x:kx + rnd(-60, 60), y:fy - rnd(0, 40), vx:rnd(-30, 30), vy:-rnd(10, 40), drag:2, rot:rnd(0, TAU), vr:rnd(-6, 6), life:.9, s:rnd(6, 9), c:['#7CCB5A', '#A8E07A', '#FFC8E0'][(Math.random() * 3) | 0] });
+  else if (el === 'earth' && S.p.moving && r < .5) fx({ k:'smoke', x:kx + rnd(-40, 40), y:fy + rnd(0, 8), vx:-(S.p.vx || 0) * .15, vy:-rnd(10, 30), drag:1.5, life:rnd(.5, .8), s:rnd(16, 26), c:'190,160,110', a:.5 });
+  else if (el === 'metal' && r < .25) fx({ k:'spark', x:kx + rnd(-60, 60), y:fy - rnd(0, 30), vx:rnd(-60, 60), vy:-rnd(40, 90), drag:4, life:.3, s:2.5, c:'#E8EEF6' });
+}
+const hexA = (h, a) => `rgba(${parseInt(h.slice(1, 3), 16)},${parseInt(h.slice(3, 5), 16)},${parseInt(h.slice(5, 7), 16)},${a})`;
 function drawOmniForm(kx, ky, im, fade, O = S.hs.on, cols = STORM_EL(), gs = 0, body = OMNI_BODY) {
   if (!ok(im)) return;
   const T = S.t, inK = Math.min(1, O.t / .25), k = Math.min(inK, fade), GS = gs || [176, 188, 200, 212, 226][O.tier - 1], hover = 34 + Math.sin(T * 2.4) * 6, fx0 = kx, fy0 = ky + 26;
