@@ -228,6 +228,36 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 #toast{pointer-events:none}
 /* the page itself never pinch-zooms; scrolling lists still scroll (Sammy's QA #5) */
 html,body{touch-action:pan-x pan-y}
+/* ===== the computer: a 16:9 game (Sammy P. and A, 2026-10-08) =====
+   Play fills a 16:9 frame, letterboxed in the window, and shows more of the world sideways. Every menu, card and sheet keeps the
+   phone's portrait column in the middle over a dimmed game, since each one was designed for it. The phone is untouched. */
+.keyscard{display:none}
+/* iPhone Safari's floating toolbar covers the bottom of a full-height page: the game ends above it (A's iPhone, 2026-10-08) */
+html.iosbar #stage{height:calc(100% - 84px)}
+html.desk body{display:grid;place-items:center;background:#05060F}
+html.desk #stage{width:min(100vw,calc(100dvh * 16 / 9));height:min(100dvh,calc(100vw * 9 / 16));max-width:none;margin:0}
+html.desk .scr{left:50%;right:auto;width:min(560px,100%);translate:-50% 0}
+/* full-screen menus keep the realm's own art across the frame behind their column */
+html.desk #stage:not(.modal):has(.scr:not([hidden])){background:#0C1420 url(art4/hero-tall.jpg?v=11) 50% 30%/cover no-repeat}
+/* a sheet over a run: the whole frame dims evenly and the HUD steps aside */
+html.desk #stage.modal::after{content:"";position:absolute;inset:0;z-index:19;background:rgba(8,10,30,.6);pointer-events:none}
+html.desk #stage.modal #hud{visibility:hidden}
+html.desk #stage.modal .scr{background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.desk .tabs{left:50%;right:auto;width:min(560px,100%);translate:-50% 0}
+/* controls at the frame's corners on night-glass discs with their key letter; the minimap docked at the end of the HUD bar */
+html.desk #ultBtn{left:24px!important;right:auto!important;top:auto!important;bottom:24px}
+html.desk #callBtn{right:24px!important;left:auto!important;top:auto!important;bottom:24px}
+html.desk #ultBtn::after,html.desk #callBtn::after{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:#fff;color:#141A3D;font:900 12px var(--round);box-shadow:0 2px 0 rgba(0,0,0,.3);z-index:3}
+html.desk #ultBtn::after{content:"K"}html.desk #callBtn::after{content:"J"}
+html.desk #mapBtn{left:calc(50% + min(320px, var(--colw) * .725) + 10px)!important;right:auto!important;top:8px!important}
+html.desk #hud .top{left:50%;right:auto;width:min(640px,calc(var(--colw) * 1.45));translate:-50% 0}
+html.desk .keyscard{display:none;position:absolute;left:16px;bottom:116px;flex-direction:column;gap:5px;padding:10px 14px;border-radius:14px;background:rgba(14,20,52,.62);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);font:800 12px var(--round);color:rgba(255,255,255,.85);pointer-events:none}
+/* the keys card teaches for the first two runs, then lives on the pause screen (design review: no permanent text in play) */
+html.desk #stage.keyshow .keyscard,html.desk #stage:has(#paused:not([hidden])) .keyscard{display:flex}
+html.desk #stage:has(#paused:not([hidden])) .keyscard{z-index:30}
+html.desk .keyscard b{font:900 11px var(--round);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+html.desk .keyscard kbd{display:inline-block;min-width:16px;margin-right:6px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.14);box-shadow:inset 0 -2px 0 rgba(0,0,0,.25);font:900 11px var(--round);color:#fff;text-align:center}
 /* a pause button big enough for a child's thumb (Sammy's QA #14) */
 #hud #pauseBtn{width:46px!important;height:46px!important}
 #joy{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none}
@@ -1660,6 +1690,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <div id="joy"><i></i></div>
     <div id="seal" aria-hidden="true"><div class="sealrow" id="sealRow"></div></div>
     <div id="moveGhost"><i></i></div>
+    <div class="keyscard" id="keysCard" aria-hidden="true"><b>Keys</b><span><kbd>W A S D</kbd> move</span><span><kbd>Space</kbd> dash</span><span><kbd>J</kbd> Star Call</span><span><kbd>K</kbd> spirit animal</span><span><kbd>Esc</kbd> pause</span></div>
     <div id="coachRing"></div>
     <div id="coachDim"></div>
     <div id="coach"><div class="cb"><b id="coachT"></b><span id="coachP"></span><button class="ok" id="coachOk">OK</button></div><i class="tail"></i></div>
@@ -3222,11 +3253,25 @@ function updateFX(dt) {
 
 /* ================= sizing ================= */
 let W = 0, H = 0, DPR = 1, VW = 0, VH = 0;
-const Z = 0.58;                                // world-to-screen zoom: pulled back so the horde fills the screen
+// world-to-screen zoom: pulled back so the horde fills the screen. On a computer the game plays in a 16:9 frame and shows more of
+// the world sideways (Sammy P., 2026-10-08: "make the game full width ... see more of the world on a desktop but still a great UI/UX
+// on the phone"; A: "desktop should be 16x9 type of UI"); the zoom follows the frame's height, so the view top to bottom matches a
+// phone's and only the width grows. ?desk=1 forces it, ?desk=0 turns it off
+let Z = 0.58;
+// (until its design review passes, the 16:9 layout runs only with ?desk=1; DESK_AUTO turns on detection for wide screens with a mouse)
+const DESK_AUTO = false;
+const DESK = () => /[?&]desk=1/.test(location.search) || (DESK_AUTO && !/[?&]desk=0/.test(location.search) && matchMedia('(min-width: 900px) and (min-aspect-ratio: 4/3) and (pointer: fine)').matches);
 const off = document.createElement('canvas'), og = off.getContext('2d');
+// iPhone Safari that draws the page under its floating toolbar (A's iPhone, 2026-10-08: "Tap to begin" was hidden behind the address
+// bar): the page runs the full screen height there, so the game stops short of the toolbar. Older Safari, which ends the page above its
+// toolbar, and the home-screen app are left alone
+const IOS_BAR = () => /iPhone|iPod/.test(navigator.userAgent) && !navigator.standalone && innerHeight > innerWidth && innerHeight >= screen.height - 40;
 function size() {
-  const r = stage.getBoundingClientRect(); DPR = Math.min(1.6, window.devicePixelRatio || 1);   // crisp enough on a phone, and far cheaper to fill
-  W = r.width; H = r.height; VW = W / Z; VH = H / Z; cv.width = W * DPR; cv.height = H * DPR; off.width = W * DPR / 2; off.height = H * DPR / 2;
+  const desk = DESK(); document.documentElement.classList.toggle('desk', desk); document.documentElement.classList.toggle('iosbar', !desk && IOS_BAR());
+  const r = stage.getBoundingClientRect(); DPR = Math.min(desk ? 1.25 : 1.6, window.devicePixelRatio || 1);   // crisp enough on a phone, and far cheaper to fill
+  W = r.width; H = r.height; Z = desk ? .58 * Math.max(1, H / 844) : .58;
+  stage.style.setProperty('--colw', Math.round(Math.min(W, H * .4615)) + 'px');   // the phone-width column the menus keep on a computer
+  VW = W / Z; VH = H / Z; cv.width = W * DPR; cv.height = H * DPR; off.width = W * DPR / 2; off.height = H * DPR / 2;
 }
 addEventListener('resize', size); size();
 
@@ -3248,6 +3293,8 @@ const stillSky = () => document.documentElement.classList.toggle('met-still', SE
 stillSky();
 function show(id) { if (S && !S.over && (id === 'levelUp' || id === 'chest' || id === 'tipCard' || id === 'beastCard')) (S.stops = S.stops || []).push([Math.round(S.t * 10) / 10, id]);   // every pause, for the pacing checks
  if (id === 'pickKeeper') markKeepers(); document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); if (id) guardTaps();
+  // (on a computer, a sheet over a run dims the whole frame evenly and hides the HUD; design review, 2026-10-08)
+  stage.classList.toggle('modal', !!id && !!S && !S.over && running === false && !FRONT.includes(id));
   const tb = document.getElementById('tabs'); if (tb) { tb.hidden = !FRONT.includes(id); tb.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.tab === id)); } }
 const FRONT = ['home', 'map', 'book', 'season'];
 // a sheet that opens under a thumb still dragging (a level-up, a teaching card, a chest) ignores taps until that finger
@@ -3432,6 +3479,8 @@ function startRun() {
   if (S.out) { S.p.x = S.out.start.x; S.p.y = S.out.start.y; S.pet.x = S.p.x - 40; S.pet.y = S.p.y + 30; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
   AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=13`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); for (const n of ['breath', 'inhale', 'exhale']) if (!IMG['k' + keeper + n]) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL >= SURGE.from) { formArt(); if (!IMG['k' + keeper + 'face']) load('k' + keeper + 'face', `art4/k${keeper}-face.png?v=13`); } if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=13`; new Image().src = `art4/k${keeper}-hurt.png?v=13`; } renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
+  // (on a computer the keys card shows for a player's first two runs, for twenty seconds)
+  { const k = fewTimes('_keys', 2); stage.classList.remove('keyshow'); if (k && DESK()) { markSeen(k); stage.classList.add('keyshow'); setTimeout(() => stage.classList.remove('keyshow'), 20000); } }
   // (banners start fresh each run: S.t restarts at 0, so a stale BANNER.last kept warnings silent; Sammy's QA #6)
   BANNER.q.length = 0; BANNER.t = 0; BANNER.last = -99;
   // tutorials belong to level 1 only; later levels just play
@@ -3564,7 +3613,7 @@ let cueT = 0;
 function pickupPop(name, col) { floatText(S.p.x, S.p.y - 96, name, col, 24); }
 // big banners sit just under whatever the top bar is showing, so they never cover it
 // below the top bar and below the minimap and companion buttons under it, so nothing covers its words (QA, 2026-10-07)
-function cue(big, small, ms = 1800, warn) { const c = $('#cue'), top = $('#hud .top'); if (top) { const st = stage.getBoundingClientRect().top, y = Math.max(top.getBoundingClientRect().bottom, ...['#mapBtn', '#ultBtn'].map(q => { const e = $(q); const r = e && !e.hidden && e.offsetParent ? e.getBoundingClientRect() : null; return r && r.height ? r.bottom : 0; })); c.style.top = (y - st + 10) + 'px'; } c.className = warn ? 'warn' : ''; c.innerHTML = `<b>${big}</b>${small ? `<span>${small}</span>` : ''}`; c.style.opacity = 1; clearTimeout(cueT); cueT = setTimeout(() => { c.style.opacity = 0; }, ms); }
+function cue(big, small, ms = 1800, warn) { const c = $('#cue'), top = $('#hud .top'); if (top) { const st = stage.getBoundingClientRect().top, y = Math.max(top.getBoundingClientRect().bottom, ...(DESK() ? [] : ['#mapBtn', '#ultBtn']).map(q => { const e = $(q); const r = e && !e.hidden && e.offsetParent ? e.getBoundingClientRect() : null; return r && r.height ? r.bottom : 0; })); c.style.top = (y - st + 10) + 'px'; } c.className = warn ? 'warn' : ''; c.innerHTML = `<b>${big}</b>${small ? `<span>${small}</span>` : ''}`; c.style.opacity = 1; clearTimeout(cueT); cueT = setTimeout(() => { c.style.opacity = 0; }, ms); }
 
 /* ================= enemies ================= */
 const ETYPE = {
@@ -9539,7 +9588,7 @@ function bannerPic(b) {
 }
 function banner(b) {
   const c = $('#cue'), top = $('#hud .top'), pic = bannerPic(b), bs = BANNER_SAY[b.id], say = (typeof bs === 'function' ? bs() : bs) || b.text;
-  if (top) { const st = stage.getBoundingClientRect().top, y = Math.max(top.getBoundingClientRect().bottom, ...['#mapBtn', '#ultBtn'].map(q => { const e = $(q); const r = e && !e.hidden && e.offsetParent ? e.getBoundingClientRect() : null; return r && r.height ? r.bottom : 0; })); c.style.top = (y - st + 10) + 'px'; }
+  if (top) { const st = stage.getBoundingClientRect().top, y = Math.max(top.getBoundingClientRect().bottom, ...(DESK() ? [] : ['#mapBtn', '#ultBtn']).map(q => { const e = $(q); const r = e && !e.hidden && e.offsetParent ? e.getBoundingClientRect() : null; return r && r.height ? r.bottom : 0; })); c.style.top = (y - st + 10) + 'px'; }
   if (b.low) c.style.top = (stage.getBoundingClientRect().height - 210) + 'px';
   // two pictures meet in one tile when a banner is about two things together (an element reaction: the two stones, a spark between)
   c.className = 'bn'; c.innerHTML = `${b.pics ? `<i class="bp two">${b.pics.map(el => `<img src="art4/props/x-stone-${el}.png?v=8" alt="">`).join('')}</i>` : pic ? `<i class="bp"><img src="${pic}" alt=""></i>` : ''}<div><b></b><span></span></div>`; c.querySelector('b').textContent = b.title; c.querySelector('span').textContent = say;
