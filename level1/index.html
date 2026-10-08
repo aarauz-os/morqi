@@ -3335,7 +3335,7 @@ function startRun() {
   // Level 5 holds the temples too (A, 2026-10-07)
   S.l5 = LVL === 5 && towersOn() ? makeL5() : null; S.well = LVL === 5 ? makeWell() : null;
   if (S.out) { S.p.x = S.out.start.x; S.p.y = S.out.start.y; S.pet.x = S.p.x - 40; S.pet.y = S.p.y + 30; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
-  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=13`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); if (!IMG['k' + keeper + 'breath']) load('k' + keeper + 'breath', `art4/k${keeper}-breath.png?v=13`); if (LVL >= SURGE.from) { formArt(); if (!IMG['k' + keeper + 'face']) load('k' + keeper + 'face', `art4/k${keeper}-face.png?v=13`); } if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=13`; new Image().src = `art4/k${keeper}-hurt.png?v=13`; } renderSkills(); startLoop();
+  AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=13`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); for (const n of ['breath', 'inhale']) if (!IMG['k' + keeper + n]) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL >= SURGE.from) { formArt(); if (!IMG['k' + keeper + 'face']) load('k' + keeper + 'face', `art4/k${keeper}-face.png?v=13`); } if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=13`; new Image().src = `art4/k${keeper}-hurt.png?v=13`; } renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // tutorials belong to level 1 only; later levels just play
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
@@ -5471,6 +5471,10 @@ function lbBurst() {
   // rings 70 ms apart were six bright events in 0.3 s)
   ring(P.x, P.y - 20, 30, LB.R, '#FFF1C0', .6, 14, true); flash(P.x, P.y - 40, 300, '#FFF6DE', .22);
   for (let i = 0; i < 25; i++) { const a = i / 25 * TAU, s = rnd(380, 620); fx({ k:'spark', x:P.x, y:P.y - 50, vx:Math.cos(a) * s, vy:Math.sin(a) * s * .7, drag:2.5, life:.6, s:4, c:LB_COL[i % 5] }); }
+  // the out-breath made visible: a soft wave of breath in all five colours rolls out from the Keeper's palms, the way they face
+  // (A, 2026-10-08: "poses for exhailing with their respective vfx"); slow puffs, never another flash
+  // (it streams out over 0.3 s in lbTick: a breath is a stream, not a pop; design review, 2026-10-08)
+  O.puffs = 0;
   // the first time, the banner says it; after that, the name floats up (one place at a time)
   if (SEEN.has('_lastbreath')) floatText(P.x, P.y - 150, 'Last Breath!', '#FFFFFF', 34);
   // every creature near is struck by the element that beats it; the boss feels it once, like Raditz did
@@ -5489,6 +5493,9 @@ function lbTick(dt) {
   // the five colours pour in toward the Keeper as the breath comes in
   if (!O.burst) { if (Math.random() < dt * 40) { const a = rnd(0, TAU), r = rnd(220, 320); fx({ k:'star', x:P.x + Math.cos(a) * r, y:P.y - 40 + Math.sin(a) * r * .7, vx:-Math.cos(a) * r / .5, vy:-Math.sin(a) * r * .7 / .5, drag:0, life:.5, s:rnd(5, 8), c:LB_COL[(Math.random() * 5) | 0] }); }
     if (O.t >= LB.breath) lbBurst(); return; }
+  // the out-breath streams from the Keeper's palms for 0.3 s after the burst: 30 soft puffs in the five colours, the way they face
+  if (O.t < LB.breath + .3 && O.puffs < 30) { const f = P.face < 0 ? Math.PI : 0, rgb = ['78,155,224', '111,191,74', '255,154,74', '230,178,58', '221,230,244'], due = Math.min(30, Math.ceil((O.t - LB.breath) / .3 * 30));
+    for (; O.puffs < due; O.puffs++) { const a = f + rnd(-.75, .75), sp = rnd(260, 520); fx({ k:'smoke', x:P.x + Math.cos(f) * 34, y:P.y - 45, vx:Math.cos(a) * sp, vy:Math.sin(a) * sp * .55 - 20, drag:2.2, life:rnd(.7, 1.1), s:rnd(18, 30), c:rgb[O.puffs % 5], a:.42 }); } }
   // unsteady power: every so often a bolt of the right element leaps to the nearest creatures; sparks of all five fly off the Keeper
   if (O.t < O.life - .6 && (O.strikeT -= dt) <= 0) { O.strikeT = LB.every * rnd(.8, 1.25);
     const near = S.en.filter(e => !e.dead && !e.boss && Math.hypot(e.x - P.x, e.y - P.y) < 420).sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y)).slice(0, 3);
@@ -7432,10 +7439,10 @@ function draw() {
   if (!S.fall && !S.noKeeper) {
   const runName = `k${keeper}r${[1, 2, 3, 2][Math.floor(S.t * 10) % 4]}`, useRun = P.moving && ok(IMG[runName]), hk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .28);
   const pose = n => ok(IMG['k' + keeper + n]) ? 'k' + keeper + n : null;
-  // Last Breath: the Keeper stands and swells with one deep breath in (design review, 2026-10-08: the kneeling pose is the defeat
-  // pose, so it is kept for catching their breath at the end only)
-  const lbk = lbOn() && S.lb.t > S.lb.life - .5, lbIn = lbOn() && !S.lb.burst ? 1 + .07 * Math.sin(Math.min(1, S.lb.t / LB.breath) * Math.PI / 2) : 1;
-  const posed = lbk ? pose('breath') : S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
+  // Last Breath: the Keeper kneels upright, eyes closed, palms rising, and swells with one deep breath in (Codex's inhale pose,
+  // brief 19); the slumped breath pose is kept for catching their breath at the end only (design review, 2026-10-08)
+  const lbk = lbOn() && S.lb.t > S.lb.life - .5, lbi = lbOn() && !S.lb.burst, lbIn = lbOn() && !S.lb.burst ? 1 + .03 * Math.sin(Math.min(1, S.lb.t / LB.breath) * Math.PI / 2) : 1;
+  const posed = lbi ? pose('inhale') : lbk ? pose('breath') : S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
   // the Keeper is drawn at KEEPER_KS (above draw()), one scale for every pose
   const hs = hsOn(), hsIm = hs ? (IMG['k' + keeper + 'hs'] || load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`)) : null;
   // while Ascended the Keeper stays themself on the ground; the Ascended form rises out of them as a genie
@@ -7465,7 +7472,8 @@ function draw() {
   if (lbOn() && S.lb.burst && S.lb.t < LB.breath + .55) { const om = IMG['k' + keeper + 'hs']; if (ok(om)) { const q = (S.lb.t - LB.breath) / .55, w = ks * 1.55, h = w * om.height / om.width; g.globalAlpha = Math.sin(q * Math.PI) * .7; g.drawImage(om, kx - w / 2, ky + 34 - h, w, h); g.globalAlpha = 1; } }
   const sgo = !hs && surgeOn(), formK = hs ? omniFormFade() : sgo ? surgeFade() : 0;
   if (ok(kim) && formK < 1) { g.save(); g.globalAlpha = 1 - formK; g.translate(kx, ky + 30 - bob); { const rk = Math.max(0, 1 - (S.t - (P.hitAt ?? -9)) / .35); g.rotate(lean - (P.hdx || 0) * (P.hitHeavy ? .32 : .2) * rk * rk); } if (P.face < 0) g.scale(-1, 1);
-    g.scale(ksx * (1 + hk * .08) * (1 + (lbIn - 1) * .4), ksy * (1 - hk * .1) * lbIn);
+    // (a Last Breath swells evenly by 3%: the chest fills, the proportions hold)
+    g.scale(ksx * (1 + hk * .08) * lbIn, ksy * (1 - hk * .1) * lbIn);
     // the look's signature: a soft rim of light in the Keeper's element colour
     // (in a Last Breath's unsteady power the rim grows and shifts through all five colours, never settling)
     { const lbp = lbOn() && S.lb.burst && S.lb.t < S.lb.life - .5, rs = lbp ? 1.14 + .03 * Math.sin(S.t * 9) : 1.06, [c0, c1, f] = lbp ? lbDrift() : [EL[keeperEl], EL[keeperEl], 0];
