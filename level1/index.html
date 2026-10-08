@@ -598,6 +598,13 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 #breathe .br-k img{transform:translateY(var(--pad,0%)) scaleX(-1)}
 #breathe .br-sh{position:absolute;bottom:-6px;left:22%;right:22%;height:14px;border-radius:50%;background:rgba(20,30,60,.28);filter:blur(2px)}
 #breathe .br-p.alive img{animation:brHop .55s var(--spring) 2}
+/* the daily breath: the animal is never grey, only asleep: a slow lean and a drifting z, and a warm glow that grows as you breathe */
+#breathe.daily .br-frost{display:none}
+#breathe.daily .br-p img{filter:none!important;rotate:calc(-6deg * (1 - var(--warm)))}
+#breathe .br-glow{position:absolute;left:10%;right:10%;bottom:4%;height:80%;border-radius:50%;background:radial-gradient(circle,rgba(255,232,170,.75),rgba(255,232,170,0) 65%);opacity:0;transition:opacity 1.4s}
+#breathe.daily .br-glow{opacity:var(--warm)}
+#breathe .br-z{display:none;position:absolute;right:22%;top:6%;font:900 26px var(--round);color:#fff;text-shadow:0 2px 6px rgba(20,30,70,.5)}#breathe .br-z b{font-size:18px;margin-left:3px;vertical-align:12px}
+#breathe.daily .br-p:not(.alive) .br-z{display:block;animation:zDrift 2.6s ease-in-out infinite}
 @keyframes brHop{50%{translate:0 -14%}}
 #breathe .br-puffs{position:absolute;inset:0;pointer-events:none}
 #breathe .br-puffs i{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--c);box-shadow:0 0 12px var(--c);opacity:0}
@@ -1319,6 +1326,25 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .hm-a{width:92px;height:auto;margin-right:-26px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.4));animation:hmBob 2.6s ease-in-out infinite reverse}
 @keyframes hmBob{50%{transform:translateY(-6px)}}
 .hm-go{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(98px + env(safe-area-inset-bottom));min-width:250px;z-index:3}
+/* the daily breath (A, 2026-10-08): a glass pill over Play that glows until today's breath is done */
+.hm-daily{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(168px + env(safe-area-inset-bottom));z-index:3;display:flex;align-items:center;gap:10px;padding:7px 18px 7px 8px;border:0;border-radius:99px;
+  background:rgba(14,20,52,.78);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22),0 8px 20px rgba(0,0,0,.3);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;animation:hdGlow 2.4s ease-in-out infinite}
+.hm-daily .hd-orb{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#FBF7EE 45%,rgba(255,226,170,.7) 72%);box-shadow:0 0 16px rgba(255,226,170,.8);animation:hdBreathe 4s ease-in-out infinite}
+.hm-daily span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}.hm-daily b{font:900 15px var(--round)}.hm-daily em{font:800 11.5px var(--round);font-style:normal;opacity:.75}
+.hm-daily.done{animation:none;opacity:.85}.hm-daily.done .hd-orb{animation:none}
+@keyframes hdBreathe{0%,100%{transform:scale(.85)}50%{transform:scale(1.1)}}
+@keyframes hdGlow{0%,100%{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22),0 8px 20px rgba(0,0,0,.3)}50%{box-shadow:inset 0 0 0 1.5px rgba(255,236,190,.7),0 0 26px rgba(255,226,170,.55)}}
+/* a spirit animal left a day or more without a breath is sleepy and dim (never gone); the next breath wakes it */
+/* a spirit animal left a day without a breath is asleep, in full colour, breathing slow and deep with a soft z drifting up (never
+   grey: grey is the Stillmaker's frost; design review, 2026-10-08). Tapping it opens the daily breath */
+#hmPetFig{position:relative}
+#hmPet.sleepy{animation-duration:5.5s!important;rotate:-5deg}
+.hm-zzz{display:none;position:absolute;left:58%;top:-6px;font:900 18px var(--round);color:#fff;text-shadow:0 2px 6px rgba(20,30,70,.5);pointer-events:none}
+.hm-zzz b{font-size:13px;margin-left:2px;vertical-align:8px}
+#hmPet.sleepy + .hm-zzz{display:block;animation:zDrift 2.6s ease-in-out -1.1s infinite}
+@keyframes zDrift{0%{opacity:0;transform:translate(0,6px)}30%{opacity:1}100%{opacity:0;transform:translate(10px,-18px)}}
+#hud #pauseBtn.tip{animation:pauseTip 1.1s ease-in-out 5}
+@keyframes pauseTip{50%{box-shadow:0 0 0 3px #FFE6A3,0 0 22px rgba(255,230,163,.85);transform:scale(1.12)}}
 .tabs{position:absolute;left:0;right:0;bottom:0;z-index:25;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(14,18,52,.82),rgba(10,13,40,.96));box-shadow:0 -1px 0 rgba(255,255,255,.14);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .tabs button{display:grid;justify-items:center;gap:2px;border:0;background:none;color:rgba(255,255,255,.7);font-family:var(--round);font-weight:800;font-size:11.5px;padding:4px 0;min-height:60px;border-radius:16px;cursor:pointer}
 .tabs button img{width:40px;height:40px;object-fit:contain;transition:transform .2s}
@@ -1659,7 +1685,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <button class="hm-gear" id="hmGear" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
-    <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="still-sky h" aria-hidden="true"><i></i></div><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa"><img class="hm-a" id="hmPet" alt=""></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
+    <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="still-sky h" aria-hidden="true"><i></i></div><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa" id="hmPetFig"><img class="hm-a" id="hmPet" alt=""><i class="hm-zzz" aria-hidden="true">z<b>z</b></i></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
+    <button class="hm-daily" id="hmDaily" aria-label="Daily breath with your spirit animal"><i class="hd-orb" aria-hidden="true"></i><span><b>Daily breath</b><em id="hmDayN">30 seconds</em></span></button>
     <button class="btn green hm-go" id="hmGo">Play</button>
     <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
       <h3>Grow your Sanctuary</h3><p class="gr-qi"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="grQi">0</b> Sparks</p><p class="gr-sub">Earn Sparks by freeing creatures</p>
@@ -1824,7 +1851,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <div class="br-sky"></div><div class="br-hill br-cold"></div><div class="br-hill br-warm"></div><div class="br-frost"></div>
     <div class="br-top"><b id="brTitle"></b><span class="br-dots" id="brDots"></span></div>
     <div class="br-stage" id="brStage">
-      <div class="br-fig br-p"><i class="br-sh"></i><img id="brPerson" alt=""></div>
+      <div class="br-fig br-p"><i class="br-glow"></i><i class="br-sh"></i><img id="brPerson" alt=""><i class="br-z" aria-hidden="true">z<b>z</b></i></div>
       <div class="br-fig br-k"><i class="br-sh"></i><img id="brKeeper" alt=""></div>
       <div class="br-puffs" id="brPuffs" aria-hidden="true"></div>
     </div>
@@ -3526,7 +3553,7 @@ const ETYPE = {
 const ELS = ['wood', 'fire', 'earth', 'metal', 'water'];
 // toughness keeps pace with the player's growing powers; level 1 eases you in, later levels are tougher, and a skilled
 // player's tier adds more
-function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.93, 1.13, 1.32, 1.43, 1.57][S.level - 1] * (1 + .12 * (S.hard || 0)); }
+function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.93, 1.13, 1.32, 1.43, 1.57][S.level - 1] * (1 + .12 * (S.hard || 0)) * (1 + ((S.dirK || 1) - 1) * .5); }
 /* Difficulty that follows the player (A, 2026-10-05: "adjustable to player skill based on the last 12 games. it will
    start tracking after 3 levels you beat in 3m or less in a row and make the following level harder and it will back
    off after 3 lives lost in the same run. we want to always keep the player feeling like a god"). Only the creatures
@@ -3535,15 +3562,18 @@ function hpScale() { return (1 + S.t / 90 + (S.lv - 1) * .06) * [.93, 1.13, 1.32
    never past what the last twelve wins support; three lives lost in one run lower it at once. */
 const HARD_MAX = 6;
 function skill() { try { return Object.assign({ tier:0, streak:0, hist:[] }, JSON.parse(store.get('morqi.skill') || '{}')); } catch (e) { return { tier:0, streak:0, hist:[] }; } }
+// (2026-10-08: levels now run 4-5 minutes, so "three minutes or less" could never happen and the tier never rose; Sammy felt
+// "unstoppable" in meeting 3. A win counts toward the climb when it is fast or clean, meaning no falls at all. Still three in a row,
+// still eased by three falls in one run)
 function skillWin(secs, falls) {
-  const k = skill(), fast = secs <= 180;
+  const k = skill(), fast = secs <= 180 || falls === 0;
   k.hist.push({ lv:S.level, t:Math.round(secs), falls, fast }); k.hist = k.hist.slice(-12);
   k.streak = fast ? k.streak + 1 : 0;
   const room = Math.max(0, k.hist.filter(h => h.fast).length - 2);   // the last twelve wins set how far it can climb
   if (k.streak >= 3) k.tier = Math.min(HARD_MAX, k.tier + 1, room);
   store.set('morqi.skill', JSON.stringify(k));
 }
-function skillFall() { if ((S.falls = (S.falls || 0) + 1) !== 3) return; const k = skill(); k.tier = Math.max(0, k.tier - 1); k.streak = 0; store.set('morqi.skill', JSON.stringify(k)); S.hard = k.tier; }
+function skillFall() { S.dirK = 1; S.dirLoss = 0; if ((S.falls = (S.falls || 0) + 1) !== 3) return; const k = skill(); k.tier = Math.max(0, k.tier - 1); k.streak = 0; store.set('morqi.skill', JSON.stringify(k)); S.hard = k.tier; }
 function spawn(type, at, rush, el) {
   if (S.en.length >= CAP + (S.capBoost || 0) && type !== 'golem') return null;
   let T = ETYPE[type]; const sc = hpScale(); let x, y;
@@ -4631,7 +4661,28 @@ function beatTick() {
 // worth (bot, 2026-10-08: holding only the climb still left ten separate stops on Level 4). The first level-up comes at once, to teach
 // it; never during the boss, which is its own calm arena
 const inPeak = () => !!(S && S.beat && !S.bossSpawned && !S.bossAt && S.lv > 2 && !S.lullPick && !S.beat.lull);   // (design review, 2026-10-08: held chests never opened in the lull)
+/* The director (A, 2026-10-08: "for the difficulty please be the expert in this and recommend what would be best"). Levels stay
+   tuned for 7-11 year olds; a player who is cruising gets more, quietly, inside the run, the way Left 4 Dead's AI director and
+   Resident Evil 4's hidden difficulty work. From Level 3, while the Keeper has lost little health over the last half minute and
+   stands above 60%, the crowd grows a little every second, up to a third more and a sixth tougher. It backs off three times as
+   fast the moment the Keeper gets hurt, falls under 40%, or falls; it pauses for the boss. Never shown, never punishing: a
+   struggling child never feels it. */
+const DIR = { from:3, max:1.3, up:.006, down:.02, calm:.15, low:.4 };
+function dirTick(dt) {
+  const P = S.p; if (S.dirHp == null) S.dirHp = P.hp;
+  const lost = Math.max(0, S.dirHp - P.hp) / P.max; S.dirHp = P.hp;
+  S.dirLoss = (S.dirLoss || 0) * Math.exp(-dt / 30) + lost;
+  // (boss fights stay as designed: the boost lets go when the boss arrives; QA, 2026-10-08)
+  if (S.bossSpawned || S.bossAt) S.dirK = 1;
+  const k = S.dirK || 1;
+  if (S.level < DIR.from || S.bossSpawned || S.bossAt || hsOn() || lbOn() || S.over) return;
+  if (P.hp < P.max * DIR.low || S.dirLoss > DIR.calm * 2.5) S.dirK = Math.max(1, k - DIR.down * dt * 3);
+  else if (S.dirLoss < DIR.calm && P.hp > P.max * .6) S.dirK = Math.min(DIR.max, k + DIR.up * dt);
+}
 function lullStart() {
+  // the first calm moment from Level 2 on, the pause button pulses and Luma says what is behind it, no words on screen (meeting 3:
+  // "I didn't even know that pause button was there"; design review, 2026-10-08: never a text toast during play)
+  if (S.level >= 2 && !SEEN.has('_pausetip')) { markSeen('_pausetip'); const pb = $('#pauseBtn'); pb.classList.remove('tip'); void pb.offsetWidth; pb.classList.add('tip'); AU.vo('vo-pause-tip', .2, .4); }
   // the gem sweep: everything on the ground comes in at once, with a rising chime
   // the gems themselves streaming in say it; the word only the first two times a run, and no ring round the Keeper (design review)
   const n = S.gems.length; if (n >= 12) { for (const q of S.gems) q.pull = true; S.sweeps = (S.sweeps || 0) + 1; if (S.sweeps <= 2) pickupPop('Gem Wind!', '#A8F4FF'); SFX.sweep(); S.sweepN = n; S.sweepAt = S.t; }
@@ -4645,7 +4696,7 @@ function direct(dt) {
     // from Level 3 the first forty seconds start busier, so a later level never opens on an empty field (A's playthrough,
     // 2026-10-05: Level 4's first half minute was bare ground)
     const rate = Math.min((S.level === 5 ? 13 : 9) + (S.hard || 0), (1 + t * .035 + (S.level >= 3 ? 1.6 * Math.max(0, 1 - t / 40) : 0)) * (1 + (S.lv - 1) * .05) * (1 + .1 * (S.hard || 0)) * (S.level === 5 ? 1.35 : 1));
-    S.spawnAcc += dt * rate * (S.beat ? S.beat.mul : 1);
+    S.spawnAcc += dt * rate * (S.beat ? S.beat.mul : 1) * (S.dirK || 1);
     while (S.spawnAcc > 1) { S.spawnAcc--; spawn(t > 40 && LV().allow.length && Math.random() < .18 ? 'wolf' : 'critter'); }
     // scripted waves wait out the lull
     if (S.beat && S.beat.lull) S.waveShift = (S.waveShift || 0) + dt;
@@ -5118,10 +5169,14 @@ function makeWell() { const Sh = SHRINES[2]; ['', '-sealed'].forEach(v => load('
 function wellTick(dt) {
   const W = S.well; if (!W || W.sealed) return; const P = S.p, d = Math.hypot(P.x - W.x, (P.y - W.y) * 1.4);
   if (d < 700 && !SEEN.has('_well')) { markSeen('_well'); BANNER.q.unshift({ id:'well', title:'A frost well!', text:'Stand on it to seal it.', pic:`art4/props/x-well-${W.el}.png?v=2` }); BANNER.t = Math.min(BANNER.t, 1.5); }
-  if (d < 95 && P.hp > 0) { W.hold += dt; if (W.hold >= 2) { W.sealed = true; SFX.fanfare(false); ring(W.x, W.y, 20, 420, GROUND_RING[W.el], .8, 14, true); stars(W.x, W.y - 40, 30, GROUND_RING[W.el], 380); paintThaw(W.x, W.y, 260); return; } }
+  if (d < 95 && P.hp > 0) { W.hold += dt; if (W.hold >= 2) { W.sealed = true; SFX.fanfare(false);
+    // sealing it frees the frost creatures it called nearby, so a child sees what the well was doing (meeting 3: "what the fuck did I do")
+    floatText(W.x, W.y - 150, 'Well sealed!', '#FFFFFF', 30); inArea(W.x, W.y, 420, c => { if (!c.boss && !c.giant) hurt(c, c.max * 3, keeperEl, { kb:500, fx:W.x, fy:W.y, react:true }); }); ring(W.x, W.y, 20, 420, GROUND_RING[W.el], .8, 14, true); stars(W.x, W.y - 40, 30, GROUND_RING[W.el], 380); paintThaw(W.x, W.y, 260); return; } }
   else W.hold = Math.max(0, W.hold - dt * 2);
   if (d < 1300 && W.hold <= 0 && (W.cd -= dt) <= 0) { W.cd = 3.5; const aw = Math.atan2(W.y - P.y, W.x - P.x); for (let i = 0; i < 3; i++) { const a = aw + (i - 1) * .5; spawn('critter', { x:W.x + Math.cos(a) * 120, y:W.y + Math.sin(a) * 80 }, 1.1, W.el); }
-    for (let i = 0; i < 6; i++) fx({ k:'smoke', x:W.x + rnd(-50, 50), y:W.y - 10, vx:rnd(-20, 20), vy:-rnd(40, 80), drag:1, life:rnd(.8, 1.3), s:rnd(20, 34), c:'220,236,255', a:.5 }); }
+    // each call is seen: a frost plume bursts up out of the well as its three creatures climb out
+    ring(W.x, W.y, 20, 200, '#DDF1FF', .5, 8, false); shards(W.x, W.y - 30, '#DDF1FF', 10, 260);
+    for (let i = 0; i < 14; i++) fx({ k:'smoke', x:W.x + rnd(-50, 50), y:W.y - 10, vx:rnd(-30, 30), vy:-rnd(60, 140), drag:1, life:rnd(.9, 1.4), s:rnd(22, 38), c:'220,236,255', a:.65 }); }
 }
 /* Element reactions (the Legend Engine, Phase 2; A, 2026-10-08: "Phase 2 only if phase 1 is completed"): when two elements meet on one
    creature within two seconds they react, and the reaction spills onto the crowd round it. Only the five feeding pairs react (A,
@@ -6739,6 +6794,7 @@ function update(dt) {
     if (S.lvlDefer > 3) { const extra = S.lvlDefer - 3; for (let i = 0; i < extra; i++) applyPick(options()[0], true); S.lvlDefer = 3;
       floatText(P.x, P.y - 130, 'Powers grew!', '#FFE58A', 24); ring(P.x, P.y, 20, 260, '#FFE58A', .5, 10, true); SFX.levelup(); }
     flushLevels(); }
+  dirTick(dt);
   lbCheck();
   if (P.hp <= 0 && !S.over) fall();
 }
@@ -7283,6 +7339,8 @@ function draw() {
   if (S.out) drawOutposts(inView); else if (S.l5) drawOutpostRings(S.l5, inView);
   // the frost well, and while the Keeper stands on it, a ring filling round it
   { const Wl = S.well; if (Wl && inView(Wl.x, Wl.y, 260)) { const im = IMG['x-well-' + Wl.el + (Wl.sealed ? '-sealed' : '')]; if (ok(im)) g.drawImage(im, Wl.x - 130, Wl.y - 93, 260, 186);
+    // (the spot to stand on: a pale ring that breathes at its base, so a child sees where sealing happens; meeting 3, 2026-10-08)
+    if (!Wl.sealed && Wl.hold <= 0) { const q = .5 + .5 * Math.sin(S.t * 4); g.save(); g.setLineDash([14, 12]); g.lineDashOffset = -S.t * 30; g.strokeStyle = `rgba(230,244,255,${.55 + .3 * q})`; g.lineWidth = 5; g.beginPath(); g.ellipse(Wl.x, Wl.y, 150, 104, 0, 0, TAU); g.stroke(); g.restore(); }
     if (!Wl.sealed && Wl.hold > 0) { g.save(); g.strokeStyle = GROUND_RING[Wl.el]; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.ellipse(Wl.x, Wl.y, 150, 104, 0, -Math.PI / 2, -Math.PI / 2 + TAU * Wl.hold / 2); g.stroke(); g.restore(); } } }
   // the trail to the goal: soft dots on the ground in its colour, drifting toward it, when it is far (A, 2026-10-07: "where to go next")
   // shown for the first eight seconds of each new goal, then the edge marker alone points the way (design review, 2026-10-07: text,
@@ -9684,6 +9742,13 @@ function paintShore(c, size, ox, oy, s, round) {
   if (S.boss && !S.boss.dead) mark(S.boss.x, S.boss.y, 4.6 * k, '#8C7BFF', 'o', true);
   if (S.bloomSeed) mark(S.bloomSeed.x, S.bloomSeed.y, (4 + Math.sin(S.t * 6)) * k, '#FFD24A', 'o', true);
   for (const it of S.items) if (it.kind === 'stone') mark(it.x, it.y, (3.8 + Math.sin(S.t * 6) * .8) * k, EL[it.el], 'sq', true);
+  // the temples in their element's colour, the one to go to next pulsing, a taken one with a white heart; and the frost well. Off
+  // the map they sit on its rim, so the minimap points the way (meeting 3, 2026-10-08: "where the fuck is this fire temple")
+  { const O = OUT(), open = O ? openOf(O) : [];
+    if (O) for (const T of O.towers) { const cx = T.cx ?? T.x, cy = T.cy ?? T.y, next = open.includes(T), r = (T.held ? 4 : next ? 5.2 + Math.sin(S.t * 6) * 1.2 : 4.2) * k;
+      const [mx, my] = pin(cx, cy, r + 2); c.fillStyle = GROUND_RING[T.el] || EL[T.el]; c.beginPath(); c.moveTo(mx, my - r * 1.25); c.lineTo(mx + r, my - r * .2); c.lineTo(mx + r * .8, my + r); c.lineTo(mx - r * .8, my + r); c.lineTo(mx - r, my - r * .2); c.closePath(); c.fill();
+      c.strokeStyle = '#fff'; c.lineWidth = Math.max(1, r / 3.2); c.stroke(); if (T.held) { c.fillStyle = '#fff'; c.beginPath(); c.arc(mx, my, r * .32, 0, TAU); c.fill(); } }
+    const Wl = S.well; if (Wl && !Wl.sealed) mark(Wl.x, Wl.y, (3.6 + Math.sin(S.t * 5) * .6) * k, '#BFE6FF', 'o', true); }
   // you: your companion's face, ringed in white
   const fr = 10 * k, [px, py] = [X(P.x), Y(P.y)], face = mapFace();
   c.save(); c.beginPath(); c.arc(px, py, fr, 0, TAU); c.fillStyle = '#1B2257'; c.fill(); c.clip();
@@ -9873,21 +9938,22 @@ const wiseShare = () => { const n = S.wiseN || 0; return n > 0 ? Math.min(1, (S.
    holds to breathe in (the Keeper kneels, palms rising) and lets go to breathe out (the Keeper pushes the breath out), and each
    full breath brings back a share of their colour. After the last one they thank you, and the Victory card follows. A breath in
    shorter than 2 s asks for a longer one; if nobody touches it for 8 s, the Keeper breathes on their own, so no child is stuck. */
-function breatheLife(realm) {
-  const f = freedOf(realm), used = RISES[LVL - 1] - S.rises, again = SEEN.has('_breathed-' + realm);
+function breatheLife(realm, daily) {
+  const pet = ANIMAL[animal].y, f = daily ? { img:null, alt:pet } : freedOf(realm), used = daily ? 0 : RISES[LVL - 1] - S.rises, again = !daily && SEEN.has('_breathed-' + realm);
   // the full breath the first time each person is freed; one breath on a replay (design review, 2026-10-08: 18-30 s on every win)
-  const N = again ? 1 : Math.min(5, 3 + (S.p.hp < S.p.max * .5 ? 1 : 0) + (used > 0 ? 1 : 0));
-  const scr = $('#breathe'), orb = $('#brOrb'), say = $('#brSay'), kim = $('#brKeeper'), pim = $('#brPerson'), who = PEOPLE[realm].replace(/^The/, 'the');
+  const N = daily ? 5 : again ? 1 : Math.min(5, 3 + (S.p.hp < S.p.max * .5 ? 1 : 0) + (used > 0 ? 1 : 0));
+  const scr = $('#breathe'), orb = $('#brOrb'), say = $('#brSay'), kim = $('#brKeeper'), pim = $('#brPerson'), who = daily ? pet : PEOPLE[realm].replace(/^The/, 'the');
+  scr.classList.toggle('daily', !!daily);
   const SK = VIC_SKY[realm] || VIC_SKY.water, G = GROUND_ART[realm] || GROUND_ART.water;
   scr.style.setProperty('--sky1', SK[0]); scr.style.setProperty('--sky2', SK[1]); scr.style.setProperty('--acc', SK[2]);
   scr.style.setProperty('--ground-cold', `url(art4/${G[0]}.jpg?v=8)`); scr.style.setProperty('--ground-warm', `url(art4/${G[1]}.jpg?v=8)`);
-  $('#brTitle').textContent = `Breathe life into ${who}`; $('#brDots').innerHTML = Array.from({ length:N }, () => '<i></i>').join('');
+  $('#brTitle').textContent = daily ? `Breathe with ${who}` : `Breathe life into ${who}`; $('#brDots').innerHTML = Array.from({ length:N }, () => '<i></i>').join('');
   // feet on one ground line: each picture is lowered by the empty rows under its figure
   const seat = im => { const go = () => { try { const c = document.createElement('canvas'), w = c.width = 64, h = c.height = 64, x = c.getContext('2d', { willReadFrequently:true }); x.drawImage(im, 0, 0, w, h);
       const d = x.getImageData(0, 0, w, h).data; let r = h - 1; for (; r > 0; r--) { let hit = false; for (let q = 0; q < w; q++) if (d[(r * w + q) * 4 + 3] > 40) { hit = true; break; } if (hit) break; }
       im.style.setProperty('--pad', ((h - 1 - r) / h * 100).toFixed(1) + '%'); } catch (e) {} }; if (im.complete && im.naturalWidth) go(); else im.onload = go; };
   const pose = n => { kim.src = `art4/k${keeper}${n ? '-' + n : ''}.png?v=13`; seat(kim); };
-  pim.src = `art4/${f.img}.png?v=8`; pim.alt = f.alt; seat(pim); pose(''); $('.br-p').classList.remove('alive'); orb.classList.remove('touched');
+  pim.src = daily ? lookSrc(`art4/a-${animal}-y.png?v=8`) : `art4/${f.img}.png?v=8`; pim.alt = f.alt; seat(pim); pose(''); $('.br-p').classList.remove('alive'); orb.classList.remove('touched');
   let done = 0, phase = 'rest', t0 = 0, idle, autoT, finished = false;
   const fast = window.__qaFast;   // the scripted playtest breathes at once
   // (each breath brings some colour back, and the last one brings it all, with the hop: the payoff lands at the end; design review)
@@ -9902,7 +9968,10 @@ function breatheLife(realm) {
         { duration:fast ? 1 : 1300, delay:fast ? 0 : i * 60, easing:'ease-in-out', fill:'forwards' }).onfinish = () => d.remove(); }
     const bl = document.createElement('b'); bl.style.left = x1 + 'px'; bl.style.top = y1 + 'px'; box.appendChild(bl);
     bl.animate([{ opacity:0, transform:'scale(.4)' }, { opacity:1, transform:'scale(1)', offset:.4 }, { opacity:0, transform:'scale(1.3)' }], { duration:fast ? 1 : 900, delay:fast ? 0 : 1300, fill:'forwards' }).onfinish = () => bl.remove(); };
-  const end = () => { if (finished) return; finished = true; clearTimeout(idle); clearTimeout(autoT); markSeen('_breathed-' + realm);
+  const end = () => { if (finished) return; finished = true; clearTimeout(idle); clearTimeout(autoT);
+    if (daily) { const r = dailyDone(); $('#brTitle').textContent = `${who} is wide awake!`; setOrb(1, .6, r.line); $('.br-p').classList.add('alive'); SFX.cleared();
+      setTimeout(() => { show('home'); renderHome(); if (r.bonus) toast(r.bonus, 4200); }, fast ? 50 : 3200); return; }
+    markSeen('_breathed-' + realm);
     $('#brTitle').textContent = `You brought ${who} back!`; setOrb(1, .6, ''); $('.br-p').classList.add('alive'); SFX.cleared();
     AU.vo('vo-breathe-done', .2, .4); setTimeout(() => AU.vo('vo-thanks-' + realm, 0, .4, false), 2200);
     setTimeout(() => { if (S && S.over) results(); }, fast ? 50 : 3600); };
@@ -9920,6 +9989,23 @@ function breatheLife(realm) {
   addEventListener('keydown', kd); addEventListener('keyup', ku);
   paint(); setOrb(1, .4, 'Hold to breathe in'); show('breathe'); AU.music(true); AU.song('home'); if (!again) AU.vo('vo-breathe-in', .5, .4); armIdle();
   if (fast) { inhale(); t0 -= 3000; release(); }
+}
+/* Coming back every day (A, 2026-10-08: "i agree with the daily return question"; the rule: reward the grind, never punish the
+   gap, never sell the grind). One daily breath with the spirit animal, about 30 s, grows it and pays a few Sparks; the days you
+   practised add up, never reset, with bonuses at 3, 7, 14 and 30. Miss a day and the animal on the home screen is sleepy and dim
+   ("unregulated", as D put it) until the next breath wakes it. Nothing is ever taken away. */
+const DAILY_MILES = [[3, 100], [7, 250], [14, 500], [30, 1000]];
+const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const dayGap = (a, b) => Math.round((new Date(b + 'T12:00') - new Date(a + 'T12:00')) / 864e5);
+function daily() { try { return Object.assign({ last:null, count:0 }, JSON.parse(store.get('morqi.daily') || '{}')); } catch (e) { return { last:null, count:0 }; } }
+const dailyToday = () => daily().last === dayKey();
+const petSleepy = () => { const d = daily(); return !!d.last && dayGap(d.last, dayKey()) >= 2; };
+function dailyDone() {
+  const d = daily(), today = dayKey(); let bonus = null;
+  if (d.last !== today) { d.count++; d.last = today; const pay = 20, m = DAILY_MILES.find(([n]) => n === d.count);
+    store.set('morqi.petxp.' + animal, (+(store.get('morqi.petxp.' + animal) || 0)) + 60); addQi(pay + (m ? m[1] : 0));
+    if (m) bonus = `Day ${d.count} of breathing! +${m[1]} Sparks`; store.set('morqi.daily', JSON.stringify(d)); }
+  return { bonus, line:`Day ${d.count} of breathing` };
 }
 function win() {
   if (S.won) return; S.won = true; S.over = true; running = false; skillWin(S.t, S.falls || 0);
@@ -10817,13 +10903,20 @@ function renderHome() {
   // new pages in the Book: a dot on its tab, and Luma says so once
   const nb = !PITCH && store.get('morqi.bookNew') === '1'; document.querySelector('#tabs [data-tab="book"]').classList.toggle('dot', nb);
   // the first time a run has paid Sparks, the Sparks pill glows until it is opened
-  $('#hmQi').classList.toggle('hint', qi() > 0 && store.get('morqi.sparksTaught') !== '1');
+  // ...and again whenever a plot or a Star Call can be grown with the Sparks in hand (meeting 3: nobody found Grow your Sanctuary)
+  { const g = grown(), q = qi(), plot = PLOTS.some(p => (g[p.el] || 0) < plotMax(p.el) && q >= plotCost(g[p.el] || 0, p.el)), call = Object.keys(CALL).some(id => callOwned(id) && callLv(id) < CALL_UP.length && q >= CALL_UP[callLv(id)]);
+    $('#hmQi').classList.toggle('hint', (qi() > 0 && store.get('morqi.sparksTaught') !== '1') || plot || call); }
   if (nb && !homeSaid) { homeSaid = true; setTimeout(() => AU.vo('vo-booknew', 0, .5), 700); }
   // a new season's theme, offered once to players who keep the music off
   if (!PITCH && !AU.musicOn && store.get('morqi.themeAsked') !== THEME.id) { store.set('morqi.themeAsked', THEME.id); store.set('morqi.themeBonus', 'want:' + THEME.id); $('#thName').textContent = THEME.n; setTimeout(() => openSheet('#themeSheet'), 900); }
+  { const done = dailyToday(), d = daily(), b = $('#hmDaily'); b.classList.toggle('done', done); $('#hmDayN').textContent = done ? `Day ${d.count} ✓` : d.count ? `Day ${d.count + 1}` : '30 seconds';
+    $('#hmPet').classList.toggle('sleepy', petSleepy() && !done); }
   $('#hmQiN').textContent = qi().toLocaleString(); $('#hmKeeper').src = `art4/k${keeper}-hi.png?v=13`; $('#hmKeeper').alt = K.n; $('#hmPet').src = lookSrc(`art4/a-${animal}-y.png?v=8`); $('#hmPet').alt = ANIMAL[animal].y;
 }
 $('#hmGo').onclick = () => { SFX.select(); goTab('map'); };
+$('#hmDaily').onclick = () => { SFX.select(); AU.init(); breatheLife(keeperEl, true); };
+// a sleepy spirit animal on the home screen, tapped, wakes into the daily breath
+$('#hmPetFig').addEventListener('click', () => { if ($('#hmPet').classList.contains('sleepy')) { SFX.select(); AU.init(); breatheLife(keeperEl, true); } });
 // the painted portal is the door to the realms, so it answers a tap like one
 $('#hmPortal').onclick = () => { SFX.sweep(); const p = $('#hmPortal'); p.classList.remove('go'); void p.offsetWidth; p.classList.add('go'); setTimeout(() => goTab('map'), 380); };
 document.querySelectorAll('.ss-r').forEach(b => b.onclick = () => { SFX.pop(); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); });
