@@ -2223,7 +2223,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -5250,6 +5250,8 @@ function surgeStart() {
   // with a burst of the element's own pieces
   for (let i = 0; i < 16; i++) { const a = i / 16 * TAU; fx({ k:'star', x:P.x + Math.cos(a) * 20, y:P.y - 50 + Math.sin(a) * 30, vx:Math.cos(a) * 260, vy:Math.sin(a) * 200 - 40, drag:3, life:.5, s:rnd(7, 11), c:FORM_PAL[keeperEl][i % 5] }); }
   AU.song('omni', 1); SFX.power();
+  // the first Surge ever is named aloud, for a child who can't read yet (design review, 2026-10-07; A recorded it 2026-10-08)
+  if (!SEEN.has('_surgego')) { markSeen('_surgego'); AU.vo('vo-surge-go', .15, .5); }
   return true;
 }
 function surgeEnd() {
@@ -10290,9 +10292,9 @@ const PEOPLE = { water:'The fisherman', wood:'The woodcarver', fire:'The drummer
 function omniTease(next) {
   const d = document.createElement('div'); d.id = 'tease';
   d.innerHTML = `<i class="tz-light"></i><img src="art4/k${keeper}-omni.png?v=1" alt="Your Keeper as Omni"><span class="tz-st">${CYCLE.map(el => `<img src="art4/props/x-stone-${el}.png?v=8" alt="">`).join('')}</span><p>One day, with all five stones,<b>you'll go Omni!</b></p>`;
-  $('#stage').appendChild(d); requestAnimationFrame(() => d.classList.add('on')); SFX.sweep();
+  $('#stage').appendChild(d); requestAnimationFrame(() => d.classList.add('on')); SFX.sweep(); AU.vo('vo-omni-tease', .5, .4);
   let done = false; const end = () => { if (done) return; done = true; d.classList.remove('on'); setTimeout(() => { d.remove(); next(); }, 350); };
-  d.addEventListener('pointerdown', end); setTimeout(end, reduce ? 2200 : 3400);
+  d.addEventListener('pointerdown', end); setTimeout(end, 5000);   // Luma's line (about 4 s) finishes first
 }
 // (design review, 2026-10-07: fire's "free from restless excitement" read as losing something good)
 const FEEL = { water:'fear', wood:'anger', fire:'restlessness', earth:'worry', metal:'grief' };
