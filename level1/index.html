@@ -2005,14 +2005,17 @@ const KIND = {
   'earth-m':{ n:'Worry Stone',       beh:'roll',   hp:1.4, sp:.85,  minion:1 },
   'metal-m':{ n:'Chime Wraith',      beh:'weave',  hp:1,   sp:1.1,  f:2.4, amp:1, minion:1 }
 };
-// two new families (the Legend Engine plan, Codex brief 17; A, 2026-10-08: "a taste in Levels 4-5"): the Bell Ringer calls
-// reinforcements and runs; the Lantern Wisp fades in where you aren't looking
+// two new families (the Legend Engine plan, Codex brief 17; A, 2026-10-08: "a taste in Levels 4-5"): the Caller calls
+// reinforcements and runs, each with its element's own instrument (brief 17b: the bell is metal's alone); the Lantern Wisp fades in
+// where you aren't looking
 Object.assign(KIND, Object.fromEntries(['water', 'wood', 'fire', 'earth', 'metal'].flatMap(el => [
-  [el + '-r', { n:{ water:'Frost Bell Seal', wood:'Bark Bell Sprite', fire:'Lantern Bell Imp', earth:'Clay Bell Critter', metal:'Bronze Bell Mouse' }[el], beh:'call', hp:1.8, sp:1.15,
+  [el + '-r', { n:{ water:'Conch Seal', wood:'Clapper Sprite', fire:'Drum Imp', earth:'Whistle Pebble', metal:'Bell Mouse' }[el], beh:'call', hp:1.8, sp:1.15,
     short:'Rings its bell to call more creatures', tip:'It rings its bell to call more creatures, then runs away. Free it first!' }],
   [el + '-w', { n:{ water:'Mist Wisp', wood:'Leaf Wisp', fire:'Ember Wisp', earth:'Amber Wisp', metal:'Silver Wisp' }[el], beh:'phase', hp:.7, sp:1.05, f:2, amp:.6,
     short:'Fades in behind you', tip:'It fades in where you are not looking. Watch behind you!' }]])));
-Object.keys(KIND).forEach(k => { load('e-' + k, `art4/e-${k}.png?v=8`); if (!KIND[k].minion) load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=8`); });
+['water', 'wood', 'fire', 'earth', 'metal'].forEach(el => load('e-' + el + '-r-call', `art4/e-${el}-r-call.png?v=2`));   // the Callers' calling pose
+// the Callers were repainted in brief 17b, so their files get a new version and phones fetch the new art
+Object.keys(KIND).forEach(k => { const v = /-r$/.test(k) ? 9 : 8; load('e-' + k, `art4/e-${k}.png?v=${v}`); if (!KIND[k].minion) load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=${v}`); });
 const lookSrc = p => p;   // the bold look is the only look now; kept so image paths have one place to change
 if (!/[?&]towers=0/.test(location.search)) { ['wood', 'fire', 'earth', 'water', 'metal'].forEach(el => { load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`); load('x-temple-' + el + '-alive', `art4/props/x-temple-${el}-alive.png?v=1`); }); ['wood', 'fire', 'earth'].forEach(r => load('sf-' + r, `art4/story/story-frost-${r}.jpg?v=8`)); }
 ['x-stone-wood','x-stone-fire','x-stone-earth','x-stone-metal','x-stone-water','x-bloom','x-lantern','x-sword','x-boulder','x-pearl','x-bamboo','x-chest','x-chest-open','x-crate','x-heart','x-shrine-wood','x-shrine-fire','x-shrine-earth','x-shrine-metal','x-shrine-water','x-tower-metal'].forEach(n => load(n, `art4/props/${n}.png?v=8`));
@@ -4945,15 +4948,16 @@ function familiesTick(dt) {
     const m = Math.hypot(P.vx || 0, P.vy || 0), a0 = m > 20 ? Math.atan2(-(P.vy || 0), -(P.vx || 0)) : rnd(0, TAU);
     for (let i = 0; i < 2; i++) { const a = a0 + (i - .5) * .7, e = spawn('critter', { x:P.x + Math.cos(a) * 230, y:P.y + Math.sin(a) * 170 }, 1); if (e) asFamily(e, e.el + '-w'); } }
   if (S.level === 5 && S.t > 35 && (S.ringerT = (S.ringerT ?? 6) - dt) <= 0 && S.en.filter(e => !e.dead && e.K && e.K.beh === 'call').length < 2) { S.ringerT = 24;
-    const e = spawn('wolf', null, 1); if (e) asFamily(e, (e.el === 'metal' ? 'earth' : e.el) + '-r'); }   // the metal Caller waits for its matte-bronze repaint
+    const e = spawn('wolf', null, 1); if (e) asFamily(e, e.el + '-r'); }
   wellTick(dt);
 }
 // the frost well: keeps creatures coming until the Keeper stands on it for two seconds to seal it
-function makeWell() { const Sh = SHRINES[3];   // the earth temple's way (design review, 2026-10-08: the fire well's red rim and crosshair lid read as a warning; back when repainted) ['', '-sealed'].forEach(v => load('x-well-' + Sh.el + v, `art4/props/x-well-${Sh.el}${v}.png?v=1`));
+// the fire temple's way (brief 17b repainted the fire well: basalt rim, lantern lid)
+function makeWell() { const Sh = SHRINES[2]; ['', '-sealed'].forEach(v => load('x-well-' + Sh.el + v, `art4/props/x-well-${Sh.el}${v}.png?v=2`));
   return { el:Sh.el, x:Math.round(TOWER.x + (Sh.x - TOWER.x) * .55), y:Math.round(TOWER.y + 120 + (Sh.y - TOWER.y) * .55), hold:0, cd:2, sealed:false }; }
 function wellTick(dt) {
   const W = S.well; if (!W || W.sealed) return; const P = S.p, d = Math.hypot(P.x - W.x, (P.y - W.y) * 1.4);
-  if (d < 700 && !SEEN.has('_well')) { markSeen('_well'); BANNER.q.unshift({ id:'well', title:'A frost well!', text:'Stand on it to seal it.', pic:`art4/props/x-well-${W.el}.png?v=1` }); BANNER.t = Math.min(BANNER.t, 1.5); }
+  if (d < 700 && !SEEN.has('_well')) { markSeen('_well'); BANNER.q.unshift({ id:'well', title:'A frost well!', text:'Stand on it to seal it.', pic:`art4/props/x-well-${W.el}.png?v=2` }); BANNER.t = Math.min(BANNER.t, 1.5); }
   if (d < 95 && P.hp > 0) { W.hold += dt; if (W.hold >= 2) { W.sealed = true; SFX.fanfare(false); ring(W.x, W.y, 20, 420, GROUND_RING[W.el], .8, 14, true); stars(W.x, W.y - 40, 30, GROUND_RING[W.el], 380); paintThaw(W.x, W.y, 260); return; } }
   else W.hold = Math.max(0, W.hold - dt * 2);
   if (d < 1300 && W.hold <= 0 && (W.cd -= dt) <= 0) { W.cd = 3.5; const aw = Math.atan2(W.y - P.y, W.x - P.x); for (let i = 0; i < 3; i++) { const a = aw + (i - 1) * .5; spawn('critter', { x:W.x + Math.cos(a) * 120, y:W.y + Math.sin(a) * 80 }, 1.1, W.el); }
@@ -7058,7 +7062,7 @@ function draw() {
   // one creature, drawn; drawn again (again = true) when a tower redrawn over the Keeper would hide it
   const drawCreature = (e, again) => {
     // during a Bloom the creatures wear their happy faces, freed of the spell for a moment
-    const art = S.bloom && !e.boss && e.own && ok(IMG[e.img + '-happy']) ? e.img + '-happy' : e.img;
+    const art = S.bloom && !e.boss && e.own && ok(IMG[e.img + '-happy']) ? e.img + '-happy' : e.ringT != null && ok(IMG[e.img + '-call']) ? e.img + '-call' : e.img;
     const im = e.boss || (e.giant && e.own) ? (ok(IMG[e.img]) ? IMG[e.img] : null) : e.own ? tinted(art, '#000', 0) : tinted(art, EL[e.el]), s = e.size, wind = e.act && e.act.ph === 0 ? Math.min(1, e.act.t / e.act.wind) : 0, rolling = e.act && e.act.ph === 1 && e.act.k === 'lane';
     if (!im) return;
     const hk = Math.max(0, 1 - (S.t - (e.hitAt ?? -9)) / .16), bk = Math.max(0, 1 - (S.t - (e.biteAt ?? -9)) / .2), froz = e.frozen > 0;
@@ -9075,7 +9079,7 @@ const BANNER_SAY = { ...Object.fromEntries(['water', 'wood', 'fire', 'earth', 'm
   bloom:'Touch it. Everyone dances!', ult:'It strikes on its own.', giant_rammer:'Dodge its charge, then hit its back.', giant_colossus:'Hit its core when it glows.', giant_alpha:'Free its pack first.' };
 function bannerPic(b) {
   if (b.pic) return b.pic;
-  if (b.card) return `art4/e-${b.card}.png?v=8`;
+  if (b.card) return `art4/e-${b.card}.png?v=${/-r$/.test(b.card) ? 9 : 8}`;
   if (b.id.startsWith('giant_')) { const e = S.en.find(q => q.giant === b.id.slice(6)), im = e && IMG[e.img]; return im ? giantPic(im) : 'art4/e-golem.png?v=8'; }
   return { gem:'art4/icons/icon-spark.png?v=9', shrine:`art4/props/x-shrine-${(S && S.lastShrineEl) || 'water'}.png?v=8`, bloom:'art4/props/x-bloom.png?v=8', ult:`art4/a-${animal}-y.png?v=8`,
     enemy:`art4/e-${(S.en.find(e => !e.boss) || { el:'water' }).el}-a.png?v=8` }[b.id] || null;
