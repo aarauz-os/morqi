@@ -1519,6 +1519,12 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #results .sparks i{clip-path:none;border-radius:2px;width:calc(var(--s) * .7);height:var(--s);animation-name:confettiFall}
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0) rotateY(0);opacity:0}8%{opacity:1}100%{transform:translateY(110vh) rotate(2turn) rotateY(3turn);opacity:.9}}
 @media (prefers-reduced-motion:reduce){#results .vic-beams,#results .vic-cloud,#results .vic-keeper,#results .victory img,#results .vic-pals img,#results .vicT,#results .vicT::after,#results .resQ{animation:none!important}}
+/* level-ups held for the lull: gold pips round the level badge, one per pick, and one soft shimmer as each is held (Phase 1, design review 2026-10-08) */
+#hud .lvbadge .lvh{position:absolute;left:50%;bottom:-7px;translate:-50% 0;display:flex;gap:3px}
+#hud .lvbadge .lvh b{width:7px;height:7px;border-radius:50%;background:#FFD45A;box-shadow:0 0 0 1.5px #7A4A10}
+#hud .lvbadge.shim::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(255,224,138,.7),rgba(255,224,138,0) 70%);animation:lvShim .8s ease-out forwards;pointer-events:none}
+@keyframes lvShim{from{opacity:1;transform:scale(.8)}to{opacity:0;transform:scale(1.5)}}
+@media (prefers-reduced-motion:reduce){#hud .lvbadge.shim::after{animation:none;opacity:0}}
 </style>
 
 <div id="stage">
@@ -2235,7 +2241,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters'].map(k => 'vo-card-' + k), 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -3117,7 +3123,8 @@ const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(
 // dark; on the home, barely there until the player has met him, then a little clearer
 const stillSky = () => document.documentElement.classList.toggle('met-still', SEEN.has('_stillmaker'));
 stillSky();
-function show(id) { if (id === 'pickKeeper') markKeepers(); document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); if (id) guardTaps();
+function show(id) { if (S && !S.over && (id === 'levelUp' || id === 'chest' || id === 'tipCard' || id === 'beastCard')) (S.stops = S.stops || []).push([Math.round(S.t * 10) / 10, id]);   // every pause, for the pacing checks
+ if (id === 'pickKeeper') markKeepers(); document.querySelectorAll('.scr').forEach(s => { s.hidden = s.id !== id; }); if (id) guardTaps();
   const tb = document.getElementById('tabs'); if (tb) { tb.hidden = !FRONT.includes(id); tb.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.tab === id)); } }
 const FRONT = ['home', 'map', 'book', 'season'];
 // a sheet that opens under a thumb still dragging (a level-up, a teaching card, a chest) ignores taps until that finger
@@ -3533,6 +3540,7 @@ function hurt(e, dmg, el, o = {}) {
   // a wisp can't be hit until mostly faded in, a Caller until it has walked into view
   if (e.fade != null && e.fade < .7) return;
   if (e.K && e.K.beh === 'call' && (Math.abs(e.x - S.p.x) > VW * .5 || Math.abs(e.y - S.p.y) > VH * .5)) return;
+  if (e.post && !e.posted) return;   // a shooter can't be freed on its way in, only once it holds its post (QA, 2026-10-08: they died before firing)
   let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0)) * (surgeOn() ? SURGE.mul : 1);
   const k = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), strong = k > 1, weak = k < 1;
   m *= k;
@@ -3560,8 +3568,10 @@ function hurt(e, dmg, el, o = {}) {
     e.stag = (e.stag || 0) + dealt;
     if (e.boss && e.stag >= e.max * .08 && e.hp - dealt > 0) { e.stag = 0; e.stagAt = S.t; S.hitstop = Math.max(S.hitstop || 0, .07); S.shake = Math.max(S.shake, .32);
       ring(e.x, e.y - e.size * .3, 20, e.size * .95, c, .45, 14, true); stars(e.x, e.y - e.size * .4, 16, '#FFFFFF', 400); SFX.thud(true); } }
-  // damage numbers only on the Warden, where they show the fight going your way
-  if (e.boss && S.nums.length < 28 && (e.numCd || 0) <= S.t) { e.numCd = S.t + .45; S.nums.push({ x:e.x + rnd(-10, 10), y:e.y - e.size * .55, v:Math.round(dealt), t:0, strong, weak }); }
+  // damage numbers on bosses and giants only, never the swarm or the brutes (design review, 2026-10-08: brutes come in groups), so they show a fight going your way without
+  // hiding the shots; they grow with the Keeper's level, and a hit with the element that beats it shows in that element's colour
+  // (the Legend Engine, Phase 1; at most 25 at once)
+  if ((e.boss || e.giant) && S.nums.length < 25 && (e.numCd || 0) <= S.t) { e.numCd = S.t + (e.boss ? .45 : .3); S.nums.push({ x:e.x + rnd(-10, 10), y:e.y - e.size * .55, v:Math.round(dealt), t:0, strong, weak, el, big:e.boss || e.giant, sc:1 + Math.min(.35, (S.lv - 1) * .025) }); }
   if (o.spark !== false && (e.sparkCd || 0) <= S.t) { e.sparkCd = S.t + .1; fx({ k:'hit', x:e.x + rnd(-6, 6), y:e.y - e.size * .3, life:.16, s:e.r * 1.6, c:EL[el], rot:rnd(0, TAU) }); }
   // the finishing Ascended keeps the boss for its own finale: nothing else lands the last blow (QA, 2026-10-06: the
   // boss fell at seven seconds, so the five-element finale never played)
@@ -3600,7 +3610,7 @@ function kill(e) {
   }
   paintThaw(e.x, e.y, e.type === 'golem' ? 190 : e.boss ? 900 : 84);
   // a giant felled pays out: a chest, a heart and a fountain of gems
-  if (e.giant) { SFX.cleared(); S.shake = .6; S.hitstop = Math.max(S.hitstop || 0, .12); ring(e.x, e.y, 30, 420, col, .7, 18, true); stars(e.x, e.y - 80, 40, '#FFE58A', 520); dropChest(e.x, e.y);
+  if (e.giant) { S.rainbowNext = true; SFX.cleared(); S.shake = .6; S.hitstop = Math.max(S.hitstop || 0, .12); ring(e.x, e.y, 30, 420, col, .7, 18, true); stars(e.x, e.y - 80, 40, '#FFE58A', 520); dropChest(e.x, e.y);
     S.items.push({ x:e.x + 50, y:e.y, kind:'heart', t:0, z:10, vz:260 }); for (let i = 0; i < 16; i++) S.gems.push({ x:e.x, y:e.y, z:6, vz:rnd(240, 380), vx:rnd(-200, 200), vy:rnd(-200, 200), v:4, kind:1, t:0 }); }
   if (e.type === 'golem') {
     S.shake = .35; ring(e.x, e.y, 20, 200, col, .5, 10, true);
@@ -3668,7 +3678,11 @@ function crates(dt) {
     if (Math.hypot(it.x - P.x, it.y - 18 - P.y) < 84) { it.got = true; if (it.kind === 'stone') collectStone(it.el); else useItem(it.kind); }
   }
   S.items = S.items.filter(it => !it.got && (it.kind === 'stone' || it.t < 40));
-  for (const ch of S.chests) { ch.t += dt; if (!ch.got && !hsOn() && !S.holdLevels && !callBusy() && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true; openChest(); } }
+  // a chest taken in the thick of a peak is carried and opens in the lull (Phase 1 pacing, 2026-10-08)
+  for (const ch of S.chests) { ch.t += dt; if (!ch.got && !hsOn() && !S.holdLevels && !callBusy() && Math.hypot(ch.x - P.x, ch.y - P.y) < 64) { ch.got = true;
+    if (inPeak()) { S.chestHeld = (S.chestHeld || 0) + 1; SFX.chestDrop(); stars(P.x, P.y - 40, 16, '#FFE58A', 260); if (!SEEN.has('_chesthold')) { markSeen('_chesthold'); BANNER.q.unshift({ id:'chesthold', title:'Spirit Chest!', text:'It opens when it\u2019s calm.', pic:'art4/props/x-chest.png?v=8' }); BANNER.t = Math.min(BANNER.t, .5); } }
+    else openChest(); } }
+  if (S.chestHeld && !inPeak() && !(S.bossAt && !S.bossSpawned) && running && !S.pendingLevel && !S.lvlDefer && !popupOpen() && !COACH.cur && !hsOn() && !S.omni && !callBusy()) { S.chestHeld--; openChest(); }
   S.chests = S.chests.filter(c => !c.got);
 }
 function useItem(k) {
@@ -3691,7 +3705,7 @@ function useItem(k) {
     for (let i = 0; i < 26; i++) { const a = rnd(0, TAU), d = rnd(0, VW * .55); const x = P.x + Math.cos(a) * d, y = P.y + Math.sin(a) * d * 1.6; setTimeout(() => { if (!S) return; flash(x, y, 140, '#FFD24A', .2); confetti(x, y, 8, 260); burst(x, y, '#FFB347', 8, 300); }, i * 40); }
   }
 }
-function dropChest(x, y) { S.chests.push({ x, y, t:0 }); SFX.chestDrop(); stars(x, y - 30, 20, '#FFE58A', 260); }
+function dropChest(x, y) { S.chests.push({ x, y, t:0, rainbow:!!S.rainbowNext }); S.rainbowNext = false; SFX.chestDrop(); stars(x, y - 30, 20, '#FFE58A', 260); }
 
 /* ================= the ten powers ================= */
 const cdMul = () => Math.pow(.91, S.gifts.lungs || 0);
@@ -4385,11 +4399,11 @@ const LEVELS = [
     { t:30,  el:'fire',  form:'ring',   mix:[['critter', 18], ['wolf', 4]], name:'Imps and beetles' },
     { t:46,  el:'earth', form:'elite',  mix:[['golem', 1], ['critter', 12]], name:'A Stone Ox and its crabs' },
     { t:58,  el:'wood',  form:'pincer', mix:[['critter', 18], ['wolf', 5]], name:'Sprouts and moths' },
-    { t:72,  el:'earth', form:'column', mix:[['critter', 16], ['wolf', 6]], name:'Crabs and Armadillos charge' },
+    { t:72,  el:'earth', form:'wall',   mix:[['critter', 15]], name:'A wall of Pebble Crabs' },   // the line wall (Phase 1)
     { t:88,  el:'water', form:'ring',   mix:[['critter', 20], ['wolf', 6]], name:'Frogs and jellies' },
     { t:102, el:'earth', form:'elite',  mix:[['golem', 1], ['wolf', 6]], name:'A Stone Ox and its armadillos' },
     { t:118, el:'metal', form:'pincer', mix:[['critter', 18], ['wolf', 6]], name:'Hornets and Mantises' },
-    { t:134, el:'mix',   form:'ring',   mix:[['critter', 24], ['wolf', 8]], name:'Every element closes in' },
+    { t:134, el:'metal', form:'wall',   mix:[['critter', 17]], name:'A wall of Bronze Hornets' },
     { t:150, el:'mix',   form:'storm',  mix:[['critter', 36], ['wolf', 12], ['golem', 1]], name:'The Still sends everything' } ] },
   // the Silver City is the demo's long climb (A, 2026-10-06: "That level should be much longer to finish but again it's to
   // leave a great lasting impression"): four acts over about nine minutes, each heavier, with the Bell Knights growing
@@ -4400,12 +4414,12 @@ const LEVELS = [
     { t:46,  el:'water', form:'ring',   mix:[['critter', 20], ['wolf', 6]], name:'Frogs and jellies' },
     { t:62,  el:'metal', form:'elite',  mix:[['golem', 2], ['critter', 12]], name:'Two Bell Knights and their hornets' },
     { t:78,  el:'wood',  form:'pincer', mix:[['critter', 20], ['wolf', 6]], name:'Sprouts and moths' },
-    { t:94,  el:'fire',  form:'column', mix:[['critter', 18], ['wolf', 6]], name:'Imps and beetles charge' },
+    { t:94,  el:'water', form:'shooters', mix:[['wolf', 9]], name:'Spout Frogs surround you' },   // the ranged ring (Phase 1, a taste of Level 10's)
     { t:110, el:'metal', form:'column', mix:[['golem', 1], ['critter', 16], ['wolf', 5]], name:'A Bell Knight marches in' },
     { t:126, el:'mix',   form:'ring',   mix:[['critter', 26], ['wolf', 8]], name:'Every element closes in' },
     { t:144, el:'wood',  form:'elite',  mix:[['golem', 1], ['wolf', 6]], name:'An Old Treant and its moths' },
     { t:160, el:'metal', form:'pincer', mix:[['golem', 2], ['critter', 14], ['wolf', 6]], name:'Bell Knights from both sides' },
-    { t:178, el:'earth', form:'ring',   mix:[['critter', 26], ['wolf', 8]], name:'Crabs and Armadillos all around' },
+    { t:178, el:'water', form:'shooters', mix:[['wolf', 11]], name:'A ring of Spout Frogs' },
     { t:196, el:'water', form:'elite',  mix:[['golem', 1], ['wolf', 8]], name:'A Tide Turtle and its frogs' },
     { t:214, el:'mix',   form:'storm',  mix:[['critter', 34], ['wolf', 10], ['golem', 2]], name:'The Still stirs' },
     { t:236, el:'fire',  form:'elite',  mix:[['golem', 2], ['critter', 16]], name:'Two Ember Golems' },
@@ -4457,6 +4471,23 @@ function launchWave(plan) {
   // the Silver City's waves come four tenths bigger (A, 2026-10-06: "i would love it if there were just more enemies")
   const list = []; for (const [type, n0] of w.mix) { const n = type === 'golem' ? n0 : Math.round(n0 * grow * (S.level === 5 ? 1.4 : 1)); for (let i = 0; i < n; i++) list.push(type); }
   const brutes = list.filter(t => t === 'golem'), rest = list.filter(t => t !== 'golem');
+  /* Two threat families with one job each (the Legend Engine, Phase 1): a line wall closes a lane and marches across, so the
+     Keeper breaks through one spot; a ring of shooters holds its ground round the Keeper and fires, so standing still is punished */
+  if (w.form === 'wall') {
+    const [dx, dy] = SIDES[plan.dirs[0]], px = -dy, py = dx, n = rest.length, sp = 62;
+    rest.forEach((type, i) => { const off = (i - (n - 1) / 2) * 52, e = spawn(type, at(P.x + dx * D + px * off, P.y + dy * D + py * off), 1, pick(w.el));
+      if (e) { e.wall = { dx:-dx, dy:-dy, sp, go:0 }; e.heavy = true; e.hp = e.max = e.max * 2.4; } });
+    if (!SEEN.has('_wall')) { markSeen('_wall'); BANNER.q.unshift({ id:'wall', title:'A wall!', text:'Break through one spot.', pic:`art4/e-${pick(w.el)}-a.png?v=8`, low:dy < 0 }); BANNER.t = Math.min(BANNER.t, 1); }   // a wall from the top: the banner sits low, off its path
+    S.hordes++; SFX.stomp(); return;
+  }
+  if (w.form === 'shooters') {
+    // ten at most, however strong the Keeper: twenty shooters made standing anywhere a loss (bot, 2026-10-08)
+    const ring = rest.slice(0, 10), n = ring.length, R = 330;
+    ring.forEach((type, i) => { const a = i / n * TAU, e = spawn('wolf', at(P.x + Math.cos(a) * (D + 40), P.y + Math.sin(a) * (D + 40)), 1, 'water');
+      if (e) { e.post = { x:clamp(P.x + Math.cos(a) * R, 60, WORLD - 60), y:clamp(P.y + Math.sin(a) * R * .8, 60, WORLD - 60), until:S.t + 14 }; e.cd = 1.4 + i % 3 * .6; e.hp = e.max = e.max * 2.5; } });
+    if (!SEEN.has('_shooters')) { markSeen('_shooters'); BANNER.q.unshift({ id:'shooters', title:'Surrounded!', text:'Keep moving!', pic:'art4/e-water-b.png?v=8' }); BANNER.t = Math.min(BANNER.t, 1); }
+    S.hordes++; SFX.stomp(); return;
+  }
   if (w.form === 'ring' || w.form === 'storm') {
     rest.forEach((type, i) => { const a = i / rest.length * TAU, r = D * (type === 'wolf' ? .98 : .85); spawn(type, at(P.x + Math.cos(a) * r, P.y + Math.sin(a) * r), w.form === 'storm' ? 1.1 : .85, w.el === 'mix' ? pool[i % pool.length] : w.el); });
     brutes.forEach((t, i) => { const a = rnd(0, TAU); spawn('golem', at(P.x + Math.cos(a) * D, P.y + Math.sin(a) * D), 1, pick(w.el)); });
@@ -4481,18 +4512,44 @@ function launchWave(plan) {
   }
   S.hordes++; SFX.stomp();
 }
+/* A run with a heartbeat (the Legend Engine, Phase 1; A, 2026-10-08: "lets finish phase 1"; A's recording and both of Sammy P.'s
+   reviews: play stopped every 20-30 s): the crowd comes in waves of pressure that build to a peak, then ease into a lull. Each
+   peak is about a third bigger than the last; in the lull the crowd thins to under a third of the peak, scripted waves wait,
+   gems on the ground sweep in, and the level-ups and Spirit Chests held through the peak arrive together. */
+const BEAT = { cycle:[40, 55, 55, 60, 65], peak:.72, grow:.3, cap:1.6, norm:.516 };
+function beatTick() {
+  if (/[?&]beat=0/.test(location.search)) { S.beat = null; return; }   // the old flat pacing, for comparison
+  const c = BEAT.cycle[S.level - 1] || 60, n = Math.floor(S.t / c), u = (S.t % c) / c, P = Math.min(BEAT.cap, 1 + BEAT.grow * n), lull = u >= BEAT.peak;
+  const m = lull ? .3 : .35 + (P - .35) * Math.pow(u / BEAT.peak, 1.6), was = S.beat && S.beat.lull;
+  S.beat = { n, u, P, lull, mul:m / BEAT.norm, lullAt:lull ? (was ? S.beat.lullAt : S.t) : null };
+  if (lull && !was && !S.bossSpawned && S.t > 5) lullStart();
+  // the held picks come on the game's own clock (a real-time timer missed the window when the game ran slower or faster)
+  if (S.flushAt != null && S.t >= S.flushAt) { S.flushAt = null; if (S.lvlDefer && !S.holdLevels) { const n = Math.min(S.lvlDefer, 4); S.lvlCarry = S.lvlDefer - n; S.lvlDefer = n; S.lullPick = true; flushLevels(); } }
+}
+// level-ups and chests are held and arrive together in a short window as each lull begins: one stop a wave, not one a minute's
+// worth (bot, 2026-10-08: holding only the climb still left ten separate stops on Level 4). The first level-up comes at once, to teach
+// it; never during the boss, which is its own calm arena
+const inPeak = () => !!(S && S.beat && !S.bossSpawned && !S.bossAt && S.lv > 2 && !S.lullPick && !S.beat.lull);   // (design review, 2026-10-08: held chests never opened in the lull)
+function lullStart() {
+  // the gem sweep: everything on the ground comes in at once, with a rising chime
+  // the gems themselves streaming in say it; the word only the first two times a run, and no ring round the Keeper (design review)
+  const n = S.gems.length; if (n >= 12) { for (const q of S.gems) q.pull = true; S.sweeps = (S.sweeps || 0) + 1; if (S.sweeps <= 2) pickupPop('Gem Wind!', '#A8F4FF'); SFX.sweep(); S.sweepN = n; S.sweepAt = S.t; }
+  S.flushAt = S.t + (n >= 12 ? 1.6 : .2);
+}
 function direct(dt) {
   const t = S.t;
-  teach();
+  teach(); if (!S.bossSpawned) beatTick();
   if (!S.bossSpawned) {
     // a light trickle between waves, mixed elements, growing slowly
     // from Level 3 the first forty seconds start busier, so a later level never opens on an empty field (A's playthrough,
     // 2026-10-05: Level 4's first half minute was bare ground)
     const rate = Math.min((S.level === 5 ? 13 : 9) + (S.hard || 0), (1 + t * .035 + (S.level >= 3 ? 1.6 * Math.max(0, 1 - t / 40) : 0)) * (1 + (S.lv - 1) * .05) * (1 + .1 * (S.hard || 0)) * (S.level === 5 ? 1.35 : 1));
-    S.spawnAcc += dt * rate;
+    S.spawnAcc += dt * rate * (S.beat ? S.beat.mul : 1);
     while (S.spawnAcc > 1) { S.spawnAcc--; spawn(t > 40 && LV().allow.length && Math.random() < .18 ? 'wolf' : 'critter'); }
+    // scripted waves wait out the lull
+    if (S.beat && S.beat.lull) S.waveShift = (S.waveShift || 0) + dt;
     const WV = LV().waves, next = WV[S.waveIdx];
-    if (next && !S.warn && t >= next.t - 2.2) {
+    if (next && !S.warn && t - (S.waveShift || 0) >= next.t - 2.2) {
       S.warn = planWave(next);
       const from = next.form === 'ring' || next.form === 'storm' ? 'all around you' : next.form === 'pincer' ? 'both sides' : SIDES[S.warn.dirs[0]][2];
       SFX.alarm();
@@ -4965,6 +5022,14 @@ function wellTick(dt) {
 }
 function brain(e, P, d, dt, s) {
   if (e.giant) return giantMove(e, P, d, dt, s);
+  // a wall marches straight across, never turning; once well past, it is gone
+  if (e.wall && !e.act) { const W = e.wall; e.x += W.dx * W.sp * dt; e.y += W.dy * W.sp * dt; W.go += W.sp * dt; if (W.go > Math.hypot(VW, VH) + 400) e.dead = true; return true; }
+  // a shooter walks to its post on the ring and holds it, firing at the Keeper; after a while it breaks ranks
+  if (e.post && !e.act) { if (S.t > e.post.until) { e.post = null; return false; }
+    const px = e.post.x - e.x, py = e.post.y - e.y, pd = Math.hypot(px, py); if (pd > 10) { e.x += px / pd * s * 1.6 * dt; e.y += py / pd * s * 1.6 * dt; }
+    else if (!e.posted) { e.posted = true; e.cd = .25 + Math.random() * .5; }   // fires as soon as it holds its post
+    else if ((e.cd -= dt) <= 0 && d < 560) { e.cd = 2.4; e.act = { k:'spit', ph:0, t:0, wind:.6 }; }
+    return true; }
   const K = e.K, a = e.act, ux = (P.x - e.x) / d, uy = (P.y - e.y) / d;
   if (a) {
     a.t += dt;
@@ -7012,6 +7077,9 @@ function draw() {
   }
   for (const ch of S.chests) {
     const bob = Math.sin(S.t * 3) * 4;
+    // a giant's chest stands in a pillar of the five elements' colours, so it can be found across the field (Phase 1)
+    // a giant's chest: a taller, painted gold beam with gold stars (design review: the five colours together are Omni's)
+    if (ch.rainbow) { const gr = g.createLinearGradient(0, ch.y - 760, 0, ch.y); gr.addColorStop(0, 'rgba(255,210,110,0)'); gr.addColorStop(1, `rgba(240,180,60,${.42 + .12 * Math.sin(S.t * 4)})`); g.fillStyle = gr; g.fillRect(ch.x - 40, ch.y - 760, 80, 760); if (Math.random() < .5) stars(ch.x + rnd(-40, 40), ch.y - rnd(0, 500), 1, '#FFE58A', 80); }
     add(() => { const gr = g.createLinearGradient(0, ch.y - 420, 0, ch.y); gr.addColorStop(0, 'rgba(255,220,120,0)'); gr.addColorStop(1, `rgba(255,220,120,${.45 + .2 * Math.sin(S.t * 5)})`); g.fillStyle = gr; g.fillRect(ch.x - 26, ch.y - 420, 52, 420); glowAt(ch.x, ch.y - 10, 180, '#FFD24A', .7); });
     if (Math.random() < .3) stars(ch.x + rnd(-30, 30), ch.y - rnd(0, 60), 1, '#FFE58A', 60);
     if (!spr('x-chest', ch.x, ch.y - 16 + bob, 110)) { g.fillStyle = '#B8251A'; g.fillRect(ch.x - 30, ch.y - 40, 60, 44); }
@@ -7311,8 +7379,8 @@ function draw() {
       g.restore(); } }
   // damage numbers and callouts
   g.textAlign = 'center'; g.lineJoin = 'round';
-  for (const n of S.omni || S.omniSnap ? [] : S.nums) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 32 : n.weak ? 19 : 25) * pk / Z;
-    g.globalAlpha = Math.min(1, (.65 - n.t) * 5); g.font = `900 ${sz}px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif`; g.lineWidth = 4.5 / Z; g.strokeStyle = 'rgba(16,22,34,.72)'; g.strokeText(n.v, n.x, y); g.fillStyle = n.strong ? '#FFF4E0' : n.weak ? '#AEB8C0' : '#FFFFFF'; g.fillText(n.v, n.x, y); }
+  for (const n of S.omni || S.omniSnap ? [] : S.nums) { const pk = n.t < .08 ? 1.5 - n.t / .08 * .5 : 1, y = n.y - n.t * 60, sz = (n.strong ? 32 : n.weak ? 19 : 25) * (n.sc || 1) * (n.big ? 1 : .82) * pk / Z;
+    g.globalAlpha = Math.min(1, (.65 - n.t) * 5); g.font = `900 ${sz}px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif`; g.lineWidth = 4.5 / Z; g.strokeStyle = 'rgba(16,22,34,.72)'; g.strokeText(n.v, n.x, y); if (n.strong && n.el) { g.lineWidth = 3 / Z; g.strokeStyle = n.el === 'earth' ? '#C8902A' : n.el === 'metal' ? '#9AA8B8' : GROUND_RING[n.el] || '#FFFFFF'; g.strokeText(n.v, n.x, y); } g.fillStyle = n.weak ? '#AEB8C0' : '#FFFFFF'; g.fillText(n.v, n.x, y); }
   for (const t of S.omni || S.omniSnap ? [] : S.txt) { g.globalAlpha = Math.min(1, (1.1 - t.t) * 3); g.font = `900 ${Math.round(t.size / Z)}px ui-rounded, "SF Pro Rounded", Nunito, system-ui, sans-serif`; g.lineWidth = 5; g.strokeStyle = 'rgba(16,22,34,.72)'; const y = t.y - t.t * 50; g.strokeText(t.s, t.x, y); g.fillStyle = t.c; g.fillText(t.s, t.x, y); }
   g.globalAlpha = 1; g.lineWidth = 1;
   // everything from here draws in screen space (Omni's poster too, while the markers below sit it out)
@@ -7590,6 +7658,7 @@ function drawSurgeForm(kx, ky, im, fade, O) {
   else if (el === 'earth' && S.p.moving && r < .5) fx({ k:'smoke', x:kx + rnd(-40, 40), y:fy + rnd(0, 8), vx:-(S.p.vx || 0) * .15, vy:-rnd(10, 30), drag:1.5, life:rnd(.5, .8), s:rnd(16, 26), c:'190,160,110', a:.5 });
   else if (el === 'metal' && r < .25) fx({ k:'spark', x:kx + rnd(-60, 60), y:fy - rnd(0, 30), vx:rnd(-60, 60), vy:-rnd(40, 90), drag:4, life:.3, s:2.5, c:'#E8EEF6' });
 }
+const mixHex = (a, b, k) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), x = p(a), y = p(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * k).toString(16).padStart(2, '0')).join(''); };
 const hexA = (h, a) => `rgba(${parseInt(h.slice(1, 3), 16)},${parseInt(h.slice(3, 5), 16)},${parseInt(h.slice(5, 7), 16)},${a})`;
 function drawOmniForm(kx, ky, im, fade, O = S.hs.on, cols = STORM_EL(), gs = 0, body = OMNI_BODY) {
   if (!ok(im)) return;
@@ -8882,7 +8951,9 @@ function payPouch() {
 }
 function levelUp() {
   // never break a Bloom or Ascended, the boss's entrance or a Star Call: level-ups wait, then come one after another
-  if (S.bloom || hsOn() || S.omni || S.omniSnap || S.holdLevels || callBusy()) { S.lvlDefer = (S.lvlDefer || 0) + 1; return; }
+  if (S.bloom || hsOn() || S.omni || S.omniSnap || S.holdLevels || callBusy() || inPeak()) { S.lvlDefer = (S.lvlDefer || 0) + 1;
+    if (inPeak() && !SEEN.has('_lvhold')) { markSeen('_lvhold'); BANNER.q.unshift({ id:'lvhold', title:'A new power is coming!', text:'It comes when it\u2019s calm.', pic:icon(POW[START[keeperEl]].icon) }); BANNER.t = Math.min(BANNER.t, .5); }
+    return; }
   const P = S.p, chain = S.lvChain, opts = options(); S.lvChain = false;
   // a Keeper with every power at its best is paid on the spot, a pouch of Sparks and a breath of health, with no sheet to
   // stop play (QA, 2026-10-06: a gem-chasing player met sixty sheets of only a pouch and tea)
@@ -8982,6 +9053,7 @@ function afterPick() {
   // tier starting behind the sheet locked it with every card spent)
   if (S.queued > 0 && (S.bloom || hsOn() || S.holdLevels || callBusy())) { S.lvlDefer = (S.lvlDefer || 0) + S.queued; S.queued = 0; }
   if (S.queued > 0) { S.queued--; S.lvChain = true; levelUp(); return; }
+  if (S.lullPick) { S.lullPick = false; S.lvlDefer = (S.lvlDefer || 0) + (S.lvlCarry || 0); S.lvlCarry = 0; }   // the lull's picks are done; the rest waits for the next
   resume();
 }
 
@@ -9087,6 +9159,7 @@ function bannerPic(b) {
 function banner(b) {
   const c = $('#cue'), top = $('#hud .top'), pic = bannerPic(b), say = BANNER_SAY[b.id] || b.text;
   if (top) { const st = stage.getBoundingClientRect().top, y = Math.max(top.getBoundingClientRect().bottom, ...['#mapBtn', '#ultBtn'].map(q => { const e = $(q); const r = e && !e.hidden && e.offsetParent ? e.getBoundingClientRect() : null; return r && r.height ? r.bottom : 0; })); c.style.top = (y - st + 10) + 'px'; }
+  if (b.low) c.style.top = (stage.getBoundingClientRect().height - 210) + 'px';
   c.className = 'bn'; c.innerHTML = `${pic ? `<i class="bp"><img src="${pic}" alt=""></i>` : ''}<div><b></b><span></span></div>`; c.querySelector('b').textContent = b.title; c.querySelector('span').textContent = say;
   c.style.opacity = 1; clearTimeout(cueT); cueT = setTimeout(() => { c.style.opacity = 0; }, 4800);
 }
@@ -9105,12 +9178,14 @@ function hideCoach() { ['#coach', '#coachDim', '#coachRing', '#moveGhost'].forEa
 function coachTick(dt) {
   NOTES.t -= dt; if (NOTES.t <= 0 && NOTES.q.length && !COACH.cur && !popupOpen()) { toast(NOTES.q.shift(), 4200); NOTES.t = 5.5; }
   // creature cards become banners too: the creature's name and what beats it (the red-shapes warning the first time)
-  for (let i = COACH.q.length - 1; i >= 0; i--) { const c = COACH.q[i]; if (c.card) { COACH.q.splice(i, 1); const K = KIND[c.card], el = c.card.split('-')[0], red = !SEEN.has('_redtip');
+  // a new family (Callers, Wisps) is introduced once, not once per element (QA, 2026-10-08: four Wisp banners in 65 s)
+  for (let i = COACH.q.length - 1; i >= 0; i--) { const c = COACH.q[i]; if (c.card) { COACH.q.splice(i, 1); const fam = (/-([rw])$/.exec(c.card) || [])[1]; if (fam) { if (SEEN.has('_fam_' + fam)) continue; markSeen('_fam_' + fam); } const K = KIND[c.card], el = c.card.split('-')[0], red = !SEEN.has('_redtip');
     if (red) markSeen('_redtip'); (c.now ? (BANNER.t = Math.min(BANNER.t, .5), BANNER.q.unshift.bind(BANNER.q)) : BANNER.q.push.bind(BANNER.q))({ id:c.id, card:c.card, title:`A new creature: ${K.n}`, text:red ? 'Red shapes on the ground mean an attack. Step out!' : `${andList(weakTo(el).map(k => ELNAME[k]))} beat it.`, red }); } }
   BANNER.t -= dt;
-  if (BANNER.t <= 0 && BANNER.q.length && !COACH.cur && !popupOpen() && !S.over && !hsOn() && !S.omni && !S.omniSnap && !callBusy()) { const b = BANNER.q.shift();
+  // a banner that jumps the queue still lets the one showing finish (QA, 2026-10-08: the wall's cut the wisp's off after 3.4 s)
+  if (BANNER.t <= 0 && BANNER.q.length && S.t - (BANNER.last ?? -99) >= 4.8 && !COACH.cur && !popupOpen() && !S.over && !hsOn() && !S.omni && !S.omniSnap && !callBusy()) { const b = BANNER.q.shift();
     // a new family says what to do about it (A recorded the lines, 2026-10-08)
-    banner(b); if (b.card) AU.vo(/-r$/.test(b.card) ? 'vo-card-caller' : /-w$/.test(b.card) ? 'vo-card-wisp' : b.red ? 'vo-card-beast' : 'vo-newcreature'); else if (CARD_VO[b.id]) AU.vo('vo-card-' + CARD_VO[b.id]); BANNER.t = 20; }
+    banner(b); BANNER.last = S.t; if (b.card) AU.vo(/-r$/.test(b.card) ? 'vo-card-caller' : /-w$/.test(b.card) ? 'vo-card-wisp' : b.red ? 'vo-card-beast' : 'vo-newcreature'); else if (CARD_VO[b.id]) AU.vo('vo-card-' + CARD_VO[b.id]); BANNER.t = 20; }
   if (COACH.cur) return;
   COACH.gap -= dt;
   if (COACH.gap > 0 || !COACH.q.length || popupOpen() || S.over || S.pendingLevel || hsOn() || surgeOn() || S.omni || S.omniSnap || callBusy()) return;
@@ -9157,7 +9232,7 @@ function tipArt(id) {
   return `<div class="hsdemo logo"><img class="logo-pic" src="art4/logo-morqi.png?v=11" alt=""></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', l4temples:'l4temples', l5temples:'l5temples', surge:'surge' };
+const CARD_VO = { giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', gem:'gem', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', wall:'wall', shooters:'shooters', l4temples:'l4temples', l5temples:'l5temples', surge:'surge' };
 function showCoach(c) {
   if (c.card && !ok(IMG['e-' + c.card]) && (c.wait = (c.wait || 0) + 1) < 8) { COACH.q.unshift(c); COACH.gap = .4; return; }
   COACH.cur = c; running = false; closeSeal(); guardTaps();
@@ -9384,7 +9459,7 @@ const tipEl = (el, big) => `<i class="el${big ? ' big' : ''}" style="--c:${EL[el
 const tipGem = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 20 11 12 22 4 11Z" fill="#5CF2FF" stroke="#0B3A52" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 2 15.5 9.5 12 11Z" fill="#fff" opacity=".85"/></svg>';
 // each bubble: [picture, title, line] — the picture carries it for a child who can't read yet (design review, 2026-10-06)
 const HUD_TIPS = {
-  lvPill:() => [tipGem, `Level ${S.lv}`, 'Gems fill your green bar. Each time it fills, you pick a new power.'],
+  lvPill:() => [tipGem, `Level ${S.lv}`, S.lvlDefer ? 'Your new power comes when it\u2019s calm.' : 'Gems fill your green bar. Each time it fills, you pick a new power.'],
   xpBar:() => [tipGem, `Level ${S.lv}`, 'Gems fill this bar. Each time it fills, you pick a new power.'],
   livesPill:() => [`<img src="${$('#livesImg').src}" alt=""><i class="n">×${S.rises}</i>`, `${S.rises} ${S.rises === 1 ? 'Rise' : 'Rises'} left`, S.rises ? 'If you fall, you rise again where you stood.' : 'No Rises left. Catch gems and the light will give you another.'],
   wavePill:() => { const w = LEVELS[S.level - 1].waves[S.waveIdx] || (S.warn && S.warn.w), el = w && w.el !== 'mix' ? w.el : null;   // the same wave its marker shows
@@ -9444,7 +9519,9 @@ function goalOf() {
   return null;
 }
 function hud() {
-  $('#lvPill').textContent = S.lv;
+  // held picks show as gold pips round the badge, one per pick up to four, with one soft shimmer as each is held (design review, 2026-10-08)
+  { const lp = $('#lvPill'), h = Math.min(4, (S.lvlDefer || 0) + (S.lvlCarry || 0)), k = S.lv + ':' + h; if (lp.dataset.k !== k) { const more = h > +(lp.dataset.h || 0); lp.dataset.k = k; lp.dataset.h = h;
+    lp.innerHTML = `${S.lv}${h ? `<i class="lvh">${'<b></b>'.repeat(h)}</i>` : ''}`; if (more) { lp.classList.remove('shim'); void lp.offsetWidth; lp.classList.add('shim'); } } }
   { const G = goalOf(), el = $('#goal'); S.goal = G; el.hidden = !G; if (G) { const k = G.t + G.el; if (el.dataset.k !== k) { el.dataset.k = k; S.goalAt = S.t; el.querySelector('span').textContent = G.t; el.style.setProperty('--c', GROUND_RING[G.el] || EL[G.el]); } } }
   $('#hud').classList.toggle('boss', !!(S.boss && !S.boss.dead));
   { const G = S.surge, sp = G ? (G.on ? 1 - G.on.t / G.on.life : G.ready ? 1 : G.used ? 0 : Math.min(1, G.q / SURGE.need)) : 0, lpS = $('#livesPill');
