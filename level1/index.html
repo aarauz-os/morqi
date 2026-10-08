@@ -238,12 +238,14 @@ html.desk body{display:grid;place-items:center;background:#05060F}
 html.desk #stage{width:min(100vw,calc(100dvh * 16 / 9));height:min(100dvh,calc(100vw * 9 / 16));max-width:none;margin:0}
 html.desk .scr{left:50%;right:auto;width:min(560px,100%);translate:-50% 0}
 /* full-screen menus keep the realm's own art across the frame behind their column */
-html.desk #stage:not(.modal):has(.scr:not([hidden])){background:#0C1420 url(art4/hero-tall.jpg?v=11) 50% 30%/cover no-repeat}
+html.desk #stage:not(.modal):has(.scr:not([hidden]))::before{content:"";position:absolute;inset:-60px;z-index:1;background:#0C1420 url(art4/hero-tall.jpg?v=11) 50% 30%/cover no-repeat;filter:blur(26px) brightness(.42) saturate(1.15);pointer-events:none}
 /* a sheet over a run: the whole frame dims evenly and the HUD steps aside */
 html.desk #stage.modal::after{content:"";position:absolute;inset:0;z-index:19;background:rgba(8,10,30,.6);pointer-events:none}
 html.desk #stage.modal #hud{visibility:hidden}
 html.desk #stage.modal .scr{background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
 html.desk .tabs{left:50%;right:auto;width:min(560px,100%);translate:-50% 0}
+/* the menus' own art covers their whole column on a computer (design review: the home art left dark strips) */
+html.desk .scr .art{left:0;right:0;width:100%;transform:none;aspect-ratio:auto}
 /* controls at the frame's corners on night-glass discs with their key letter; the minimap docked at the end of the HUD bar */
 html.desk #ultBtn{left:24px!important;right:auto!important;top:auto!important;bottom:24px}
 html.desk #callBtn{right:24px!important;left:auto!important;top:auto!important;bottom:24px}
@@ -251,7 +253,7 @@ html.desk #ultBtn::after,html.desk #callBtn::after{position:absolute;top:-6px;ri
 html.desk #ultBtn::after{content:"K"}html.desk #callBtn::after{content:"J"}
 html.desk #mapBtn{left:calc(50% + min(320px, var(--colw) * .725) + 10px)!important;right:auto!important;top:8px!important}
 html.desk #hud .top{left:50%;right:auto;width:min(640px,calc(var(--colw) * 1.45));translate:-50% 0}
-html.desk .keyscard{display:none;position:absolute;left:16px;bottom:116px;flex-direction:column;gap:5px;padding:10px 14px;border-radius:14px;background:rgba(14,20,52,.62);
+html.desk .keyscard{display:none;position:absolute;left:16px;bottom:116px;flex-direction:column;gap:5px;padding:10px 14px;border-radius:14px;background:rgba(14,20,52,.88);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);font:800 12px var(--round);color:rgba(255,255,255,.85);pointer-events:none}
 /* the keys card teaches for the first two runs, then lives on the pause screen (design review: no permanent text in play) */
 html.desk #stage.keyshow .keyscard,html.desk #stage:has(#paused:not([hidden])) .keyscard{display:flex}
@@ -3259,8 +3261,8 @@ let W = 0, H = 0, DPR = 1, VW = 0, VH = 0;
 // phone's and only the width grows. ?desk=1 forces it, ?desk=0 turns it off
 let Z = 0.58;
 // (until its design review passes, the 16:9 layout runs only with ?desk=1; DESK_AUTO turns on detection for wide screens with a mouse)
-const DESK_AUTO = false;
-const DESK = () => /[?&]desk=1/.test(location.search) || (DESK_AUTO && !/[?&]desk=0/.test(location.search) && matchMedia('(min-width: 900px) and (min-aspect-ratio: 4/3) and (pointer: fine)').matches);
+const DESK_AUTO = true;
+const DESK = () => /[?&]desk=1/.test(location.search) || (DESK_AUTO && !/[?&]desk=0/.test(location.search) && matchMedia('(min-width: 900px) and (min-aspect-ratio: 4/3) and (pointer: fine) and (hover: hover)').matches && !navigator.maxTouchPoints);   // (no touch: an iPad or a touchscreen laptop keeps the phone layout)
 const off = document.createElement('canvas'), og = off.getContext('2d');
 // iPhone Safari that draws the page under its floating toolbar (A's iPhone, 2026-10-08: "Tap to begin" was hidden behind the address
 // bar): the page runs the full screen height there, so the game stops short of the toolbar. Older Safari, which ends the page above its
@@ -7799,6 +7801,8 @@ function draw() {
   if (!S.omni && !S.omniSnap) {
   // edge arrows never sit on the HUD's buttons, the skills bar or the top bar (QA, 2026-10-05): they slide along their
   // edge until they are clear
+  // (edge markers sit at the frame's true edge: on a computer there is no phone thumb bar to clear at the bottom; design review)
+  const EDGE_T = DESK() ? 110 : 150, EDGE_B = DESK() ? 64 : 120;
   const hudR = ['#ultBtn', '#callBtn', '#mapBtn', '#hud .top'].map(q => $(q)).filter(e => e && !e.hidden && e.offsetParent).map(e => { const r = e.getBoundingClientRect(), b = stage.getBoundingClientRect(); return [r.left - b.left - 20, r.top - b.top - 20, r.right - b.left + 20, r.bottom - b.top + 20]; });
   // markers pointing the same way space out along the edge instead of stacking (QA, 2026-10-05)
   // (each step along the edge is checked against the buttons again, so a marker slid down the edge never lands on the Star Call
@@ -7810,22 +7814,22 @@ function draw() {
   g.setTransform(DPR, 0, 0, DPR, 0, 0);
   for (const it of S.items) if (it.kind === 'stone' && it !== S.ptrItem) {   // a stone off screen gets an arrow in its element's colour
     const sx = (it.x - cx) * Z, sy = (it.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 120 && sy < H - 110) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true)), k = 1 + Math.sin(S.t * 6) * .15;
+    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, EDGE_T, H - EDGE_B), true)), k = 1 + Math.sin(S.t * 6) * .15;
     beacon(ex, ey, a, GROUND_RING[it.el], 'x-stone-' + it.el, k);
   }
   if (S.bloomSeed) {   // the seed off screen gets a golden arrow that pulses
     const sd = S.bloomSeed, sx = (sd.x - cx) * Z, sy = (sd.y - cy) * Z;
-    if (!(sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20)) { const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true)), k = 1 + Math.sin(S.t * 6) * .15;
+    if (!(sx > 20 && sx < W - 20 && sy > 20 && sy < H - 20)) { const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, EDGE_T, H - EDGE_B), true)), k = 1 + Math.sin(S.t * 6) * .15;
       beacon(ex, ey, a, '#FFD24A', 'x-bloom', k); }
   }
   for (const sh of S.shrines || []) {   // a shrine off-screen gets an arrow in its element's colour
     const sx = (sh.x - cx) * Z, sy = (sh.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 120 && sy < H - 110) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
+    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, EDGE_T, H - EDGE_B), true));
     beacon(ex, ey, a, GROUND_RING[sh.el], 'x-shrine-' + sh.el, 1);
   }
   if (OUT() && !S.bossSpawned) for (const T of openOf(OUT())) {   // each temple off screen (Level 5: the next in turn): an arrow with its ring filling round it
     if (T.held) continue; const sx = (T.cx - cx) * Z, sy = (T.cy - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 120 && sy < H - 110) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true)), f = T.fill / needOf(T);
+    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, EDGE_T, H - EDGE_B), true)), f = T.fill / needOf(T);
     const O5 = OUT(), nk = O5.nudgeAt != null && S.t - O5.nudgeAt < .9 ? 1 + .4 * Math.sin((S.t - O5.nudgeAt) / .9 * Math.PI) : 1;
     beacon(ex, ey, a, GROUND_RING[T.el], 'x-temple-' + T.el, nk);
     g.lineWidth = 4; g.strokeStyle = 'rgba(14,20,40,.7)'; g.beginPath(); g.arc(ex, ey, 22, 0, TAU); g.stroke();
@@ -7834,14 +7838,14 @@ function draw() {
   // chests off screen: never during a boss fight, and only the two nearest (design review, 2026-10-07: eight crowded the edges)
   for (const ch of S.bossSpawned ? [] : S.chests.slice().sort((p, q) => Math.hypot(p.x - S.p.x, p.y - S.p.y) - Math.hypot(q.x - S.p.x, q.y - S.p.y)).slice(0, 2)) {
     const sx = (ch.x - cx) * Z, sy = (ch.y - cy) * Z; if (sx > 20 && sx < W - 20 && sy > 120 && sy < H - 110) continue;
-    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
+    const a = Math.atan2(sy - H / 2, sx - W / 2), [ex, ey] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, EDGE_T, H - EDGE_B), true));
     beacon(ex, ey, a, '#FFD24A', 'x-chest', 1);
   }
   // out in the frost: ice creeps in from the screen's edges over the six seconds, and a warm beacon points back to the light
   if (S.storm && S.storm.out > 0) { const k = Math.min(1, S.storm.out / STORM.out), vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * (.62 - .3 * k), W / 2, H / 2, Math.max(W, H) * .75);
     vg.addColorStop(0, 'rgba(225,240,255,0)'); vg.addColorStop(1, `rgba(225,240,255,${.75 * k})`); g.fillStyle = vg; g.fillRect(0, 0, W, H);
     const St = S.storm, a = Math.atan2(St.y - S.p.y, St.x - S.p.x), d = Math.hypot(St.x - S.p.x, St.y - S.p.y) - St.r, tx = S.p.x + Math.cos(a) * (d + 40), ty = S.p.y + Math.sin(a) * (d + 40);
-    let sx = (tx - cx) * Z, sy = (ty - cy) * Z; if (sx < 30 || sx > W - 30 || sy < 150 || sy > H - 120) [sx, sy] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, 150, H - 120), true));
+    let sx = (tx - cx) * Z, sy = (ty - cy) * Z; if (sx < 30 || sx > W - 30 || sy < 150 || sy > H - 120) [sx, sy] = spaced(clearOf(clamp(sx, 30, W - 30), clamp(sy, EDGE_T, H - EDGE_B), true));
     beacon(sx, sy, a, '#FFC870', 'x-temple-' + (St.el || 'wood'), 1 + Math.sin(S.t * 8) * .15); }
   // an incoming wave: the edges it comes from glow in its element, with beacons facing in
   if (S.warn && !hsOn()) {   // while Ascended nothing can touch you, so the warning would only be noise
