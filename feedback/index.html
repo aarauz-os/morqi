@@ -47,7 +47,9 @@ textarea::placeholder{color:var(--faint)}
 .send{display:block;width:min(100%,420px);text-align:center;text-decoration:none;color:#fff;font:900 18px var(--round);padding:15px 18px;border-radius:999px;background:linear-gradient(180deg,#5FE08A,var(--go) 55%,var(--go-2));box-shadow:0 4px 0 #1B7E3F,0 8px 22px rgba(0,0,0,.35);border:0;cursor:pointer}
 .send:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .alt{font-size:13px;color:var(--faint);text-align:center}
-.alt button{background:none;border:0;color:var(--pick);font:800 13px var(--round);text-decoration:underline;cursor:pointer;padding:6px}
+.alt button,.foot button.small{background:none;border:0;color:var(--pick);font:800 13px var(--round);text-decoration:underline;cursor:pointer;padding:6px;box-shadow:none;width:auto}
+button.send{border:0;cursor:pointer}
+.send[hidden]{display:none}
 .done{display:none;text-align:center;color:var(--pick);font-weight:800}
 .done.on{display:block}
 @media (prefers-reduced-motion:no-preference){.opts span{transition:background .15s,box-shadow .15s}
@@ -172,8 +174,9 @@ textarea::placeholder{color:var(--faint)}
 </main>
 
 <div class="foot">
-  <a class="send" id="send" href="#">Text my answers to DP Media</a>
-  <div class="alt">No texting here? <button type="button" id="copy">Copy my answers</button> and send them to <span>347-414-2753</span></div>
+  <a class="send" id="send" href="#" target="_blank" rel="noopener" hidden>Send my answers</a>
+  <button type="button" class="send" id="copy">Copy my answers</button>
+  <div class="alt" id="altSay">Then ask a grown-up to send them to whoever shared MorQi with you.</div>
 </div>
 
 <script>
@@ -182,7 +185,10 @@ const KEEPERS = ['Amara', 'Kai', 'Priya', 'Mateo', 'Ruby', 'Malik', 'Sina'];
 document.getElementById('keepers').innerHTML = KEEPERS.map((n, i) =>
   `<label><input type="radio" name="keeper" value="${n}"><span><img src="../level1/art4/k${i + 1}-face.png?v=13" alt="">${n}</span></label>`).join('');
 
-const NUMBER = '+13474142753';
+// answers go to an anonymous Google Form, never to anyone's phone (A, 2026-10-08: a child texting a personal number shared both
+// families' numbers, a COPPA red flag). FORM is the form's pre-filled link with ANSWERS where the answer text goes; until it is
+// set, the page offers Copy only.
+const FORM = '';
 // one short message, a line per answered question, so it reads well in a text thread
 function summary() {
   const lines = ['MorQi playtest'];
@@ -195,13 +201,14 @@ function summary() {
   return lines.join('\n');
 }
 const send = document.getElementById('send'), done = document.getElementById('done');
-function refresh() { send.href = `sms:${NUMBER}?&body=${encodeURIComponent(summary())}`; }
+// until the form exists, Copy is the one green button; once it does, Send is, and Copy steps back to a small link (design review)
+function refresh() { if (FORM) { send.hidden = false; send.href = FORM.replace('ANSWERS', encodeURIComponent(summary())); const c = document.getElementById('copy'); c.className = 'small'; document.getElementById('altSay').textContent = ''; document.getElementById('altSay').appendChild(c); } }
 document.addEventListener('input', refresh); document.addEventListener('change', refresh); refresh();
-send.addEventListener('click', () => { done.textContent = 'Your Messages app should open with your answers. Tap send. Thank you!'; done.classList.add('on'); });
+send.addEventListener('click', () => { done.textContent = 'Your answers are in the form. Tap Submit there. Thank you!'; done.classList.add('on'); });
 document.getElementById('copy').addEventListener('click', async () => {
   const text = summary();
-  try { await navigator.clipboard.writeText(text); done.textContent = 'Copied! Paste it into a text to 347-414-2753.'; }
-  catch (e) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done.textContent = 'Copied! Paste it into a text to 347-414-2753.'; } catch (e2) { done.textContent = 'Select and copy your answers above, then text them to 347-414-2753.'; } t.remove(); }
+  try { await navigator.clipboard.writeText(text); done.textContent = 'Copied! A grown-up can paste it into a message to whoever shared MorQi with you.'; }
+  catch (e) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done.textContent = 'Copied! A grown-up can paste it into a message to whoever shared MorQi with you.'; } catch (e2) { done.textContent = 'Select and copy your answers, and ask a grown-up to send them to whoever shared MorQi with you.'; } t.remove(); }
   done.classList.add('on');
 });
 </script>
