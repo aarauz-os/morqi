@@ -2005,6 +2005,13 @@ const KIND = {
   'earth-m':{ n:'Worry Stone',       beh:'roll',   hp:1.4, sp:.85,  minion:1 },
   'metal-m':{ n:'Chime Wraith',      beh:'weave',  hp:1,   sp:1.1,  f:2.4, amp:1, minion:1 }
 };
+// two new families (the Legend Engine plan, Codex brief 17; A, 2026-10-08: "a taste in Levels 4-5"): the Bell Ringer calls
+// reinforcements and runs; the Lantern Wisp fades in where you aren't looking
+Object.assign(KIND, Object.fromEntries(['water', 'wood', 'fire', 'earth', 'metal'].flatMap(el => [
+  [el + '-r', { n:{ water:'Frost Bell Seal', wood:'Bark Bell Sprite', fire:'Lantern Bell Imp', earth:'Clay Bell Critter', metal:'Bronze Bell Mouse' }[el], beh:'call', hp:1.8, sp:1.15,
+    short:'Rings its bell to call more creatures', tip:'It rings its bell to call more creatures, then runs away. Free it first!' }],
+  [el + '-w', { n:{ water:'Mist Wisp', wood:'Leaf Wisp', fire:'Ember Wisp', earth:'Amber Wisp', metal:'Silver Wisp' }[el], beh:'phase', hp:.7, sp:1.05, f:2, amp:.6,
+    short:'Fades in behind you', tip:'It fades in where you are not looking. Watch behind you!' }]])));
 Object.keys(KIND).forEach(k => { load('e-' + k, `art4/e-${k}.png?v=8`); if (!KIND[k].minion) load('e-' + k + '-happy', `art4/happy/e-${k}.png?v=8`); });
 const lookSrc = p => p;   // the bold look is the only look now; kept so image paths have one place to change
 if (!/[?&]towers=0/.test(location.search)) { ['wood', 'fire', 'earth', 'water', 'metal'].forEach(el => { load('x-temple-' + el, `art4/props/x-temple-${el}.png?v=12`); load('x-temple-' + el + '-alive', `art4/props/x-temple-${el}-alive.png?v=1`); }); ['wood', 'fire', 'earth'].forEach(r => load('sf-' + r, `art4/story/story-frost-${r}.jpg?v=8`)); }
@@ -2154,6 +2161,8 @@ const AU = (() => {
     // the genie (Ascended): out, a swirl of air rising into a warm chord with a sub underneath; in, the swirl falling
     // back into one soft chime. Everything pitched sits at or below about 700 Hz, the air above it
     // each Ascended tier opens on its own chime, one rising note per tier (F, A, C, E flat, F), all under 700 Hz
+    // a Caller's call: a bright rising three-note horn under 700 Hz, its own sound, never the boss's toll (design review, 2026-10-08)
+    call() { [392, 523.25, 659.25].forEach((f, i) => tone({ f, at:i * .09, dur:.32, vol:.06, type:'triangle', att:.01 })); },
     tier(n) { [174.61, 220, 261.63, 311.13, 349.23].slice(0, n).forEach((f, i) => tone({ f, at:.5 + i * .11, dur:.7, vol:.07, type:'triangle', att:.01 })); },
     // the forge waking: a deep anvil ring, and a lighter iron clank for each gear catching (all under 700 Hz, never a
     // boss's stomp or quake; design review, 2026-10-06)
@@ -3286,7 +3295,7 @@ function startRun() {
   if (LVL === 5) { S.p.x = L5_START.x; S.p.y = L5_START.y; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
   S.out = towersLevel(LVL) ? makeOutposts(LVL) : null;
   // Level 5 holds the temples too (A, 2026-10-07)
-  S.l5 = LVL === 5 && towersOn() ? makeL5() : null;
+  S.l5 = LVL === 5 && towersOn() ? makeL5() : null; S.well = LVL === 5 ? makeWell() : null;
   if (S.out) { S.p.x = S.out.start.x; S.p.y = S.out.start.y; S.pet.x = S.p.x - 40; S.pet.y = S.p.y + 30; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
   AU.song(SONG_OF[worldOf()]); AU.music(true); new Image().src = `art4/rise/k${keeper}.jpg?v=13`; if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); if (LVL >= SURGE.from) { formArt(); if (!IMG['k' + keeper + 'face']) load('k' + keeper + 'face', `art4/k${keeper}-face.png?v=13`); } if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=13`; new Image().src = `art4/k${keeper}-hurt.png?v=13`; } renderSkills(); startLoop();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
@@ -3517,6 +3526,10 @@ function spawnBoss() {
 // one place for every hit: element bonus, buffs, flash, squash, knockback, numbers and sparks
 function hurt(e, dmg, el, o = {}) {
   if (e.dead || (e.spared && !o.strike)) return;
+  // the new families must be seen to be played (QA, 2026-10-08: wisps were freed while near invisible, Callers before they were on screen):
+  // a wisp can't be hit until mostly faded in, a Caller until it has walked into view
+  if (e.fade != null && e.fade < .7) return;
+  if (e.K && e.K.beh === 'call' && (Math.abs(e.x - S.p.x) > VW * .5 || Math.abs(e.y - S.p.y) > VH * .5)) return;
   let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0)) * (surgeOn() ? SURGE.mul : 1);
   const k = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), strong = k > 1, weak = k < 1;
   m *= k;
@@ -4911,6 +4924,41 @@ const AFTER_SHIELD = 6, afterShield = () => S.shieldT != null ? Math.max(0, 1 - 
 function armourVs(el) { let m = auraGuard() * (1 - (S.gifts.rooted || 0) * .08) * (1 - .04 * (S.grow.earth || 0)) * (1 - afterShield()); if (el) { const strong = eff(el, keeperEl) > 1; m *= strong ? (S.buffs.ward > 0 ? .55 : 1.15) : .9; } return m; }
 const SHOT_HIT = { bubble:'#7FC4FF', thorn:'#7FCF4A', ember:'#FFB050', pebble:'#C8A060', blade:'#E6EEF4' };
 function hazard(k, x, y, r, life, dmg) { if (S.hz.length < 60) S.hz.push({ k, x, y, r, life, t:0, dmg, tick:0, rot:rnd(0, TAU) }); }
+// the call (design review, 2026-10-08: two ground rings and the toll read as the bosses' attacks): its own horn, six motes flying
+// from the bell to where the help will stand, a frost puff there, and the help half a second later, never near the Keeper
+function ringBell(e) { S.rangN = (S.rangN || 0) + 1; SFX.call && SFX.call();
+  const P = S.p, away = Math.atan2(e.y - P.y, e.x - P.x), c = GROUND_RING[e.el];
+  for (let i = 0; i < 6; i++) { const a = away + (i - 2.5) * .45; let x = e.x + Math.cos(a) * 150, y = e.y + Math.sin(a) * 100;
+    const dp = Math.hypot(x - P.x, y - P.y); if (dp < 220) { x += (x - P.x) / (dp || 1) * (220 - dp); y += (y - P.y) / (dp || 1) * (220 - dp); }
+    fx({ k:'star', x:e.x, y:e.y - 60, vx:(x - e.x) * 2, vy:(y - e.y + 60) * 2, drag:2, life:.5, s:9, c });
+    setTimeout(() => { if (!S || S.over) return; for (let k = 0; k < 4; k++) fx({ k:'smoke', x:x + rnd(-20, 20), y:y + rnd(-8, 8), vx:rnd(-30, 30), vy:-rnd(20, 50), drag:1.2, life:.6, s:rnd(16, 24), c:'220,236,255', a:.6 }); }, 250);
+    setTimeout(() => { if (S && !S.over) spawn('critter', { x, y }, 1.1, e.el); }, 500); }
+}
+// turn a freshly spawned creature into one of the new families
+function asFamily(e, kid) { if (!e) return null; const K0 = e.K, K = KIND[kid]; Object.assign(e, { kid, K, el:kid.split('-')[0], img:'e-' + kid, own:ok(IMG['e-' + kid]), heavy:false });
+  e.hp = e.max = e.max / K0.hp * K.hp; e.sp = e.sp / K0.sp * K.sp; if (K.beh === 'phase') e.fade = 0; return e; }
+/* The new families' taste in the demo (A, 2026-10-08): Lantern Wisps on Level 4, Bell Ringers and one frost well on Level 5 */
+function familiesTick(dt) {
+  if (S.over || hsOn() || S.omni || S.bossSpawned) return; const P = S.p;
+  if (S.level === 4 && S.t > 25 && (S.wispT = (S.wispT ?? 4) - dt) <= 0) { S.wispT = 10;
+    // behind the Keeper: opposite the way they are moving, on screen but out of their eyeline
+    const m = Math.hypot(P.vx || 0, P.vy || 0), a0 = m > 20 ? Math.atan2(-(P.vy || 0), -(P.vx || 0)) : rnd(0, TAU);
+    for (let i = 0; i < 2; i++) { const a = a0 + (i - .5) * .7, e = spawn('critter', { x:P.x + Math.cos(a) * 230, y:P.y + Math.sin(a) * 170 }, 1); if (e) asFamily(e, e.el + '-w'); } }
+  if (S.level === 5 && S.t > 35 && (S.ringerT = (S.ringerT ?? 6) - dt) <= 0 && S.en.filter(e => !e.dead && e.K && e.K.beh === 'call').length < 2) { S.ringerT = 24;
+    const e = spawn('wolf', null, 1); if (e) asFamily(e, (e.el === 'metal' ? 'earth' : e.el) + '-r'); }   // the metal Caller waits for its matte-bronze repaint
+  wellTick(dt);
+}
+// the frost well: keeps creatures coming until the Keeper stands on it for two seconds to seal it
+function makeWell() { const Sh = SHRINES[3];   // the earth temple's way (design review, 2026-10-08: the fire well's red rim and crosshair lid read as a warning; back when repainted) ['', '-sealed'].forEach(v => load('x-well-' + Sh.el + v, `art4/props/x-well-${Sh.el}${v}.png?v=1`));
+  return { el:Sh.el, x:Math.round(TOWER.x + (Sh.x - TOWER.x) * .55), y:Math.round(TOWER.y + 120 + (Sh.y - TOWER.y) * .55), hold:0, cd:2, sealed:false }; }
+function wellTick(dt) {
+  const W = S.well; if (!W || W.sealed) return; const P = S.p, d = Math.hypot(P.x - W.x, (P.y - W.y) * 1.4);
+  if (d < 700 && !SEEN.has('_well')) { markSeen('_well'); BANNER.q.unshift({ id:'well', title:'A frost well!', text:'Stand on it to seal it.', pic:`art4/props/x-well-${W.el}.png?v=1` }); BANNER.t = Math.min(BANNER.t, 1.5); }
+  if (d < 95 && P.hp > 0) { W.hold += dt; if (W.hold >= 2) { W.sealed = true; SFX.fanfare(false); ring(W.x, W.y, 20, 420, GROUND_RING[W.el], .8, 14, true); stars(W.x, W.y - 40, 30, GROUND_RING[W.el], 380); paintThaw(W.x, W.y, 260); return; } }
+  else W.hold = Math.max(0, W.hold - dt * 2);
+  if (d < 1300 && W.hold <= 0 && (W.cd -= dt) <= 0) { W.cd = 3.5; const aw = Math.atan2(W.y - P.y, W.x - P.x); for (let i = 0; i < 3; i++) { const a = aw + (i - 1) * .5; spawn('critter', { x:W.x + Math.cos(a) * 120, y:W.y + Math.sin(a) * 80 }, 1.1, W.el); }
+    for (let i = 0; i < 6; i++) fx({ k:'smoke', x:W.x + rnd(-50, 50), y:W.y - 10, vx:rnd(-20, 20), vy:-rnd(40, 80), drag:1, life:rnd(.8, 1.3), s:rnd(20, 34), c:'220,236,255', a:.5 }); }
+}
 function brain(e, P, d, dt, s) {
   if (e.giant) return giantMove(e, P, d, dt, s);
   const K = e.K, a = e.act, ux = (P.x - e.x) / d, uy = (P.y - e.y) / d;
@@ -4933,6 +4981,16 @@ function brain(e, P, d, dt, s) {
   const lane = (wind, spd, dur, len, rest) => { e.act = { k:'lane', ph:0, t:0, wind, dx:ux, dy:uy, spd, dur, len, w:e.r * 2.1, rest, trail:K.beh === 'charge' }; SFX.ting(); };
   const circle = (wind, r, x, y, o = {}) => { e.act = { k:'circle', ph:0, t:0, wind, r, x, y, ...o }; };
   switch (K.beh) {
+    // the Lantern Wisp: fades in first, then drifts in weaving
+    case 'phase': {
+      if ((e.fade ?? 1) < 1) { e.fade = Math.min(1, (e.fade || 0) + dt / 1.2); if (e.fade < .5) return true; }
+      const w = Math.sin(S.t * K.f + e.ph) * K.amp; if (d > e.r + P.r - 6) go(ux - uy * w, uy + ux * w); return true; }
+    // the Bell Ringer: walks in, stops and rings (more creatures come), then runs; free it before it rings again
+    case 'call': {
+      if (e.flee > 0) { e.flee -= dt; go(-ux, -uy, 1.5); return true; }
+      if (e.ringT != null) { e.ringT -= dt; if (e.ringT <= 0) { e.ringT = null; ringBell(e); e.flee = 5; e.cd = 9; } return true; }
+      if (d < 560 && Math.abs(e.x - P.x) < VW * .5 && Math.abs(e.y - P.y) < VH * .48 && e.cd <= 0) { e.ringT = 1.8; return true; }   // a long, readable wind-up: time to free it first   // rings once on screen, where it can be seen
+      return false; }
     case 'weave': case 'zigzag': case 'thorns': {
       let w = Math.sin(S.t * K.f + e.ph) * K.amp; if (K.beh === 'zigzag') w = Math.sign(w) * K.amp;
       if (d > e.r + P.r - 6) go(ux - uy * w, uy + ux * w);
@@ -6353,7 +6411,7 @@ function update(dt) {
   if (P.hp < P.max * .3 && !S.over && (S.beatT = (S.beatT || 0) - dt) <= 0) { S.beatT = .5 + P.hp / P.max * 2.5; SFX.heartbeat(); }
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.004, dt); P.ry = (P.ry || 0) * Math.pow(.004, dt);
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); surgeTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); dangerTick(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); surgeTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); familiesTick(dt); dangerTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
@@ -6920,6 +6978,9 @@ function draw() {
   }
   if (S.level === 5) drawForgeGround();
   if (S.out) drawOutposts(inView); else if (S.l5) drawOutpostRings(S.l5, inView);
+  // the frost well, and while the Keeper stands on it, a ring filling round it
+  { const Wl = S.well; if (Wl && inView(Wl.x, Wl.y, 260)) { const im = IMG['x-well-' + Wl.el + (Wl.sealed ? '-sealed' : '')]; if (ok(im)) g.drawImage(im, Wl.x - 130, Wl.y - 93, 260, 186);
+    if (!Wl.sealed && Wl.hold > 0) { g.save(); g.strokeStyle = GROUND_RING[Wl.el]; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.ellipse(Wl.x, Wl.y, 150, 104, 0, -Math.PI / 2, -Math.PI / 2 + TAU * Wl.hold / 2); g.stroke(); g.restore(); } } }
   // the trail to the goal: soft dots on the ground in its colour, drifting toward it, when it is far (A, 2026-10-07: "where to go next")
   // shown for the first eight seconds of each new goal, then the edge marker alone points the way (design review, 2026-10-07: text,
   // trail and marker pointed at the same temple at once)
@@ -7000,7 +7061,7 @@ function draw() {
     if (!im) return;
     const hk = Math.max(0, 1 - (S.t - (e.hitAt ?? -9)) / .16), bk = Math.max(0, 1 - (S.t - (e.biteAt ?? -9)) / .2), froz = e.frozen > 0;
     const step = froz ? 0 : Math.sin(e.wob * 1.7), toward = S.p.x > e.x ? 1 : -1;
-    let hop, rot, sx, sy; const fly = !e.boss && e.K && (e.K.beh === 'weave' || e.K.beh === 'zigzag' || e.K.beh === 'thorns');
+    let hop, rot, sx, sy; const fly = !e.boss && e.K && (e.K.beh === 'weave' || e.K.beh === 'zigzag' || e.K.beh === 'thorns' || e.K.beh === 'phase');
     if (e.boss) { const st = Math.max(0, 1 - (S.t - (e.stompAt ?? -9)) / .35); hop = 0; rot = Math.sin(S.t * 1.3) * .035; sx = 1 + Math.sin(S.t * 2.2) * .015 + st * .1 + hk * .05; sy = 1 + Math.sin(S.t * 2.2) * .025 - st * .12 - hk * .04; }
     else {
       hop = fly ? 10 + Math.sin(e.wob * 1.3) * 6 : Math.abs(step) * (e.type === 'golem' ? 3 : 6); rot = step * (fly ? .04 : e.type === 'wolf' ? .05 : .1) + toward * (.06 + bk * .25); sx = 1 + hk * .26 - Math.abs(step) * .03; sy = 1 - hk * .22 + Math.abs(step) * .05;
@@ -7014,8 +7075,10 @@ function draw() {
     const flip = e.own ? (e.K.face === -1 && toward > 0) : (e.type === 'wolf' && toward > 0);
     if (e.own && !e.boss && fly) { g.fillStyle = 'rgba(10,20,30,.25)'; g.beginPath(); g.ellipse(e.x, e.y + e.r * .6, e.r * .9, e.r * .35, 0, 0, TAU); g.fill(); }
     if (e.boss) { drawBoss(e, hk); return; }
+    if (e.ringT != null) { const k = 1 - e.ringT / 1.8, j = Math.sin(S.t * (18 + 26 * k)); rot = j * (.05 + .13 * k); }   // a Caller shakes harder as its call builds
     g.save(); g.translate(e.x, e.y + e.r * .5 - hop); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
-    g.drawImage(im, -s / 2, -s * .62 - e.r * .5, s, s);
+    if (e.fade != null && e.fade < 1) g.globalAlpha = e.fade * e.fade;   // a Lantern Wisp fading in
+    g.drawImage(im, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1;
     const fk = e.giant ? Math.max(0, 1 - (S.t - (e.pulseAt ?? -9)) / .1) : hk;
     if (fk > 0) { const wh = silhouette(art, '#FFFFFF'); if (wh) { g.globalAlpha = fk * (e.boss || e.giant ? .25 : .9); g.drawImage(wh, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
     if (froz) { const ic = silhouette(art, '#BFE8FF'); if (ic) { g.globalAlpha = .55; g.drawImage(ic, -s / 2, -s * .62 - e.r * .5, s, s); g.globalAlpha = 1; } }
@@ -8959,7 +9022,7 @@ function note(id) { if (S) S.taught['c_' + id] = 1; }
 const BANNER = { q:[], t:0 };
 // a banner says it in eight words or fewer, with a picture of the thing it means, and stays up as long as Luma's line (design review,
 // 2026-10-07: the cards' pictures were lost, and 33 words could not be read in 3.8 s)
-const BANNER_SAY = { gem:'Walk over them to grow stronger.', enemy:'Use the element that beats their ring.', shrine:'Stand inside it to heal.',
+const BANNER_SAY = { ...Object.fromEntries(['water', 'wood', 'fire', 'earth', 'metal'].flatMap(el => [['k' + el + '-r', 'It calls more. Free it first!'], ['k' + el + '-w', 'It sneaks up behind you. Look around!']])), gem:'Walk over them to grow stronger.', enemy:'Use the element that beats their ring.', shrine:'Stand inside it to heal.',
   bloom:'Touch it. Everyone dances!', ult:'It strikes on its own.', giant_rammer:'Dodge its charge, then hit its back.', giant_colossus:'Hit its core when it glows.', giant_alpha:'Free its pack first.' };
 function bannerPic(b) {
   if (b.pic) return b.pic;
@@ -9315,6 +9378,7 @@ function goalOf() {
   const P = S.p, B = S.boss && !S.boss.dead ? S.boss : null;
   if (B) return null;
   if (S.bossAt && !S.bossSpawned) return { t:'Get ready: the boss is coming!', el:worldOf() };
+  if (S.well && !S.well.sealed && Math.hypot(S.well.x - P.x, S.well.y - P.y) < 900) return { t:'Seal the frost well!', el:S.well.el, x:S.well.x, y:S.well.y };
   const st = S.items.find(it => it.kind === 'stone' && !it.got);
   if (st) return { t:`Grab the ${ELNAME[st.el].toLowerCase()} stone!`, el:st.el, x:st.x, y:st.y };
   const O = OUT();
