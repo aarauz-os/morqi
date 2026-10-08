@@ -5276,15 +5276,15 @@ const FORM_PAL = { fire:['#FF8A3A', '#FFB35A', '#FF6A2A', '#FFD08A', '#FF9A4A'],
   metal:['#C9D3DB', '#E8EEF6', '#9AA8B8', '#FFFFFF', '#B8C4D8'] };
 // the forms Codex has painted so far (brief 15, complete 2026-10-07: Nova and Tidal for all seven; brief 16 brings Wild, Titan and
 // Chrome); until a form's art lands, its poster and its ride show the Keeper in the element's light
-// brief 16 landed 2026-10-08; Titan waits (design review: its glowing veins and flame-shaped hair read as Nova) until Codex's redo (brief 16b)
-const SURGE_ART = Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map(k => [k, ['nova', 'tidal', 'wild', 'chrome']]));
+// brief 16 landed 2026-10-08, and 16b's matte-sandstone Titan the same day: all five forms for all seven Keepers
+const SURGE_ART = Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map(k => [k, ['nova', 'tidal', 'wild', 'titan', 'chrome']]));
 const formKey = () => FORM[keeperEl].toLowerCase();
 // a form only surges once Codex has painted it; until then this Keeper and element have no Surge at all (A, 2026-10-07: "since
 // none of the images are done we can hold off on the transformations that dont have them yet")
 const surgeArt = () => (SURGE_ART[keeper] || []).includes(formKey());
 function formArt() {
   const k = formKey(), n = 'k' + keeper + '-' + k;
-  if ((SURGE_ART[keeper] || []).includes(k)) { if (!IMG[n]) load(n, `art4/surge/k${keeper}-${k}.png?v=3`); if (ok(IMG[n])) return IMG[n]; }
+  if ((SURGE_ART[keeper] || []).includes(k)) { if (!IMG[n]) load(n, `art4/surge/k${keeper}-${k}.png?v=4`); if (ok(IMG[n])) return IMG[n]; }
   return IMG['k' + keeper];
 }
 const SG = () => S.surge || (S.surge = { q:0, ready:false, used:false, on:null });
