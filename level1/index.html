@@ -3521,7 +3521,7 @@ function hurt(e, dmg, el, o = {}) {
   const k = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), strong = k > 1, weak = k < 1;
   m *= k;
   // the words teach, so they show the first few times in a run; after that the coloured hit says it
-  if (strong && S.level < 3 && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
+  if (strong && !surgeOn() && S.level < 3 && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
   if (weak && S.level < 3 && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
   if (e.giant) m *= giantArmour(e);
   const dealt = dmg * m;
@@ -3560,7 +3560,8 @@ function kill(e) {
     const now = S.t; S.burst = (S.burst || []).filter(t => now - t < 3); S.burst.push(now);
     const n = S.burst.length, tier = n >= 100 ? 3 : n >= 50 ? 2 : n >= 25 ? 1 : 0;
     if (n < 10) S.burstTier = 0;
-    if (tier > (S.burstTier || 0) && !hsOn()) { S.burstTier = tier; floatText(S.p.x, S.p.y - 120, ['', 'Great!', 'Amazing!', 'Unstoppable!'][tier], '#FFE14A', 30); stars(S.p.x, S.p.y - 60, 16 + tier * 8, '#FFE58A', 360); SFX.combo(tier * 3); }
+    if (tier > (S.burstTier || 0) && !hsOn() && !surgeOn()) {   // no words on the form during Omni or a Surge (design review, 2026-10-08)
+ S.burstTier = tier; floatText(S.p.x, S.p.y - 120, ['', 'Great!', 'Amazing!', 'Unstoppable!'][tier], '#FFE14A', 30); stars(S.p.x, S.p.y - 60, 16 + tier * 8, '#FFE58A', 360); SFX.combo(tier * 3); }
     if (Math.random() < (e.type === 'golem' ? 1 / 3 : S.out && e.from ? HOLD.heart : .003)) S.items.push({ x:e.x, y:e.y, kind:'heart', t:0, z:10, vz:240 }); }
   const col = EL[e.el];
   if (!e.boss) {
@@ -5215,7 +5216,8 @@ const FORM_PAL = { fire:['#FF8A3A', '#FFB35A', '#FF6A2A', '#FFD08A', '#FF9A4A'],
   metal:['#C9D3DB', '#E8EEF6', '#9AA8B8', '#FFFFFF', '#B8C4D8'] };
 // the forms Codex has painted so far (brief 15, complete 2026-10-07: Nova and Tidal for all seven; brief 16 brings Wild, Titan and
 // Chrome); until a form's art lands, its poster and its ride show the Keeper in the element's light
-const SURGE_ART = { 1:['nova', 'tidal'], 2:['nova', 'tidal'], 3:['nova', 'tidal'], 4:['nova', 'tidal'], 5:['nova', 'tidal'], 6:['nova', 'tidal'], 7:['nova', 'tidal'] };
+// brief 16 landed 2026-10-08; Titan waits (design review: its glowing veins and flame-shaped hair read as Nova) until Codex's redo (brief 16b)
+const SURGE_ART = Object.fromEntries([1, 2, 3, 4, 5, 6, 7].map(k => [k, ['nova', 'tidal', 'wild', 'chrome']]));
 const formKey = () => FORM[keeperEl].toLowerCase();
 // a form only surges once Codex has painted it; until then this Keeper and element have no Surge at all (A, 2026-10-07: "since
 // none of the images are done we can hold off on the transformations that dont have them yet")
@@ -7187,7 +7189,7 @@ function draw() {
     g.drawImage(kim, -ks / 2, kTop(ks), ks, ks);   // feet on the shadow
     if (hk > 0) { const rd = silhouette(kName, '#FF4A3A'); if (rd) { g.globalAlpha = hk * .6; g.drawImage(rd, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
     // a Surge begins as light from the Keeper's own figure (A, 2026-10-07)
-    if (sgo && S.surge.on.t < .35) { const lt = silhouette(kName, FORM_PAL[S.surge.on.el][3]); if (lt) { g.globalAlpha = Math.sin(Math.min(1, S.surge.on.t / .35) * Math.PI) * .95; g.drawImage(lt, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
+    if (sgo && S.surge.on.t < .35) { const lt = silhouette(kName, S.surge.on.el === 'metal' ? '#9AA8B8' : FORM_PAL[S.surge.on.el][3]); if (lt) { g.globalAlpha = Math.sin(Math.min(1, S.surge.on.t / .35) * Math.PI) * .95; g.drawImage(lt, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
     if (S.storm && S.storm.out > 0) { const ic = silhouette(kName, '#DCEEFF'); if (ic) { g.globalAlpha = Math.min(.85, S.storm.out / STORM.out); g.drawImage(ic, -ks / 2, kTop(ks), ks, ks); g.globalAlpha = 1; } }
     g.restore(); }
   if (hs) drawOmniForm(kx, ky, hsIm, formK);
@@ -7463,7 +7465,7 @@ const FORM_BODY = { fire:{ base:'30,22,22', mid:'70,52,48', mid2:'48,36,34', hi:
   water:{ base:'16,34,66', mid:'72,124,186', mid2:'46,88,146', hi:[210, 236, 255], lo:[150, 196, 236], smoke:'70,104,150' },
   wood:{ base:'20,42,24', mid:'86,146,72', mid2:'58,104,50', hi:[220, 244, 196], lo:[160, 206, 136], smoke:'74,110,66' },
   earth:{ base:'50,36,20', mid:'176,136,76', mid2:'126,94,50', hi:[255, 236, 190], lo:[214, 182, 126], smoke:'126,104,72' },
-  metal:{ base:'30,36,48', mid:'144,156,174', mid2:'98,108,126', hi:[240, 244, 250], lo:[192, 200, 212], smoke:'110,118,134' } };
+  metal:{ base:'22,28,44', mid:'86,100,128', mid2:'62,74,98', hi:[220, 228, 242], lo:[150, 166, 190], smoke:'78,90,114' } };   // darker steel-blue so Chrome's silver stands out (design review, 2026-10-08)
 const STORM_EL = () => [EL.water, EL.wood, '#FF9A4A', EL.earth, '#E8EEF6'];
 function bolt(x0, y0, x1, y1, c, w, big) {   // a jagged bolt; a big one has a white core, a flicker is dim and coreless
   const n = 8, pts = [[x0, y0]]; for (let i = 1; i < n; i++) { const q = i / n; pts.push([x0 + (x1 - x0) * q + rnd(-14, 14), y0 + (y1 - y0) * q + rnd(-9, 9)]); } pts.push([x1, y1]);
