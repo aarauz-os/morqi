@@ -4491,7 +4491,10 @@ function spawn(type, at, rush, el) {
     // while the frost closes in, creatures come out of the frost beyond the screen, never on the wall beside the Keeper (QA)
     if (S.arena && !S.storm) { x = S.arena.x + Math.cos(a) * (S.arena.r - 30); y = S.arena.y + Math.sin(a) * (S.arena.r - 30); }
     // off screen round the Keeper, at a point inside the world (QA, 2026-10-06: clamping a point beyond the edge pulled it back on screen)
-    else { const d = Math.hypot(VW, VH) / 2 + 50; let b = a; for (let k = 0; k < 10; k++) { const tx = S.p.x + Math.cos(b) * d, ty = S.p.y + Math.sin(b) * d; if (tx > 30 && tx < WORLD - 30 && ty > 30 && ty < WORLD - 30) break; b = rnd(0, TAU); }
+    // just past the edge of the view in that direction (A, 2026-10-09: on a wide desktop the old circle reached 1,500 units, so
+    // creatures from above and below spent ages walking in and the field felt empty)
+    else { const edge = q => Math.min(VW / 2 / Math.max(.01, Math.abs(Math.cos(q))), VH / 2 / Math.max(.01, Math.abs(Math.sin(q)))) + 60;
+      let b = a, d = edge(b); for (let k = 0; k < 10; k++) { const tx = S.p.x + Math.cos(b) * d, ty = S.p.y + Math.sin(b) * d; if (tx > 30 && tx < WORLD - 30 && ty > 30 && ty < WORLD - 30) break; b = rnd(0, TAU); d = edge(b); }
       x = S.p.x + Math.cos(b) * d; y = S.p.y + Math.sin(b) * d; }
   }
   x = clamp(x, 30, WORLD - 30); y = clamp(y, 30, WORLD - 30);
@@ -7836,7 +7839,9 @@ function update(dt) {
     if (d < e.r + P.r && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .55; P.hitAt = S.t; const x0 = P.x, y0 = P.y; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
       const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + Math.min(1, S.t / (S.level === 1 ? 270 : 180))) * lvHit()) * armourVs(e.el) * titanSkin(); P.hp -= hit; S.hitsTaken = (S.hitsTaken || 0) + 1; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
       if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? (S.storm ? S.storm.r0 + 400 : A.r) - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } keeperHit(e.x, e.y, e.el, e.boss || e.heavy, e.boss ? { x:P.x - x0, y:P.y - y0 } : null); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
-    if (d > 1500 && !e.boss && !S.arena && !e.plant) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
+    // "lost" means well beyond the view, whatever the screen: on a wide desktop the view's half-diagonal passed 1500, so creatures that
+    // spawned at its edge were thrown back every frame and circled the Keeper in a ring instead of closing in (A, 2026-10-09)
+    if (d > Math.max(1500, Math.hypot(VW, VH) / 2 + 400) && !e.boss && !S.arena && !e.plant) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
