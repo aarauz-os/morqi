@@ -89,6 +89,14 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 html.desk #estones{right:24px;top:50%;transform:translateY(-50%);gap:10px}html.desk .es{width:42px;height:42px}html.desk .es img{inset:5px;width:32px;height:32px}
 @media (prefers-reduced-motion:reduce){.es.full{animation:none}}
 .bk-heal{display:grid;gap:4px;margin-top:8px}.bk-heal b{font:900 14px var(--round);color:var(--c)}.bk-heal i{display:block;height:7px;border-radius:99px;background:linear-gradient(90deg,var(--c) calc(var(--p) * 100%),rgba(255,255,255,.12) 0)}.bk-heal small{font-size:12px;opacity:.75}
+/* Spirit Charms (phase 2; Codex brief 26): the worn charm hangs at the spirit animal's collar; the sheet lists all ten */
+.hm-charm{position:absolute;z-index:2;left:34%;top:46%;width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(10,14,40,.45));transform-origin:50% 0;animation:chSwing 3.2s ease-in-out infinite;pointer-events:none}
+@keyframes chSwing{50%{transform:rotate(8deg)}}
+.ch-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:6px 0 4px}.ch-say{min-height:2.6em;text-align:center;font:800 13px/1.3 var(--round);color:#fff;margin:4px 0 8px}.ch-say i{display:block;font-style:normal;font-weight:700;opacity:.7}
+.ch-c{display:grid;justify-items:center;gap:4px;padding:8px 2px;border:0;border-radius:16px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.14);color:#fff;font:800 11.5px/1.2 var(--round);cursor:pointer;text-align:center}
+.ch-c img{width:44px;height:44px;object-fit:contain}.ch-c span{display:none}.ch-c.on{box-shadow:inset 0 0 0 2px #FFE58A,0 0 14px rgba(255,229,138,.35)}
+.ch-c.locked img{filter:grayscale(1) brightness(.6);opacity:.55}.ch-c.locked span{opacity:.65}
+@media (prefers-reduced-motion:reduce){.hm-charm{animation:none}}
 /* the Spirit Chest's bubbles: what it gave, small, never stopping play (A, 2026-10-08) */
 #chestPop{position:absolute;left:50%;top:57%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:30}
 .cpop{display:flex;align-items:center;gap:7px;padding:4px 13px 4px 4px;border-radius:99px;background:rgba(14,20,52,.74);box-shadow:inset 0 0 0 1px rgba(255,229,138,.35),0 6px 14px rgba(4,6,22,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:900 13px var(--round);color:#fff;white-space:nowrap;animation:cpopIn .35s var(--spring);transition:opacity .35s,transform .35s}
@@ -1759,12 +1767,15 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <button class="hm-gear" id="hmGear" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
-    <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="still-sky h" aria-hidden="true"><i></i></div><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa" id="hmPetFig"><img class="hm-a" id="hmPet" alt=""><i class="hm-zzz" aria-hidden="true">z<b>z</b></i></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
+    <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="still-sky h" aria-hidden="true"><i></i></div><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa" id="hmPetFig"><img class="hm-a" id="hmPet" alt=""><i class="hm-zzz" aria-hidden="true">z<b>z</b></i><img class="hm-charm" id="hmCharm" alt="" hidden></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
     <button class="hm-daily" id="hmDaily" aria-label="Daily breath with your spirit animal"><i class="hd-orb" aria-hidden="true"></i><span><b>Daily breath</b><em id="hmDayN">30 seconds</em></span></button>
     <button class="btn green hm-go" id="hmGo">Play</button>
     <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
       <h3>Grow your Sanctuary</h3><div class="gr-wheel" id="grWheel" role="img"></div><p class="gr-sub">Each plot grows with its own element. Free creatures to fill your stones.</p>
       <div class="gr-list" id="grList"></div><h4 class="gr-h" id="grCallsH">Star Calls</h4><p class="gr-qi"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="grQi">0</b> Sparks</p><div class="gr-list" id="grCalls"></div><button class="btn green" id="grDone">Done</button></div></div>
+    <div class="hm-over" id="charmSheet" hidden><div class="hm-sheet">
+      <h3>Spirit Charms</h3><p class="gr-sub">Your spirit animal wears one. Each is earned by playing.</p>
+      <div class="ch-grid" id="chGrid"></div><p class="ch-say" id="chSay" aria-live="polite"></p><button class="btn green" id="chDone">Done</button></div></div>
     <div class="hm-over" id="setSheet" hidden><div class="hm-sheet">
       <h3>Settings</h3>
       <div class="set-row">
@@ -4189,7 +4200,7 @@ function startRun() {
   // the Sanctuary's growth carries into the run: Heart Spring raises health (the other plots act where they apply)
   // the Heart Spring: 8% a level to five, then 2 health a level to 1000
   { const lv = S.grow.water || 0, hp = Math.round(220 * (1 + .08 * Math.min(lv, 5)) + 2 * Math.max(0, lv - 5)); S.p.hp = S.p.max = hp; }
-  camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; S.cam = { x:camX, y:camY };
+  camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; S.cam = { x:camX, y:camY }; S.charm = (charmOn() || {}).c || null;
   if (!towersLevel(LVL)) paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
   $('#hud').hidden = false; $('#bossWrap').classList.remove('on'); $('#cue').innerHTML = ''; { const es = $('#estones'); es.innerHTML = ''; es.dataset.k = ''; }
@@ -8452,6 +8463,8 @@ function draw() {
     // not just gliding"); the cycle steps with the ground it covers, one frame per 18 px, so its feet never slide
     const mv = Math.hypot(pet.x - (pet.px ?? pet.x), pet.y - (pet.py ?? pet.y)); pet.px = pet.x; pet.py = pet.y; pet.ph = ((pet.ph || 0) + Math.min(mv, 40) / 18) % 4;
     const runP = pet.moving || pet.dash > 0, rk = animal + 'r' + (1 + Math.floor(pet.ph)), cyc = runP && mv > .4 && ok(IMG[rk]);
+    // the worn Spirit Charm leaves a soft trail of its colours as the animal runs
+    if (S.charm && mv > .6 && Math.random() < .35) fx({ k:'star', x:pet.x + rnd(-12, 12), y:pet.y + 8, vx:rnd(-25, 25), vy:rnd(-50, -15), drag:1, life:rnd(.4, .7), s:rnd(4, 7), c:S.charm === 'five' ? EL[CYCLE[(Math.random() * 5) | 0]] : S.charm });
     const hop = runP ? Math.abs(Math.sin(pet.bob)) * (cyc ? 2 : 9) : Math.abs(Math.sin(S.t * 3)) * 2;
     let sx = 1, sy = 1, rot = runP ? Math.sin(pet.bob) * (cyc ? .02 : .09) : 0;
     if (pet.dash > 0) { sx = 1.22; sy = .84; rot = (pet.dir || 1) * .18; }
@@ -11832,6 +11845,7 @@ function liveDancers(x, W, A) {
 }
 function renderHome() {
   // the garden's day: the birth element's drift, and the wilting or the warning the day before (once a day each)
+  renderCharm();
   { drift(); const w = wilt(), today = dayKey(), ev = eventNow();
     if (ev && store.get('morqi.eventSaid') !== today) { store.set('morqi.eventSaid', today); setTimeout(() => toast(`${ev.n}! ${ELNAME[ev.el]} creatures give double ${ELNAME[ev.el].toLowerCase()} qi this weekend.`, 4600), 2400); }
     if (w) setTimeout(() => toast(`Your garden wilted a little while you were away. One breath a day keeps it green.`, 4600), 900);
@@ -11860,7 +11874,38 @@ $('#hmGo').onclick = () => { SFX.select(); goTab('map'); };
   t.onclick = e => { e.preventDefault(); store.set('morqi.tunein', store.get('morqi.tunein') === 'off' ? 'on' : 'off'); sync(); SFX.select(); }; sync(); $('#setTvRow').hidden = !DESK(); }
 $('#hmDaily').onclick = () => { SFX.select(); AU.init(); breatheLife(keeperEl, true); };
 // a sleepy spirit animal on the home screen, tapped, wakes into the daily breath
-$('#hmPetFig').addEventListener('click', () => { if ($('#hmPet').classList.contains('sleepy')) { SFX.select(); AU.init(); breatheLife(keeperEl, true); } });
+$('#hmPetFig').addEventListener('click', () => { if ($('#hmPet').classList.contains('sleepy')) { SFX.select(); AU.init(); breatheLife(keeperEl, true); } else openCharms(); });
+/* Spirit Charms (phase 2; Codex brief 26): ten charms earned by playing and never bought. Five from the people you free, four from the
+   days you breathe, one for Harmony. The spirit animal wears one at home and leaves a soft trail in its colours in a run. */
+const FIVE = 'five', CHARMS = [
+  { id:'water', n:'The fisherman\u2019s lantern', how:'Free the fisherman', has:() => SEEN.has('_freed-water'), c:'#4E9BE0' },
+  { id:'wood', n:'The woodcarver\u2019s sapling', how:'Free the woodcarver', has:() => SEEN.has('_freed-wood'), c:'#6FBF4A' },
+  { id:'fire', n:'The drummer\u2019s drum', how:'Free the drummer', has:() => SEEN.has('_freed-fire'), c:'#FF6A3A' },
+  { id:'earth', n:'The grandmother\u2019s bun', how:'Free the grandmother', has:() => SEEN.has('_freed-earth'), c:'#F3E6CF' },
+  { id:'metal', n:'The bell ringer\u2019s bell', how:'Free the bell ringer', has:() => SEEN.has('_freed-metal'), c:'#D6A15A' },
+  { id:'day3', n:'A breathing pearl', how:'Breathe 3 days', has:() => daily().count >= 3, c:'#EDE6FF' },
+  { id:'day7', n:'A jade drop', how:'Breathe 7 days', has:() => daily().count >= 7, c:'#3FBF7A' },
+  { id:'day14', n:'A golden coin', how:'Breathe 14 days', has:() => daily().count >= 14, c:'#FFD24A' },
+  { id:'day30', n:'The five-colour crystal', how:'Breathe 30 days', has:() => daily().count >= 30, c:FIVE },
+  { id:'harmony', n:'The harmony knot', how:'Reach Harmony in your garden', has:() => +(store.get('morqi.harmony') || 0) >= 1, c:FIVE } ];
+const charmOn = () => { const C = CHARMS.find(c => c.id === store.get('morqi.charm')); return C && C.has() ? C : null; };
+function renderCharm() {
+  const C = charmOn(), im = $('#hmCharm'); im.hidden = !C; if (C) { im.src = `art4/charms/charm-${C.id}.webp?v=1`; im.alt = C.n; }
+  // a newly earned charm is announced once
+  const got = CHARMS.filter(c => c.has()).map(c => c.id), seen = (store.get('morqi.charmsSeen') || '').split(',').filter(Boolean), fresh = got.filter(id => !seen.includes(id));
+  if (fresh.length) { store.set('morqi.charmsSeen', got.join(',')); const F = CHARMS.find(c => c.id === fresh[0]); setTimeout(() => toast(`New Spirit Charm: ${F.n}! Tap your spirit animal to wear it.`, 4600), 3600); }
+}
+function openCharms() {
+  const box = $('#chGrid'), on = store.get('morqi.charm');
+  box.innerHTML = CHARMS.map(c => { const has = c.has(); return `<button class="ch-c${has ? '' : ' locked'}${on === c.id && has ? ' on' : ''}" data-id="${c.id}" aria-label="${has ? c.n : 'Locked. ' + c.how}"><img src="art4/charms/charm-${c.id}.webp?v=1" alt=""><span>${has ? c.n : c.how}</span></button>`; }).join('');
+  // one row of five per kind of feat; the line under the grid names the charm tapped, or how a locked one is earned
+  const say = C => { $('#chSay').innerHTML = C ? `${C.n}<i>${C.has() ? (store.get('morqi.charm') === C.id ? 'Worn' : 'Tap to wear') : C.how}</i>` : 'Tap a charm'; };
+  say(charmOn());
+  box.querySelectorAll('.ch-c').forEach(b => b.onclick = () => { const C = CHARMS.find(c => c.id === b.dataset.id); if (b.classList.contains('locked')) { SFX.pop(); say(C); return; }
+    SFX.select(); store.set('morqi.charm', store.get('morqi.charm') === C.id ? '' : C.id); openCharms(); say(C); renderCharm(); });
+  if ($('#charmSheet').hidden) { SFX.select(); openSheet('#charmSheet'); }
+}
+$('#chDone').onclick = () => { SFX.select(); closeSheet($('#charmSheet')); };
 // the painted portal is the door to the realms, so it answers a tap like one
 $('#hmPortal').onclick = () => { SFX.sweep(); const p = $('#hmPortal'); p.classList.remove('go'); void p.offsetWidth; p.classList.add('go'); setTimeout(() => goTab('map'), 380); };
 document.querySelectorAll('.ss-r').forEach(b => b.onclick = () => { SFX.pop(); b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope'); });
