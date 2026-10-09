@@ -12023,7 +12023,7 @@ function renderBook() {
     SFX.select(); const d = $('#bkDetail'); let h;
     if (x.dataset.k) h = beastHTML(x.dataset.k, true) + `<p class="bk-count">Freed ${b[x.dataset.k]} ${b[x.dataset.k] === 1 ? 'time' : 'times'}</p>`;
     else { const el = x.dataset.p, cid = Object.keys(CALL).find(id => CALL[id].from === el), C = cid && CALL[cid];
-      const st = healStage(el), hv = heals()[el] || 0, nx = HEAL_AT[st], lo = st ? HEAL_AT[st - 1] : 0, pic = HEAL_ART.includes(el + st) ? `b-heal-${el}-${st}.png?v=1` : `people/face-${el}.png?v=9`;
+      const st = healStage(el), hv = heals()[el] || 0, nx = HEAL_AT[st], lo = st ? HEAL_AT[st - 1] : 0, pic = HEAL_ART.includes(el + st) ? `b-heal-${el}-${st}.png?v=${st === 3 ? 2 : 1}` : `people/face-${el}.png?v=9`;
       h = `<div class="beast big" style="--c:${EL[el]}"><span class="pic"><img src="art4/${pic}" alt=""></span><div><b>${PEOPLE[el]}</b><p>"${FREED[el].q}"</p><span class="chips">Freed from ${BOSSES[el].name.replace(/^The /, 'the ')}</span>`
         + `<span class="bk-heal"><b>${HEAL_NAME[st]}</b>${nx ? `<i style="--p:${((hv - lo) / (nx - lo)).toFixed(3)}"></i><small>Free ${ELNAME[el].toLowerCase()} creatures to help them heal</small>` : '<small>Strong again, thanks to you</small>'}</span>`
         + `${C ? `<span class="bk-gift"><img src="art4/calls/${C.img}.png?v=9" alt="">${C.gift}: ${C.n}</span>` : ''}</div></div>`;
