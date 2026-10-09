@@ -365,3 +365,68 @@ html.paged #market .strip img{height:190px}
 #long .realms img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
 #long .realms figcaption{position:absolute;left:0;right:0;bottom:0;padding:10px 6px 4px;font:800 10.5px/1.15 var(--round,inherit);color:#fff;background:linear-gradient(transparent,rgba(8,12,32,.82));text-align:center}
 html.paged #long figure.world img{aspect-ratio:16/8}
+
+/* ---------- story-first round (2026-10-09) ---------- */
+.cover .stakes{font-size:clamp(17px,1.8vw,21px);font-weight:900;line-height:1.35;color:var(--muted);max-width:36ch}
+/* the story: three beats side by side, each a picture, a line and one sentence, in the game's own art */
+.tale{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;align-items:start}
+.tale .beat{display:grid;gap:14px;align-content:start}
+.tale .h{font-size:clamp(26px,2.6vw,34px);line-height:1.08}
+.tale .lede{font-size:16px}
+.tale .pic{margin:0;border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.4)}
+.tale .pic img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+/* five people under the ice: the faces keep a little warmth, the frost does the rest */
+.iced{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-content:center;aspect-ratio:4/3;margin:0;padding:0 14px;list-style:none;border-radius:20px;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(120,160,240,.22),rgba(13,19,64,.9));box-shadow:0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.4)}
+.iced li{display:grid;gap:8px;justify-items:center;text-align:center;min-width:0}
+.iced img{width:100%;aspect-ratio:1;border-radius:50%;object-fit:cover;filter:grayscale(.85) brightness(1.05) sepia(.25) hue-rotate(170deg) saturate(1.6);
+  box-shadow:0 0 0 2px rgba(190,214,255,.6),0 0 18px rgba(150,190,255,.35)}
+.iced span{font-size:11px;font-weight:900;letter-spacing:0;line-height:1.15;min-height:2.3em;color:var(--muted)}
+/* the heart: how you reach a boss, in one plain line */
+.balance{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.balance .dots img{width:30px;height:30px;object-fit:contain}
+.balance p{font-size:18px;font-weight:900;line-height:1.35;color:var(--text)}
+/* every day: the app around the run, in three rhythms, on real phone screens */
+.daily-head{align-items:end}
+.rhythm{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:22px;align-items:start}
+.rh{margin:0;display:grid;gap:10px;align-content:start}
+.rh .when{font-size:11.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rh .shots{display:flex;gap:10px}
+.rh .phone{width:118px;border-radius:20px;padding:3px}
+.rh .phone img{border-radius:17px}
+.rh figcaption{display:grid;gap:4px;text-align:left;justify-items:start}
+.rh figcaption b{font-size:15px;line-height:1.25}
+.rh figcaption span{font-size:12.5px;line-height:1.45;color:var(--muted)}
+/* the need and the market on one page */
+.need-row{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:center}
+.road{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
+html.paged .road{grid-template-columns:none}
+@media (max-width:860px){
+  html:not(.paged) .tale{grid-template-columns:1fr}
+  html:not(.paged) .rhythm{grid-template-columns:1fr}
+  html:not(.paged) .rh .phone{width:min(46%,200px)}
+  html:not(.paged) .road{grid-auto-flow:row}
+  html:not(.paged) .balance{flex-direction:column;align-items:flex-start}
+}
+html.paged .tale .h{font-size:30px}
+html.paged .tale .lede{font-size:15px}
+html.paged #daily .h{font-size:38px}
+html.paged #daily .lede{font-size:15.5px}
+html.paged #market .h{font-size:38px}
+html.paged #market .stat{padding:14px 16px}
+html.paged #market .stat b{font-size:38px}
+/* print: big blurred shadows rasterise into grey boxes, so the new pictures keep a hairline only */
+html.paged .tale .pic,html.paged .iced{box-shadow:0 0 0 1px var(--line)}
+html.paged .rh .phone{width:142px;padding:3px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+html.paged .rhythm{grid-template-columns:142px repeat(3,minmax(0,1fr));gap:24px}
+html.paged #daily .in{gap:16px}
+html.paged .iced img,.iced img{max-width:58px}
+/* the long game's two lines that now say what is built today: tighter steps so the page still fits (QA pagefit, 2026-10-09) */
+html.paged #long .beats{gap:9px}
+html.paged #long .beats span{font-size:14px;line-height:1.4}
+/* the need's two numbers beside the market's: two equal columns that may shrink on a phone */
+@media (max-width:860px){html:not(.paged) #market .need-row .stats{grid-template-columns:1fr !important;gap:12px}
+  html:not(.paged) #market .need-row .stat{padding:16px 14px}}
+html.paged #long .in > .stack:first-child{gap:14px}
+html.paged #long .beats b{font-size:16px}
+html.paged #long .beats span{font-size:13.5px}

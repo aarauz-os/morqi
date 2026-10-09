@@ -56,6 +56,10 @@ ol,ul{padding:0;list-style:none}
 .stage .cam{display:none}
 .stage .eyes{position:absolute;left:50%;top:9vh;width:min(86vw,780px);transform:translateX(-50%);opacity:0;pointer-events:none;
   filter:drop-shadow(0 0 30px rgba(150,180,255,.25));will-change:opacity,transform}
+/* the lids: a soft band from the middle line that widens as --o goes 0 to 1 (no hard edge at any opening) */
+.stage .eyes{--o:0;--r:calc(var(--o) * 60%);
+  -webkit-mask-image:linear-gradient(to bottom,transparent calc(50% - var(--r)),#000 calc(50% - var(--r) + 16%),#000 calc(50% + var(--r) - 16%),transparent calc(50% + var(--r)));
+  mask-image:linear-gradient(to bottom,transparent calc(50% - var(--r)),#000 calc(50% - var(--r) + 16%),#000 calc(50% + var(--r) - 16%),transparent calc(50% + var(--r)))}
 .stage .sky{position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(to bottom,rgba(5,7,26,.55),rgba(5,7,26,0) 26%,rgba(5,7,26,0) 70%,rgba(5,7,26,.6)),
              radial-gradient(130% 90% at 50% 45%,transparent 55%,rgba(4,6,22,.55))}
@@ -152,6 +156,42 @@ main{position:relative;z-index:1}
 .stones{display:flex;gap:var(--s1)}
 .stones img{width:54px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
 .omni{display:grid;grid-template-columns:120px 1fr;gap:var(--s3);align-items:center}
+
+/* the story: three short beats while the frost takes the map and the camera comes down onto the first shore */
+.stakes{font-size:clamp(17px,1.6vw,20px);line-height:1.4;font-weight:900;color:var(--muted);max-width:34ch}
+.tale .beat + .beat{margin-top:88vh}
+.tale .beat .h{max-width:16ch}
+.still{border-radius:18px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.18),0 18px 36px rgba(0,0,0,.4)}
+.still img{width:100%;aspect-ratio:4/3;object-fit:cover}
+/* five people, still under the ice: the faces keep a little warmth, the frost does the rest */
+.iced{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--s1)}
+.iced li{display:grid;justify-items:center;gap:6px;text-align:center;min-width:0}
+.iced img{width:100%;max-width:72px;aspect-ratio:1;border-radius:50%;object-fit:cover;
+  filter:grayscale(.85) brightness(1.05) sepia(.25) hue-rotate(170deg) saturate(1.6);
+  box-shadow:inset 0 0 0 2px rgba(220,233,255,.5),0 0 0 2px rgba(190,214,255,.55),0 0 22px rgba(150,190,255,.35)}
+.iced span{font-size:12px;font-weight:900;letter-spacing:0;line-height:1.15;min-height:2.3em;color:var(--muted);overflow-wrap:anywhere;hyphens:manual}
+/* the heart closes the ride: the stones over the map, and balance in one plain line */
+.balance{display:grid;grid-template-columns:auto 1fr;gap:var(--s3);align-items:center;padding:var(--s3) 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.balance .stones img{width:38px}
+.balance .say{font-size:clamp(17px,1.5vw,20px)}
+
+/* every day: the app around the run, three rhythms (today, as they play, every month), each shown on a real phone screen */
+.phone-shot{margin:0}
+.phone-shot img{width:100%;aspect-ratio:480/1038;object-fit:cover;border-radius:18px;
+  box-shadow:0 0 0 4px #0A0E2A,0 0 0 5px rgba(255,255,255,.2),0 18px 36px rgba(0,0,0,.45)}
+.home{display:grid;grid-template-columns:168px 1fr;gap:var(--s3);align-items:center}
+.home > div > * + *{margin-top:var(--s2)}
+.loop{display:grid;gap:0}
+.loop li{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr;column-gap:var(--s3);row-gap:6px;padding:var(--s3) 0;border-top:1px solid var(--line)}
+.loop .when{grid-column:1;font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.loop .txt{grid-column:1;align-self:start}
+.loop .txt b{display:block;font-size:19px;line-height:1.25;color:#fff}
+.loop .txt span{display:block;margin-top:6px;color:var(--muted);font-size:15px}
+.loop .pair{grid-column:2;grid-row:1 / span 2;display:grid;grid-template-columns:118px 118px;gap:var(--s2)}
+.daily .beat:not([data-stop]) .loop li{border-top:0;padding-top:0}
+/* the cover's scroll cue goes once the reader has started */
+.cue{transition:opacity .6s}
+html.moved .cue{opacity:0}
 
 .keepers{display:grid;grid-template-columns:repeat(7,1fr);gap:var(--s1)}
 .keepers li{display:grid;justify-items:center;text-align:center;gap:2px;align-content:start}
@@ -327,6 +367,16 @@ html.js .ch.solid .wrap.in > *:nth-child(n+4){transition-delay:.27s}
   .phone{display:none}
   .lesson .realm{max-width:none}
   .omni{grid-template-columns:84px 1fr;gap:var(--s2)}
+  .tale .beat + .beat{margin-top:84vh}
+  .iced{gap:6px}
+  .iced span{font-size:10.5px}
+  .balance{grid-template-columns:1fr;gap:var(--s2)}
+  .balance .stones img{width:34px}
+  .home{grid-template-columns:116px 1fr;gap:var(--s2)}
+  .home .body{font-size:15px}
+  .loop li{grid-template-columns:1fr;padding:var(--s3) 0 var(--s2)}
+  .loop .pair{grid-column:1;grid-row:auto;grid-template-columns:1fr 1fr;gap:var(--s2);margin-top:var(--s2);padding:0 var(--s1)}
+  .loop .txt b{font-size:18px}
   .keepers{grid-template-columns:repeat(4,1fr);row-gap:var(--s2)}
   .foes{grid-template-columns:1fr}
   .mini,.foes > div:last-child .mini{grid-template-columns:1fr;gap:var(--s1)}
@@ -369,6 +419,19 @@ html.js .ch.solid .wrap.in > *:nth-child(n+4){transition-delay:.27s}
   .cta{padding:14px 24px;font-size:17px}
 }
 @media (max-width:370px){ .mode{display:none} }
+@media (max-width:480px){
+  .ch.over.cover{padding:0}
+  .cover .card{max-width:none;width:100%;max-height:46vh;max-height:46svh;margin:0;border-radius:26px 26px 0 0;
+    padding:var(--s3) var(--s3) max(var(--s3), calc(env(safe-area-inset-bottom) + var(--s2)));background:rgba(9,13,42,.78)}
+  .cover .card > * + *{margin-top:var(--s1)}
+  .cover .logo img{width:150px}
+  .cover .tag{font-size:23px}
+  .cover .stakes{font-size:16px}
+  .cover .lede,.cover .meta{display:none}
+  .cover .ctas{margin-top:var(--s2)}
+  .cue{bottom:var(--cue-b,48vh)}
+}
+html.plain .cover .card{max-height:none;border-radius:22px}
 
 /* ---------- plain reading: the same words, no world ---------- */
 html.plain .stage{display:none}
@@ -376,6 +439,7 @@ html.plain .ch.over{padding-top:var(--s5)}
 html.plain .ch.over.cover{min-height:0;padding-top:var(--s6)}
 html.plain .card,html.plain .lesson .realm{margin-left:auto;margin-right:auto;max-width:1080px;background:var(--glass-solid);-webkit-backdrop-filter:none;backdrop-filter:none}
 html.plain .lesson .realm{margin-top:var(--s1)}
+html.plain .tale .beat + .beat{margin-top:var(--s3)}
 html.plain .lesson + .ch{padding-top:var(--s5)}
 html.plain .cue{display:none}
 html.plain .bar{background:rgba(9,13,42,.94)}

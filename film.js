@@ -44,8 +44,12 @@
   // a realm's own stop sits right over its island; inside the lesson the ride (rideAt) flies the camera between them
   const over = (i, t) => ({ u: ISLES[i].c[0][0], v: ISLES[i].c[0][1], span: 460, spanM: 300, t, dim: 0, alt: 1 });
   const STOPS = {
-    cover:    { u: 1024, v: 600,  span: 2048, spanM: 700, uM: 560, t: T0, eyes: 0, dim: 0, alt: 1 },
-    need:     { u: 660,  v: 860,  span: 1500, spanM: 760, uM: 560, t: T0, eyes: 0, dim: 0, alt: .8 },
+    // the cover shows the five realms alive; the story's first card freezes them (FREEZE) as the eyes open over the map,
+    // the second drops toward the islands under his half-shut gaze, the third lands on the first frozen shore
+    cover:    { u: 1024, v: 600,  span: 2048, spanM: 560, uM: 600, vM: 960, t: TA, eyes: 0, dim: 0, alt: 1 },   // a phone sees the lit islands in its top half, above the sheet
+    story1:   { u: 1000, v: 640,  span: 1800, spanM: 680, uM: 620, t: T0, eyes: 1, dim: .16, alt: .95 },
+    story2:   { u: 700,  v: 860,  span: 1350, spanM: 640, uM: 520, t: T0, eyes: .5, dim: .06, alt: .8 },
+    story3:   { u: 290,  v: 1050, span: 980,  spanM: 520, t: T0, eyes: 0, dim: 0, alt: .5 },
     game:     { u: 250,  v: 1060, span: 760,  spanM: 470, t: T1, dim: 0, alt: .35 },
     lesson:   { u: 330,  v: 1030, span: 900,  spanM: 420, uM: 300, vM: 690, t: T1, dim: 0, alt: .4 },
     shore:    over(0, T1),
@@ -54,12 +58,13 @@
     harvest:  over(3, [1, 1, 1, 1, 0]),
     city:     over(4, TA),
     win:      { u: 680,  v: 850,  span: 1500, spanM: 560, uM: 660, vM: 500, t: TA, dim: 0, alt: .75, stones: 1 },
-    cast:     { u: 820,  v: 760,  span: 1100, spanM: 560, t: TA, dim: 0, alt: .55 },
-    heart:    { u: 1290, v: 500,  span: 1050, spanM: 560, t: TA, dim: .05, alt: .55 },
-    long:     { u: 1450, v: 340,  span: 1500, spanM: 620, t: TA, dim: .05, alt: .8, eyes: 1 },
-    room:     { u: 1580, v: 250,  span: 1250, spanM: 600, t: TA, dim: .8, alt: .7 },
-    market:   { u: 1640, v: 210,  span: 1180, spanM: 580, t: TA, dim: .82, alt: .7 },
-    why:      { u: 1710, v: 180,  span: 1120, spanM: 560, t: TA, dim: .82, alt: .7 },
+    daily:    { u: 820,  v: 760,  span: 1100, spanM: 560, t: TA, dim: .08, alt: .55 },
+    cast:     { u: 1290, v: 500,  span: 1050, spanM: 560, t: TA, dim: .05, alt: .55 },
+    room:     { u: 1450, v: 340,  span: 1250, spanM: 600, t: TA, dim: .8, alt: .7 },
+    market:   { u: 1540, v: 280,  span: 1180, spanM: 580, t: TA, dim: .82, alt: .7 },
+    why:      { u: 1610, v: 230,  span: 1120, spanM: 560, t: TA, dim: .82, alt: .7 },
+    // the long game: the world surfaces once more, frozen to the north-east, and he is watching again
+    long:     { u: 1700, v: 190,  span: 1500, spanM: 620, t: TA, dim: .3, alt: .8, eyes: 1 },
     business: { u: 1770, v: 155,  span: 1060, spanM: 540, t: TA, dim: .82, alt: .7 },
     plan:     { u: 1820, v: 135,  span: 1000, spanM: 520, t: TA, dim: .82, alt: .7 },
     team:     { u: 1860, v: 120,  span: 940,  spanM: 500, t: TA, dim: .84, alt: .7 },
@@ -116,6 +121,8 @@
       p: y / maxY, stop: raw < .5 ? A.name : B.name,
       ra: 0, rc: 0, rf: 0, rx: y < (rideY ? rideY.L : 0) ? FEST[0].fx : 4 + FEST[4].fx, ry: .5, rz: 1, rx2: 0, rm: 0,
     };
+    // the frost takes the realms one at a time, the farthest first, the Pearl Shore last
+    if (A.name === 'cover' && B.name === 'story1') st.thaw = st.thaw.map((v, j) => 1 - smooth(seg(raw, .08 + (4 - j) * .11, .4 + (4 - j) * .11)));
     rideAt(y, st, k);
     return st;
   }
@@ -300,8 +307,11 @@
     }
     if (moving || dirty || renderer.always) { renderer.draw(cur, dt); dirty = false; }
     if (ride) ride.draw(cur, dt);
-    eyes.style.opacity = (cur.eyes * .92).toFixed(3);
-    eyes.style.transform = `translate(-50%, ${((1 - cur.eyes) * -24).toFixed(1)}px) scale(${(.9 + cur.eyes * .1).toFixed(3)})`;
+    // the eyes open like eyelids parting: a slit at the middle line that widens with the scroll; half open is a narrowed stare
+    const eo = clamp(cur.eyes);
+    eyes.style.opacity = (Math.min(1, eo * 2.2) * .94).toFixed(3);
+    eyes.style.setProperty('--o', eo.toFixed(3));
+    eyes.style.transform = `translate(-50%, ${((1 - eo) * -14).toFixed(1)}px) scale(${(.94 + eo * .08).toFixed(3)})`;
     dimEl.style.opacity = cur.dim.toFixed(3);
     window.__state = cur;
   }
@@ -313,6 +323,8 @@
     const mid = innerHeight * .45; let on = chs[0];
     chs.forEach(c => { if (c.getBoundingClientRect().top < mid) on = c; });
     if (rn.textContent !== on.dataset.ch) { rn.textContent = on.dataset.ch; rt.textContent = on.dataset.name; }
+    root.classList.toggle('moved', scrollY > 24);
+    { const cv = $('#cover .card'); if (cv) $('.cue').style.setProperty('--cue-b', (cv.offsetHeight + 16) + 'px'); }
     bar.classList.toggle('past', plain || scrollY > innerHeight * .6);
     bar.classList.toggle('solid', plain || scrollY > innerHeight * .6);
     // the TV's picture comes in as it reaches the screen: the snow only fades, it never flickers
@@ -324,7 +336,7 @@
   let rideAsked = false;
   function askRide() {
     if (rideAsked || !anchors.length) return;
-    const need = anchors.find(a => a.name === 'need');
+    const need = anchors.find(a => a.name === 'story2');
     if (need && scrollY < need.y - innerHeight * .5) return;
     rideAsked = true;
     import('./ride.js').then(m => { ride = m.start(window.__film); }).catch(e => console.warn('ride off:', e && e.message));
