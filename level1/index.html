@@ -1,4 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="art4/app-icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MorQi"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#141A44">
 </head><body>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
@@ -97,6 +98,13 @@ html.desk #estones{right:24px;top:50%;transform:translateY(-50%);gap:10px}html.d
 .ch-c img{width:44px;height:44px;object-fit:contain}.ch-c span{display:none}.ch-c.on{box-shadow:inset 0 0 0 2px #FFE58A,0 0 14px rgba(255,229,138,.35)}
 .ch-c.locked img{filter:grayscale(1) brightness(.6);opacity:.55}.ch-c.locked span{opacity:.65}
 @media (prefers-reduced-motion:reduce){.hm-charm{animation:none}}
+/* keeping progress safe (phase 2b, 2026-10-09): the home-screen sheet, and the backup code in Settings */
+.sbtn{flex:1;min-height:42px;padding:9px 14px;border:0;border-radius:99px;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22);color:#fff;font:900 14px var(--round);cursor:pointer}
+.sbtn.link{display:block;margin:10px auto 0;background:none;box-shadow:none;opacity:.75;flex:none}
+.hs-icon{display:block;width:76px;height:76px;margin:4px auto 8px;border-radius:18px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.set-save{display:flex;gap:8px;justify-content:center;margin:8px 0}
+.set-code{display:grid;gap:6px;margin:4px 0 8px}.set-code p{margin:0;text-align:center;font:800 13px/1.35 var(--round);opacity:.85}
+.set-code textarea{width:100%;box-sizing:border-box;border:0;border-radius:12px;padding:10px;background:rgba(255,255,255,.08);color:#fff;font:600 12px/1.3 ui-monospace,Menlo,monospace;resize:none}
 /* the Spirit Chest's bubbles: what it gave, small, never stopping play (A, 2026-10-08) */
 #chestPop{position:absolute;left:50%;top:57%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:30}
 .cpop{display:flex;align-items:center;gap:7px;padding:4px 13px 4px 4px;border-radius:99px;background:rgba(14,20,52,.74);box-shadow:inset 0 0 0 1px rgba(255,229,138,.35),0 6px 14px rgba(4,6,22,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:900 13px var(--round);color:#fff;white-space:nowrap;animation:cpopIn .35s var(--spring);transition:opacity .35s,transform .35s}
@@ -1785,6 +1793,9 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
       <h3>Grow your Sanctuary</h3><div class="gr-wheel" id="grWheel" role="img"></div><p class="gr-sub">Each plot grows with its own element. Free creatures to fill your stones.</p><div class="gr-wells" id="grWells"></div>
       <div class="gr-list" id="grList"></div><h4 class="gr-h" id="grCallsH">Star Calls</h4><p class="gr-qi"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="grQi">0</b> Sparks</p><div class="gr-list" id="grCalls"></div><button class="btn green" id="grDone">Done</button></div></div>
+    <div class="hm-over" id="homeSheet" hidden><div class="hm-sheet">
+      <h3>Keep your garden safe</h3><img class="hs-icon" src="art4/app-icon-180.png" alt="MorQi's home-screen icon">
+      <p class="gr-sub" id="hsSay"></p><button class="btn green" id="hsOk">Got it</button><button class="sbtn link" id="hsLater">Later</button></div></div>
     <div class="hm-over" id="goalSheet" hidden><div class="hm-sheet">
       <h3>Today's goals</h3><p class="gr-sub" id="glSub"></p><div class="gl-list" id="glList"></div><p class="gl-qi" id="glQi"></p><button class="btn green" id="glDone">Done</button></div></div>
     <div class="hm-over" id="charmSheet" hidden><div class="hm-sheet">
@@ -1799,6 +1810,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <label class="set-t" id="setTvRow"><button class="ibtn tvBtn" id="setTv" aria-label="TV intro"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="3.5" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M8.5 3.5 12 7l3.5-3.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span>TV intro</span></label>
       </div>
       <p class="set-mus" id="setMus"></p>
+      <div class="set-save"><button class="sbtn" id="setBackup">Back up my progress</button><button class="sbtn" id="setRestore">Restore</button></div>
+      <div class="set-code" id="setCode" hidden><p id="scSay"></p><textarea id="scText" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea><div class="set-save"><button class="sbtn" id="scGo"></button><button class="sbtn" id="scClose">Close</button></div></div>
       <div class="set-grown"><b>For grown-ups</b><span id="setWeek" hidden></span><span>No ads interrupt play. Sparks are earned by playing, and more for keeping the music on for weeks and months.</span></div>
       <button class="btn green" id="setDone">Done</button></div></div>
     <div class="hm-over" id="themeSheet" hidden><div class="hm-sheet th-sheet">
@@ -11861,7 +11874,7 @@ function liveDancers(x, W, A) {
 }
 function renderHome() {
   // the garden's day: the birth element's drift, and the wilting or the warning the day before (once a day each)
-  renderCharm();
+  renderCharm(); askHomeScreen();
   { const G = goalsToday(), d = G.list.filter(g => g.done).length; $('#hmGoalN').textContent = d === 3 ? 'All done' : `${d} of 3`; $('#hmGoalRing').style.setProperty('--p', (d / 3).toFixed(3)); }
   { drift(); const w = wilt(), today = dayKey(), ev = eventNow();
     if (ev && store.get('morqi.eventSaid') !== today) { store.set('morqi.eventSaid', today); setTimeout(() => toast(`${ev.n}! ${ELNAME[ev.el]} creatures give double ${ELNAME[ev.el].toLowerCase()} qi this weekend.`, 4600), 2400); }
@@ -12070,6 +12083,37 @@ function openGoals() {
   SFX.select(); openSheet('#goalSheet');
 }
 $('#hmGoals').onclick = () => openGoals();
+/* Keeping progress safe (A, 2026-10-09, "protect players' progress"): Safari may clear a website's saved progress after about a week
+   unvisited, but never a home-screen app's. So after a first win, an iPhone or iPad in Safari is asked, at most three times and a few
+   days apart, to add MorQi to the home screen; Android shows the browser's own install offer. Nothing is collected. */
+let installEv = null; addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEv = e; });
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const iosSafari = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function askHomeScreen() {
+  if (standalone() || PITCH || !starsOf(1) || !(installEv || iosSafari())) return;
+  const n = +(store.get('morqi.askHome') || 0), last = store.get('morqi.askHomeAt'); if (n >= 3 || (last && dayGap(last, dayKey()) < 3)) return;
+  store.set('morqi.askHome', n + 1); store.set('morqi.askHomeAt', dayKey());
+  $('#hsSay').textContent = installEv ? 'Install MorQi on this device, so your garden, charms and days of breathing are always kept.'
+    : 'Add MorQi to your Home Screen, so your garden, charms and days of breathing are always kept: tap the Share button, then \u201cAdd to Home Screen\u201d.';
+  $('#hsOk').textContent = installEv ? 'Install' : 'Got it'; setTimeout(() => openSheet('#homeSheet'), 1800);
+}
+$('#hsOk').onclick = () => { SFX.select(); if (installEv) { installEv.prompt(); installEv = null; } closeSheet($('#homeSheet')); };
+$('#hsLater').onclick = () => { SFX.select(); closeSheet($('#homeSheet')); };
+/* the backup code (2026-10-09): everything MorQi keeps on this device, as one code a grown-up can save and paste back on any device */
+const saveKeys = () => Object.keys(localStorage).filter(k => k.startsWith('morqi.'));
+function backupCode() { const o = {}; for (const k of saveKeys()) o[k] = localStorage.getItem(k); return 'MQ1:' + btoa(unescape(encodeURIComponent(JSON.stringify(o)))); }
+function restoreCode(c) { const t = (c || '').trim(); if (!t.startsWith('MQ1:')) return false; let o; try { o = JSON.parse(decodeURIComponent(escape(atob(t.slice(4))))); } catch (e) { return false; }
+  if (!o || typeof o !== 'object' || !Object.keys(o).every(k => k.startsWith('morqi.'))) return false; for (const k of saveKeys()) localStorage.removeItem(k); for (const k in o) localStorage.setItem(k, o[k]); return true; }
+function codeSheet(mode) {
+  const box = $('#setCode'), ta = $('#scText'), go = $('#scGo'); box.hidden = false; delete go.dataset.sure;
+  if (mode === 'backup') { $('#scSay').textContent = 'Your progress code. Copy it and keep it somewhere safe (a note or an email to yourself).'; ta.value = backupCode(); ta.readOnly = true; go.textContent = 'Copy';
+    go.onclick = () => { ta.select(); try { navigator.clipboard.writeText(ta.value).then(() => toast('Copied. Keep it somewhere safe.', 2600), () => toast('Select the code and copy it.', 2600)); } catch (e) { toast('Select the code and copy it.', 2600); } }; }
+  else { $('#scSay').textContent = 'Paste a progress code. It replaces the progress on this device.'; ta.value = ''; ta.readOnly = false; go.textContent = 'Restore';
+    go.onclick = () => { if (!go.dataset.sure) { go.dataset.sure = '1'; go.textContent = 'Tap again to replace'; return; } if (restoreCode(ta.value)) { toast('Progress restored.', 2400); setTimeout(() => location.reload(), 900); } else { delete go.dataset.sure; go.textContent = 'Restore'; toast('That code didn\u2019t work. Check it was copied whole.', 3200); } }; }
+}
+$('#setBackup').onclick = () => { SFX.select(); codeSheet('backup'); };
+$('#setRestore').onclick = () => { SFX.select(); codeSheet('restore'); };
+$('#scClose').onclick = () => { SFX.select(); $('#setCode').hidden = true; };
 $('#glDone').onclick = () => { SFX.select(); closeSheet($('#goalSheet')); };
 /* the monthly element weekend (phase 2, live operations after Pikmin Bloom): the second weekend of every month that month's element
    pays double element qi; no setup, it simply arrives */
@@ -12164,7 +12208,7 @@ function renderGrow() {
 const openSheet = id => { $(id).hidden = false; guardTaps(); $('#tabs').classList.add('under'); if (id === '#growSheet') { store.set('morqi.sparksTaught', '1'); $('#hmQi').classList.remove('hint'); } };
 const closeSheet = o => { o.hidden = true; if (![...document.querySelectorAll('.hm-over')].some(x => !x.hidden)) $('#tabs').classList.remove('under'); };
 $('#hmQi').onclick = () => { SFX.select(); renderGrow(); openSheet('#growSheet'); };
-$('#hmGear').onclick = () => { SFX.select(); renderSound(); $('#setWeek').textContent = weekNote(); $('#setWeek').hidden = !weekNote(); openSheet('#setSheet'); };
+$('#hmGear').onclick = () => { SFX.select(); renderSound(); $('#setCode').hidden = true; $('#setWeek').textContent = weekNote(); $('#setWeek').hidden = !weekNote(); openSheet('#setSheet'); };
 $('#thOn').onclick = () => { AU.init(); if (!AU.musicOn) { AU.toggleMusic(); musStreak(true); } AU.music(true); AU.song('home'); renderSound(); SFX.select(); closeSheet($('#themeSheet')); };
 $('#thNo').onclick = () => { SFX.select(); if (!AU.musicOn) AU.music(false); closeSheet($('#themeSheet')); };
 // a short listen, even with the music off: Haven plays for twelve seconds, so a child can hear it before choosing
