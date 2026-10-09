@@ -203,7 +203,7 @@ export function start(film) {
     draw(st, dt = 0) {
       if (!alive) return;
       time += dt;
-      if (st.dim > .9 && frames > 3) return;           // the world is under the reading: let the device rest
+      if ((st.dim > .9 || st.ra > .995) && frames > 3) return;   // the world is under the reading or a festival: let the device rest
       uniforms.uTime.value = time;
       st.thaw.forEach((v, i) => { uniforms.uThaw.value[i] = v; });
       clouds.forEach(c => { c.material.uniforms.uTime.value = time; });

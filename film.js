@@ -15,40 +15,55 @@
 
   /* ---------- the world, in pixels of the 2048 x 1360 painting ---------- */
   const W = 2048, H = 1360, EXT = 560;   // below the painting the clouds fall away into night, so islands near its edge can sit high on a tall screen
-  // the five realms in the order the lesson thaws them: where each island sits and how far its thaw reaches
+  // the five realms in level order on the walkable map: where each island sits and how far its thaw reaches
+  // (each circle is [x, y, radius]; the first is the island's heart, where its stone rises and its dive lands)
   const ISLES = [
-    { el: 'water', c: [[200, 1095, 160], [125, 975, 95]] },
-    { el: 'wood',  c: [[690, 1048, 168], [322, 893, 128]] },
-    { el: 'fire',  c: [[592, 852, 152]] },
-    { el: 'earth', c: [[162, 722, 158]] },
-    { el: 'metal', c: [[452, 612, 152]] },
+    { el: 'water', c: [[160, 1085, 170], [80, 975, 70]] },
+    { el: 'wood',  c: [[405, 975, 160], [350, 880, 72]] },
+    { el: 'fire',  c: [[612, 835, 160], [790, 880, 92]] },
+    { el: 'earth', c: [[858, 705, 150], [810, 612, 62]] },
+    { el: 'metal', c: [[1145, 585, 165], [1125, 478, 88]] },
+  ];
+  // the gold path from the Pearl Shore to the moon. Between dives the camera follows it, so the route itself carries the
+  // ride. AT: the path point each island's dive leaves from.
+  const PATH = [[184, 1086], [306, 1067], [475, 1011], [512, 936], [606, 852], [728, 805], [794, 786], [887, 702], [934, 692],
+    [1028, 674], [1112, 598], [1309, 533], [1390, 400], [1640, 210], [1905, 90]];
+  const AT = [0, 2, 4, 7, 10];
+  // inside each realm: where the camera rests in its festival painting (fx, a fraction across it), where it is drawn while
+  // the card is read (aim: x and y fractions) and how far it pushes in. The Ridge is the peak: it flies on into the volcano.
+  const FEST = [
+    { fx: .56, aim: [.66, .45], push: .07 },   // water: the moon over the bay
+    { fx: .58, aim: [.66, .5],  push: .09 },   // wood: the waterfalls
+    { fx: .48, aim: [.8, .56],  push: .62 },   // fire: past the sun, into the volcano
+    { fx: .25, aim: [.33, .56], push: .1 },    // earth: the fair, its stallholders
+    { fx: .5,  aim: [.58, .6],  push: .12 },   // metal: the city above the clouds
   ];
   // camera at each stop: centre (u,v), visible width on a wide screen (span) and on a tall one (spanM),
   // thaw per realm, the eyes in the cloud, how far the world dims behind the reading
   const T0 = [0, 0, 0, 0, 0], T1 = [1, 0, 0, 0, 0], TA = [1, 1, 1, 1, 1];
+  // a realm's own stop sits right over its island; inside the lesson the ride (rideAt) flies the camera between them
+  const over = (i, t) => ({ u: ISLES[i].c[0][0], v: ISLES[i].c[0][1], span: 460, spanM: 300, t, dim: 0, alt: 1 });
   const STOPS = {
-    cover:    { u: 1024, v: 600,  span: 2048, spanM: 640, uM: 640, t: T0, eyes: 0, dim: 0, alt: 1 },
-    need:     { u: 560,  v: 820,  span: 1450, spanM: 600, t: T0, eyes: 0, dim: 0, alt: .8 },
-    game:     { u: 250,  v: 1030, span: 760,  spanM: 470, t: T1, dim: 0, alt: .35 },
-    lesson:   { u: 260,  v: 1020, span: 820,  spanM: 480, t: T1, dim: 0, alt: .4 },
-    // the lesson holds one steady shot of all five islands and they thaw in turn (A, 2026-10-09: the hop right, up, back left,
-    // right again read as "very choppy and doesnt make sense"); the camera only eases a little closer as each one wakes
-    shore:    { u: 430, v: 880, span: 1320, spanM: 620, t: T1, dim: 0, alt: .45 },
-    grove:    { u: 432, v: 872, span: 1305, spanM: 615, t: [1, 1, 0, 0, 0], dim: 0, alt: .46 },
-    ridge:    { u: 434, v: 864, span: 1290, spanM: 610, t: [1, 1, 1, 0, 0], dim: 0, alt: .47 },
-    harvest:  { u: 436, v: 856, span: 1275, spanM: 605, t: [1, 1, 1, 1, 0], dim: 0, alt: .48 },
-    city:     { u: 438, v: 848, span: 1260, spanM: 600, t: TA, dim: 0, alt: .5 },
-    win:      { u: 470, v: 820, span: 1450, spanM: 600, t: TA, dim: 0, alt: .75, stones: 1 },
-    cast:     { u: 680,  v: 610,  span: 980,  spanM: 520, t: TA, dim: 0, alt: .55 },
-    heart:    { u: 860,  v: 500,  span: 1050, spanM: 560, t: TA, dim: .05, alt: .55 },
-    long:     { u: 1300, v: 360,  span: 1500, spanM: 620, t: TA, dim: .05, alt: .8, eyes: 1 },
-    room:     { u: 1560, v: 250,  span: 1250, spanM: 600, t: TA, dim: .8, alt: .7 },
+    cover:    { u: 1024, v: 600,  span: 2048, spanM: 700, uM: 560, t: T0, eyes: 0, dim: 0, alt: 1 },
+    need:     { u: 660,  v: 860,  span: 1500, spanM: 760, uM: 560, t: T0, eyes: 0, dim: 0, alt: .8 },
+    game:     { u: 250,  v: 1060, span: 760,  spanM: 470, t: T1, dim: 0, alt: .35 },
+    lesson:   { u: 330,  v: 1030, span: 900,  spanM: 420, uM: 300, vM: 690, t: T1, dim: 0, alt: .4 },
+    shore:    over(0, T1),
+    grove:    over(1, [1, 1, 0, 0, 0]),
+    ridge:    over(2, [1, 1, 1, 0, 0]),
+    harvest:  over(3, [1, 1, 1, 1, 0]),
+    city:     over(4, TA),
+    win:      { u: 680,  v: 850,  span: 1500, spanM: 560, uM: 660, vM: 500, t: TA, dim: 0, alt: .75, stones: 1 },
+    cast:     { u: 820,  v: 760,  span: 1100, spanM: 560, t: TA, dim: 0, alt: .55 },
+    heart:    { u: 1290, v: 500,  span: 1050, spanM: 560, t: TA, dim: .05, alt: .55 },
+    long:     { u: 1450, v: 340,  span: 1500, spanM: 620, t: TA, dim: .05, alt: .8, eyes: 1 },
+    room:     { u: 1580, v: 250,  span: 1250, spanM: 600, t: TA, dim: .8, alt: .7 },
     market:   { u: 1640, v: 210,  span: 1180, spanM: 580, t: TA, dim: .82, alt: .7 },
     why:      { u: 1710, v: 180,  span: 1120, spanM: 560, t: TA, dim: .82, alt: .7 },
     business: { u: 1770, v: 155,  span: 1060, spanM: 540, t: TA, dim: .82, alt: .7 },
     plan:     { u: 1820, v: 135,  span: 1000, spanM: 520, t: TA, dim: .82, alt: .7 },
     team:     { u: 1860, v: 120,  span: 940,  spanM: 500, t: TA, dim: .84, alt: .7 },
-    play:     { u: 1880, v: 110,  span: 820,  spanM: 460, t: TA, dim: .93, alt: .7 },
+    play:     { u: 1890, v: 100,  span: 820,  spanM: 460, t: TA, dim: .93, alt: .7 },
   };
   const SIDE_FX = { left: .66, right: .34, none: .5 };
 
@@ -70,6 +85,7 @@
       const side = el.dataset.side || 'none';
       return { y: Math.min(maxY, Math.max(0, y)), s, fx: SIDE_FX[side] ?? .5, name: el.dataset.stop };
     }).filter(Boolean).sort((a, b) => a.y - b.y);
+    rideMarks();
   }
 
   /* ---------- state from scroll ---------- */
@@ -98,8 +114,86 @@
       alt: lerp(A.s.alt ?? .5, B.s.alt ?? .5, t),
       stones: lerp(A.s.stones ?? 0, B.s.stones ?? 0, smooth(raw)),
       p: y / maxY, stop: raw < .5 ? A.name : B.name,
+      ra: 0, rc: 0, rf: 0, rx: y < (rideY ? rideY.L : 0) ? FEST[0].fx : 4 + FEST[4].fx, ry: .5, rz: 1, rx2: 0, rm: 0,
     };
+    rideAt(y, st, k);
     return st;
+  }
+
+  /* ---------- the lesson's ride ---------- */
+  // For each realm: glide along the gold path to its island (it thaws as you arrive), drop through the clouds into its
+  // festival, read the card there, rise out through the clouds and glide on. The path only ever climbs up and to the right,
+  // so the whole chapter is one journey forward. Scrolling back runs it backwards.
+  let rideY = null, rideOK = false;
+  function rideMarks() {
+    const at = n => { const a = anchors.find(a => a.name === n); return a ? a.y : undefined; };
+    const L = at('lesson'), R = ['shore', 'grove', 'ridge', 'harvest', 'city'].map(at), Wn = at('win');
+    rideY = [L, ...R, Wn].every(v => v !== undefined) ? { L, R, W: Wn } : null;
+  }
+  const seg = (y, a, b) => clamp((y - a) / Math.max(1e-6, b - a));
+  const ss = t => t * t * t * (t * (t * 6 - 15) + 10);
+  const bump = (r, a, b, c, d) => smooth(seg(r, a, b)) * (1 - smooth(seg(r, c, d)));
+  // a point on the path between island i and the next, q 0..1, from heart to heart
+  function along(i, q) {
+    const pts = [ISLES[i].c[0], ...PATH.slice(AT[i], AT[i + 1] + 1), ISLES[i + 1].c[0]];
+    const len = [0];
+    for (let n = 1; n < pts.length; n++) len.push(len[n - 1] + Math.hypot(pts[n][0] - pts[n - 1][0], pts[n][1] - pts[n - 1][1]));
+    const d = q * len[len.length - 1]; let n = 1; while (n < pts.length - 1 && len[n] < d) n++;
+    const f = clamp((d - len[n - 1]) / Math.max(1e-6, len[n] - len[n - 1]));
+    const P = pts[Math.max(0, n - 2)], A = pts[n - 1], B = pts[n], N = pts[Math.min(pts.length - 1, n + 1)];
+    return [cr(P[0], A[0], B[0], N[0], f), cr(P[1], A[1], B[1], N[1], f)];
+  }
+  // the camera inside realm i's festival: h runs 0 (landing) .. .5 (the card arrives) .. 1 (leaving)
+  function inside(i, h, st) {
+    const F = FEST[i], e = Math.pow(smooth(clamp(h)), 1.8);    // rest while the card lands, then the push
+    st.rx = i + lerp(F.fx, F.aim[0], e); st.ry = lerp(.5, F.aim[1], e); st.rz = 1 + F.push * e;
+  }
+  function rideAt(y, st, k) {
+    const R = rideY; if (!R || y <= R.L || y >= R.W) return;
+    const ys = [R.L, ...R.R, R.W];
+    let s = 0; while (s < 5 && y >= ys[s + 1]) s++;            // segment s runs from ys[s] to ys[s+1]; realm s arrives at its end
+    const r = seg(y, ys[s], ys[s + 1]);
+    const CLOSE = lerp(460, 300, k), GLIDE = lerp(980, 480, k);
+    const isle = i => ISLES[i].c[0];
+    const SP = a => lerp(a.span, a.spanM, k);
+    // the map underneath
+    let u, v, span, alt, fy = .5, ge = -1;
+    if (s === 0) {                       // from the lesson's wide shot, down onto the Pearl Shore
+      const a = STOPS.lesson, g = ss(seg(r, .3, .82));
+      u = lerp(lerp(a.u, a.uM ?? a.u, k), isle(0)[0], g); v = lerp(lerp(a.v, a.vM ?? a.v, k), isle(0)[1], g);
+      span = Math.exp(lerp(Math.log(SP(a)), Math.log(CLOSE), g)); alt = lerp(a.alt, 1, g); fy = lerp(lerp(.5, .36, k), .5, g); ge = g;
+    } else if (s === 5) {                // up out of the Silver City to all five, the stones rising
+      const a = STOPS.win, g = ss(seg(r, .26, 1));
+      u = lerp(isle(4)[0], lerp(a.u, a.uM ?? a.u, k), g); v = lerp(isle(4)[1], lerp(a.v, a.vM ?? a.v, k), g);
+      span = Math.exp(lerp(Math.log(CLOSE), Math.log(SP(a)), g)); alt = lerp(1, a.alt, g); fy = lerp(.5, lerp(.5, .36, k), g); ge = 1 - g;
+    } else {                             // along the path from the last island to this one
+      const q = ss(seg(r, .26, .78)), g = smooth(seg(r, .26, .42)) * (1 - smooth(seg(r, .6, .8)));
+      [u, v] = along(s - 1, q);
+      span = Math.exp(lerp(Math.log(CLOSE), Math.log(GLIDE), g)); alt = lerp(1, .1, g);
+    }
+    // keep the frame's bottom edge inside the painting: below it there is only mirrored cloud and night (a tall screen
+    // sees far more of the map's height than a wide one)
+    { const sc = Math.max(innerWidth / span, innerWidth / W, innerHeight / (H + EXT)); v = Math.min(v, H * .97 - (1 - fy) * innerHeight / sc * 1.04); }
+    st.u = u; st.v = v; st.span = span; st.alt = alt; st.fx = ge < 0 ? lerp(.42, .5, k) : lerp(st.fx, lerp(.42, .5, k), ge); st.fy = fy;
+    // each island thaws as the camera arrives over it
+    st.thaw = st.thaw.map((t, i) => i === 0 || i < s ? 1 : i > s ? 0 : smooth(seg(r, .5, .78)));
+    // the festivals: out of the last one, into this one
+    const soft = still ? 2.5 : 1;
+    let a = 0, c = 0;
+    if (s > 0) {                         // leaving realm s-1: up into its sky, through the clouds
+      inside(s - 1, .5 + .5 * seg(r, 0, .26), st);
+      const lift = smooth(seg(r, .12, .26)); st.ry = lerp(st.ry, .08, lift); st.rz *= 1 + .5 * lift;
+      a = 1 - smooth(seg(r, .23 - .05 * (soft - 1), .27 + .04 * (soft - 1)));
+      c = bump(r, .15, .23, .27, .35); st.rf = seg(r, .13, .37);
+    }
+    if (s < 5 && r > .5) {               // arriving in realm s: down through the clouds onto its ground, then look up
+      inside(s, .5 * seg(r, .84, 1), st);
+      const land = 1 - smooth(seg(r, .84, .98)); st.rz *= 1 + .7 * land; st.ry = lerp(st.ry, .9, land);
+      a = smooth(seg(r, .82 - .06 * (soft - 1), .86 + .02 * (soft - 1)));
+      c = bump(r, .74, .82, .84, .92); st.rf = seg(r, .72, .94);
+    }
+    if (still) { const i = Math.min(4, Math.floor(st.rx)); st.rx = i + FEST[i].fx; st.ry = .5; st.rz = 1; }   // reduced motion: the festivals only fade
+    st.ra = rideOK ? a : 0; st.rc = rideOK ? c : 0;
   }
 
   /* ---------- the flat renderer: two layers of one painting on one canvas ---------- */
@@ -174,6 +268,8 @@
     name: 'flat',
     draw(st) {
       if (!frozen) return;
+      if (st.ra > .995 && this.covered) return;              // a festival fills the screen: nothing of the map shows
+      this.covered = st.ra > .995;
       buildThaw(st.thaw);
       const f = frame(st, innerWidth, innerHeight);
       const kf = frozen.width / W, kt = thawed ? thawed.width / W : 1;
@@ -182,11 +278,11 @@
       if (thawed && st.thaw.some(v => v > .001)) ctx.drawImage(thawed, f.sx * kt, f.sy * kt, f.sw * kt, f.sh * kt, 0, 0, cw, ch);
     },
   };
-  let renderer = flat;
+  let renderer = flat, ride = null;
 
   /* ---------- the loop ---------- */
   let cur = null, last = performance.now(), dirty = true, raf = 0;
-  const KEYS = ['u', 'v', 'span', 'fx', 'fy', 'eyes', 'dim', 'alt', 'stones'];
+  const KEYS = ['u', 'v', 'span', 'fx', 'fy', 'eyes', 'dim', 'alt', 'stones', 'ra', 'rc', 'rf', 'rx', 'ry', 'rz', 'rx2', 'rm'];
   function settle() { cur = targetAt(scrollY); dirty = true; }
   function tick(now) {
     raf = requestAnimationFrame(tick);
@@ -203,6 +299,7 @@
       const k2 = tall(); cur.u = lerp(1024, 430, k2); cur.v = lerp(760, 840, k2); cur.span = lerp(2048, 640, k2); cur.fx = .5; cur.fy = lerp(.5, .3, k2); cur.alt = .9; cur.dim = Math.max(.35, tg.dim); cur.eyes = tg.eyes;
     }
     if (moving || dirty || renderer.always) { renderer.draw(cur, dt); dirty = false; }
+    if (ride) ride.draw(cur, dt);
     eyes.style.opacity = (cur.eyes * .92).toFixed(3);
     eyes.style.transform = `translate(-50%, ${((1 - cur.eyes) * -24).toFixed(1)}px) scale(${(.9 + cur.eyes * .1).toFixed(3)})`;
     dimEl.style.opacity = cur.dim.toFixed(3);
@@ -223,6 +320,16 @@
     $('.tv').style.setProperty('--snow', clamp((pr.top + pr.height * .1) / (innerHeight * .7)).toFixed(3));
   }
   addEventListener('scroll', readout, { passive: true });
+  // the festival paintings come down while the first chapters are read, so the lesson's ride is ready when it arrives
+  let rideAsked = false;
+  function askRide() {
+    if (rideAsked || !anchors.length) return;
+    const need = anchors.find(a => a.name === 'need');
+    if (need && scrollY < need.y - innerHeight * .5) return;
+    rideAsked = true;
+    import('./ride.js').then(m => { ride = m.start(window.__film); }).catch(e => console.warn('ride off:', e && e.message));
+  }
+  addEventListener('scroll', askRide, { passive: true });
 
   const mode = $('.mode');
   function setPlain(v) {
@@ -266,7 +373,7 @@
 
   /* ---------- resize ---------- */
   let rz = 0;
-  addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => { sizeView(); measure(); dirty = true; renderer.resize && renderer.resize(); readout(); }); });
+  addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(() => { sizeView(); measure(); dirty = true; renderer.resize && renderer.resize(); ride && ride.resize(); readout(); }); });
   RM.addEventListener && RM.addEventListener('change', () => { still = RM.matches; dirty = true; });
 
   /* ---------- jank meter ---------- */
@@ -275,7 +382,8 @@
 
   /* ---------- boot ---------- */
   window.__film = {
-    STOPS, ISLES, W, H, EXT, frame, targetAt, get state() { return cur; }, get still() { return still; }, get plain() { return plain; },
+    STOPS, ISLES, PATH, FEST, W, H, EXT, frame, targetAt,
+    rideReady() { rideOK = true; dirty = true; }, get state() { return cur; }, get still() { return still; }, get plain() { return plain; },
     useRenderer(r) { renderer = r; dirty = true; view.style.opacity = r === flat ? '1' : '0'; },
     flat, view, jank: () => jank.report(), redraw() { dirty = true; },
   };
@@ -295,6 +403,7 @@
     }
     measure(); settle(); readout(); flat.draw(cur);
     raf = requestAnimationFrame(tick);
+    askRide();
     window.__ready = true;
     // the full-size painting, then (if the device can take it) the world in three dimensions
     load('img/world.webp').then(im => { world = im; frozen = freeze(im); thawKey = ''; dirty = true; window.__sharp = true; }).catch(() => {});
