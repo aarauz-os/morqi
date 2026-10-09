@@ -327,9 +327,6 @@
     { const cv = $('#cover .card'); if (cv) $('.cue').style.setProperty('--cue-b', (cv.offsetHeight + 16) + 'px'); }
     bar.classList.toggle('past', plain || scrollY > innerHeight * .6);
     bar.classList.toggle('solid', plain || scrollY > innerHeight * .6);
-    // the TV's picture comes in as it reaches the screen: the snow only fades, it never flickers
-    const pr = $('#play').getBoundingClientRect();
-    $('.tv').style.setProperty('--snow', clamp((pr.top + pr.height * .1) / (innerHeight * .7)).toFixed(3));
   }
   addEventListener('scroll', readout, { passive: true });
   // the festival paintings come down while the first chapters are read, so the lesson's ride is ready when it arrives
@@ -357,7 +354,15 @@
   // one action, one button: the bar's Play steps back while a big one is on screen
   const quiet = new Set();
   const qio = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? quiet.add(e.target) : quiet.delete(e.target)); bar.classList.toggle('quiet', quiet.size > 0); }, { threshold: .4 });
-  $$('#cover .cta, #play .cta, #play .tv').forEach(el => qio.observe(el));
+  $$('#cover .cta, #play .cta, #play .invite').forEach(el => qio.observe(el));
+  // "Press and hold." does what it says: held, the light swells and the game opens as the breath tops out; a plain click opens it too
+  { const iv = $('#play .invite'); let hold = 0, went = false;
+    const go = () => { went = true; iv.classList.add('went'); location.href = iv.getAttribute('href'); };
+    const up = () => { clearTimeout(hold); if (!went) iv.classList.remove('held'); };
+    iv.addEventListener('pointerdown', e => { if (e.button) return; went = false; iv.classList.add('held'); clearTimeout(hold); hold = setTimeout(go, 1200); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(k => iv.addEventListener(k, up));
+    iv.addEventListener('click', e => { if (went) e.preventDefault(); });
+    iv.addEventListener('contextmenu', e => e.preventDefault()); }
 
   /* ---------- the heart: free her ---------- */
   const free = $('#free');

@@ -312,12 +312,13 @@ html.js .ch.solid .wrap.in > *:nth-child(n+4){transition-delay:.27s}
 .ch.room{padding:var(--s6) var(--gut) var(--s5);min-height:100vh;min-height:100svh;display:flex;align-items:center;
   background:radial-gradient(90% 70% at 30% 60%,rgba(26,34,96,.85),rgba(7,9,32,0) 70%)}
 .ch.room .wrap{width:100%;max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1.15fr 1fr;gap:var(--s5);align-items:center}
-.tv{position:relative;display:block;-webkit-tap-highlight-color:transparent}
-.tv svg{display:block;width:100%;height:auto}
-.tv .snow{opacity:var(--snow,1);transition:opacity .2s linear}
-.tv .led{filter:drop-shadow(0 0 6px #6FF2CF)}
-.tv:hover svg{transform:translateY(-2px)}
-.tv svg{transition:transform .3s var(--ease)}
+/* the light the game opens on: black, one curl of blue light on the .618 line, the words on the .382 line; it breathes six times a minute */
+.invite{position:relative;display:block;aspect-ratio:4/5;border-radius:var(--s3);overflow:hidden;background:#000;text-decoration:none;color:var(--text);
+  box-shadow:0 0 0 1px var(--line),0 24px 60px rgba(0,0,0,.45);-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.invite-light{position:absolute;left:50%;top:61.8%;width:58%;height:auto;translate:-50% -50%;animation:ivBreathe 10s ease-in-out infinite;transition:scale 1.4s var(--ease)}
+.invite.held .invite-light{scale:1.45}
+.invite-say{position:absolute;left:0;right:0;top:38.2%;translate:0 -50%;text-align:center;font:900 clamp(22px,2.6vw,30px)/1.2 var(--round);letter-spacing:0;text-shadow:0 2px 16px rgba(0,0,0,.55)}
+@keyframes ivBreathe{0%,100%{transform:scale(1);opacity:.88}50%{transform:scale(1.07);opacity:1}}
 .play-copy > * + *{margin-top:var(--s3)}
 .play-copy .eyebrow + .h{margin-top:var(--s2)}
 .play-copy .h{font-size:clamp(32px,4vw,56px)}
@@ -343,7 +344,7 @@ html.js .ch.solid .wrap.in > *:nth-child(n+4){transition-delay:.27s}
   .card[data-side],.lesson .realm[data-side="right"]{margin-left:auto;margin-right:auto}
   .card,.card.wide{max-width:600px}
   .ch.room .wrap{grid-template-columns:1fr;gap:var(--s4)}
-  .tv{max-width:520px;margin:0 auto;width:100%}
+  .invite{max-width:520px;margin:0 auto;width:100%}
 }
 @media (max-width:640px){
   .story{grid-template-columns:1fr;gap:var(--s2)}
@@ -410,7 +411,7 @@ html.js .ch.solid .wrap.in > *:nth-child(n+4){transition-delay:.27s}
   .planned{flex-direction:column;gap:var(--s1)}
   .ch.room{padding:72px var(--gut) max(var(--s3),env(safe-area-inset-bottom));align-items:flex-start}
   .ch.room .wrap{gap:var(--s3)}
-  .tv{width:100%;max-width:420px}
+  .invite{width:100%;max-width:420px}
   .play-copy > * + *{margin-top:var(--s2)}
   .play-copy .h{font-size:30px}
   .play-copy .body{font-size:15px}
@@ -452,5 +453,5 @@ html.plain .bar::before{opacity:0}
   .free-art img{transition:opacity .4s linear}
   .free.done.tapped .burst{animation:none}
   .picks button.no{animation:none}
-  .cta,.tv svg{transition:none}
+  .cta,.invite-light{transition:none}.invite-light{animation:none}
 }

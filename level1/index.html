@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>MorQi</title>
+<script>/* the opening (or a returning player's Sanctuary) comes up from the very first frame: until then the page stays black instead of flashing the title */
+try { var bfS = localStorage.getItem('morqi.seen') || '', bfP = localStorage.getItem('morqi.profile');
+  // (a returning player lands in their Sanctuary, so the title never shows for them either)
+  if (/[?&]from=pitch/.test(location.search) || bfP || bfS.split(',').indexOf('_open') < 0) document.documentElement.classList.add('bf1-pre'); } catch (e) {}</script>
+<style>html.bf1-pre,html.bf1-pre body,html.bf1-pre #stage{background:#000}html.bf1-pre #stage > .scr,html.bf1-pre #stage > .tabs{visibility:hidden}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Shippori+Mincho+B1:wght@700;800&display=swap">
@@ -825,7 +830,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 /* sized from the title's own column, not the window: on a desktop the game is a phone-shaped column, and a window-sized
    cloud spilled past it and over the tagline (QA, 2026-10-07) */
 #title{container-type:inline-size}
-#rotate{display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#0B1030;color:#fff;font:800 18px var(--round);text-align:center;padding:16px}
+#rotate{display:none;position:fixed;inset:0;z-index:2147483600;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#0B1030;color:#fff;font:800 18px var(--round);text-align:center;padding:16px}
 #rotate .rphone{width:44px;height:76px;border:4px solid #fff;border-radius:10px;position:relative;animation:rphone 2.4s ease-in-out infinite}
 #rotate .rphone::after{content:"";position:absolute;left:50%;bottom:6px;width:10px;height:4px;margin-left:-5px;border-radius:2px;background:#fff}
 @keyframes rphone{0%,30%{transform:rotate(-90deg)}60%,100%{transform:rotate(0)}}
@@ -1399,6 +1404,18 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .scr .art{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);aspect-ratio:9/16;max-width:none;background-position:50% 50%;background-size:cover;background-repeat:no-repeat}
 #home,#map,#book,#season{background:#0B1030;justify-content:flex-start;padding:0;overflow:hidden}
 #home::before,#map::before{content:"";position:absolute;inset:-20px;background:var(--bgi) 50% 50%/cover;filter:blur(18px) brightness(.6)}
+/* the welcome back (2026-10-09): the logo over the garden's sky drifts up and away, Luma says hello, and on the day's first launch a
+   breath light stays in the sky. Spacing on 16px golden steps (10 / 16 / 26). */
+.hm-welcome{position:absolute;left:50%;top:calc(110px + env(safe-area-inset-top));translate:-50% 0;z-index:4;width:min(66vw,280px);display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none}
+.hm-welcome img{width:100%;height:auto;filter:drop-shadow(0 6px 22px rgba(0,0,0,.35))}
+.hm-welcome p{margin:0;font:800 16px var(--round);color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.5);white-space:nowrap}
+.hm-luma{position:absolute;left:50%;top:calc(232px + env(safe-area-inset-top));translate:-50% 0;z-index:4;display:flex;align-items:center;gap:10px;padding:6px 16px 6px 6px;border-radius:99px;background:rgba(14,20,52,.74);box-shadow:var(--float);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);font:800 14px var(--round);color:#fff;white-space:nowrap;pointer-events:none;opacity:0}
+.hm-luma i{width:36px;height:36px;border-radius:50%;flex:none;background:url(art4/luma.jpg?v=1) 55% 31%/360% auto no-repeat;box-shadow:0 0 0 2px #fff}
+.hm-sky{position:absolute;left:50%;top:calc(96px + env(safe-area-inset-top));translate:-50% 0;z-index:4;border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;opacity:0;-webkit-tap-highlight-color:transparent}
+.hm-sky canvas{position:relative;inset:auto;width:104px;height:104px;display:block}
+.hm-sky span{margin-top:-10px;font:800 13.5px var(--round);color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.55),0 0 2px rgba(0,0,0,.4)}
+.hm-daily.quiet{visibility:hidden}
+.hm-sky:focus-visible{outline:2px solid #CFEAFF;outline-offset:2px;border-radius:16px}
 #home{--bgi:url(art4/home/fd-sanctuary.jpg?v=9)}#map{--bgi:url(art4/home/fd-map.jpg?v=9)}
 .hm-art{background-image:url(art4/home/fd-sanctuary.jpg?v=9)}
 /* the living Sanctuary: the painting's own loop, then the weather over it (A, 2026-10-05) */
@@ -1455,6 +1472,8 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .hm-daily .hd-orb{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#FBF7EE 45%,rgba(255,226,170,.7) 72%);box-shadow:0 0 16px rgba(255,226,170,.8);animation:hdBreathe 4s ease-in-out infinite}
 .hm-daily span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}.hm-daily b{font:900 15px var(--round)}.hm-daily em{font:800 11.5px var(--round);font-style:normal;opacity:.75}
 .hm-daily.done{animation:none;opacity:.85}.hm-daily.done .hd-orb{animation:none}
+/* the breath's icon is the breath light itself, Luma's tail, drawn still (2026-10-09) */
+.hm-daily .hd-orb.hd-tail{position:relative;inset:auto;width:34px;height:34px;border-radius:0;background:none;box-shadow:none;animation:none}
 @keyframes hdBreathe{0%,100%{transform:scale(.85)}50%{transform:scale(1.1)}}
 @keyframes hdGlow{0%,100%{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22),0 8px 20px rgba(0,0,0,.3)}50%{box-shadow:inset 0 0 0 1.5px rgba(255,236,190,.7),0 0 26px rgba(255,226,170,.55)}}
 /* a spirit animal left a day or more without a breath is sleepy and dim (never gone); the next breath wakes it */
@@ -1792,7 +1811,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 
   <section class="scr" id="title">
     <div class="still-sky t" aria-hidden="true"><i></i></div>
-    <div class="brand"><canvas class="logo-cloud" id="logoCloud" aria-hidden="true"></canvas><img class="logo" src="art4/logo-morqi.png?v=11" alt="MorQi"><span class="tag">Balance is your superpower</span></div>
+    <div class="brand"><canvas class="logo-cloud" id="logoCloud" aria-hidden="true"></canvas><img class="logo" src="art4/logo-morqi.png?v=11" alt="MorQi"><span class="tag">Balance is your superpower.</span></div>
     <div class="tsound">
       <label class="set-t"><button class="ibtn musBtn" aria-label="Music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="#fff"/><circle cx="16.5" cy="16" r="2.8" fill="#fff"/></svg></button>
       <button class="ibtn sfxBtn" aria-label="Sound effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#fff"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></button>
@@ -1821,7 +1840,12 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
     </div>
     <button class="hm-event" id="hmEvent" hidden><img id="hmEvBadge" alt=""><span><b id="hmEvName">Water Weekend</b><em id="hmEvSub">Double qi</em></span></button>
     <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="still-sky h" aria-hidden="true"><i></i></div><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa" id="hmPetFig"><img class="hm-a" id="hmPet" alt=""><i class="hm-zzz" aria-hidden="true">z<b>z</b></i><img class="hm-charm" id="hmCharm" alt="" hidden></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
-    <div class="hm-today"><button class="hm-daily" id="hmDaily" aria-label="Daily breath with your spirit animal"><i class="hd-orb" aria-hidden="true"></i><span><b>Daily breath</b><em id="hmDayN">30 seconds</em></span></button><button class="hm-goals" id="hmGoals" aria-label="Today's goals"><i class="hg-ring" id="hmGoalRing"></i><span><b>Goals</b><em id="hmGoalN">0 of 3</em></span></button></div>
+    <div class="hm-today"><button class="hm-daily" id="hmDaily" aria-label="Daily breath with your spirit animal"><canvas class="hd-orb hd-tail" id="hmDailyIcon" aria-hidden="true"></canvas><span><b>Daily breath</b><em id="hmDayN">30 seconds</em></span></button><button class="hm-goals" id="hmGoals" aria-label="Today's goals"><i class="hg-ring" id="hmGoalRing"></i><span><b>Goals</b><em id="hmGoalN">0 of 3</em></span></button></div>
+    <!-- the welcome back (2026-10-09): the logo drifts up out of the garden's sky, Luma says hello, and on the day's first launch the
+         logo leaves a breath light in the sky, an offer and never a gate -->
+    <div class="hm-welcome" id="hmWelcome" hidden aria-hidden="true"><img src="art4/logo-morqi.png?v=11" alt=""><p>Balance is your superpower.</p></div>
+    <div class="hm-luma" id="hmLuma" hidden role="status"><i aria-hidden="true"></i><span>You’re back! Your garden is waiting!</span></div>
+    <button class="hm-sky" id="hmSky" hidden aria-label="Today’s breath with your spirit animal"><canvas aria-hidden="true"></canvas><span>Today’s breath</span></button>
     <button class="btn green hm-go" id="hmGo">Play</button>
     <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
       <h3>Grow your Sanctuary</h3><div class="gr-wheel" id="grWheel" role="img"></div><p class="gr-sub">Each plot grows with its own element. Free creatures to fill your stones.</p><div class="gr-wells" id="grWells"></div>
@@ -2033,6 +2057,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       <button class="btn green" id="nextLvBtn" hidden>Level 2</button>
       <div class="res-row"><button class="btn green" id="againBtn">Play again</button>
       <button class="btn quietb hbtn" id="resHomeBtn"><img src="art4/tabs/tab-sanctuary.png?v=9" alt=""><span>Home</span></button></div>
+      <button class="btn quietb" id="resShare" hidden>Share MorQi</button>
     </div>
   </section>
 
@@ -2104,684 +2129,627 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 <!-- a phone turned on its side: MorQi is played upright (design review, 2026-10-07: the title broke at 844x390) -->
 <div id="rotate" aria-live="polite"><i class="rphone" aria-hidden="true"></i><b>Turn your phone upright to play</b></div>
 <script>
-/* Tune In: the first-launch boot for the desktop game.
-   An original box TV and a pebble console sit in a dark room, a spirit animal asleep on top. The child's breath clears the
-   signal in three steps: snow, then a soft picture, then a curved 4:3 picture with scanlines, then the frame widens past the
-   TV to the full game frame and every effect lets go. The picture behind the snow is the live game canvas, read every frame,
-   so the last frame is the game itself and the hand-off has no cut.
+/* Breathe First: the game's opening (it replaces the TV boot, which stays in boot/tunein.js, unwired).
+   Black. One light, a curl of blue in the game's toy-art language, breathing on its own about six times a minute. The child
+   keeps a thumb on it and breathes in: it swells, the frozen world fades up in grey and two eyes open faintly in the cloud.
+   They let go: colour runs out from the exact point their thumb was, five element colours riding the front, and the eyes
+   close as the colour reaches them. The light uncurls into Luma, then the logo for a second, then the game.
 
    Rules this file keeps:
-   - the TV and console are drawn here from scratch; no maker's shape, badge, logo or sound
-   - snow holds a constant mean brightness at low contrast; one tube-on bloom, never repeated; no rolling bars
-   - colour fringes are two element tints (wood green on one side, water blue on the other), added only, never subtracted,
-     so an edge can never turn red
-   - prefers-reduced-motion (or reduced:true) gets a plain fade
-   - type is the game's own round faces
+   - one breath only, and it never fails: a thumb that lifts early is asked to go slower and the film waits
+   - the eyes never speak; nothing here asks for an account, a purchase or a number, and nothing leaves the device
+   - every motion runs on this file's clock (no CSS animation), so a recording or a screenshot is frame-exact
+   - reduced motion (or a phone that cannot hold the frame rate) gets soft fades with the same words, no swell, no spread
+   - type is the game's own round face, tracking 0
 
-   API: TuneIn.play(opts) -> handle { skip(), frame(), state, el }
-     gameCanvas   the live game canvas, read every frame (missing or empty: a night picture stands in)
-     stage        the element to cover (the overlay is position:absolute inside it)
-     animal       spirit-animal key; art at <artBase>a-<animal>-sleep.png and -y.png (artBase default 'art4/', page-relative)
-     short        the 3-second version (any key or tap skips)      reduced  a plain 0.7 s fade (default: prefers-reduced-motion)
-     onBreathIn(n)  each time a hold starts (n = the breath being tried, 1..3)
-     onBreathOut(n) each counted breath (a hold of 1 s or more); n = 3 starts the hand-off
-     onDone()       after the overlay has removed itself; the game frame is untouched
-     petTarget    optional {x, y, size} (or a function returning it) in game-canvas px: where the animal lands
-     animalName, touch (force the touch hint), sound:false (silent)
-     Escape skips. Space and Escape never reach the game while the boot is up.
-   Recording extras (used by boot/test.html): clock (ms), manual (no rAF; call handle.frame()), audio (an
-   OfflineAudioContext), audioAt (seconds into that context when the boot starts).
-   TuneIn.sting(ctx, at) plays the five-note chime alone. */
+   API: BreatheFirst.play(opts) -> handle { skip(), frame(), state, el }
+     stage        the element to cover (the overlay sits inside it, position absolute)
+     gameCanvas   the live game canvas; grey under the veil, in colour where the veil opens
+     mode         'family' (first launch: waits for the thumb) or 'pitch' (about 10 s, plays itself)
+     reduced      soft fades only (default: prefers-reduced-motion)        fade  force the fade thaw (testing)
+     touch        true on a touch screen (the words say thumb), false with a mouse
+     artBase      default 'art4/' (luma.jpg, still/eyes.png, logo-morqi.png)
+     world()      called once, about 0.3 s in: load the level behind the black
+     thaw(x, y, r)  each frame of the spread, in stage px: thaw the world itself from that point
+     unlock()     called inside the press (and again on touchend): wake the sound; returns true once sound runs
+     audio()      -> { ctx, out } when sound may play, else null
+     sfx(name)    'out' (the breath out), 'land' (colour reaches the world), 'alive' (everything is back)
+     vo(id)       a voice line by id; silent when its file is missing
+     onDone(how)  'end' or 'skip', as the overlay starts to fade; it removes itself after
+   Test hooks: window.__bfT (seconds) replaces the clock when it is a number. */
 (function () {
   'use strict';
 
-  var EL = { wood:'#6FBF4A', fire:'#FF9A4A', earth:'#FFD24A', metal:'#C9D3DB', water:'#4E9BE0' };
-  var ORDER = ['wood', 'fire', 'earth', 'metal', 'water'];
-  var NAMES = { rat:'Rat', ox:'Ox', tiger:'Tiger', rabbit:'Rabbit', dragon:'Dragon', snake:'Snake', horse:'Horse', goat:'Goat',
-    monkey:'Monkey', rooster:'Rooster', dog:'Dog', pig:'Pig' };
-  // seconds
-  var T = { enter:.6, bloom:.9, inhale:2.2, minHold:1.0, exhale:2.0, back:.5, lock:3.1, out:.5,
-    sEnter:.25, sSignal:1.25, sLock:1.15, sOut:.35, reduced:.7 };
-  var STEP = [0, .34, .67, 1];
-
+  var SPARK = ['#FFF8EA', '#FFE8B0', '#FFFFFF', '#FFE2A0', '#FFF1CF'];   // the thaw's sparks: warm white and pale gold (gold is growth)
   var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
   var lerp = function (a, b, k) { return a + (b - a) * k; };
   var sstep = function (a, b, x) { var k = clamp((x - a) / (b - a), 0, 1); return k * k * (3 - 2 * k); };
   var eio = function (k) { k = clamp(k, 0, 1); return k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; };
   var eout = function (k) { k = clamp(k, 0, 1); return 1 - Math.pow(1 - k, 3); };
+  var TAU = Math.PI * 2;
 
   /* ---------------- look ---------------- */
+  // the light, the words and the logo sit on the golden lines of the frame: words at .382, the light at .618
   var CSS = [
-    '.tunein{position:absolute;inset:0;z-index:2147483000;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;',
-    '  -webkit-tap-highlight-color:transparent;cursor:default;color:#F4F8FF;opacity:0;',
-    '  font-family:var(--round,ui-rounded),"Nunito",system-ui,sans-serif}',
-    /* night room: a cool wall falling to black; the TV lights it */
-    '.tunein-room{position:absolute;inset:0;background:radial-gradient(120% 95% at 50% 36%,#151C40 0%,#0A0F27 52%,#04060D 100%)}',
-    '.tunein-halo,.tunein-floor{position:absolute;pointer-events:none;border-radius:50%;opacity:0;',
-    '  background:radial-gradient(closest-side,var(--tunein-glow,#5A6A9A) 0%,transparent 100%)}',
-    '.tunein-floor{filter:blur(6px)}',
-    '.tunein-scene{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform,opacity}',
-    '.tunein-set{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;display:block}',
-    '.tunein-gl{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;display:block}',
-    /* spirit animal (every motion below is driven by the boot's clock, never by CSS animation, so a recording is frame-exact) */
-    '.tunein-pet{position:absolute;left:0;top:0;pointer-events:none;will-change:transform,opacity}',
-    '.tunein-pet-a,.tunein-pet-b{position:absolute;inset:0;transform-origin:50% 92%}',
-    '.tunein-pet img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}',
-    '.tunein-pet .awake{opacity:0}',
-    '.tunein-z{position:absolute;left:0;top:0;font-size:var(--zs,18px);color:#C9D6FF;opacity:0;text-shadow:0 0 8px rgba(160,180,255,.6)}',
-    '.tunein-zz{position:absolute;right:6%;top:10%}',
-    '.tunein-spark{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(255,255,255,.75),rgba(255,255,255,0) 65%)}',
-    /* breath ring and words */
-    '.tunein-ui{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;pointer-events:none}',
-    '.tunein-ring{position:relative;width:var(--rs,88px);height:var(--rs,88px)}',
-    '.tunein-ring .orb{position:absolute;inset:0;margin:auto;width:54%;height:54%;border-radius:50%;',
-    '  background:radial-gradient(circle at 38% 32%,#FFFFFF,#FBF7EE 42%,rgba(255,240,215,.55) 70%,rgba(255,240,215,0) 74%);',
-    '  box-shadow:0 0 0 2px rgba(255,255,255,.8),0 0 44px rgba(255,226,170,.5)}',
-    '.tunein-finger{position:absolute;width:27%;left:58%;top:56%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.3));pointer-events:none}',
-    '.tunein-pips{display:flex;gap:8px}',
-    '.tunein-pips i{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.35);box-shadow:inset 0 0 0 2px rgba(255,255,255,.75)}',
-    '.tunein-pips i.on{background:#FFF6DE;transform:scale(1.25);box-shadow:0 0 12px rgba(255,236,180,.9)}',
-    '.tunein-say{font:900 var(--fs,17px)/1.15 var(--round,ui-rounded),"Nunito",system-ui,sans-serif;color:#fff;text-align:center;white-space:nowrap;',
-    '  padding:7px 16px;border-radius:99px;background:rgba(14,20,52,.8);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}',
-    '.tunein-say:empty{visibility:hidden}',
-    '.tunein-how{display:flex;align-items:center;gap:7px;font:800 13px/1 "Nunito",var(--round,ui-rounded),system-ui,sans-serif;color:rgba(244,248,255,.72);white-space:nowrap}',
-    '.tunein-how kbd{font:900 12px/1 "Nunito",var(--round,ui-rounded),system-ui,sans-serif;padding:5px 9px;border-radius:8px;color:#F4F8FF;',
-    '  background:rgba(244,248,255,.12);box-shadow:inset 0 -2px 0 rgba(0,0,0,.25),0 0 0 1px rgba(244,248,255,.14)}',
-    '.tunein-skip{position:absolute;right:16px;top:calc(env(safe-area-inset-top,0px) + 16px);padding:7px 14px;border:0;border-radius:99px;cursor:pointer;',
-    '  font:800 13px var(--round,ui-rounded),"Nunito",system-ui,sans-serif;color:rgba(255,255,255,.85);background:rgba(14,20,52,.55);opacity:0}',
-    '.tunein-skip:focus-visible{outline:2px solid #FFF6DE;outline-offset:2px}',
-    '.tunein:focus{outline:none}',
-    '.tunein-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'
+    '.bf1-root{position:absolute;inset:0;z-index:2147483000;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;',
+    '  -webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;cursor:default;color:#F4F8FF;background:#000;',
+    '  font-family:var(--round,ui-rounded),"Nunito",system-ui,sans-serif;letter-spacing:0}',
+    '.bf1-root:focus{outline:none}',
+    '.bf1-cv{position:absolute;left:0;top:0;width:100%;height:100%;display:block;pointer-events:none}',
+    /* the light is the press target: no callout, no selection, no scroll or zoom from it */
+    '.bf1-light{position:absolute;left:0;top:0;border-radius:50%;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;cursor:pointer}',
+    '.bf1-say{position:absolute;left:16px;right:16px;top:0;text-align:center;pointer-events:none;will-change:opacity}',
+    '.bf1-say p{margin:0 auto;max-width:17em;font-weight:900;font-size:var(--fs,24px);line-height:1.24;text-wrap:balance;',
+    '  text-shadow:0 2px 16px rgba(0,0,0,.55),0 0 2px rgba(0,0,0,.4)}',
+    '.bf1-say p + p{margin-top:10px}',
+    '.bf1-say .bf1-sub{font-weight:800;font-size:calc(var(--fs,24px) * .618 + 4px);color:rgba(244,248,255,.74)}',
+    '.bf1-skip,.bf1-snd{position:absolute;top:calc(env(safe-area-inset-top,0px) + 16px);min-height:44px;padding:0 16px;border:0;border-radius:99px;cursor:pointer;',
+    '  font:800 14px var(--round,ui-rounded),"Nunito",system-ui,sans-serif;letter-spacing:0;color:rgba(244,248,255,.86);background:rgba(18,22,44,.62);',
+    '  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);touch-action:manipulation;-webkit-touch-callout:none}',
+    '.bf1-skip{right:16px}',
+    '.bf1-snd{left:16px;display:flex;align-items:center;gap:8px}',
+    '.bf1-snd svg{width:18px;height:18px;flex:none}',
+    '.bf1-skip:focus-visible,.bf1-snd:focus-visible{outline:2px solid #CFEAFF;outline-offset:2px}',
+    '.bf1-end{position:absolute;left:16px;right:16px;top:0;display:flex;flex-direction:column;align-items:center;gap:16px;pointer-events:none;opacity:0}',
+    '.bf1-end img{width:var(--lw,280px);height:auto;display:block;filter:drop-shadow(0 6px 22px rgba(0,0,0,.45))}',
+    '.bf1-end p{margin:0;font-weight:800;font-size:18px;line-height:1.3;color:rgba(244,248,255,.86);text-align:center}',
+    '.bf1-haptic{position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}',
+    '.bf1-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'
   ].join('\n');
 
   function injectCSS(doc) {
-    if (doc.getElementById('tunein-style')) return;
-    var s = doc.createElement('style'); s.id = 'tunein-style'; s.textContent = CSS; doc.head.appendChild(s);
+    if (doc.getElementById('bf1-style')) return;
+    var s = doc.createElement('style'); s.id = 'bf1-style'; s.textContent = CSS; doc.head.appendChild(s);
   }
 
-  /* the set, in its own units: TV on a low bench, pebble console on the floor in front, a cable between them.
-     Screen glass: x 262, y 186, 360 x 270 (4:3), corner 34. Seat for the animal: (500, 168). */
-  var SCREEN = { x:262, y:186, w:360, h:270, r:34 };
-  var VB = { x:0, y:-40, w:1000, h:740 };
-  var SEAT = { x:500, y:170, size:200 };
-
-  function setSVG() {
-    var btns = ORDER.map(function (e, i) {
-      var a = -Math.PI / 2 + i * Math.PI * 2 / 5, x = 232 + Math.cos(a) * 60, y = 642 + Math.sin(a) * 17;
-      return '<g class="tunein-btn" data-i="' + i + '" style="opacity:.42"><ellipse cx="' + x.toFixed(1) + '" cy="' + (y + 2.5).toFixed(1) +
-        '" rx="12" ry="6.5" fill="#000" opacity=".35"/><ellipse cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" rx="11" ry="6" fill="' + EL[e] +
-        '"/><ellipse cx="' + (x - 3).toFixed(1) + '" cy="' + (y - 2).toFixed(1) + '" rx="4.5" ry="2" fill="#fff" opacity=".55"/></g>';
-    }).join('');
-    return '' +
-'<svg class="tunein-set" viewBox="' + [VB.x, VB.y, VB.w, VB.h].join(' ') + '" aria-hidden="true" focusable="false">' +
-'<defs>' +
-  /* pearl plastic, seen in a dark room: soft lilac-grey that the screen lifts */
-  '<linearGradient id="tunein-shell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAE5F4"/><stop offset=".5" stop-color="#C9C2DA"/><stop offset="1" stop-color="#8A83A2"/></linearGradient>' +
-  '<radialGradient id="tunein-shellAO" cx=".5" cy=".45" r=".62"><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#140F2A" stop-opacity=".45"/></radialGradient>' +
-  '<linearGradient id="tunein-recess" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#080A14"/><stop offset="1" stop-color="#262A45"/></linearGradient>' +
-  '<radialGradient id="tunein-knob" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D8D2E6"/><stop offset="1" stop-color="#8A83A2"/></radialGradient>' +
-  '<pattern id="tunein-dots" width="12" height="12" patternUnits="userSpaceOnUse" x="668" y="332"><circle cx="6" cy="6" r="3.1" fill="#12142A"/></pattern>' +
-  '<linearGradient id="tunein-bench" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#323C6E"/><stop offset="1" stop-color="#1A2148"/></linearGradient>' +
-  '<linearGradient id="tunein-benchF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#141A3A"/><stop offset="1" stop-color="#0A0E22"/></linearGradient>' +
-  '<radialGradient id="tunein-peb" cx=".42" cy=".3" r=".9"><stop offset="0" stop-color="#F4F0FA"/><stop offset=".6" stop-color="#B9B2CC"/><stop offset="1" stop-color="#5E5878"/></radialGradient>' +
-  '<radialGradient id="tunein-pebTop" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#CFC8DF"/></radialGradient>' +
-  '<radialGradient id="tunein-lit" cx=".5" cy="1" r="1"><stop offset="0" class="tunein-gs" stop-color="#5A6A9A" stop-opacity=".55"/><stop offset="1" stop-color="#5A6A9A" stop-opacity="0"/></radialGradient>' +
-  '<filter id="tunein-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter>' +
-  '<filter id="tunein-shadow" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>' +
-  '<filter id="tunein-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
-'</defs>' +
-/* cable, behind the bench */
-'<path d="M338 650 C 410 646, 430 606, 486 586" fill="none" stroke="#0A0E20" stroke-width="7" stroke-linecap="round"/>' +
-/* bench */
-'<rect x="186" y="572" width="20" height="40" rx="6" fill="#0C1029"/><rect x="794" y="572" width="20" height="40" rx="6" fill="#0C1029"/>' +
-'<rect x="142" y="522" width="716" height="58" rx="16" fill="url(#tunein-benchF)"/>' +
-'<rect x="130" y="504" width="740" height="22" rx="11" fill="url(#tunein-bench)"/>' +
-'<rect x="146" y="505" width="708" height="2.5" rx="1.25" fill="#5A66A8" opacity=".55"/>' +
-/* TV shadow on the bench */
-'<ellipse cx="500" cy="508" rx="250" ry="9" fill="#000" opacity=".55" filter="url(#tunein-shadow)"/>' +
-/* feet */
-'<rect x="292" y="488" width="64" height="20" rx="9" fill="#5F5878"/><rect x="644" y="488" width="64" height="20" rx="9" fill="#5F5878"/>' +
-/* shell */
-'<rect x="225" y="148" width="550" height="348" rx="66" fill="url(#tunein-shell)"/>' +
-'<rect x="225" y="148" width="550" height="348" rx="66" fill="url(#tunein-shellAO)"/>' +
-'<rect x="225" y="148" width="550" height="348" rx="66" fill="url(#tunein-lit)" class="tunein-shellLit" opacity="0"/>' +
-'<path d="M300 164 C 420 152, 600 152, 712 166" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity=".55" filter="url(#tunein-soft)"/>' +
-/* screen recess and glass (the live picture is drawn over the glass) */
-'<rect x="246" y="170" width="392" height="302" rx="48" fill="url(#tunein-recess)"/>' +
-'<rect x="' + SCREEN.x + '" y="' + SCREEN.y + '" width="' + SCREEN.w + '" height="' + SCREEN.h + '" rx="' + SCREEN.r + '" fill="#090B16"/>' +
-/* side panel: two knobs with lilac rims, a speaker grille, a jade power light */
-'<g transform="translate(707 222)"><circle r="31" fill="#000" opacity=".28" cy="3"/><circle r="30" fill="#8A83A2"/><circle r="24" fill="url(#tunein-knob)"/><rect x="-3.5" y="-21" width="7" height="15" rx="3.5" fill="#7B7494"/></g>' +
-'<g transform="translate(707 290)"><circle r="23" fill="#000" opacity=".28" cy="3"/><circle r="22" fill="#8A83A2"/><circle r="17" fill="url(#tunein-knob)"/><rect x="-3" y="-15" width="6" height="11" rx="3" fill="#7B7494"/></g>' +
-'<rect x="668" y="332" width="78" height="126" rx="20" fill="#2B2C48" opacity=".55"/>' +
-'<rect x="668" y="332" width="78" height="126" rx="20" fill="url(#tunein-dots)"/>' +
-'<circle class="tunein-led" cx="707" cy="476" r="5.5" fill="#2E3A36"/>' +
-/* console on the floor: a pearl pebble with five element buttons in a ring */
-'<ellipse cx="236" cy="694" rx="132" ry="13" fill="#000" opacity=".6" filter="url(#tunein-shadow)"/>' +
-'<ellipse cx="232" cy="656" rx="120" ry="44" fill="url(#tunein-peb)"/>' +
-'<ellipse cx="232" cy="642" rx="104" ry="29" fill="url(#tunein-pebTop)"/>' +
-'<ellipse cx="232" cy="642" rx="17" ry="5.5" fill="none" stroke="#F4F0FA" stroke-width="2.2"/>' +
-btns +
-'</svg>';
+  /* ---------------- the light: a curl of blue light, glossy, lit from the upper left ---------------- */
+  var SPR = {};
+  function sprite(doc, col, size) {
+    var key = col + size; if (SPR[key]) return SPR[key];
+    var c = doc.createElement('canvas'); c.width = c.height = size; var x = c.getContext('2d'), h = size / 2;
+    var g = x.createRadialGradient(h, h, 0, h, h, h); g.addColorStop(0, col); g.addColorStop(.35, col); g.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = g; x.fillRect(0, 0, size, size); return (SPR[key] = c);
+  }
+  /* Luma's tail, drawn as she is painted: a broad, see-through curl of pale blue light, its brightest line on the OUTER edge, a
+     few stars inside, a soft furred rim, about one and a tenth turns ending in a hooked tip, a white core at its eye.
+     (x, y) the eye; R the outer reach; spin where the base points (radians); unc 0..1 widens it from the light into her tail. */
+  var FUR = [], STARS = [];
+  (function () { var r = 4242, rnd = function () { r = (r * 16807) % 2147483647; return r / 2147483647; };
+    for (var i = 0; i < 40; i++) FUR.push([rnd(), rnd()]);
+    for (i = 0; i < 16; i++) STARS.push([.08 + .86 * rnd(), (rnd() - .5) * 1.3, rnd() * 6]); })();
+  function tailPts(x, y, R, spin, unc) {
+    var turns = lerp(1.32, 1.1, unc), wf = lerp(1, 1.22, unc), N = 120, P = [];
+    for (var i = 0; i <= N; i++) {
+      var s = i / N, th = spin + turns * TAU * (1 - s), r = R * (.13 + .87 * Math.pow(s, .82 + .5 * unc));
+      P.push({ s:s, x:x + Math.cos(th) * r, y:y + Math.sin(th) * r * (1 - .24 * unc), w:R * (.03 + .46 * Math.pow(s, 1.3)) * wf * (1 - .62 * (1 - .7 * unc) * sstep(.78, 1, s)) });   // a soft rounded end, like a tail's tip-to-root taper
+    }
+    for (i = 0; i <= N; i++) {
+      var a = P[Math.max(0, i - 1)], b = P[Math.min(N, i + 1)], dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+      if (nx * (P[i].x - x) + ny * (P[i].y - y) < 0) { nx = -nx; ny = -ny; }    // n points away from the eye: the outer side
+      P[i].nx = nx; P[i].ny = ny;
+    }
+    return P;
+  }
+  function drawCurl(g, x, y, R, spin, glow, alpha, unc, t) {
+    if (alpha <= 0.002 || R < 1) return;
+    var doc = g.canvas.ownerDocument, P = tailPts(x, y, R, spin, unc), N = P.length - 1, i, p;
+    g.save(); g.globalAlpha = alpha;
+    // the halo it casts (a glow below zero draws it still and flat, for a small icon)
+    var flat = glow < 0; glow = Math.max(0, glow);
+    g.globalCompositeOperation = flat ? 'destination-over' : 'lighter';
+    var hr = R * (2 + .5 * glow) * (flat ? 0 : 1) + .01, hg = g.createRadialGradient(x, y, 0, x, y, hr);
+    hg.addColorStop(0, 'rgba(126,200,255,' + (.22 * glow + .08) + ')'); hg.addColorStop(.4, 'rgba(126,200,255,' + (.08 * glow + .03) + ')'); hg.addColorStop(1, 'rgba(126,200,255,0)');
+    g.fillStyle = hg; g.beginPath(); g.arc(x, y, hr, 0, TAU); g.fill();
+    g.globalCompositeOperation = 'source-over';
+    // the body: see-through, pale at the rim, a deeper glow toward the eye
+    g.beginPath();
+    for (i = 0; i <= N; i++) { p = P[i]; var ox = p.x + p.nx * p.w, oy = p.y + p.ny * p.w; if (i) g.lineTo(ox, oy); else g.moveTo(ox, oy); }
+    // a round end, turned the way the tail runs (ahead of its last point)
+    var e = P[N], e0 = P[N - 1], ang = Math.atan2(e.ny, e.nx), ccw = Math.cos(ang + Math.PI / 2) * (e.x - e0.x) + Math.sin(ang + Math.PI / 2) * (e.y - e0.y) < 0;
+    g.arc(e.x, e.y, e.w, ang, ang + (ccw ? -Math.PI : Math.PI), ccw);
+    for (i = N; i >= 0; i--) { p = P[i]; g.lineTo(p.x - p.nx * p.w, p.y - p.ny * p.w); }
+    g.closePath();
+    var bg = g.createRadialGradient(x, y, 0, x, y, R * 1.15);
+    bg.addColorStop(0, 'rgba(126,200,255,.62)'); bg.addColorStop(.55, 'rgba(150,212,255,.58)'); bg.addColorStop(1, 'rgba(207,234,255,.56)');
+    g.fillStyle = bg; g.fill();
+    // lit from inside: the same shape again, added, so it glows like her tail rather than sitting flat on the dark
+    g.globalCompositeOperation = 'lighter'; var ig = g.createRadialGradient(x, y, 0, x, y, R * 1.2);
+    ig.addColorStop(0, 'rgba(126,200,255,.42)'); ig.addColorStop(.6, 'rgba(126,200,255,.2)'); ig.addColorStop(1, 'rgba(207,234,255,.14)'); g.fillStyle = ig; g.fill();
+    g.globalCompositeOperation = 'source-over';
+    g.globalCompositeOperation = 'lighter';
+    // two streaks of light running down the inside of the curl
+    g.lineCap = 'round';
+    [[.3, .028, .26], [-.32, .02, .18]].forEach(function (k) {
+      g.beginPath(); for (i = 6; i <= N - 4; i++) { p = P[i]; var sx = p.x + p.nx * p.w * k[0], sy = p.y + p.ny * p.w * k[0]; if (i > 6) g.lineTo(sx, sy); else g.moveTo(sx, sy); }
+      g.strokeStyle = 'rgba(235,248,255,' + k[2] + ')'; g.lineWidth = R * k[1]; g.stroke(); });
+    // the bright rim, on the outer edge only, with a wider glow under it
+    g.beginPath(); for (i = 3; i <= N; i++) { p = P[i]; var rx = p.x + p.nx * p.w * .93, ry = p.y + p.ny * p.w * .93; if (i > 3) g.lineTo(rx, ry); else g.moveTo(rx, ry); }
+    g.strokeStyle = 'rgba(160,215,255,' + (.16 + .12 * glow) + ')'; g.lineWidth = R * .16; g.stroke();
+    g.strokeStyle = 'rgba(240,250,255,.6)'; g.lineWidth = Math.max(1.2, R * .03); g.stroke();
+    // a soft furred edge: small pale tufts just outside the rim
+    var fur = sprite(doc, '#E6F5FF', 64);
+    for (i = 0; i < FUR.length; i++) { var f = FUR[i], q = P[Math.floor(10 + f[0] * (N - 10))], fs = R * (.07 + .07 * f[1]);
+      g.globalAlpha = alpha * .22; g.drawImage(fur, q.x + q.nx * q.w * 1.02 - fs / 2, q.y + q.ny * q.w * 1.02 - fs / 2, fs, fs); }
+    g.globalAlpha = alpha;
+    // stars inside it, twinkling on the clock
+    for (i = 0; i < STARS.length; i++) { var st = STARS[i], sp = P[Math.floor(st[0] * N)], tw = .45 + .55 * Math.sin(t * (1.3 + i * .21) + st[2]);
+      g.fillStyle = 'rgba(255,255,255,' + (.75 * tw) + ')'; g.beginPath(); g.arc(sp.x + sp.nx * sp.w * st[1] * .8, sp.y + sp.ny * sp.w * st[1] * .8, Math.max(.7, R * .014), 0, TAU); g.fill(); }
+    // the white core at its eye, where the thumb goes
+    var er = R * (.24 + .08 * glow), eg = g.createRadialGradient(x, y, 0, x, y, er);
+    eg.addColorStop(0, 'rgba(255,255,255,.95)'); eg.addColorStop(.4, 'rgba(225,244,255,.55)'); eg.addColorStop(1, 'rgba(126,200,255,0)');
+    g.fillStyle = eg; g.beginPath(); g.arc(x, y, er, 0, TAU); g.fill();
+    g.restore();
   }
 
-  /* ---------------- shader ---------------- */
-  var VS = '#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
-  var FS = [
-    '#version 300 es',
-    'precision highp float;',
-    'uniform sampler2D uTex;uniform vec4 uWin;uniform vec4 uCrop;uniform float uNoise,uLod,uLines,uLow,uScan,uCurve,uFringe,uRad,uFrame,uBloom,uHas,uDpr,uSat;',
-    'uniform vec3 uTA,uTB;out vec4 o;',
-    'float hash(vec2 p){p=fract(p*vec2(443.897,441.423));p+=dot(p,p.yx+19.19);return fract((p.x+p.y)*p.x);}',
-    'float box(vec2 p,vec2 b,float r){vec2 q=abs(p)-b+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}',
-    'vec3 pic(vec2 uv,float lod){',
-    '  if(lod<.5) return textureLod(uTex,uv,lod).rgb;',
-    '  vec2 s=exp2(lod)/vec2(textureSize(uTex,0))*.6;',
-    '  return (textureLod(uTex,uv+vec2(s.x,s.y),lod).rgb+textureLod(uTex,uv+vec2(-s.x,s.y),lod).rgb+textureLod(uTex,uv+vec2(s.x,-s.y),lod).rgb+textureLod(uTex,uv-s,lod).rgb)*.25;}',
-    'void main(){',
-    '  vec2 fc=gl_FragCoord.xy;vec2 q=(fc-uWin.xy)/uWin.zw;',
-    '  float d=box((q-.5)*uWin.zw,uWin.zw*.5,uRad);float m=clamp(.5-d,0.,1.);',
-    '  if(m<=0.){o=vec4(0.);return;}',
-    '  vec2 c=q*2.-1.;c+=c*(c.yx*c.yx)*uCurve;vec2 cq=c*.5+.5;',
-    '  float inside=step(0.,cq.x)*step(cq.x,1.)*step(0.,cq.y)*step(cq.y,1.);',
-    '  vec2 ed=smoothstep(vec2(0.),vec2(.035+.09*uCurve),cq)*smoothstep(vec2(0.),vec2(.035+.09*uCurve),1.-cq);',
-    '  float vig=mix(1.,ed.x*ed.y*(1.-.22*dot(c,c)*.5),clamp(uCurve*6.,0.,1.));',
-    '  vec2 uv=uCrop.xy+cq*uCrop.zw;',
-    '  if(uLow>0.){vec2 g=vec2(uLines*uWin.z/uWin.w,uLines);vec2 cell=(floor(cq*g)+.5)/g;uv=mix(uv,uCrop.xy+cell*uCrop.zw,uLow);}',
-    '  vec3 col=vec3(.045,.055,.1);',
-    '  if(uHas>.5){col=pic(uv,uLod);',
-    '    if(uFringe>0.){vec2 off=vec2(uFringe*uDpr/uWin.z*uCrop.z,0.);vec3 L=vec3(.299,.587,.114);float l0=dot(col,L);',
-    '      float la=dot(pic(uv+off,uLod),L),lb=dot(pic(uv-off,uLod),L);col+=uTA*max(la-l0,0.)*1.1+uTB*max(lb-l0,0.)*1.1;}',
-    // colour arrives with the signal: washed out in the snow, full at the end
-    '    col=mix(vec3(dot(col,vec3(.299,.587,.114))),col,uSat);}',
-    '  float sl=.5+.5*cos(cq.y*uLines*6.2831853);col*=mix(1.,(.64+.36*sl)/.82,uScan);',
-    // snow: one value per grain, re-rolled every frame, mean fixed at .19, spread .22 (low contrast)
-    '  float n=hash(floor(fc/(1.7*uDpr))+vec2(mod(uFrame,61.)*17.13,mod(uFrame,47.)*9.71));',
-    '  vec3 sn=(.19+(n-.5)*.22)*vec3(.8,.88,1.06);col=mix(col,sn,uNoise);',
-    '  if(uBloom<1.){',
-    '    vec3 off=vec3(.03,.035,.06)+.05*smoothstep(1.3,0.,length(c-vec2(-.45,.55)));',
-    '    float lw=clamp(uBloom/.35,0.,1.),oh=clamp((uBloom-.35)/.65,0.,1.),th=2.*uDpr/uWin.w*2.;',
-    '    float lm=step(abs(c.x),lw)*step(abs(c.y),max(th,oh));float fl=(1.-oh)*(1.-oh);',
-    '    col=mix(off,mix(col,vec3(.6,.68,.8),fl*.8),lm);}',
-    '  col*=vig*inside;',
-    '  o=vec4(clamp(col,0.,1.)*m,m);}'
-  ].join('\n');
-
-  function makeGL(cnv, keep) {
-    var gl = cnv.getContext('webgl2', { alpha:true, premultipliedAlpha:true, antialias:false, preserveDrawingBuffer:!!keep });
-    if (!gl) return null;
-    function sh(t, src) { var s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error('TuneIn shader: ' + gl.getShaderInfoLog(s)); return s; }
-    var pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr);
-    if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) throw new Error('TuneIn link: ' + gl.getProgramInfoLog(pr));
-    gl.useProgram(pr);
-    var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    var loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    var tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    var U = {}; ['uTex', 'uWin', 'uCrop', 'uNoise', 'uLod', 'uLines', 'uLow', 'uScan', 'uCurve', 'uFringe', 'uRad', 'uFrame', 'uBloom', 'uHas', 'uDpr', 'uSat', 'uTA', 'uTB']
-      .forEach(function (n) { U[n] = gl.getUniformLocation(pr, n); });
-    var hex = function (h) { return [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255]; };
-    gl.uniform3fv(U.uTA, hex(EL.wood)); gl.uniform3fv(U.uTB, hex(EL.water)); gl.uniform1i(U.uTex, 0);
-    var has = false;
-    return {
-      upload: function (src) {
-        if (!src) return;
-        try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src); gl.generateMipmap(gl.TEXTURE_2D); has = true; }
-        catch (e) { has = false; }
-      },
-      draw: function (u) {
-        gl.viewport(0, 0, cnv.width, cnv.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.uniform4fv(U.uWin, u.win); gl.uniform4fv(U.uCrop, u.crop);
-        gl.uniform1f(U.uNoise, u.noise); gl.uniform1f(U.uLod, u.lod); gl.uniform1f(U.uLines, u.lines); gl.uniform1f(U.uLow, u.low);
-        gl.uniform1f(U.uScan, u.scan); gl.uniform1f(U.uCurve, u.curve); gl.uniform1f(U.uFringe, u.fringe); gl.uniform1f(U.uRad, u.rad);
-        gl.uniform1f(U.uFrame, u.frame); gl.uniform1f(U.uBloom, u.bloom); gl.uniform1f(U.uHas, has ? 1 : 0); gl.uniform1f(U.uDpr, u.dpr); gl.uniform1f(U.uSat, u.sat);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-      },
-      lose: function () { var x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); }
-    };
-  }
-
-  /* ---------------- sound: our own breath and a five-note chime, all synthesised ---------------- */
-  function Sound(ctx) {
-    if (!ctx) return null;
-    var out = ctx.createGain(); out.gain.value = .9; out.connect(ctx.destination);
-    var len = ctx.sampleRate * 2, nb = ctx.createBuffer(1, len, ctx.sampleRate), ch = nb.getChannelData(0), seed = 7;
+  /* ---------------- sound: wind, one rising tone, the breath in and out, synthesised on the game's own context ---------------- */
+  function Sound(ctx, out) {
+    var len = ctx.sampleRate * 2, nb = ctx.createBuffer(1, len, ctx.sampleRate), ch = nb.getChannelData(0), seed = 11;
     for (var i = 0; i < len; i++) { seed = (seed * 16807) % 2147483647; ch[i] = (seed / 2147483647) * 2 - 1; }
     function noise(at) { var s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; s.start(at); return s; }
-    // snow hiss: always running, its level follows the snow
-    var hs = noise(0), hf = ctx.createBiquadFilter(), hg = ctx.createGain(); hf.type = 'bandpass'; hf.frequency.value = 900; hf.Q.value = .6;
-    var hl = ctx.createBiquadFilter(); hl.type = 'lowpass'; hl.frequency.value = 1200;
-    hg.gain.value = 0; hs.connect(hf); hf.connect(hl); hl.connect(hg); hg.connect(out);
-    function bell(at, f, v) {
-      [[1, 1, 2.4], [2.76, .22, 1.1], [5.4, .07, .5]].forEach(function (p) {
-        var o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f * p[0];
-        g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(v * p[1], at + .006); g.gain.exponentialRampToValueAtTime(.0001, at + p[2]);
-        o.connect(g); g.connect(out); o.start(at); o.stop(at + p[2] + .05);
-      });
-    }
+    // low wind: always running while the opening is up, a slow swell on a ten-second cycle
+    var ws = noise(ctx.currentTime), wl = ctx.createBiquadFilter(), wb = ctx.createBiquadFilter(), wg = ctx.createGain();
+    wl.type = 'lowpass'; wl.frequency.value = 520; wb.type = 'bandpass'; wb.frequency.value = 240; wb.Q.value = .5; wg.gain.value = 0;
+    ws.connect(wl); wl.connect(wb); wb.connect(wg); wg.connect(out);
+    var lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = .1; lg.gain.value = 90; lfo.connect(lg); lg.connect(wb.frequency); lfo.start();
+    wg.gain.setTargetAtTime(.2, ctx.currentTime, .6);
     function air(at, f0, f1, g0, g1, dur, q) {
       var s = noise(at), f = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g = ctx.createGain(); f.type = 'bandpass'; f.Q.value = q || .9;
-      lp.type = 'lowpass'; lp.frequency.value = 1200;
+      lp.type = 'lowpass'; lp.frequency.value = 1300;
       f.frequency.setValueAtTime(f0, at); f.frequency.exponentialRampToValueAtTime(f1, at + dur);
       g.gain.setValueAtTime(g0, at); g.gain.linearRampToValueAtTime(g1, at + dur);
-      s.connect(f); f.connect(lp); lp.connect(g); g.connect(out); s.stop(at + dur + .05); return { s:s, f:f, g:g };
+      s.connect(f); f.connect(lp); lp.connect(g); g.connect(out); s.stop(at + dur + .1); return g;
     }
-    var inh = null;
+    var tone = null, breath = null;
     return {
-      ctx:ctx,
-      hiss: function (at, lv) { hg.gain.setTargetAtTime(lv * .055, at, .05); },
-      tubeOn: function (at) {
-        var o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(70, at); o.frequency.exponentialRampToValueAtTime(52, at + .6);
-        g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(.22, at + .05); g.gain.exponentialRampToValueAtTime(.0001, at + .7);
-        o.connect(g); g.connect(out); o.start(at); o.stop(at + .75);
-        air(at + .05, 600, 1100, .0, .05, .35, .7); air(at + .4, 1100, 700, .05, 0, .5, .7);
+      // one rising tone over the breath in, from wherever the breath has got to
+      inhale: function (from, dur) {
+        var at = ctx.currentTime; this.cut(at);
+        var o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), g2 = ctx.createGain();
+        o.type = 'sine'; o2.type = 'triangle';
+        var f0 = 196 * Math.pow(2, from), f1 = 392;
+        o.frequency.setValueAtTime(f0, at); o.frequency.exponentialRampToValueAtTime(f1, at + Math.max(.2, dur));
+        o2.frequency.setValueAtTime(f0 * 2, at); o2.frequency.exponentialRampToValueAtTime(f1 * 2, at + Math.max(.2, dur));
+        g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(.16, at + .5); g2.gain.setValueAtTime(0, at); g2.gain.linearRampToValueAtTime(.035, at + .6);
+        o.connect(g); g.connect(out); o2.connect(g2); g2.connect(out); o.start(at); o2.start(at);
+        tone = { o:o, o2:o2, g:g, g2:g2 };
+        breath = air(at, 380 + 500 * from, 1100, .02, .14, Math.max(.2, dur), .8);
       },
-      inhale: function (at) { if (inh) return; inh = air(at, 420, 1100, 0, .16, T.inhale, .8); },
-      release: function (at, counted) {
-        if (inh) { var g = inh.g.gain; g.cancelScheduledValues(at); g.setTargetAtTime(0, at, .08); inh = null; }
-        if (counted) air(at, 1100, 320, .15, 0, T.exhale, .8);
+      // the tone settles at the top of the breath and hangs there softly
+      top: function () { if (!tone) return; var at = ctx.currentTime; tone.g.gain.setTargetAtTime(.07, at, .4); tone.g2.gain.setTargetAtTime(.015, at, .4); if (breath) breath.gain.setTargetAtTime(0, at, .2); },
+      cut: function (at) {
+        at = at || ctx.currentTime;
+        if (tone) { var t0 = tone; [t0.g, t0.g2].forEach(function (g) { g.gain.cancelScheduledValues(at); g.gain.setTargetAtTime(0, at, .12); }); setTimeout(function () { try { t0.o.stop(); t0.o2.stop(); } catch (e) {} }, 900); tone = null; }
+        if (breath) { breath.gain.cancelScheduledValues(at); breath.gain.setTargetAtTime(0, at, .1); breath = null; }
       },
-      note: function (at, i) { bell(at, [392, 440][i] || 440, .1); },
-      chime: function (at) {
-        // five rising notes, one per element (D E G A D, pentatonic, the octave under the melody line), then a soft open pad
-        [293.66, 329.63, 392, 440, 587.33].forEach(function (f, i) { bell(at + i * .13, f, .17 - i * .015); });
-        [146.83, 220].forEach(function (f) {
-          var o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f;
-          g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(.05, at + .5); g.gain.exponentialRampToValueAtTime(.0001, at + 4.5);
-          o.connect(g); g.connect(out); o.start(at); o.stop(at + 4.6);
-        });
-      },
-      stop: function (at) { out.gain.setTargetAtTime(0, at, .4); }
+      exhale: function () { var at = ctx.currentTime; this.cut(at); air(at, 1100, 300, .16, 0, 2.2, .8); wg.gain.setTargetAtTime(.32, at, .5); wg.gain.setTargetAtTime(.14, at + 2.4, 1); },
+      stop: function () { var at = ctx.currentTime; this.cut(at); wg.gain.cancelScheduledValues(at); wg.gain.setTargetAtTime(0, at, .5); setTimeout(function () { try { ws.stop(); lfo.stop(); } catch (e) {} }, 3000); }
     };
   }
 
-  /* ---------------- the boot ---------------- */
+  /* ---------------- the opening ---------------- */
   function play(o) {
     o = o || {};
     var stage = o.stage, doc = stage.ownerDocument, win = doc.defaultView;
-    var gameCanvas = o.gameCanvas || null;
+    var pitch = o.mode === 'pitch';
     var reduced = o.reduced != null ? !!o.reduced : !!(win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    var short = !!o.short, manual = !!o.manual;
-    // auto: the full film plays hands-free with quicker breaths (the pitch link); presses do nothing, Skip still works
-    var auto = !!o.auto && !short, autoP = false;
-    // nobody breathing for 8 s: the boot takes that breath for them, as the game's breath screen does, so no child is stuck
-    T.inhale = auto ? 1.3 : 2.2; T.exhale = auto ? 1.2 : 2.0; T.minHold = auto ? 1.0 : 2.0;
-    var clock = o.clock || function () { return win.performance.now(); };
-    var animal = NAMES[o.animal] ? o.animal : 'monkey';
-    var name = o.animalName || NAMES[animal];
+    var touch = o.touch != null ? !!o.touch : !!(win.matchMedia && win.matchMedia('(pointer: coarse)').matches);
     var art = o.artBase || 'art4/';
     var url = function (f) { try { return new URL(art + f, doc.baseURI).href; } catch (e) { return art + f; } };
-    var cb = function (k, a) { try { if (typeof o[k] === 'function') o[k](a); } catch (e) { setTimeout(function () { throw e; }); } };
+    var call = function (k, a, b, c) { try { if (typeof o[k] === 'function') return o[k](a, b, c); } catch (e) { setTimeout(function () { throw e; }); } };
+    var realClock = function () { return typeof win.__bfT === 'number' ? win.__bfT * 1000 : win.performance.now(); };
+    var clock = o.clock || realClock;
+
+    // seconds. Family: the child sets the pace. Pitch: the whole film fits in ten seconds, touched or not
+    var T = pitch
+      ? { intro:1.5, autoAt:3, inh:4, inhAuto:2.6, inhEnd:5.6, topMax:.2, thaw:2.0, luma:1.4, lumaDur:1.5, logoIn:.3, logoHold:1.05, exit:.4 }
+      : { intro:1.5, autoAt:10, inh:4, inhAuto:4, inhEnd:1e9, topMax:2.5, thaw:4.5, luma:4.8, lumaDur:2.6, logoIn:.35, logoHold:1.1, exit:.5, thumbAt:6, restWait:8 };
 
     injectCSS(doc);
     if (win.getComputedStyle(stage).position === 'static') stage.style.position = 'relative';
-    var root = doc.createElement('div'); root.className = 'tunein'; root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true');
-    root.setAttribute('aria-label', 'Wake your ' + name);
+    var root = doc.createElement('div'); root.className = 'bf1-root'; root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-label', 'Before we show you anything, breathe with us'); root.setAttribute('tabindex', '-1');
+    var spk = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
     root.innerHTML =
-      '<div class="tunein-room"></div><div class="tunein-halo"></div><div class="tunein-floor"></div>' +
-      '<div class="tunein-scene">' + setSVG() + '</div>' +
-      '<canvas class="tunein-gl"></canvas>' +
-      '<div class="tunein-pet"><div class="tunein-pet-a"><div class="tunein-pet-b"><img class="asleep" alt="" draggable="false" src="' + url('a-' + animal + '-sleep.png') + '">' +
-        '<img class="awake" alt="" draggable="false" src="' + url('a-' + animal + '-y.png') + '"></div></div>' +
-        '<div class="tunein-zz" aria-hidden="true"><span class="tunein-z">z</span><span class="tunein-z">z</span><span class="tunein-z">z</span></div></div>' +
-      '<div class="tunein-spark"></div>' +
-      '<div class="tunein-ui"><div class="tunein-ring"><div class="orb"></div><svg class="tunein-finger" viewBox="0 0 40 52" aria-hidden="true">' +
-        '<path d="M15 6a4 4 0 0 1 8 0v18l9 2.5a5 5 0 0 1 3.6 5.7L33 46H14L5.5 34a3.6 3.6 0 0 1 5.4-4.7L15 33z" fill="#fff" stroke="#3A3550" stroke-width="2.5" stroke-linejoin="round"/></svg></div>' +
-        '<div class="tunein-pips"><i></i><i></i><i></i></div><div class="tunein-say"></div>' +
-        '<div class="tunein-how"><kbd>Space</kbd><span>or the circle</span></div></div>' +
-      '<button class="tunein-skip" type="button">Skip to the game ›</button><div class="tunein-sr" aria-live="polite"></div>';
+      '<canvas class="bf1-cv"></canvas>' +
+      '<div class="bf1-light" role="button" aria-label="' + (touch ? 'The light: keep your thumb on it and breathe in' : 'The light: keep it pressed, or keep Space pressed, and breathe in') + '"></div>' +
+      '<div class="bf1-say" aria-hidden="true"></div>' +
+      '<div class="bf1-end" aria-hidden="true"><img alt="" draggable="false" src="' + url('logo-morqi.png?v=11') + '"><p>Balance is your superpower.</p></div>' +
+      (pitch ? '<button class="bf1-snd" type="button">' + spk + '<span>Tap for sound</span></button>' : '') +
+      '<button class="bf1-skip" type="button">Skip ›</button>' +
+      '<label class="bf1-haptic" aria-hidden="true"><input type="checkbox" switch tabindex="-1"></label>' +
+      '<div class="bf1-sr" aria-live="polite"></div>';
     stage.appendChild(root);
     var $ = function (q) { return root.querySelector(q); };
-    var room = $('.tunein-room'), halo = $('.tunein-halo'), floor = $('.tunein-floor'), scene = $('.tunein-scene'), cnv = $('.tunein-gl'), pet = $('.tunein-pet'),
-      petA = $('.tunein-pet-a'), petB = $('.tunein-pet-b'), imgSleep = $('.tunein-pet .asleep'), imgAwake = $('.tunein-pet .awake'), zs = root.querySelectorAll('.tunein-z'), spark = $('.tunein-spark'), ui = $('.tunein-ui'), ring = $('.tunein-ring'), finger = $('.tunein-finger'), orb = $('.tunein-ring .orb'),
-      say = $('.tunein-say'), how = $('.tunein-how'), skipBtn = $('.tunein-skip'), sr = $('.tunein-sr'), pips = root.querySelectorAll('.tunein-pips i'),
-      led = $('.tunein-led'), gs = $('.tunein-gs'), shellLit = $('.tunein-shellLit'), btns = root.querySelectorAll('.tunein-btn'), zz = $('.tunein-zz');
-    if (o.touch === true || (o.touch == null && win.matchMedia && win.matchMedia('(pointer: coarse)').matches)) how.style.display = 'none';
-    if (auto) { how.style.display = 'none'; finger.style.display = 'none'; }
+    var cnv = $('.bf1-cv'), g = cnv.getContext('2d'), lightEl = $('.bf1-light'), sayEl = $('.bf1-say'), endEl = $('.bf1-end'), skipBtn = $('.bf1-skip'),
+      sndBtn = $('.bf1-snd'), sr = $('.bf1-sr'), haptic = $('.bf1-haptic');
 
-    var glx = null;
-    if (!reduced) { try { glx = makeGL(cnv, manual); } catch (e) { glx = null; } }
-    if (!glx) reduced = true;
-
-    // sound: a live context unless one was handed in (recording renders offline)
-    var ctx = o.audio || null, ownCtx = false;
-    if (!ctx && o.sound !== false && !reduced) {
-      var AC = win.AudioContext || win.webkitAudioContext; if (AC) { try { ctx = new AC(); ownCtx = true; } catch (e) { ctx = null; } }
+    // art: the eyes in the cloud, Luma, made ready once each loads
+    var eyes = { img:new Image(), open:null, shut:null, w:1200, h:346 }, luma = { img:new Image(), card:null };
+    eyes.img.onload = function () { try { prepEyes(); } catch (e) {} };
+    luma.img.onload = function () { try { prepLuma(); } catch (e) {} };
+    eyes.img.src = url('still/eyes.png?v=2'); luma.img.src = url('luma.jpg?v=1');
+    // the eye openings in eyes.png (1200 x 346): centre x, centre y, half width, half height
+    var LIDS = [[488, 213, 74, 34], [712, 213, 74, 34]];
+    function prepEyes() {
+      var im = eyes.img, w = eyes.w, h = eyes.h;
+      var open = doc.createElement('canvas'); open.width = w; open.height = h; open.getContext('2d').drawImage(im, 0, 0, w, h);
+      // shut: the same cloud with the openings smudged over by a blurred copy of itself, and a soft lash line
+      var small = doc.createElement('canvas'); small.width = Math.round(w / 18); small.height = Math.round(h / 18);
+      small.getContext('2d').drawImage(im, 0, 0, small.width, small.height);
+      var blur = doc.createElement('canvas'); blur.width = w; blur.height = h; var bx = blur.getContext('2d'); bx.imageSmoothingQuality = 'high'; bx.drawImage(small, 0, 0, w, h);
+      var mask = doc.createElement('canvas'); mask.width = w; mask.height = h; var mx = mask.getContext('2d');
+      LIDS.forEach(function (L) { mx.save(); mx.translate(L[0], L[1]); mx.scale(1, L[3] / L[2]); var mg = mx.createRadialGradient(0, 0, L[2] * .55, 0, 0, L[2] * 1.25);
+        mg.addColorStop(0, '#000'); mg.addColorStop(1, 'rgba(0,0,0,0)'); mx.fillStyle = mg; mx.beginPath(); mx.arc(0, 0, L[2] * 1.25, 0, TAU); mx.fill(); mx.restore(); });
+      mx.globalCompositeOperation = 'source-in'; mx.drawImage(blur, 0, 0);
+      var shut = doc.createElement('canvas'); shut.width = w; shut.height = h; var sx = shut.getContext('2d'); sx.drawImage(im, 0, 0, w, h); sx.drawImage(mask, 0, 0);
+      sx.strokeStyle = 'rgba(28,30,40,.75)'; sx.lineWidth = 5; sx.lineCap = 'round';
+      LIDS.forEach(function (L) { sx.beginPath(); sx.moveTo(L[0] - L[2] * .82, L[1] - 2); sx.quadraticCurveTo(L[0], L[1] + L[3] * .55, L[0] + L[2] * .82, L[1] - 2); sx.stroke(); });
+      eyes.open = open; eyes.shut = shut;
     }
-    var snd = null; try { snd = Sound(ctx); } catch (e) { snd = null; }
-    var t0 = clock();
-    var at = function () { return ownCtx ? ctx.currentTime : (o.audioAt || 0) + (clock() - t0) / 1000; };
+    // Luma's portrait, cut round from her hearth picture with a soft edge, so her own night fades into ours
+    // the crop from luma.jpg (800 x 602) and her painted tail in it: its eye, its reach and the way its base points
+    var LC = { x:220, y:42, s:560, tailX:.615, tailY:.775, tailR:.165, spin:-.55 };
+    function prepLuma() {
+      var c = doc.createElement('canvas'); c.width = c.height = LC.s; var x = c.getContext('2d');
+      x.drawImage(luma.img, LC.x, LC.y, LC.s, LC.s, 0, 0, LC.s, LC.s);
+      x.globalCompositeOperation = 'destination-in'; var h = LC.s / 2, mg = x.createRadialGradient(h * 1.04, h * 1.1, h * .5, h * 1.04, h * 1.1, h);
+      mg.addColorStop(0, '#000'); mg.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = mg; x.fillRect(0, 0, LC.s, LC.s);
+      luma.card = c;
+    }
+
+    // the grey world: a copy of the game canvas, desaturated and cooled, refreshed every few frames until the colour comes
+    var grey = doc.createElement('canvas'), gx = grey.getContext('2d'), greyOK = false, lumaTmp = doc.createElement('canvas');
+    function refreshGrey(cw, ch) {
+      var gc = o.gameCanvas; if (!gc || !gc.width) return;
+      if (grey.width !== cw || grey.height !== ch) { grey.width = cw; grey.height = ch; }
+      gx.globalCompositeOperation = 'source-over'; gx.globalAlpha = 1;
+      try { gx.drawImage(gc, 0, 0, cw, ch); } catch (e) { return; }
+      gx.globalCompositeOperation = 'saturation'; gx.fillStyle = '#808080'; gx.fillRect(0, 0, cw, ch);
+      gx.globalCompositeOperation = 'multiply'; gx.fillStyle = '#7E889E'; gx.fillRect(0, 0, cw, ch);
+      gx.globalCompositeOperation = 'source-over'; greyOK = true;
+    }
 
     // ----- state -----
-    var S = { phase:'enter', t:0, breaths:0, sBase:0, s:0, held:false, hs:0, es:0, exFrom:0, exTo:0, back:null, ls:0, lsFrom:0,
-      chimed:false, chimeT:-1, stirT:-1, wakeT:-1, uiA:0, skA:0, lt:0, p3:0, outT:-1, lastInput:0, said:'', done:false, frame:0, tube:false, glow:[90, 106, 154], glowN:0, petState:'' };
+    var t0 = clock();
+    var S = { t:0, lt:0, frame:0, phase:'idle', held:false, pid:null, touched:false, auto:false, inh:0, hs:0, topT:-1, restT:-1, L:-1, Lu:-1, Lg:-1, exitT:-1,
+      ox:0, oy:0, lx:-1, ly:-1, tx:-1, ty:-1, worldT:-1, said:'', saidSub:'', sayA:0, sayKey:'', sayFrom:0, thumbSaid:false, fade:reduced || !!o.fade, dts:[], unlocked:false,
+      done:false, gone:false, how:'', eyesShutT:-1, landT:-1, aliveT:-1, endA:0, voT:-1, slower:false, early:false, parts:null, outSnd:false };
+    var snd = null;
+    function sound() { if (snd) return snd; var a = call('audio'); if (!a || !a.ctx) return null; try { snd = Sound(a.ctx, a.out || a.ctx.destination); } catch (e) { snd = null; } return snd; }
+    // family: the wind from frame one where the browser already allows sound; the pitch stays silent until a touch
+    if (!pitch) sound();
 
-    function setSay(txt) { if (S.said === txt) return; S.said = txt; say.textContent = txt; sr.textContent = txt; }
+    function unlock() {
+      var ok = call('unlock');
+      if (ok && !S.unlocked) { S.unlocked = true; if (sndBtn) sndBtn.style.display = 'none'; sound(); }
+      return ok;
+    }
+    function tick() {
+      // a haptic tick where the device has one: the vibration call, or on an iPhone the system switch's own tap
+      try { if (win.navigator.vibrate) win.navigator.vibrate(12); else if (/iPhone|iPad/.test(win.navigator.userAgent)) haptic.click(); } catch (e) {}
+    }
 
-    /* input: hold Space or press on the overlay. Space never reaches the game while this is up. */
-    function press() {
+    // ----- input: press and hold anywhere; the light comes to the thumb -----
+    function stagePt(e) { var r = root.getBoundingClientRect(); return { x:e.clientX - r.left, y:e.clientY - r.top }; }
+    function press(pt) {
       if (S.done) return;
-      if (auto && !autoP) { S.tapT = S.t; return; }
-      if (short || reduced) { skip(); return; }
-      if (snd && ownCtx && ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
-      S.lastInput = S.t;
-      if (S.phase !== 'ready' || S.held) return;
-      if (!autoP) S.touched = true;
-      S.held = true; S.hs = S.t; S.back = null;
-      if (snd) snd.inhale(at());
-      cb('onBreathIn', S.breaths + 1);
+      unlock();
+      if (S.phase === 'out' || S.phase === 'luma' || S.phase === 'logo') return;
+      if (S.held || S.phase === 'top') return;
+      // a thumb that arrives while the light is breathing by itself takes the breath over, keeping how far in it is
+      if (S.auto) S.auto = false;
+      S.held = true; S.touched = true; S.hs = S.t; S.slower = false;
+      if (pt) { S.tx = pt.x; S.ty = pt.y; }
+      if (S.phase === 'idle' || S.phase === 'rest') S.phase = 'in';
+      tick();
+      whenLive(function () { if (S.held && S.phase === 'in') { var s = sound(); if (s) s.inhale(S.inh, inhLeft()); } });
     }
+    // a press asks the sound to resume; the tone starts as soon as the browser lets it (on a phone that can be the lift)
+    function whenLive(fn) { var a = call('audio'); if (!a || !a.ctx) return; if (a.ctx.state === 'running') { fn(); return; } try { a.ctx.resume().then(fn, function () {}); } catch (e) {} }
     function release() {
-      if (!S.held) return; S.held = false; S.lastInput = S.t;
-      var hold = S.t - S.hs;
-      if (hold >= T.minHold) {
-        S.breaths++; S.exFrom = S.s; S.es = S.t;
-        if (snd) snd.release(at(), true);
-        cb('onBreathOut', S.breaths);
-        if (S.breaths >= 3) { S.phase = 'lock'; S.ls = S.t; S.lsFrom = S.s; }
-        else { S.phase = 'exhale'; S.exTo = STEP[S.breaths]; if (snd) snd.note(at() + .9, S.breaths - 1); }
-      } else {
-        if (snd) snd.release(at(), false);
-        S.back = { t:S.t, from:S.s }; S.short = true;
-      }
+      if (!S.held) return; S.held = false;
+      if (S.done) return;
+      if (S.phase === 'top') { letGo(); return; }
+      if (S.phase !== 'in') return;
+      // a breath nearly all the way in counts (it never fails); short of that, slower, and the film waits
+      if (S.inh >= .85) { S.inh = 1; letGo(); return; }
+      S.slower = true; S.early = true;
+      if (pitch) { S.auto = true; return; }          // the pitch cannot wait: the breath carries on by itself
+      S.phase = 'rest'; S.restT = S.t; var s = sound(); if (s) s.cut();
     }
+    function inhLeft() { return Math.max(.2, (1 - S.inh) * (S.auto && !S.held ? T.inhAuto : T.inh)); }
+    function letGo() {
+      if (S.phase === 'out' || S.L >= 0) return;
+      S.phase = 'out'; S.L = S.t; S.held = false; S.inh = 1;
+      S.ox = S.lx; S.oy = S.ly;
+      var s = sound(); if (s) s.exhale();
+      call('sfx', 'out');
+      seedParts();
+    }
+    var skipKeys = function (e) { return e.target === skipBtn || e.target === sndBtn || (sndBtn && sndBtn.contains(e.target)); };
+    function onDown(e) {
+      if (S.done || skipKeys(e)) return;
+      if (S.pid != null && e.pointerId !== S.pid) return;
+      e.preventDefault(); e.stopPropagation(); takeFocus();
+      S.pid = e.pointerId; try { root.setPointerCapture(e.pointerId); } catch (x) {}
+      press(stagePt(e));
+    }
+    function onMove(e) { if (S.held && e.pointerId === S.pid && S.phase !== 'out') { var p = stagePt(e); S.tx = p.x; S.ty = p.y; } }
+    function onUp(e) { if (e.pointerId !== S.pid) return; S.pid = null; e.stopPropagation(); release(); unlock(); }
+    // iPhone: no callout, no magnifier, no scroll from the press; the press itself wakes the sound, and touchend tries again
+    function onTouchStart(e) { if (!skipKeys(e)) e.preventDefault(); }
+    function onTouchEnd() { unlock(); }
     function onKey(e) {
       if (S.done) return;
       var space = e.code === 'Space' || e.key === ' ';
       if (e.type === 'keydown') {
         if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); skip(); return; }
-        if (space) { e.preventDefault(); e.stopImmediatePropagation(); }
-        if (short || reduced) { skip(); return; }
-        if (space && !e.repeat) press();
+        if (space) { e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) press(null); }
       } else if (space || e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); if (space) release(); }
     }
-    function onDown(e) {
-      if (S.done || e.target === skipBtn) return;
-      e.preventDefault(); e.stopPropagation();
-      // a pointer press keeps the keyboard with the boot (preventDefault above stops the usual focus move)
-      takeFocus();
-      try { root.setPointerCapture(e.pointerId); } catch (x) {}
-      press();
-    }
-    function onUp(e) { if (S.done) return; e.stopPropagation(); release(); }
     function onBlur() { release(); }
-    win.addEventListener('keydown', onKey, true); win.addEventListener('keyup', onKey, true);
-    root.addEventListener('pointerdown', onDown); root.addEventListener('pointerup', onUp); root.addEventListener('pointercancel', onUp);
+    root.addEventListener('pointerdown', onDown); root.addEventListener('pointermove', onMove);
+    root.addEventListener('pointerup', onUp); root.addEventListener('pointercancel', onUp);
+    root.addEventListener('touchstart', onTouchStart, { passive:false }); root.addEventListener('touchend', onTouchEnd);
     root.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-    win.addEventListener('blur', onBlur);
+    win.addEventListener('keydown', onKey, true); win.addEventListener('keyup', onKey, true); win.addEventListener('blur', onBlur);
     skipBtn.addEventListener('click', function (e) { e.stopPropagation(); skip(); });
-    skipBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    skipBtn.addEventListener('pointerup', function (e) { e.stopPropagation(); skip(); });
+    if (sndBtn) sndBtn.addEventListener('click', function (e) { e.stopPropagation(); unlock(); takeFocus(); });
 
-    // ----- layout -----
-    function layout(W, H, cvR) {
-      var portrait = W < H, rs = Math.round(clamp(Math.min(W, H) * .11, 64, 96)), uiH = auto ? rs + 64 : rs + 96;
-      var f = portrait ? Math.min(W * 1.24 / VB.w, (H * .9 - uiH) / VB.h) : Math.min(W * .62 / VB.w, (H * .8 - uiH) / VB.h);
-      // a landscape window keeps clear space above and below the stack (design review: the z's nearly touched the top)
-      var top = Math.max(portrait ? 8 : H * .07, (H - VB.h * f - uiH) / 2 - H * .02);
-      var ox = (W - VB.w * f) / 2 - VB.x * f, oy = top - VB.y * f;
-      var sc = { x:ox + SCREEN.x * f, y:oy + SCREEN.y * f, w:SCREEN.w * f, h:SCREEN.h * f };
-      return { f:f, ox:ox, oy:oy, sc:sc, cv:cvR, portrait:portrait, rs:rs, ringX:ox + 500 * f, ringY:oy + 712 * f };
-    }
-    function canvasRect(rr) {
-      if (gameCanvas && gameCanvas.isConnected) {
-        var b = gameCanvas.getBoundingClientRect();
-        if (b.width > 2 && b.height > 2) return { x:b.left - rr.left, y:b.top - rr.top, w:b.width, h:b.height };
+    // ----- words -----
+    function words() {
+      var t = S.t, ph = S.phase;
+      if (ph === 'luma' || ph === 'logo' || S.done) return ['', ''];
+      if (ph === 'out') return S.t - S.L < .9 && !S.auto && !reduced ? [S.topWasSaid ? 'Let go, and breathe out.' : '', ''] : ['', ''];
+      if (ph === 'top') { S.topWasSaid = true; return ['Let go, and breathe out.', '']; }
+      if (S.slower && (ph === 'rest' || (pitch && S.auto && t - S.restMark < 2.2))) return ['Slower, like a balloon.', ''];
+      if (pitch) {
+        // the film plays itself; its words leave as the world comes up, so they never sit on the Keeper
+        if (S.touched || S.worldA > .15) return ['', ''];
+        return ['Before we show you anything, breathe with us.', 'Press and hold.'];
       }
-      return { x:0, y:0, w:rr.width, h:rr.height };
+      if (S.auto) return ['', ''];
+      if (!S.touched && S.thumbSaid) return [touch ? 'Put your thumb on the light.' : 'Click and keep the light pressed.', ''];
+      if (!S.touched && t < T.intro) return ['Before we show you anything, breathe with us.', ''];
+      return [touch ? 'Keep your thumb on the light and breathe in.' : 'Keep the light pressed and breathe in.', touch ? '' : 'or keep Space pressed'];
+    }
+    function setSay(w, H) {
+      var key = w.join('|');
+      if (key !== S.sayKey) {
+        // the old line fades out before the new one comes in
+        if (S.sayA > .02 && S.sayKey) { S.sayA = Math.max(0, S.sayA - S.dt / .22); applySay(); return; }
+        S.sayKey = key; S.sayFrom = S.t;
+        sayEl.innerHTML = w.filter(Boolean).map(function (s, i) { return '<p' + (i ? ' class="bf1-sub"' : '') + '>' + s + '</p>'; }).join('');
+        var plain = w.filter(Boolean).join(' '); if (plain) sr.textContent = plain;
+      }
+      S.sayA = Math.min(1, S.sayA + S.dt / .45); applySay();
+    }
+    function applySay() { sayEl.style.opacity = String(eio(S.sayA)); }
+
+    // ----- the stream: five colours riding the front of the colour -----
+    function seedParts() {
+      var rs = 1234567, rnd = function () { rs = (rs * 16807) % 2147483647; return rs / 2147483647; };
+      S.parts = []; for (var i = 0; i < 70; i++) S.parts.push({ a:rnd() * TAU, k:.55 + .45 * rnd(), d:rnd() * 1.1, c:SPARK[i % 5], s:5 + 7 * rnd(), w:(rnd() - .5) * 1.6, life:1.1 + .7 * rnd() });
     }
 
     // ----- one frame -----
     function frame() {
-      if (S.done) return;
-      var now = clock(); S.t = (now - t0) / 1000; S.frame++;
-      var t = S.t, rr = root.getBoundingClientRect(), W = rr.width, H = rr.height;
-      if (W < 2 || H < 2) return;
+      if (S.gone) return;
+      var now = clock(), raw = (now - t0) / 1000;
+      // under the rotate prompt the film waits: its clock stops and a held thumb lets go
+      if (call('paused')) { S.pOff = (S.pOff || 0) + (raw - (S.lastRaw == null ? raw : S.lastRaw)); if (S.held) release(); }
+      S.lastRaw = raw; var t = raw - (S.pOff || 0); S.dt = clamp(t - S.t, 0, .1); S.t = t; S.frame++;
+      var rr = root.getBoundingClientRect(), W = rr.width, H = rr.height; if (W < 2 || H < 2) return;
+      var dpr = Math.min(win.devicePixelRatio || 1, 1.5), cw = Math.round(W * dpr), ch = Math.round(H * dpr);
+      if (cnv.width !== cw || cnv.height !== ch) { cnv.width = cw; cnv.height = ch; greyOK = false; }
 
-      if (reduced) {
-        root.style.opacity = String(1 - sstep(0, T.reduced, t));
-        ui.style.display = 'none'; scene.style.display = 'none'; pet.style.display = 'none'; halo.style.display = floor.style.display = 'none';
-        if (t >= T.reduced) finish();
-        return;
+      // the level loads behind the black from about 0.3 s
+      if (S.worldT < 0 && t >= .3 && !S.done) { S.worldT = t; call('world'); }
+
+      // frame pacing: if the grey world cannot hold about 60 fps here, the colour comes as a fade, not a spread
+      if (!S.fade && (S.phase === 'in' || S.phase === 'top') && S.inh > .05 && typeof win.__bfT !== 'number') {
+        S.dts.push(S.dt); if (S.dts.length > 24) S.dts.shift();
+        if (S.dts.length >= 24) { var avg = S.dts.reduce(function (a, b) { return a + b; }, 0) / S.dts.length; if (avg > .021) S.fade = true; }
       }
 
-      // phase clock
-      var enterD = short ? T.sEnter : T.enter;
-      // the overlay covers the game from its first frame; only the set fades in
-      root.style.opacity = S.phase === 'out' ? String(1 - sstep(0, short ? T.sOut : T.out, t - S.outT)) : '1';
-      var bloom = short ? 1 : clamp((t - T.enter) / T.bloom, 0, 1);
-      if (!short && !S.tube && t >= T.enter) { S.tube = true; if (snd) snd.tubeOn(at()); led.setAttribute('fill', '#8FF0A0'); led.setAttribute('filter', 'url(#tunein-glow)'); }
-      if (short && !S.tube) { S.tube = true; led.setAttribute('fill', '#8FF0A0'); }
-      if (S.phase === 'enter' && (short ? t >= enterD : t >= T.enter + T.bloom)) { S.phase = short ? 'auto' : 'ready'; S.lastInput = t; }
-
-      if (!auto && !S.autoOne && S.phase === 'ready' && !S.held && t - S.lastInput > 8) S.autoOne = true;
-      if (auto || S.autoOne) {
-        if (S.phase === 'ready' && !S.held && t >= (S.autoAt || 0)) { autoP = true; press(); autoP = false; }
-        else if (S.held && t - S.hs >= T.inhale) { release(); S.autoOne = false; S.autoAt = t + T.exhale + .25; }
+      // ----- the clock of the breath -----
+      if (S.phase === 'idle' && !S.touched) {
+        if (!pitch && !S.thumbSaid && t >= T.thumbAt) { S.thumbSaid = true; if (touch) call('vo', 'vo-open-thumb'); }
+        if (t >= T.autoAt) { S.auto = true; S.phase = 'in'; S.hs = t; var s0 = sound(); if (s0) s0.inhale(S.inh, inhLeft()); }
       }
-      // signal s (0 snow .. 1 clear) and lock progress p3
-      var p3 = 0;
-      if (short) {
-        if (S.phase === 'auto') { var k = (t - enterD) / T.sSignal; S.s = lerp(0, STEP[2], eio(k)); if (k >= 1) { S.phase = 'lock'; S.ls = t; S.lsFrom = S.s; } }
-      } else if (S.phase === 'ready') {
-        var next = STEP[Math.min(3, S.breaths + 1)], gain = S.breaths >= 2 ? .18 : .55;
-        if (S.held) { var fill = clamp((t - S.hs) / T.inhale, 0, 1); S.s = S.sBase + (next - S.sBase) * gain * eout(fill); }
-        else if (S.back) { S.s = lerp(S.back.from, S.sBase, eout((t - S.back.t) / T.back)); }
-        else S.s = S.sBase;
-      } else if (S.phase === 'exhale') {
-        var ke = (t - S.es) / T.exhale; S.s = lerp(S.exFrom, S.exTo, eio(ke));
-        if (ke >= 1) { S.phase = 'ready'; S.sBase = S.exTo; S.s = S.sBase; S.short = false; }
+      if (S.phase === 'rest' && !pitch && t - S.restT >= T.restWait) { S.auto = true; S.phase = 'in'; var s1 = sound(); if (s1) s1.inhale(S.inh, inhLeft()); }
+      if (pitch && S.slower && S.restMark == null) S.restMark = t;
+      if (S.phase === 'in') {
+        if (S.held || S.auto) S.inh = clamp(S.inh + S.dt / (S.auto && !S.held ? T.inhAuto : T.inh), 0, 1);
+        // the pitch's breath tops out in time for play to start by ten seconds
+        if (pitch && t >= T.inhEnd) S.inh = 1;
+        if (S.inh >= 1) { S.phase = S.auto && !S.held ? 'out' : 'top'; S.topT = t; if (S.phase === 'out') { S.phase = 'in'; letGo(); } else { var s2 = sound(); if (s2) s2.top(); } }
       }
-      if (S.phase === 'lock' || S.phase === 'out') {
-        var LD = short ? T.sLock : T.lock;
-        // a skip freezes the picture where it is and fades; a finished lock stays at the full frame
-        p3 = S.phase === 'out' ? S.p3 : clamp((t - S.ls) / LD, 0, 1); S.p3 = p3;
-        if (S.phase === 'lock' || S.p3 >= 1) S.s = lerp(S.lsFrom, 1, sstep(.08, .8, p3));
-        if (!S.chimed && p3 >= .5) { S.chimed = true; S.chimeT = t; if (snd) snd.chime(at()); }
-        if (S.phase === 'lock' && p3 >= 1) { S.phase = 'out'; S.outT = t; }
+      if (S.phase === 'top' && t - S.topT >= T.topMax) letGo();
+      if (S.phase === 'out' && t - S.L >= T.luma) { S.phase = 'luma'; S.Lu = t; }
+      if (S.phase === 'luma' && t - S.Lu >= T.lumaDur) { S.phase = 'logo'; S.Lg = t; }
+      if (S.phase === 'logo' && t - S.Lg >= T.logoIn + T.logoHold) { finish('end'); }
+      if (S.done && t - S.exitT >= (S.how === 'skip' ? .35 : T.exit)) { remove(); return; }
+
+      // ----- the light: where it sits, how big, how bright -----
+      var baseR = clamp(Math.min(W, H) * .085, 34, 58);
+      if (S.lx < 0) { S.lx = S.tx = W / 2; S.ly = S.ty = H * .618; }
+      // turned or resized: a light nobody holds goes back to its rest point; the thaw's point keeps its place in the frame
+      if (S.vw && (S.vw !== W || S.vh !== H)) {
+        if (S.L >= 0) { S.ox *= W / S.vw; S.oy *= H / S.vh; }
+        else if (!S.held) { S.lx = S.tx = W / 2; S.ly = S.ty = H * .618; }
+        else { S.tx = clamp(S.tx, 0, W); S.ty = clamp(S.ty, 0, H); }
+        greyOK = false;
       }
-      if (S.phase === 'out' && t - S.outT >= (short ? T.sOut : T.out)) { finish(); return; }
-      var s = S.s;
+      S.vw = W; S.vh = H;
+      if (S.phase !== 'out' && S.phase !== 'luma' && S.phase !== 'logo') { var fk = reduced ? 1 : 1 - Math.pow(.0005, S.dt); S.lx = lerp(S.lx, S.tx, fk); S.ly = lerp(S.ly, S.ty, fk); }
+      var idleBreath = reduced ? 0 : Math.sin(t * TAU / 10);                    // six breaths a minute on its own
+      var sw = reduced ? 0 : eio(S.inh);
+      var relax = S.L >= 0 ? sstep(0, 1.6, t - S.L) : 0;
+      var R = baseR * (1 + .06 * idleBreath * (1 - sw)) * (1 + .62 * sw * (1 - relax)) * (1 + .1 * relax * (1 - relax) * 4);
+      var glow = clamp(.35 + .25 * (idleBreath * .5 + .5) * (1 - sw) + .65 * sw - .3 * relax, 0, 1.2);
+      var spin = reduced ? -.6 : -.6 + t * .12 + sw * .9 - relax * 1.4;
+      var lightA = sstep(0, .8, t);
 
-      // picture parameters from s
-      var u1 = clamp(s / STEP[1], 0, 1), u2 = clamp((s - STEP[1]) / (STEP[2] - STEP[1]), 0, 1), u3 = clamp((s - STEP[2]) / (1 - STEP[2]), 0, 1);
-      var noise = s <= STEP[1] ? lerp(1, .5, eout(u1)) : s <= STEP[2] ? lerp(.5, .06, eio(u2)) : lerp(.06, 0, u3);
-      var lod = s <= STEP[1] ? lerp(6.2, 3.6, u1) : s <= STEP[2] ? lerp(3.6, .25, eio(u2)) : lerp(.25, 0, u3);
-      // scanlines sized to the small screen (about 3 device px each), so they read as lines, never as moire; they grow with the zoom
-      var dprL = Math.min(win.devicePixelRatio || 1, 2), lines = clamp(layout(W, H, null).sc.h * dprL / 3.3, 60, 240);
-      var low = s <= STEP[2] ? 1 : 1 - sstep(.2, .7, u3);
-      var scan = s <= STEP[2] ? lerp(.45, .62, u2) : .62 * (1 - sstep(.15, .85, u3));
-      var curve = .16 * (1 - sstep(.1, .9, p3));
-      var sat = s <= STEP[1] ? .35 : s <= STEP[2] ? lerp(.35, .82, u2) : lerp(.82, 1, u3);
-      var fringe = s <= STEP[2] ? lerp(3.2, 2.2, u2) : 2.2 * (1 - sstep(.1, .8, u3));
-      if (snd) snd.hiss(at(), S.tube ? noise : 0);
+      // ----- the world under the veil -----
+      var worldA = sstep(0, 1, S.inh) * .94;
+      if (S.L >= 0) worldA = .94;
+      S.worldA = worldA;
+      if (S.phase !== 'out' && S.phase !== 'luma' && S.phase !== 'logo' && (S.frame % 6 === 1 || !greyOK) && worldA > 0) refreshGrey(cw, ch);
 
-      // geometry: the scene zooms toward the game frame; the window widens past the TV to that frame
-      var cvR = canvasRect(rr), L = layout(W, H, cvR), sc = L.sc;
-      var e = eio(p3), e2 = sstep(.3, 1, p3);
-      var k3 = 1 + (cvR.h / sc.h - 1) * e;
-      var scx = sc.x + sc.w / 2, scy = sc.y + sc.h / 2, tcx = cvR.x + cvR.w / 2, tcy = cvR.y + cvR.h / 2;
-      var cx = lerp(scx, tcx, e), cy = lerp(scy, tcy, e);
-      var wh = lerp(sc.h * k3, cvR.h, e2), ww = lerp(sc.w * k3, cvR.w, e2);
-      // scene transform: scale k3 about the screen centre, then move that centre to (cx, cy)
-      var tx = cx - scx * k3, ty = cy - scy * k3;
-      scene.style.width = (VB.w * L.f) + 'px'; scene.style.height = (VB.h * L.f) + 'px';
-      scene.style.transform = 'matrix(' + k3 + ',0,0,' + k3 + ',' + ((L.ox + VB.x * L.f) * k3 + tx) + ',' + ((L.oy + VB.y * L.f) * k3 + ty) + ')';
-      var sceneA = (short ? 1 : sstep(0, T.enter, t)) * (1 - sstep(.62, .92, p3));
-      scene.style.opacity = String(sceneA);
+      // the colour: a soft hole in the veil, growing from the thumb point, or a plain fade
+      var reach = Math.hypot(Math.max(S.ox, W - S.ox), Math.max(S.oy, H - S.oy)) * 1.08;
+      var pr = S.L >= 0 ? clamp((t - S.L) / T.thaw, 0, 1) : 0, Rt = reach * eout(pr), veilFade = S.fade ? sstep(0, .85, pr) : 0;
+      if (S.L >= 0 && !S.landed && pr > .22) { S.landed = true; call('sfx', 'land'); }
+      if (S.L >= 0 && !S.alive && pr > .82) { S.alive = true; call('sfx', 'alive'); }
+      // the pitch's line is about four seconds long, so it starts as the colour spreads and ends as play begins
+      if (pitch && S.L >= 0 && S.voT < 0 && t - S.L >= .5) { S.voT = t; call('vo', 'vo-open-pitch'); }
+      // the world itself thaws from the same point (its own ice to meadow), a step behind the colour
+      if (S.L >= 0 && pr < 1.01 && !S.thawDone) { call('thaw', S.ox, S.oy, S.fade ? reach : Rt * .9); if (pr >= 1 || S.fade) S.thawDone = true; }
 
-      // light: the screen's colour spills on the wall, bench and shell
-      if (gameCanvas && S.frame % 6 === 1) sampleGlow();
-      var clear = 1 - noise, pw = sstep(.2, 1, bloom);
-      var gc = [lerp(78, S.glow[0], clear), lerp(92, S.glow[1], clear), lerp(140, S.glow[2], clear)].map(Math.round);
-      var glow = 'rgb(' + gc.join(',') + ')';
-      root.style.setProperty('--tunein-glow', glow);
-      if (gs) gs.setAttribute('stop-color', glow);
-      shellLit.setAttribute('opacity', String((.35 + .4 * clear) * pw));
-      var hw = sc.w * k3 * 3.2, hh = sc.h * k3 * 3;
-      halo.style.cssText = 'left:' + (cx - hw / 2) + 'px;top:' + (cy - hh / 2) + 'px;width:' + hw + 'px;height:' + hh + 'px;opacity:' + (.33 * pw * sceneA);
-      var fy = (L.oy + 610 * L.f), fw = 900 * L.f, fh = 150 * L.f;
-      floor.style.cssText = 'left:' + (L.ox + 50 * L.f) + 'px;top:' + (fy - fh / 2) + 'px;width:' + fw + 'px;height:' + fh + 'px;opacity:' + (.26 * pw * (1 - sstep(0, .4, p3)));
-      room.style.opacity = String(1 - sstep(.85, 1, p3) * (cvR.w >= W - 1 && cvR.h >= H - 1 ? 1 : 0));
+      // ----- the eyes in the cloud: open faintly with the breath in, shut as the colour reaches them -----
+      var ew = Math.min(W * .96, 620), eh = ew * eyes.h / eyes.w, ex = W / 2, ey = H * (W > H ? .19 : .17);
+      var eDist = Math.hypot(ex - S.ox, ey - S.oy) - ew * .2;
+      if (S.L >= 0 && S.eyesShutT < 0 && (S.fade ? pr > .45 : Rt >= eDist)) S.eyesShutT = t;
+      var eOpen = reduced ? 1 : sstep(.35, .95, S.inh) * (S.eyesShutT >= 0 ? 1 - sstep(0, .45, t - S.eyesShutT) : 1);
+      var eA = .4 * sstep(.12, .7, S.inh) * (S.eyesShutT >= 0 ? 1 - sstep(reduced ? 0 : .35, reduced ? .9 : 1.25, t - S.eyesShutT) : 1);
 
-      // console buttons: soft with the breath, then lit one by one with the chime
-      for (var i = 0; i < 5; i++) {
-        var lit = S.chimeT >= 0 && t >= S.chimeT + i * .13;
-        var breathe = S.held ? .42 + .4 * clamp((t - S.hs) / T.inhale, 0, 1) : .42 + .1 * (S.breaths / 3);
-        btns[i].style.opacity = String(lit ? 1 : breathe);
-        btns[i].style.filter = lit ? 'drop-shadow(0 0 5px ' + EL[ORDER[i]] + ')' : '';
+      // ----- draw -----
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+      g.fillStyle = '#000'; g.fillRect(0, 0, cw, ch);
+      if (!S.painted) { S.painted = true; root.style.background = 'transparent'; }   // black from the first paint; the canvas holds it from here
+      if (worldA > 0 && greyOK) { g.globalAlpha = worldA; g.drawImage(grey, 0, 0, cw, ch); g.globalAlpha = 1; }
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (eA > .003 && eyes.open) {
+        g.globalAlpha = eA; g.drawImage(eyes.shut, ex - ew / 2, ey - eh / 2, ew, eh);
+        if (eOpen > .01) {
+          g.save(); g.beginPath();
+          var sc = ew / eyes.w; LIDS.forEach(function (Ld) { g.ellipse(ex - ew / 2 + Ld[0] * sc, ey - eh / 2 + Ld[1] * sc, Ld[2] * sc * 1.15, Math.max(.5, Ld[3] * sc * 1.2 * eOpen), 0, 0, TAU); });
+          g.clip(); g.drawImage(eyes.open, ex - ew / 2, ey - eh / 2, ew, eh); g.restore();
+        }
+        g.globalAlpha = 1;
+      }
+      // the veil opens
+      if (S.L >= 0) {
+        g.globalCompositeOperation = 'destination-out';
+        if (S.fade) { g.fillStyle = 'rgba(0,0,0,' + veilFade + ')'; g.fillRect(0, 0, W, H); }
+        else if (Rt > 1) { var hg = g.createRadialGradient(S.ox, S.oy, Rt * .72, S.ox, S.oy, Rt); hg.addColorStop(0, '#000'); hg.addColorStop(1, 'rgba(0,0,0,0)');
+          g.fillStyle = hg; g.beginPath(); g.arc(S.ox, S.oy, Rt, 0, TAU); g.fill(); g.fillStyle = '#000'; g.beginPath(); g.arc(S.ox, S.oy, Rt * .72 + .5, 0, TAU); g.fill(); }
+        g.globalCompositeOperation = 'source-over';
+        // a warm rim of light where the colour arrives (gold is for growth: this is the thaw)
+        if (!S.fade && pr < 1) { g.globalCompositeOperation = 'lighter'; var rim = g.createRadialGradient(S.ox, S.oy, Rt * .7, S.ox, S.oy, Rt * 1.02);
+          rim.addColorStop(0, 'rgba(255,214,140,0)'); rim.addColorStop(.75, 'rgba(255,224,160,' + (.22 * (1 - pr)) + ')'); rim.addColorStop(1, 'rgba(255,224,160,0)');
+          g.fillStyle = rim; g.beginPath(); g.arc(S.ox, S.oy, Rt * 1.02, 0, TAU); g.fill(); g.globalCompositeOperation = 'source-over'; }
+        // the five-colour stream
+        if (S.parts && !reduced) {
+          g.globalCompositeOperation = 'lighter';
+          for (var i = 0; i < S.parts.length; i++) {
+            var P = S.parts[i], lt = (t - S.L - P.d * .5) / P.life; if (lt <= 0 || lt >= 1) continue;
+            var dd = reach * .85 * eout(lt) * P.k, aa = P.a + P.w * lt, px = S.ox + Math.cos(aa) * dd, py = S.oy + Math.sin(aa) * dd, ps = P.s * (1 + lt);
+            g.globalAlpha = Math.sin(Math.PI * lt) * .9; g.drawImage(sprite(doc, P.c, 64), px - ps, py - ps, ps * 2, ps * 2);
+          }
+          g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+        }
       }
 
-      // the picture
-      var dpr = Math.min(win.devicePixelRatio || 1, 2), cw = Math.round(W * dpr), ch = Math.round(H * dpr);
-      if (cnv.width !== cw || cnv.height !== ch) { cnv.width = cw; cnv.height = ch; }
-      var wx = cx - ww / 2, wy = cy - wh / 2;
-      // the small screen shows the middle of the game, closer in (the Keeper reads at TV size); the crop opens to the whole frame
-      var ca = ww / wh, ga = cvR.w / cvR.h, cw0, ch0, zc = lerp(.6, 1, e);
-      if (ca < ga) { cw0 = ca / ga; ch0 = 1; } else { cw0 = 1; ch0 = ga / ca; }
-      cw0 *= zc; ch0 *= zc;
-      var crop = [(1 - cw0) / 2, (1 - ch0) / 2, cw0, ch0];
-      if (gameCanvas && gameCanvas.width > 0) glx.upload(gameCanvas);
-      glx.draw({ win:[wx * dpr, (H - wy - wh) * dpr, ww * dpr, wh * dpr], crop:crop, noise:S.tube ? noise : 1, lod:lod, lines:lines, low:low,
-        scan:scan, curve:curve, fringe:fringe, rad:SCREEN.r * L.f * k3 * (1 - e2) * dpr, frame:S.frame, bloom:bloom, dpr:dpr, sat:sat });
-
-      // spirit animal
-      petFrame(t, p3, L, k3, tx, ty, cvR, H);
-
-      // ring, words, skip
-      var showUI = !short && (S.phase === 'ready' || S.phase === 'exhale');
-      var dt = clamp(t - S.lt, 0, .1); S.lt = t;
-      S.uiA = clamp(S.uiA + (showUI ? 1 : -1) * dt / .45, 0, 1); ui.style.opacity = String(eio(S.uiA));
-      S.skA = clamp(S.skA + (t > .15 && S.phase !== 'out' ? 1 : -1) * dt / .3, 0, 1); skipBtn.style.opacity = String(S.skA);
-      skipBtn.style.visibility = S.skA > 0 ? 'visible' : 'hidden';
-      var rs = L.rs;
-      ui.style.setProperty('--rs', rs + 'px'); ui.style.setProperty('--fs', Math.round(clamp(rs * .21, 17, 20)) + 'px');
-      // the words never fall off a short window
-      var rx = L.ringX, ry = Math.min(L.ringY, H - (ui.offsetHeight || rs + 80) - 14);
-      ui.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translateX(-50%)';
-      var ringFill = S.held ? clamp((t - S.hs) / T.inhale, 0, 1) : S.phase === 'exhale' ? 1 - clamp((t - S.es) / T.exhale, 0, 1) :
-        S.back ? (1 - clamp((t - S.back.t) / T.back, 0, 1)) * clamp((S.back.t - S.hs) / T.inhale, 0, 1) : 0;
-      // the orb swells with the breath in and settles with the breath out, as on the game's breath screen
-      orb.style.transform = 'scale(' + (1 + ringFill) + ')';
-      // the game's finger presses the orb until the first real press
-      var fp = .5 - .5 * Math.cos(t * Math.PI * 2 / 1.4);
-      finger.style.display = auto || S.touched || S.held ? 'none' : '';
-      finger.style.transform = 'translate(' + (-6 * fp) + 'px,' + (-8 * fp) + 'px) scale(' + (1 - .1 * fp) + ')';
-      // a tap during the hands-free film answers with a small pulse
-      var tp = S.tapT != null ? clamp((t - S.tapT) / .35, 0, 1) : 1;
-      ring.style.transform = tp < 1 ? 'scale(' + (1 + .12 * Math.sin(tp * Math.PI)) + ')' : '';
-      for (var j = 0; j < 3; j++) pips[j].classList.toggle('on', j < S.breaths);
-      how.style.visibility = S.breaths === 0 && S.phase === 'ready' && !S.held ? 'visible' : 'hidden';
-      // the game's breath words; the hands-free film shows only the breath itself
-      if (S.held) setSay('Breathe in…');
-      else if (S.phase === 'exhale') setSay('Breathe out…');
-      else if (S.phase === 'ready' && !auto) setSay(S.short ? 'A little longer…' : 'Hold to breathe in');
-    }
-
-    function petFrame(t, p3, L, k3, tx, ty, cvR, H0) {
-      var f = L.f, size = SEAT.size * f;
-      // the seat moves with the scene while the TV zooms
-      var seatX = (L.ox + SEAT.x * f) * k3 + tx, seatY = (L.oy + SEAT.y * f) * k3 + ty;
-      var x = seatX, y = seatY, sz = size * (1 + (k3 - 1) * .35), a = short ? 1 : sstep(0, T.enter, t), sx = 1, sy = 1;
-      // moments: an ear twitch after breath 1, waking after breath 2, the leap at the lock
-      if (!short && S.breaths >= 1 && S.stirT < 0) S.stirT = t;
-      if (!short && S.breaths >= 2 && S.wakeT < 0) S.wakeT = t;
-      var want = S.phase === 'lock' || S.phase === 'out' ? 'fly' : 'sit';
-      var awake = clamp((p3 - .02) / .06, 0, 1);
-      imgAwake.style.opacity = String(awake); imgSleep.style.opacity = String(1 - awake);
-      var aT = '';
-      if (awake <= 0) {
-        // slow sleeping breath
-        var dz = Math.sin(t * Math.PI * 2 / 3.8);
-        aT = 'scale(' + (1 + .0125 + .0125 * dz) + ',' + (1 + .02 + .02 * dz) + ')';
-        if (S.stirT >= 0 && t - S.stirT < .8) { var st = (t - S.stirT) / .8; aT += ' rotate(' + (-6 * Math.sin(st * Math.PI * 3) * (1 - st)) + 'deg)'; }
-        if (S.wakeT >= 0 && t - S.wakeT < 1) { var wk = (t - S.wakeT) / 1; aT += ' translateY(' + (-6 * Math.sin(wk * Math.PI) ) + '%) rotate(' + (8 * Math.sin(wk * Math.PI * 4) * (1 - wk)) + 'deg)'; }
-      } else if (want === 'sit') {
-        var ws = short ? 9 : t - S.wakeT;
-        if (ws < 1) { var sq = Math.sin(ws * Math.PI * 2.2) * Math.exp(-ws * 3.2); aT = 'scale(' + (1 - .1 * sq) + ',' + (1 + .16 * sq) + ')'; }
-        else { var pk = Math.sin((ws - 1) * Math.PI * 2 / 2.4); aT = 'translateY(' + (-1.2 - 1.2 * pk) + '%) rotate(' + (-1.5 * pk) + 'deg)'; }
+      // ----- Luma: the light travels to her painted tail, takes its size and angle, and dissolves into it -----
+      var ls = Math.min(W * .78, H * .42, 400), lcx = W / 2, lcy = H * .42;
+      var tailX = lcx - ls / 2 + LC.tailX * ls, tailY = lcy - ls / 2 + LC.tailY * ls, tailR = LC.tailR * ls;
+      var trav = pitch ? .7 : 1.0, since = S.Lu >= 0 ? t - S.Lu : -1, lu = since >= 0 ? clamp(since / trav, 0, 1) : 0;
+      var curlX = S.L >= 0 ? S.ox : S.lx, curlY = S.L >= 0 ? S.oy : S.ly, unc = 0, curlA = lightA, curlR = R, curlSpin = spin, rev = 0;
+      if (since >= 0) {
+        if (reduced) { curlA = 1 - sstep(0, .3, since); rev = sstep(.3, .9, since); }
+        else {
+          var mv = eio(lu), tsp = LC.spin + TAU * Math.round((spin - LC.spin) / TAU);
+          curlX = lerp(S.ox, tailX, mv); curlY = lerp(S.oy, tailY, mv); curlR = lerp(R, tailR, mv); curlSpin = lerp(spin, tsp, mv); unc = mv;
+          curlA = 1 - sstep(trav * .6, trav + .3, since); rev = sstep(trav * .5, trav + .7, since);
+        }
       }
-      petA.style.transform = aT;
-      // three small z's drift up while it sleeps
-      for (var zi = 0; zi < 3; zi++) {
-        var zp = ((t + zi) % 3) / 3, za = awake > 0 ? 0 : (zp < .2 ? zp / .2 : 1 - (zp - .2) / .8) * .85 * (short ? 0 : sstep(0, T.enter, t));
-        zs[zi].style.opacity = String(za); zs[zi].style.transform = 'translate(' + (zp * 1.4) + 'em,' + (-zp * 2.6) + 'em) scale(' + (1 - zi * .18) + ')';
+      if (S.Lg >= 0) curlA = 0;
+      var cardA = since >= 0 ? 1 : 0;
+      if (S.Lg >= 0) cardA *= 1 - sstep(0, T.logoIn, t - S.Lg);
+      // a soft dark behind her, so she and the words read over the world
+      var dim = since >= 0 ? .42 * sstep(0, .8, since) : 0;
+      if (S.Lg >= 0) dim = lerp(.42, .9, sstep(0, T.logoIn, t - S.Lg));
+      if (dim > 0) { g.fillStyle = 'rgba(4,6,16,' + dim + ')'; g.fillRect(0, 0, W, H); }
+      if (cardA > .003 && rev > .003 && luma.card) {
+        if (reduced || rev >= 1) { g.globalAlpha = cardA * (reduced ? rev : 1); g.drawImage(luma.card, lcx - ls / 2, lcy - ls / 2, ls, ls); g.globalAlpha = 1; }
+        else {
+          // she comes in from her tail outward, so the light becomes the tail rather than sitting on top of it
+          var cs = Math.round(ls * dpr); if (lumaTmp.width !== cs) { lumaTmp.width = lumaTmp.height = cs; }
+          var lx2 = lumaTmp.getContext('2d'); lx2.globalCompositeOperation = 'source-over'; lx2.clearRect(0, 0, cs, cs); lx2.drawImage(luma.card, 0, 0, cs, cs);
+          lx2.globalCompositeOperation = 'destination-in'; var rr = cs * 1.5 * eout(rev) + 1, tx0 = LC.tailX * cs, ty0 = LC.tailY * cs, rg = lx2.createRadialGradient(tx0, ty0, rr * .55, tx0, ty0, rr);
+          rg.addColorStop(0, '#000'); rg.addColorStop(1, 'rgba(0,0,0,0)'); lx2.fillStyle = rg; lx2.fillRect(0, 0, cs, cs);
+          g.globalAlpha = cardA; g.drawImage(lumaTmp, lcx - ls / 2, lcy - ls / 2, ls, ls); g.globalAlpha = 1;
+        }
       }
-      if (want === 'fly') {
-        // crouch, leap in an arc to the Keeper's side, land, fade into the game
-        var tg = null; try { tg = typeof o.petTarget === 'function' ? o.petTarget() : o.petTarget; } catch (x) { tg = null; }
-        var tgx = cvR.x + (tg ? tg.x : cvR.w / 2), tgy = cvR.y + (tg ? tg.y : cvR.h * .5), tsz = tg && tg.size ? tg.size : cvR.h * .085;
-        var c = sstep(.04, .16, p3) * (1 - sstep(.16, .22, p3));
-        var fl = clamp((p3 - .18) / .62, 0, 1), fe = eio(fl);
-        sy = 1 - .16 * c; sx = 1 + .08 * c;
-        sz = lerp(sz, tsz, sstep(0, 1, fl));
-        x = lerp(seatX, tgx, fe); y = lerp(seatY, tgy + tsz * .45, fe) - Math.sin(Math.PI * fl) * cvR.h * .1;
-        // never leaves the top of the frame
-        y = Math.max(y, sz * .9 + H0 * .03);
-        if (fl > 0 && fl < 1) { sy *= 1 + .08 * Math.sin(Math.PI * fl); sx *= 1 - .05 * Math.sin(Math.PI * fl); }
-        if (fl >= 1) { var land = clamp((p3 - .8) / .06, 0, 1); sy = 1 - .14 * Math.sin(Math.PI * land); sx = 1 + .1 * Math.sin(Math.PI * land); }
-        a = 1 - sstep(.86, .98, p3);
-        // a soft puff where it lands
-        var sp = clamp((p3 - .8) / .2, 0, 1), ss = tsz * 1.7;
-        spark.style.width = spark.style.height = ss + 'px';
-        spark.style.transform = 'translate(' + (tgx - ss / 2) + 'px,' + (tgy + tsz * .45 - ss * .55) + 'px) scale(' + (.3 + 1.3 * eout(sp)) + ')';
-        spark.style.opacity = String(sp > 0 && sp < 1 ? .95 * (1 - sp) : 0);
-      }
-      pet.style.width = sz + 'px'; pet.style.height = sz + 'px';
-      pet.style.transform = 'translate(' + (x - sz / 2) + 'px,' + (y - sz * .9) + 'px)';
-      pet.style.opacity = String(a);
-      petB.style.transform = 'scale(' + sx + ',' + sy + ')';
-      zz.style.setProperty('--zs', Math.round(sz * .14) + 'px');
-    }
+      drawCurl(g, curlX, curlY, curlR, curlSpin, glow, curlA, unc, t);
 
-    var gctx = null;
-    function sampleGlow() {
-      try {
-        if (!gctx) { var g = doc.createElement('canvas'); g.width = g.height = 4; gctx = g.getContext('2d', { willReadFrequently:true }); }
-        gctx.drawImage(gameCanvas, 0, 0, 4, 4); var d = gctx.getImageData(0, 0, 4, 4).data, r = 0, gg = 0, b = 0;
-        for (var i = 0; i < d.length; i += 4) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; }
-        var n = d.length / 4; S.glow = [r / n * .8, gg / n * .8, b / n * .85];
-      } catch (e) {}
+      // the hit target follows the light
+      var hit = Math.max(88, R * 2.6);
+      lightEl.style.cssText = 'width:' + hit + 'px;height:' + hit + 'px;transform:translate(' + (S.lx - hit / 2) + 'px,' + (S.ly - hit / 2) + 'px)';
+
+      // ----- words -----
+      var fs = Math.round(clamp(W * .058, 21, 30));
+      sayEl.style.setProperty('--fs', fs + 'px');
+      if (S.phase === 'luma') {
+        // (a family who never touched the light hears that it was done together)
+        var cap = pitch ? 'One breath. A frozen world comes back.' : S.touched ? 'You brought them back. That’s what Keepers do.' : 'We brought them back, together. That’s what Keepers do.';
+        // the line comes in only once the light has gone into her tail
+        var capAt = reduced ? .4 : pitch ? .55 : .95;
+        if (S.voT < 0 && since >= capAt) { S.voT = t; call('vo', S.touched ? 'vo-open-keepers' : 'vo-open-together'); }
+        if (S.sayKey !== cap) { sayEl.innerHTML = '<p>' + cap + '</p>'; S.sayKey = cap; sr.textContent = cap; S.sayA = 0; }
+        S.sayA = since >= capAt ? Math.min(1, S.sayA + S.dt / .4) : 0; applySay();
+        sayEl.style.top = Math.min(H - 110, lcy + ls / 2 + 16) + 'px';
+      } else if (S.phase === 'logo' || S.done) {
+        S.sayA = Math.max(0, S.sayA - S.dt / .25); applySay();
+      } else {
+        setSay(words(), H);
+        // (the pitch's words sit higher: its Keeper stands just under the .382 line)
+        sayEl.style.top = Math.max(H * (pitch ? .3 : .382) - sayEl.offsetHeight / 2, ey + eh * .42) + 'px';
+      }
+      // the logo and the line under it, for a second
+      var lgA = S.Lg >= 0 ? sstep(0, T.logoIn, t - S.Lg) : 0;
+      if (S.done && S.how === 'end') lgA = 1 - sstep(0, T.exit, t - S.exitT);
+      if (S.done && S.how === 'skip') lgA = 0;
+      endEl.style.opacity = String(lgA);
+      endEl.style.setProperty('--lw', Math.round(Math.min(W * .62, 300)) + 'px');
+      endEl.style.top = (H * .42 - (endEl.offsetHeight || 140) / 2) + 'px';
+
+      // the whole overlay leaves over the game (or the setup) once it is done
+      root.style.opacity = S.done ? String(1 - sstep(0, S.how === 'skip' ? .35 : T.exit, t - S.exitT)) : '1';
+      if (S.done) root.style.pointerEvents = 'none';
+      skipBtn.style.visibility = S.phase === 'logo' || S.done ? 'hidden' : 'visible';
+      if (sndBtn) sndBtn.style.visibility = S.phase === 'logo' || S.done ? 'hidden' : 'visible';
     }
 
     var raf = 0;
-    function loop() { if (S.done) return; frame(); raf = win.requestAnimationFrame(loop); }
+    function loop() { if (S.gone) return; try { frame(); } catch (e) { setTimeout(function () { throw e; }); } if (!S.gone) raf = win.requestAnimationFrame(loop); }
 
-    function skip() {
-      if (S.done || S.phase === 'out') return;
-      S.phase = 'out'; S.outT = S.t; S.held = false;
-      if (snd) snd.release(at(), false);
-      if (S.chimeT < 0) S.chimeT = S.t;
-    }
-    function finish() {
-      if (S.done) return; S.done = true;
-      win.cancelAnimationFrame(raf);
+    function finish(how) {
+      if (S.done) return; S.done = true; S.how = how; S.exitT = S.t; S.held = false;
       win.removeEventListener('keydown', onKey, true); win.removeEventListener('keyup', onKey, true); win.removeEventListener('blur', onBlur);
-      // the snow goes quiet; the chime is left to ring out
-      if (snd) snd.hiss(at(), 0);
-      if (glx) glx.lose();
-      root.remove();
-      if (ownCtx && ctx) setTimeout(function () { try { ctx.close(); } catch (e) {} }, 4000);
-      cb('onDone');
+      if (snd) snd.stop();
+      call('onDone', how);
     }
-
-    // the boot is a modal moment: it takes the keyboard so Space and Escape come here, not to a button behind it
-    function takeFocus() { try { win.focus(); root.focus({ preventScroll:true }); } catch (e) {} }
-    root.setAttribute('tabindex', '-1'); takeFocus();
-    if (!manual) raf = win.requestAnimationFrame(loop);
+    function skip() { if (S.done) return; finish('skip'); }
+    function remove() {
+      if (S.gone) return; S.gone = true; win.cancelAnimationFrame(raf); root.remove();
+    }
+    function takeFocus() { try { root.focus({ preventScroll:true }); } catch (e) {} }
+    takeFocus();
+    raf = win.requestAnimationFrame(loop);
     return {
       skip:skip,
-      frame:function () { frame(); return !S.done; },
-      get state() { return { phase:S.phase, breaths:S.breaths, signal:S.s, done:S.done, t:S.t }; },
+      frame:function () { frame(); return !S.gone; },
+      get state() { return { phase:S.phase, t:S.t, inh:S.inh, held:S.held, auto:S.auto, touched:S.touched, fade:S.fade, unlocked:S.unlocked, done:S.done, how:S.how, light:[S.lx, S.ly], origin:[S.ox, S.oy], say:S.sayKey }; },
       el:root
     };
   }
 
-  // the five-note chime on its own (the sign-off for a trailer or a menu), on any audio context
-  function sting(ctx, at) { var s = Sound(ctx); if (s) s.chime(at == null ? ctx.currentTime : at); }
-
-  window.TuneIn = { play:play, sting:sting, version:'1.0.0' };
+  // drawTail: the same light, for the Sanctuary's sky
+  window.BreatheFirst = { play:play, drawTail:drawCurl, version:'1.1.0' };
 })();
 </script>
 <script>
@@ -3187,7 +3155,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -3973,7 +3941,7 @@ const AU = (() => {
       musLP.frequency.exponentialRampToValueAtTime(on ? 700 : 20000, t + (on ? .15 : .35)); mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(MUSVOL * (on ? .7 : 1), t + .3); },
     slowmo() { if (!musLP) return; const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(musLP.frequency.value, t); musLP.frequency.exponentialRampToValueAtTime(160, t + 1.1);
       mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(0, t + 1.4); }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
-    get on() { return sfxOn; }, get musicOn() { return musOn; }, vo, toggleVoice() { voOn = !voOn; save('morqi.voice', voOn); return voOn; }, get voiceOn() { return voOn; }, get vmiss() { return VFILES.filter(n => !SMP[n]); }, get beatLen() { return SIX * 4; } };
+    get on() { return sfxOn; }, get musicOn() { return musOn; }, vo, toggleVoice() { voOn = !voOn; save('morqi.voice', voOn); return voOn; }, get voiceOn() { return voOn; }, get vmiss() { return VFILES.filter(n => !SMP[n]); }, get ctx() { return c; }, get sfxBus() { return sfx; }, get beatLen() { return SIX * 4; } };
 })();
 const SFX = AU.S;
 
@@ -4289,9 +4257,9 @@ function startRun() {
   if (S.level > 1) ['move', 'pet', 'enemy', 'gem', 'xp', 'crate', 'item', 'chest', 'wave', 'boss', 'awake'].forEach(k => S.taught['c_' + k] = 1), ['lu', 'luevo', 'lugift', 'chest', 'strong', 'weak'].forEach(k => S.taught[k] = 1); $('#wavePill').classList.add('on');
   // on a computer the move card says the keys (design review, 2026-10-08: it said drag and tap beside a keys card saying W A S D)
   coach('move', KEYS() ? 'Move with W A S D' : 'Drag to move', KEYS() ? 'Your powers fire on their own. Space dashes out of a crowd.' : 'Drag anywhere. Your powers fire on their own. Tap to dash out of a crowd.', () => ({ sx:W / 2, sy:H * .7 - 70 }), 7, 'above', () => S.moved > 140);
-  // the run, its song and the keys card begin when the TV boot ends (its coach cards wait for the loop, so none open under it)
+  // the run, its song and the keys card begin when the opening ends (its coach cards wait for the loop, so none open under it)
   const go = () => { AU.song(SONG_OF[worldOf()]); AU.music(true); keysCard(); startLoop(); };
-  if (!tuneIn(go)) go();
+  if (!openingHold(go)) go();
 }
 // from Level 3 the climb is slower, so the Keeper meets each boss at about 18 / 24 / 30 (A, 2026-10-09: "by the time i get to omni
 // ive been insanely strong for too long"; the bot reached 69 on Level 5, while a full build stops growing near 28)
@@ -4359,27 +4327,65 @@ const endJoy = e => { if (joy && e.pointerId === joy.id) { const tap = e.type ==
 cv.addEventListener('pointerup', endJoy); cv.addEventListener('pointercancel', endJoy);
 // one loop at a time: a new start retires any loop still queued, so a double tap can never double the game speed
 let loopId = 0;
-/* Tune In (A, 2026-10-08: Orson's concept): on a computer the run opens on an old box TV, the spirit animal asleep on top; three
-   breaths take the picture from snow to the live game at 16:9. The full version the first time, a three-second one on later
-   launches, none when switched off in Settings. The game stays frozen under it and starts when it hands over. */
-let tunedThisLaunch = false, bootDraw = 0;
-function tuneIn(go) {
-  // the pitch bible link plays the full boot on any screen, every launch, hands-free (A, 2026-10-08: "more of a wow factor")
-  const pitch = /[?&]from=pitch/.test(location.search);
-  if ((!DESK() && !pitch) || !window.TuneIn || tunedThisLaunch || store.get('morqi.tunein') === 'off') return false;
-  tunedThisLaunch = true; const first = pitch || !SEEN.has('_tunein'); markSeen('_tunein');
-  // the picture behind the static is the live, paused run: drawn every frame (tiles still loading fill in), never stepped;
-  // the boot's own animal leaps into the run, so the run's animal waits until it lands
-  const id = ++bootDraw; S.petHide = true; AU.music(false);
-  const paint = () => { if (id !== bootDraw) return; try { draw(); } catch (e) {} requestAnimationFrame(paint); };
-  const done = () => { bootDraw++; if (S) S.petHide = false; if (S && !S.over) go(); };
-  paint();
-  if (first) AU.vo('vo-breathe-in', 1.6, .4);
+/* Breathe First (A chose it 2026-10-09; the studio's vision room settled the spec; it replaces the TV boot, kept unwired in
+   boot/tunein.js). Black, one light, "Before we show you anything, breathe with us." One breath thaws the frozen world in colour
+   from where the thumb was, the light uncurls into Luma, the logo shows for a second, then the game. Families see it on their
+   first launch only, then the Keeper and birthday setup as before; the pitch link plays it every visit, about ten seconds, and
+   hands straight to a live Level 1 run. Later launches have no opening. Nothing here sends anything anywhere.
+   startRun asks openingHold first: while the opening is up the run is built but frozen under it, drawn as tiles arrive. */
+const OPEN = { h:null, active:false, go:null, pitch:false, busy:false, asked:false };
+const ROT_Q = matchMedia('(orientation:landscape) and (max-height:480px) and (pointer:coarse)');
+let bootDraw = 0;
+const openingWanted = () => /[?&]from=pitch/.test(location.search) ? 'pitch' : (!profile() && !SEEN.has('_open')) ? 'family' : null;
+function openingHold(go) {
+  if (!OPEN.active || !S) return false;
+  OPEN.go = go; const id = ++bootDraw; AU.music(false);
+  // the frozen world is still: drawn every sixth frame for the tiles still loading, every frame while it thaws
+  let n = 0; const paint = () => { if (id !== bootDraw) return; if (OPEN.busy || n++ % 6 === 0) try { draw(); } catch (e) {} requestAnimationFrame(paint); };
+  paint(); return true;
+}
+function startOpening(mode) {
+  if (!window.BreatheFirst) return false;
+  const pitch = mode === 'pitch'; OPEN.active = true; OPEN.pitch = pitch;
+  show(null); $('#hud').style.visibility = 'hidden';
+  document.documentElement.classList.remove('bf1-pre');
+  // a family's first launch: the wind from frame one where the browser already allows sound (the pitch stays silent until a touch)
+  if (!pitch) { try { AU.init(); } catch (e) {} }
+  // sound may play once the context runs, or once a press has asked it to resume (it then starts as soon as the browser allows)
+  const live = () => { const c = AU.ctx; return !!c && (c.state === 'running' || (OPEN.asked && c.state !== 'closed')); };
   try {
-    TuneIn.play({ gameCanvas:cv, stage, animal, animalName:ANIMAL[animal].y, short:!first, auto:pitch, reduced:reduce, onDone:done,
-      petTarget:() => ({ x:(S.pet.x - camX) * Z, y:(S.pet.y - 20 - camY) * Z, size:78 * Z }) });
-  } catch (e) { bootDraw++; S.petHide = false; return false; }
+    OPEN.h = BreatheFirst.play({ stage, gameCanvas:cv, mode, reduced:reduce, touch:!KEYS(), fade:/[?&]openfade=1/.test(location.search),
+      // about 0.3 s in, Level 1 loads behind the black: the pitch's own run, or (for a family) the shore with no Keeper on it yet
+      world:() => { if (pitch) { const p = profile() || { keeper:1, animal:'goat', el:'wood' }; applyProfile(p); goTab('home'); pitchRun(); }
+        else { startRun(); if (S) S.noKeeper = true; } },
+      thaw:(x, y, r) => { if (!S || !thaw) return; OPEN.busy = true; paintThaw(camX + x / Z, camY + y / Z, Math.min(DESK() ? 1100 : 650, r / Z)); },
+      unlock:() => { OPEN.asked = true; try { AU.init(); } catch (e) {} return live(); },
+      audio:() => live() && AU.on ? { ctx:AU.ctx, out:AU.sfxBus } : null,
+      sfx:k => { if (!live()) return; if (k === 'out') SFX.sweep(); else if (k === 'land') SFX.ting(); else if (k === 'alive') SFX.cleared(); },
+      vo:id => { if (live()) AU.vo(id, 0, .4); },
+      // the rotate prompt sits above the opening, and the opening waits under it
+      paused:() => ROT_Q.matches,
+      onDone:how => openingDone(how) });
+    window.__bfH = OPEN.h;   // test hook: the opening's state
+  } catch (e) { OPEN.active = false; $('#hud').style.visibility = ''; return false; }
   return true;
+}
+function openingDone(how) {
+  const pitch = OPEN.pitch; OPEN.active = false; OPEN.busy = false; bootDraw++; $('#hud').style.visibility = '';
+  const live = !!AU.ctx && AU.ctx.state === 'running';
+  if (pitch) {
+    if (!S) { const p = profile() || { keeper:1, animal:'goat', el:'wood' }; applyProfile(p); goTab('home'); pitchRun(); }   // skipped before the level loaded
+    // (the film's thaw counts toward the shore restored: its cells are thawed, so the count keeps them)
+    else { const go = OPEN.go; OPEN.go = null; if (go && !S.over) go(); }
+  } else {
+    markSeen('_open');
+    // the shore under the opening was only scenery: the child's own run starts after their Keeper and birthday
+    S = null; running = false; $('#hud').hidden = true;
+    if (live) { AU.music(true); AU.song('home'); }
+    show('pickKeeper');
+  }
+  // no touch, no sound yet: the first touch anywhere wakes it (the old "Tap to begin" did this)
+  if (!live) addEventListener('pointerdown', () => { try { AU.init(); } catch (e) {} AU.music(true); AU.song(pitch && S ? SONG_OF[worldOf()] : 'home'); }, { capture:true, once:true });
 }
 function startLoop() { const id = ++loopId; running = true; last = performance.now(); requestAnimationFrame(t => loop(t, id)); }
 function resume() { show(null); startLoop(); }
@@ -6595,6 +6601,10 @@ const estFreeWorth = () => 100 / ((EST_RATE[S.level - 1] || 6) * 55);
 /* Something to dodge and something to chase on a phone (A, 2026-10-09: "you just barely have to pay attention ... still feels aimless
    on a mobile device"; studio analysis): from Level 3, every 20-30 s a slam is marked in red where the Keeper stands and lands a
    second later, and every 30-40 s a golden runaway appears and flees; catch it within 10 s and it drops a Spirit Chest. */
+// the breakers' frost armour in use (brief 31); water and metal wait for their redo (design review, 2026-10-09: they read paler, not stronger)
+const BREAKER_ART = ['water', 'wood', 'fire', 'earth', 'metal'];   // all five since brief 33
+// the guard shells in use; fire and earth wait for their redo and draw the plain shell meanwhile
+const GUARD_ART = ['water', 'wood', 'fire', 'earth', 'metal'];   // all five since brief 33
 const PRESS = { from:3, slam:[24, 34], wind:1.5, r:130, hurt:.15, run:[30, 40], life:10, near:70 };   // eased after the bot runs (2026-10-09)
 function pressureTick(dt) {
   if (S.level < 2 || S.over || hsOn() || S.omni || S.omniSnap || lbOn() || S.bloom || S.fall) return;
@@ -6614,8 +6624,8 @@ function pressureTick(dt) {
   S.slams = S.slams.filter(m => m.t < PRESS.wind + .3);
   // the golden runaway: it keeps just ahead of the Keeper, never quite as fast, and glows its way off when its time is up
   const R = S.runaway;
-  if (!R && S.t >= S.runAt && !S.bossSpawned && !S.bossAt) { const a = rnd(0, TAU); S.runaway = { x:clamp(P.x + Math.cos(a) * 360, 120, WORLD - 120), y:clamp(P.y + Math.sin(a) * 360, 120, WORLD - 120), t:0, a };
-    if (!SEEN.has('_runaway')) { markSeen('_runaway'); toast('A golden runaway! Catch it for a Spirit Chest!', 2600); } }
+  if (!R && S.t >= S.runAt && !S.bossSpawned && !S.bossAt) { const a = rnd(0, TAU); if (!IMG['x-runaway']) { load('x-runaway', 'art4/x-runaway.png?v=1'); for (let n = 1; n <= 4; n++) load('x-runaway-m' + n, `art4/x-runaway-m${n}.png?v=1`); } S.runaway = { x:clamp(P.x + Math.cos(a) * 180, 120, WORLD - 120), y:clamp(P.y + Math.sin(a) * 180 * .8, 120, WORLD - 120), t:0, a };
+    if (!SEEN.has('_runaway')) { markSeen('_runaway'); coach('runaway', 'A golden runaway!', 'Catch it before it fades for a Spirit Chest.', () => S.runaway ? { sx:clamp((S.runaway.x - camX) * Z, 30, W - 30), sy:clamp((S.runaway.y - camY) * Z, 150, H - 120) } : { sx:W / 2, sy:H / 2 }); } }
   if (R) { R.t += dt; const d = Math.hypot(R.x - P.x, R.y - P.y) || 1;
     if (d < PRESS.near) { dropChest(R.x, R.y); stars(R.x, R.y - 20, 26, '#FFE58A', 320); S.runaway = null; S.runAt = S.t + rnd(...PRESS.run); S.caught = (S.caught || 0) + 1; }
     else if (R.t >= PRESS.life) { stars(R.x, R.y - 20, 12, '#FFF3C0', 200); S.runaway = null; S.runAt = S.t + rnd(...PRESS.run); }
@@ -6630,8 +6640,9 @@ function pressureTick(dt) {
 const GUARD = { at:.5, life:30, boost:55 };
 function guardTick(dt) {
   const B = S.boss; if (!B || B.dead || S.level < 2 || S.level > 4 || B.guardDone) return;
+  if (!B.guard && B.hp < B.max * GUARD.at * 1.15 && GUARD_ART.includes(B.realm) && !IMG['guard-' + B.realm]) load('guard-' + B.realm, `art4/guard-${B.realm}.webp?v=2`);
   if (!B.guard && B.hp < B.max * GUARD.at) { B.guard = { t:0 }; S.surgeEndAt = -99; bornCharge(Math.max(GUARD.boost, estNeed() * .85 - (S.est[keeperEl] || 0))); SFX.charge && SFX.charge(); S.shake = Math.max(S.shake, .3);
-    ring(B.x, B.y - 60, 30, 260, '#DFF0FF', .6, 14, true); toast(SEEN.has('_guard') ? 'A guard! Your Surge breaks it.' : 'The boss raised a guard! Only your Surge can break it.', 2800); markSeen('_guard'); return; }
+    ring(B.x, B.y - 60, 30, 260, '#DFF0FF', .6, 14, true); toast(SEEN.has('_guard') ? 'A shield! Your Surge breaks it.' : 'The boss has a shield! Use your Surge.', 2800); markSeen('_guard'); return; }
   if (B.guard && (B.guard.t += dt) >= GUARD.life) breakGuard(B);
 }
 function breakGuard(B) {
@@ -7114,7 +7125,7 @@ function outpostTick(dt) {
       if (inside) S.lastRing = T;
       // ...and keep coming to the ring you last stood in once you step out, so leaving it is a choice; other part-filled rings wait (QA)
       if (BK && (inside || (S.lastRing === T && T.fill > 0)) && !hsOn()) { if ((T.bcd = (T.bcd ?? 8) - dt) <= 0) { T.bcd = BK[0];
-          const bel = weakTo(keeperEl)[0], base = Math.atan2(T.cy - P.y, T.cx - P.x);
+          const bel = weakTo(keeperEl)[0], base = Math.atan2(T.cy - P.y, T.cx - P.x); if (!IMG['breaker-' + bel]) load('breaker-' + bel, `art4/breaker-${bel}.png?v=2`);
           for (let i = 0; i < BK[1]; i++) { const a = base + (i - (BK[1] - 1) / 2) * .55, px = T.cx + Math.cos(a) * HOLD.R * .92, py = T.cy + Math.sin(a) * HOLD.R * .92 / 1.6;
             const e = spawn('critter', edgeIn(P, Math.atan2(py - P.y, px - P.x), Math.hypot(VW, VH) / 2 + 60), 1.3, bel);
             if (e) { e.breaker = T; e.plant = { x:px, y:py }; e.hp = e.max = e.hp * HOLD.brkHp; e.r *= 1.15; e.size *= 1.2; } }
@@ -7820,7 +7831,7 @@ function update(dt) {
     if (e.kb > 0) { e.kb -= dt; e.x += e.kx * dt; e.y += e.ky * dt; continue; }
     if (S.bloom && !e.boss) { bloomCreature(e, Math.hypot(P.x - e.x, P.y - e.y), dt); continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
-    if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.plant) { const L = e.plant, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 16) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } else e.planted = true; } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
+    if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.plant) { const L = e.plant, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 16) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } else { e.planted = true; if (!e.big) { e.big = 1; e.size *= 1.25; } const n = 'breaker-' + e.el; if (BREAKER_ART.includes(e.el) && e.img !== n && ok(IMG[n])) e.img = n; } } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
     if (d < e.r + P.r && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .55; P.hitAt = S.t; const x0 = P.x, y0 = P.y; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
       const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + Math.min(1, S.t / (S.level === 1 ? 270 : 180))) * lvHit()) * armourVs(e.el) * titanSkin(); P.hp -= hit; S.hitsTaken = (S.hitsTaken || 0) + 1; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
       if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? (S.storm ? S.storm.r0 + 400 : A.r) - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } keeperHit(e.x, e.y, e.el, e.boss || e.heavy, e.boss ? { x:P.x - x0, y:P.y - y0 } : null); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
@@ -8459,7 +8470,10 @@ function draw() {
   if (S.runaway) { const R = S.runaway, hop = Math.abs(Math.sin(S.t * 12)) * 10, k = R.t > PRESS.life - 2 ? .5 + .5 * Math.sin(S.t * 20) : 1;
     g.fillStyle = 'rgba(0,0,0,.2)'; g.beginPath(); g.ellipse(R.x, R.y + 4, 20, 7, 0, 0, TAU); g.fill();
     add(() => glowAt(R.x, R.y - 24 - hop, 90, '#FFD24A', .8 * k));
-    const im = IMG['x-runaway']; if (im && ok(im)) { g.save(); g.globalAlpha = k; g.translate(R.x, R.y - hop); g.scale(R.fx || 1, 1); g.drawImage(im, -36, -66, 72, 72); g.restore(); }
+    // its four-frame run cycle (brief 31), stepped by the ground it covers; it faces the way it runs
+    const mv = Math.hypot(R.x - (R.mpx ?? R.x), R.y - (R.mpy ?? R.y)); R.mpx = R.x; R.mpy = R.y; R.mph = ((R.mph || 0) + Math.min(mv, 40) / 14) % 4;
+    const fk = 'x-runaway-m' + (1 + Math.floor(R.mph)), im = mv > .2 && ok(IMG[fk]) ? IMG[fk] : IMG['x-runaway'];
+    if (im && ok(im)) { g.save(); g.globalAlpha = k; g.translate(R.x, R.y - hop * .4); g.scale(R.fx || 1, 1); g.drawImage(im, -44, -84, 88, 88); g.restore(); }
     else { g.globalAlpha = k; g.fillStyle = '#FFE58A'; g.beginPath(); g.arc(R.x, R.y - 26 - hop, 17, 0, TAU); g.fill(); g.fillStyle = '#FFFFFF'; g.beginPath(); g.arc(R.x - 5, R.y - 31 - hop, 6, 0, TAU); g.fill(); g.globalAlpha = 1; } }
   drawGiantFx();
   if (S.level === 5) drawTempleWarn();
@@ -8513,7 +8527,7 @@ function draw() {
     const flip = e.own ? (e.K.face === -1 && toward > 0) : (e.type === 'wolf' && toward > 0);
     if (e.own && !e.boss && fly) { g.fillStyle = 'rgba(10,20,30,.25)'; g.beginPath(); g.ellipse(e.x, e.y + e.r * .6, e.r * .9, e.r * .35, 0, 0, TAU); g.fill(); }
     if (e.boss) { drawBoss(e, hk); if (e.guard) { const im = IMG['guard-' + e.realm], r = e.size * .62, cy = e.y - e.size * .38, pu = .85 + .15 * Math.sin(S.t * 5);
-        if (im && ok(im)) { g.globalAlpha = .85 * pu; g.drawImage(im, e.x - r, cy - r, r * 2, r * 2); g.globalAlpha = 1; }
+        if (im && ok(im) && GUARD_ART.includes(e.realm)) { g.globalAlpha = .85 * pu; g.drawImage(im, e.x - r, cy - r, r * 2, r * 2); g.globalAlpha = 1; g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 3; g.beginPath(); g.arc(e.x, cy, r * .97, 0, TAU); g.stroke(); }
         else { g.save(); g.globalAlpha = .28 * pu; g.fillStyle = '#DFF0FF'; g.beginPath(); g.arc(e.x, cy, r, 0, TAU); g.fill(); g.globalAlpha = .8 * pu; g.strokeStyle = '#F4FAFF'; g.lineWidth = 6; g.stroke();
           g.globalAlpha = .5; g.lineWidth = 2; for (let i = 0; i < 6; i++) { const a = i / 6 * TAU + .3; g.beginPath(); g.moveTo(e.x + Math.cos(a) * r * .35, cy + Math.sin(a) * r * .35); g.lineTo(e.x + Math.cos(a) * r, cy + Math.sin(a) * r); g.stroke(); } g.restore(); } }
       return; }
@@ -10683,7 +10697,7 @@ function tipArt(id) {
   return `<div class="hsdemo logo"><img class="logo-pic" src="art4/logo-morqi.png?v=11" alt=""></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { lastbreath:'lastbreath', react:'react', chesthold:'chesthold', lvhold:'lvhold', evoteach:'evoteach', giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', wall:'wall', shooters:'shooters', l4temples:'l4temples', l5temples:'l5temples', surge:'surge' };
+const CARD_VO = { lastbreath:'lastbreath', react:'react', chesthold:'chesthold', lvhold:'lvhold', evoteach:'evoteach', giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', wall:'wall', shooters:'shooters', l4temples:'l4temples', l5temples:'l5temples', surge:'surge', breakers:'breakers', runaway:'runaway', goal:'goal' };
 function showCoach(c) {
   // (the same card never twice in a row; Sammy's QA v2 #8)
   if (c.id && COACH.lastId === c.id && performance.now() - (COACH.lastAt || 0) < 8000) { hideCoach(); return; }
@@ -11442,6 +11456,8 @@ function titlePic(k) {
 }
 function results(quiet) {
   $('#hud').hidden = true; S.quietPay = !!quiet;
+  // the pitch link only, after a win: pass MorQi on (a plain link, nothing tracked; never in the children's build)
+  $('#resShare').hidden = !(PITCH && S.won);
   // the home theme comes in under Victory, so the screen is never silent and it carries you home (A's playthrough, 2026-10-05)
   if (S.won) setTimeout(() => { if (S && S.over && !$('#results').hidden) { AU.music(true); AU.song('home'); } }, 1600);
   { const r = payPet(); $('#petProg').innerHTML = r ? petProgHTML(r) : ''; if (!quiet && r && r.after.stage > r.before.stage) setTimeout(() => SFX.jackpot(true), 1400); }
@@ -11854,7 +11870,7 @@ function applyProfile(p) { keeper = p.keeper; animal = p.animal; keeperEl = p.el
 { const t0 = performance.now(), ti = $('#title'); ti.classList.add('loading');
   const tick = () => { const p = LD.n ? LD.d / LD.n : 1, lit = Math.min(5, Math.floor(p * 5 + .001)), done = (p >= 1 && performance.now() - t0 > 1200) || performance.now() - t0 > 7000;
     [...$('#ldBar').children].forEach((s, i) => s.classList.toggle('on', i < (done ? 5 : lit))); $('#ldBar').setAttribute('aria-valuenow', Math.round((done ? 1 : p) * 100));
-    if (done) { $('#ldT').textContent = 'The world is awake'; $('#ldGo').hidden = false; return; } setTimeout(tick, 120); };
+    if (done) { $('#ldT').textContent = 'Your garden is waiting'; $('#ldGo').hidden = false; return; } setTimeout(tick, 120); };
   tick(); }
 /* MorQi as a living cloud (A, 2026-10-05: "MorQi in a shape of living breathing clouds. No faces just moving and
    'breathing' clouds as live animation"). The word is built from soft cloud puffs sampled from the logo itself: big
@@ -12050,8 +12066,9 @@ function renderHome() {
     eventChip(ev);
     // the chip is the one notice: it rings softly once a day, never a toast over Play (design review, 2026-10-09)
     if (ev && store.get('morqi.eventSaid') !== today) { store.set('morqi.eventSaid', today); const c = $('#hmEvent'); c.classList.remove('new'); void c.offsetWidth; c.classList.add('new'); }
-    if (w) setTimeout(() => toast(`Your garden wilted a little while you were away. One breath a day keeps it green.`, 4600), 900);
-    else if (gardenThirsty() && store.get('morqi.thirsty') !== today) { store.set('morqi.thirsty', today); setTimeout(() => toast('Your garden is thirsty. Breathe today, or it starts to wilt tomorrow.', 4600), 900); } }
+    // (never the first thing a returning player sees: the welcome comes first, and the garden's need comes after it, as an invitation)
+    if (w) setTimeout(() => toast(`One breath today helps your garden grow green again.`, 4600), homeLater(900));
+    else if (gardenThirsty() && store.get('morqi.thirsty') !== today) { store.set('morqi.thirsty', today); setTimeout(() => toast('A breath today keeps your garden green.', 4600), homeLater(900)); } }
   liveStart();
   const K = KEEPER_INFO[keeper - 1] || KEEPER_INFO[0];
   const I = petInfo(); $('#hmFace').src = `art4/k${keeper}-face.png?v=13`; $('#hmName').textContent = `${K.n} & ${ANIMAL[animal].y}`;
@@ -12062,18 +12079,62 @@ function renderHome() {
   // ...and again whenever a plot or a Star Call can be grown with the Sparks in hand (meeting 3: nobody found Grow your Sanctuary)
   { const g = grown(), q = qi(), plot = PLOTS.some(p => (g[p.el] || 0) < plotMax(p.el) && q >= plotCost(g[p.el] || 0, p.el)), call = Object.keys(CALL).some(id => callOwned(id) && callLv(id) < CALL_UP.length && q >= CALL_UP[callLv(id)]);
     $('#hmQi').classList.toggle('hint', (qi() > 0 && store.get('morqi.sparksTaught') !== '1') || plot || call); }
-  if (nb && !homeSaid) { homeSaid = true; setTimeout(() => AU.vo('vo-booknew', 0, .5), 700); }
+  if (nb && !homeSaid) { homeSaid = true; setTimeout(() => AU.vo('vo-booknew', 0, .5), homeLater(700)); }
   // a new season's theme, offered once to players who keep the music off
-  if (!PITCH && !AU.musicOn && store.get('morqi.themeAsked') !== THEME.id) { store.set('morqi.themeAsked', THEME.id); store.set('morqi.themeBonus', 'want:' + THEME.id); $('#thName').textContent = THEME.n; setTimeout(() => openSheet('#themeSheet'), 900); }
+  if (!PITCH && !AU.musicOn && store.get('morqi.themeAsked') !== THEME.id) { store.set('morqi.themeAsked', THEME.id); store.set('morqi.themeBonus', 'want:' + THEME.id); $('#thName').textContent = THEME.n; setTimeout(() => openSheet('#themeSheet'), homeLater(900)); }
   { const done = dailyToday(), d = daily(), b = $('#hmDaily'); b.classList.toggle('done', done); $('#hmDayN').textContent = done ? `Day ${d.count} ✓` : d.count ? `Day ${d.count + 1}` : '30 seconds';
     // (asleep, it shows Codex's own sleeping art, brief 21; awake, its normal look)
-    const sl = petSleepy() && !done; $('#hmPet').classList.toggle('sleepy', sl); $('#hmPet').dataset.sleep = sl ? '1' : ''; }
+    const sl = petSleepy() && !done && !welcomeHold; $('#hmPet').classList.toggle('sleepy', sl); $('#hmPet').dataset.sleep = sl ? '1' : ''; }
   $('#hmQiN').textContent = qi().toLocaleString(); $('#hmKeeper').src = `art4/k${keeper}-hi.png?v=13`; $('#hmKeeper').alt = K.n; $('#hmPet').src = $('#hmPet').dataset.sleep ? `art4/a-${animal}-sleep.png?v=1` : lookSrc(`art4/a-${animal}-y.png?v=8`); $('#hmPet').alt = ANIMAL[animal].y;
+  skyLight();
 }
+/* Returning players land in their Sanctuary (A, 2026-10-09: the title retires for them; the psychology head's spec). The first frame is
+   the garden at its best: the logo sits in its sky and drifts up and away, Luma says hello, and only after that may a thirsty garden or a
+   sleepy spirit animal show, as an invitation. On the day's first launch the logo leaves a breath light in the sky: touching it is that
+   day's daily breath; anything else just plays. The first touch anywhere wakes the sound (it replaces "Tap to begin"). */
+let welcomeHold = false;
+const homeLater = ms => welcomeHold ? ms + 4800 : ms;
+const SKY = { offer:false, raf:0, t0:0 };
+function landHome() {
+  applyProfile(profile()); welcomeHold = true;
+  const today = dayKey(); SKY.offer = store.get('morqi.launchDay') !== today && !dailyToday(); store.set('morqi.launchDay', today);
+  goTab('home'); document.documentElement.classList.remove('bf1-pre');
+  const wake = () => { try { AU.init(); } catch (e) {} AU.music(true); AU.song('home'); };
+  try { AU.init(); if (AU.ctx && AU.ctx.state === 'running') wake(); } catch (e) {}
+  addEventListener('pointerdown', wake, { capture:true, once:true });
+  const wel = $('#hmWelcome'), lu = $('#hmLuma'), sky = $('#hmSky'), soft = reduce;
+  wel.hidden = false; lu.hidden = false;
+  wel.animate(soft ? [{ opacity:1 }, { opacity:1, offset:.4 }, { opacity:0 }] : [{ opacity:1, transform:'none' }, { opacity:1, transform:'none', offset:.4 }, { opacity:0, transform:'translateY(-70px) scale(.55)' }],
+    { duration:2400, easing:'cubic-bezier(.45,0,.25,1)', fill:'forwards' }).onfinish = () => { wel.hidden = true; };
+  lu.animate([{ opacity:0, transform:soft ? 'none' : 'translateY(8px)' }, { opacity:1, transform:'none', offset:.12 }, { opacity:1, offset:.85 }, { opacity:0 }], { duration:3600, delay:1300, fill:'both' }).onfinish = () => { lu.hidden = true; };
+  setTimeout(() => { if (AU.ctx && AU.ctx.state === 'running') AU.vo('vo-welcome-back', 0, .5); }, 1400);
+  if (SKY.offer) sky.animate([{ opacity:0, transform:'scale(.6)' }, { opacity:1, transform:'none' }], { duration:soft ? 600 : 1100, delay:1500, easing:'cubic-bezier(.2,.75,.2,1)', fill:'both' });
+  // after the welcome: the garden's real state, as an invitation
+  setTimeout(() => { welcomeHold = false; if (!$('#home').hidden) { const sl = petSleepy() && !dailyToday(); $('#hmPet').classList.toggle('sleepy', sl); $('#hmPet').dataset.sleep = sl ? '1' : '';
+    $('#hmPet').src = sl ? `art4/a-${animal}-sleep.png?v=1` : lookSrc(`art4/a-${animal}-y.png?v=8`); } }, 4800);
+}
+// the breath light in the Sanctuary's sky: the opening's own light, breathing six times a minute
+// the Daily breath pill's icon: the same light, small and still (A's rule: the breath light is Luma's tail)
+function dailyIcon() { const c = $('#hmDailyIcon'); if (!c || c.dataset.drawn || !window.BreatheFirst) return; const D = Math.min(2, devicePixelRatio || 1); c.width = c.height = Math.round(34 * D);
+  const x = c.getContext('2d'); x.setTransform(D, 0, 0, D, 0, 0); BreatheFirst.drawTail(x, 17, 17, 12, -.6, -1, 1, 0, 0); c.dataset.drawn = '1'; }
+function skyLight() {
+  dailyIcon();
+  const b = $('#hmSky'), on = SKY.offer && !dailyToday() && !!window.BreatheFirst; b.hidden = !on;
+  // one way into the breath at a time: while the sky light shows, the Daily breath pill steps out of the way
+  $('#hmDaily').classList.toggle('quiet', on);
+  if (!on || SKY.raf) return;
+  const cv = b.querySelector('canvas'), D = Math.min(2, devicePixelRatio || 1); cv.width = cv.height = Math.round(104 * D); const x = cv.getContext('2d'); SKY.t0 = performance.now();
+  const f = now => { if ($('#home').hidden || b.hidden) { SKY.raf = 0; return; } SKY.raf = requestAnimationFrame(f);
+    const t = (now - SKY.t0) / 1000, br = reduce ? 0 : Math.sin(t * TAU / 10);
+    x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, cv.width, cv.height); x.setTransform(D, 0, 0, D, 0, 0);
+    BreatheFirst.drawTail(x, 52, 52, 24 * (1 + .07 * br), reduce ? -.6 : -.6 + t * .1, .45 + .25 * br, 1, 0, t); };
+  SKY.raf = requestAnimationFrame(f);
+}
+$('#hmSky').onclick = () => { SFX.select(); AU.init(); SKY.offer = false; $('#hmSky').hidden = true; $('#hmDaily').classList.remove('quiet'); breatheLife(keeperEl, true); };
 $('#hmGo').onclick = () => { SFX.select(); goTab('map'); };
 // the TV intro can be switched off (Orson's brief: an off switch in Settings); it only shows on a computer
 { const t = $('#setTv'), sync = () => { const on = store.get('morqi.tunein') !== 'off'; t.classList.toggle('off', !on); t.setAttribute('aria-pressed', on); };
-  t.onclick = e => { e.preventDefault(); store.set('morqi.tunein', store.get('morqi.tunein') === 'off' ? 'on' : 'off'); sync(); SFX.select(); }; sync(); $('#setTvRow').hidden = !DESK(); }
+  t.onclick = e => { e.preventDefault(); store.set('morqi.tunein', store.get('morqi.tunein') === 'off' ? 'on' : 'off'); sync(); SFX.select(); }; sync(); $('#setTvRow').hidden = true; }   // the TV intro is retired (Breathe First, 2026-10-09), so its switch is too
 $('#hmDaily').onclick = () => { SFX.select(); AU.init(); breatheLife(keeperEl, true); };
 // a sleepy spirit animal on the home screen, tapped, wakes into the daily breath
 $('#hmPetFig').addEventListener('click', () => { if ($('#hmPet').classList.contains('sleepy')) { SFX.select(); AU.init(); breatheLife(keeperEl, true); } else openCharms(); });
@@ -12177,7 +12238,7 @@ function renderBook() {
     SFX.select(); const d = $('#bkDetail'); let h;
     if (x.dataset.k) h = beastHTML(x.dataset.k, true) + `<p class="bk-count">Freed ${b[x.dataset.k]} ${b[x.dataset.k] === 1 ? 'time' : 'times'}</p>`;
     else { const el = x.dataset.p, cid = Object.keys(CALL).find(id => CALL[id].from === el), C = cid && CALL[cid];
-      const st = healStage(el), hv = heals()[el] || 0, nx = HEAL_AT[st], lo = st ? HEAL_AT[st - 1] : 0, pic = HEAL_ART.includes(el + st) ? `b-heal-${el}-${st}.png?v=${st === 3 ? 2 : 1}` : `people/face-${el}.png?v=9`;
+      const st = healStage(el), hv = heals()[el] || 0, nx = HEAL_AT[st], lo = st ? HEAL_AT[st - 1] : 0, pic = HEAL_ART.includes(el + st) ? `b-heal-${el}-${st}.png?v=${st === 3 ? 4 : 1}` : `people/face-${el}.png?v=9`;
       h = `<div class="beast big" style="--c:${EL[el]}"><span class="pic"><img src="art4/${pic}" alt=""></span><div><b>${PEOPLE[el]}</b><p>"${FREED[el].q}"</p><span class="chips">Freed from ${BOSSES[el].name.replace(/^The /, 'the ')}</span>`
         + `<span class="bk-heal"><b>${HEAL_NAME[st]}</b>${nx ? `<i style="--p:${((hv - lo) / (nx - lo)).toFixed(3)}"></i><small>Free ${ELNAME[el].toLowerCase()} creatures to help them heal</small>` : '<small>Strong again, thanks to you</small>'}</span>`
         + `${C ? `<span class="bk-gift"><img src="art4/calls/${C.img}.png?v=9" alt="">${C.gift}: ${C.n}</span>` : ''}</div></div>`;
@@ -12278,7 +12339,7 @@ function askHomeScreen() {
   store.set('morqi.askHome', n + 1); store.set('morqi.askHomeAt', dayKey());
   $('#hsSay').textContent = installEv ? 'Install MorQi on this device, so your garden, charms and days of breathing are always kept.'
     : 'Add MorQi to your Home Screen, so your garden, charms and days of breathing are always kept: tap the Share button, then \u201cAdd to Home Screen\u201d.';
-  $('#hsOk').textContent = installEv ? 'Install' : 'Got it'; setTimeout(() => openSheet('#homeSheet'), 1800);
+  $('#hsOk').textContent = installEv ? 'Install' : 'Got it'; setTimeout(() => openSheet('#homeSheet'), homeLater(1800));
 }
 $('#hsOk').onclick = () => { SFX.select(); if (installEv) { installEv.prompt(); installEv = null; } closeSheet($('#homeSheet')); };
 $('#hsLater').onclick = () => { SFX.select(); closeSheet($('#homeSheet')); };
@@ -12304,9 +12365,9 @@ $('#glDone').onclick = () => { SFX.select(); closeSheet($('#goalSheet')); };
 function eventChip(ev) {
   const c = $('#hmEvent'); c.hidden = !ev; if (!ev) return;
   const col = EL[ev.el]; c.style.setProperty('--c', col);
-  $('#hmEvBadge').src = `art4/events/event-${ev.el}-badge.png?v=1`; $('#hmEvName').textContent = ev.n; $('#hmEvSub').textContent = `Double ${ELNAME[ev.el].toLowerCase()} qi`;
+  $('#hmEvBadge').src = `art4/events/event-${ev.el}-badge.png?v=3`; $('#hmEvName').textContent = ev.n; $('#hmEvSub').textContent = `Double ${ELNAME[ev.el].toLowerCase()} qi`;
   c.onclick = () => { SFX.select(); c.classList.remove('new');
-    $('#evBanner').src = `art4/events/event-${ev.el}-banner.webp?v=1`; $('#evBadge').src = `art4/events/event-${ev.el}-badge.png?v=1`; $('#evTitle').textContent = ev.n;
+    $('#evBanner').src = `art4/events/event-${ev.el}-banner.webp?v=1`; $('#evBadge').src = `art4/events/event-${ev.el}-badge.png?v=3`; $('#evTitle').textContent = ev.n;
     $('#evSay').textContent = `All weekend, every ${ELNAME[ev.el].toLowerCase()} creature you free gives double ${ELNAME[ev.el].toLowerCase()} qi for your garden. It ends Sunday night.`;
     openSheet('#eventSheet'); AU.vo('vo-event', .3, .45); };
 }
@@ -12438,9 +12499,13 @@ function openReveal(id) { const D = CALL[id]; if (!D || !S) return; S.revealed =
     $('#crvDemo video').onerror = () => { $('#crvDemo').innerHTML = tipArt('call_' + id); }; }
   $('#crvArt').closest('.crv').querySelector('.crv-k').textContent = S.giftNew === id ? 'New Star Call!' : 'Star Call'; show('callReveal'); SFX.bx('call-seal', 1, 0); }
 $('#crvGo').onclick = () => { SFX.select(); show('results'); };
+$('#resShare').onclick = async () => { SFX.select(); const url = location.origin + location.pathname + '?from=pitch', text = 'One breath, a frozen world comes back. Ten seconds:';
+  try { if (navigator.share) { await navigator.share({ text:text + ' ' + url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text + ' ' + url); toast('Link copied'); } catch (e) { toast(url, 6000); } };
 $('#ascBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (!S || S.over || hsOn() || S.omni || S.finisherUsed) return; S.finisherUsed = true; $('#ascBtn').hidden = true; hsStart(false, 5, true); });
 $('#resGift').addEventListener('click', () => { const id = $('#resGift').dataset.id; if (S && id) openReveal(id); });
-cloudStart();
+// the opening plays from the first frame: every pitch visit, and a family's first launch; a returning player lands in their Sanctuary
+{ const m = openingWanted(); if (m && startOpening(m)) {} else if (profile() && !PITCH) landHome(); else { document.documentElement.classList.remove('bf1-pre'); cloudStart(); } }
 })();
 </script>
 </body></html>
