@@ -4493,7 +4493,8 @@ function spawn(type, at, rush, el) {
     // off screen round the Keeper, at a point inside the world (QA, 2026-10-06: clamping a point beyond the edge pulled it back on screen)
     // just past the edge of the view in that direction (A, 2026-10-09: on a wide desktop the old circle reached 1,500 units, so
     // creatures from above and below spent ages walking in and the field felt empty)
-    else { const edge = q => Math.min(VW / 2 / Math.max(.01, Math.abs(Math.cos(q))), VH / 2 / Math.max(.01, Math.abs(Math.sin(q)))) + 60;
+    // (wide screens only: phones keep the circle their balance was tuned on)
+    else { const wide = VW > VH, edge = q => wide ? Math.min(VW / 2 / Math.max(.01, Math.abs(Math.cos(q))), VH / 2 / Math.max(.01, Math.abs(Math.sin(q)))) + 60 : Math.hypot(VW, VH) / 2 + 50;
       let b = a, d = edge(b); for (let k = 0; k < 10; k++) { const tx = S.p.x + Math.cos(b) * d, ty = S.p.y + Math.sin(b) * d; if (tx > 30 && tx < WORLD - 30 && ty > 30 && ty < WORLD - 30) break; b = rnd(0, TAU); d = edge(b); }
       x = S.p.x + Math.cos(b) * d; y = S.p.y + Math.sin(b) * d; }
   }
