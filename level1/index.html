@@ -79,7 +79,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .rb{position:relative;display:block;text-align:center}
 .ribbon{display:inline-block;font-family:var(--round);font-weight:900;font-size:27px;letter-spacing:-.015em;color:var(--ink);white-space:nowrap}
 .rb.red .ribbon{color:var(--coral-2)}
-.fbdemo{position:absolute;inset:0;display:grid;place-items:center;background:#22252E}.fbdemo img{width:100%!important;height:100%!important;max-width:none;object-fit:contain}
+.fbdemo{position:absolute;inset:0;display:grid;place-items:center;background:#22252E}
+.rundemo{background:radial-gradient(circle at 50% 55%,rgba(255,214,90,.35),rgba(34,37,46,0) 60%),#22252E}.rundemo img{width:62%!important;height:auto!important;filter:drop-shadow(0 0 18px rgba(255,214,90,.7))}.fbdemo img{width:100%!important;height:100%!important;max-width:none;object-fit:contain}
 .lu-pips[hidden]{display:none}
 /* a Mega Level Up says how far its one pick grows, with the chest when one joined it (A, 2026-10-08) */
 .lu-pips{align-items:center}.lu-pips b{font:900 16px var(--round);color:#FFE58A;padding:2px 10px;border-radius:99px;background:rgba(20,24,60,.45);box-shadow:inset 0 0 0 1px rgba(255,229,138,.45)}#levelUp.mega #luTitle{color:#FFE58A;text-shadow:0 0 18px rgba(255,214,90,.75)}
@@ -10680,6 +10681,8 @@ function tipArt(id) {
   if (id === 'l5temples') return `<div class="fbdemo"><img src="${l5Pic()}" alt=""></div>`;
   if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic(S && S.out ? S.out.els[0] : S && S.l5 ? (openOf(S.l5)[0] || SHRINES[0]).el : 'wood')}" alt=""></div>`;
   if (id === 'surge') return `<div class="fbdemo"><img src="${surgePic()}" alt=""></div>`;
+  // the golden runaway's card shows the runaway itself, mid-dash (QA from A's play, 2026-10-09: it fell back to the logo)
+  if (id === 'runaway') return `<div class="fbdemo rundemo"><img src="art4/x-runaway-m2.png?v=1" alt=""></div>`;
   if (id === 'breakers') return `<div class="fbdemo"><img src="${breakerPic(S && S.out ? (openOf(S.out)[0] || S.out.towers[0]).el : 'wood')}" alt=""></div>`;
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-omni.png?v=1" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
