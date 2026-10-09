@@ -105,6 +105,10 @@ html.desk #estones{right:24px;top:50%;transform:translateY(-50%);gap:10px}html.d
 .set-save{display:flex;gap:8px;justify-content:center;margin:8px 0}
 .set-code{display:grid;gap:6px;margin:4px 0 8px}.set-code p{margin:0;text-align:center;font:800 13px/1.35 var(--round);opacity:.85}
 .set-code textarea{width:100%;box-sizing:border-box;border:0;border-radius:12px;padding:10px;background:rgba(255,255,255,.08);color:#fff;font:600 12px/1.3 ui-monospace,Menlo,monospace;resize:none}
+/* the reaction journal (2026-10-09): two stones meet in one tile */
+.bk-two{display:flex;justify-content:center;align-items:center}.bk-two img{width:46%!important;margin:0 -5%}.bk-two img:first-child{transform:rotate(-12deg)}.bk-two img:last-child{transform:rotate(12deg)}
+/* the crown (2026-10-09): won by freeing a three-star level without falling */
+#lvStars .crown{width:20px;height:20px;margin-left:6px;vertical-align:-3px;fill:rgba(255,255,255,.18)}#lvStars .crown.on{fill:#FFD24A;filter:drop-shadow(0 0 6px rgba(255,210,74,.6))}
 /* the Spirit Chest's bubbles: what it gave, small, never stopping play (A, 2026-10-08) */
 #chestPop{position:absolute;left:50%;top:57%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:30}
 .cpop{display:flex;align-items:center;gap:7px;padding:4px 13px 4px 4px;border-radius:99px;background:rgba(14,20,52,.74);box-shadow:inset 0 0 0 1px rgba(255,229,138,.35),0 6px 14px rgba(4,6,22,.25);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:900 13px var(--round);color:#fff;white-space:nowrap;animation:cpopIn .35s var(--spring);transition:opacity .35s,transform .35s}
@@ -1505,6 +1509,9 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 .bk-prog i b{display:block;height:100%;border-radius:99px;background:var(--c)}
 .bk-tabs button{display:flex;align-items:center;gap:6px;min-height:44px}
 .bk-tabs button img{width:26px;height:26px;object-fit:contain}
+/* three tabs fit a phone (the reaction journal joined, 2026-10-09) */
+.bk-tabs{max-width:100%}.bk-tabs button{padding:8px 12px;font-size:13px;gap:5px}.bk-tabs button img{width:22px;height:22px}
+.beast .pic.bk-two{display:flex}.beast .pic.bk-two img{width:44%!important}
 .bk-tabs button[data-bk="p"] img{border-radius:50%;object-fit:cover}
 .bk-grid.c4{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .bk-grid.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -1829,7 +1836,7 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
   </section>
   <section class="scr" id="book" hidden>
     <div class="bk-head"><h2>The Freed Book</h2><div class="bk-prog" id="bkBar"></div><small id="bkN"></small></div>
-    <div class="bk-tabs" role="tablist"><button class="on" data-bk="c" role="tab"><img src="art4/e-water-a.png?v=8" alt="">Creatures</button><button data-bk="p" role="tab"><img src="art4/people/face-water.png?v=9" alt="">People</button></div>
+    <div class="bk-tabs" role="tablist"><button class="on" data-bk="c" role="tab"><img src="art4/e-water-a.png?v=8" alt="">Creatures</button><button data-bk="p" role="tab"><img src="art4/people/face-water.png?v=9" alt="">People</button><button data-bk="r" role="tab"><img src="art4/props/x-stone-fire.png?v=8" alt="">Reactions</button></div>
     <div class="bk-grid" id="bkGrid"></div>
     <div class="bk-detail" id="bkDetail" hidden></div>
   </section>
@@ -6097,6 +6104,8 @@ function react(key, R, x, y) {
   const dmg = 22 + 7 * S.lv, P = S.p; S.reacts = (S.reacts || 0) + 1; megaPts(3); goalTick('react');
   const full = S.t - (S.reactFxAt ?? -9) >= .6; if (full) S.reactFxAt = S.t;
   const said = (S.reactSaid = S.reactSaid || {}); said[key] = (said[key] || 0) + 1;
+  // the reaction journal remembers each pair the first time it is made
+  if (said[key] === 1) { const rs = (store.get('morqi.reactsSeen') || '').split(',').filter(Boolean); if (!rs.includes(key)) { rs.push(key); store.set('morqi.reactsSeen', rs.join(',')); } }
   if (said[key] <= 2) floatText(x, y - 90, R.n + '!', R.c, 24);
   // the first reaction teaches the rule with the two elements that just met: which one feeds which
   if (!SEEN.has('_react')) { markSeen('_react'); const [a, b] = key.split('|'), from = FEEDS[a] === b ? a : b, to = from === a ? b : a;
@@ -11324,6 +11333,11 @@ function results(quiet) {
     ${got ? `<g class="gold">${star} fill="url(#sg)" stroke="#9A5200" stroke-width="5" stroke-linejoin="round"/><ellipse cx="40" cy="34" rx="11" ry="6" fill="#fff" opacity=".6" transform="rotate(-25 40 34)"/></g>` : ''}</svg><span>${label}</span></div>`).join('');
   { const got = goals.filter(x => x[0]).length, before = starTotal(), bl = bloomLife(before);
     if (got > starsOf(LVL)) store.set('morqi.stars.' + LVL, got);
+    // the crown (2026-10-09): with all three stars, freeing the realm without falling once wins this level's crown, a target for the
+    // strongest players (Sammy, meeting 3: "unstoppable" by the end)
+    { const crowned = !!store.get('morqi.crown.' + LVL);
+      if (!quiet && S.won && got === 3 && !(S.falls || 0) && !crowned) { store.set('morqi.crown.' + LVL, '1'); addQi(100); setTimeout(() => toast('Crown won! You freed it without falling once. +100 Sparks', 4600), 2600); }
+      else if (!quiet && S.won && got === 3 && !crowned) setTimeout(() => toast('Next: win without falling once for this level\u2019s crown.', 4200), 2600); }
     const now = bloomLife(), el = $('#resBloom');
     el.hidden = now === bl; if (now !== bl) el.innerHTML = `<img src="art4/props/x-bloom.png?v=8" alt="">Your Bloom now lasts ${now} seconds`;
     renderLevels(); }
@@ -11434,7 +11448,9 @@ function renderLevels() {
   $('#lvNum').textContent = `Level ${LVL}`; $('#lvName').textContent = LEVELS[LVL - 1].name; $('.tname').style.setProperty('--c', EL[REALM[LVL - 1]]);
   $('.tname').classList.toggle('locked', locked);
   if (locked) { $('#lvStars').innerHTML = `<b class="tlock">Free ${LEVELS[u - 1].name.replace(/^The /, 'the ')} to open it</b>`; $('#lvStars').setAttribute('aria-label', 'Locked'); }
-  else { $('#lvStars').innerHTML = [0, 1, 2].map(i => `<i class="${i < st ? 'on' : ''}">\u2605</i>`).join(''); $('#lvStars').setAttribute('aria-label', `${st} of 3 stars`); }
+  else { const cr = !!store.get('morqi.crown.' + LVL);
+    $('#lvStars').innerHTML = [0, 1, 2].map(i => `<i class="${i < st ? 'on' : ''}">\u2605</i>`).join('') + (st === 3 || cr ? `<svg class="crown${cr ? ' on' : ''}" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-1.6-10-4.6 4.2L12 5 9.2 12.2 4.6 8z"/></svg>` : '');
+    $('#lvStars').setAttribute('aria-label', `${st} of 3 stars${cr ? ', and the crown' : ''}`); }
   const pb = $('#playBtn'); pb.disabled = locked; pb.classList.toggle('locked', locked); if (locked) { pb.textContent = 'Locked'; pb.className = 'btn green locked'; } else diffBtn(pb, LVL);
   $('#lvPrev').disabled = LVL <= 1; $('#lvNext').disabled = LVL >= LEVELS.length;
   $('#lvls').innerHTML = LEVELS.map((L, i) => `<button role="tab" style="--c:${EL[REALM[i]]}" class="${i + 1 === LVL ? 'cur' : ''}${i + 1 > u ? ' lock' : ''}" data-n="${i + 1}" aria-label="Level ${i + 1}: ${L.name}${i + 1 > u ? ' (locked)' : ''}" aria-selected="${i + 1 === LVL}" ${i + 1 > u ? 'disabled' : ''}></button>`).join('');
@@ -11981,6 +11997,17 @@ const FEEL = { water:'fear', wood:'anger', fire:'restlessness', earth:'worry', m
 function renderBook() {
   const b = bookOf(), ORD = ['a', 'b', 'c', 'm'], kinds = Object.keys(KIND).sort((x, y) => REALM.indexOf(x.split('-')[0]) - REALM.indexOf(y.split('-')[0]) || ORD.indexOf(x.split('-')[1]) - ORD.indexOf(y.split('-')[1]));
   const got = kinds.filter(k => b[k]).length, freed = REALM.filter(el => SEEN.has('_freed-' + el));
+  // the reaction journal (2026-10-09): the five feeding pairs are shown from the start, each pair's two stones; a reaction's name
+  // fills in the first time the child makes it, so finding how the elements combine becomes a collection
+  if (bkTab === 'r') { const RK = Object.keys(REACT), seenR = (store.get('morqi.reactsSeen') || '').split(',').filter(Boolean), g = $('#bkGrid'); $('#bkDetail').hidden = true;
+    $('#bkBar').innerHTML = RK.map(k => `<i style="--c:${REACT[k].c}"><b style="width:${seenR.includes(k) ? 100 : 0}%"></b></i>`).join('');
+    $('#bkN').textContent = `${seenR.length} of ${RK.length} reactions found`; document.querySelectorAll('.bk-tabs button').forEach(x => x.classList.toggle('on', x.dataset.bk === bkTab));
+    g.className = 'bk-grid c3';
+    g.innerHTML = RK.map(k => { const [a, z] = k.split('|'), f = seenR.includes(k);
+      return `<button class="bk-c bk-r${f ? '' : ' frozen'}" data-r="${k}" style="--c:${REACT[k].c}" aria-label="${f ? REACT[k].n : `Not found yet: ${ELNAME[a]} and ${ELNAME[z]}`}"><span class="bk-two"><img src="art4/props/x-stone-${a}.png?v=8" alt=""><img src="art4/props/x-stone-${z}.png?v=8" alt=""></span><span>${f ? REACT[k].n : '?'}</span></button>`; }).join('');
+    g.querySelectorAll('.bk-r').forEach(x => x.onclick = () => { const k = x.dataset.r, [a, z] = k.split('|'), f = seenR.includes(k), [fe, fd] = FEEDS[a] === z ? [a, z] : [z, a]; SFX.select();
+      $('#bkDetail').innerHTML = `<div class="bk-sheet"><div class="beast big" style="--c:${REACT[k].c}"><span class="pic bk-two"><img src="art4/props/x-stone-${a}.png?v=8" alt=""><img src="art4/props/x-stone-${z}.png?v=8" alt=""></span><div><b>${f ? REACT[k].n : 'Not found yet'}</b><p>${f ? `${ELNAME[fe]} feeds ${ELNAME[fd]}, so they mix: hit one creature with both.` : `Hit one creature with ${ELNAME[a]} and with ${ELNAME[z]} to find it.`}</p></div></div></div>`; $('#bkDetail').hidden = false; });
+    return; }
   // the bar fills by realm, each in its own element's colour
   $('#bkBar').innerHTML = REALM.map(el => { const all = bkTab === 'c' ? kinds.filter(k => k.startsWith(el + '-')) : [el], n = bkTab === 'c' ? all.filter(k => b[k]).length : freed.includes(el) ? 1 : 0;
     return `<i style="--c:${EL[el]}"><b style="width:${n / all.length * 100}%"></b></i>`; }).join('');
