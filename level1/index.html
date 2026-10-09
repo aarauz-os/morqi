@@ -5901,6 +5901,8 @@ function spawnGiant(k, at) {
   const e = spawn('golem', at || { x:clamp(P.x + Math.cos(a) * d, 80, WORLD - 80), y:clamp(P.y + Math.sin(a) * d, 80, WORLD - 80) }, 1, el); if (!e) return null;
   const art = 'g-' + k + '-' + el, pose = art + '-' + { rammer:'stuck', colossus:'open', alpha:'howl' }[k];
   if (GIANT_ART) giantSheet(k);
+  // its walk in its own element (Codex, brief 27), loaded the first time that giant and element appear
+  if (!IMG[art + '-m1']) for (let n = 1; n <= 4; n++) load(`${art}-m${n}`, `art4/move/${art}-m${n}.webp?v=1`);
   Object.assign(e, { type:'giant', giant:k, gst:'walk', gcd:2.4, howl:.6, size:G.size, r:G.r, sp:G.sp * (1 + .04 * (S.hard || 0)), dmg:G.dmg, heavy:true, xp:40, tagT:3.5,
     gart:art, gpose:pose, img:GIANT_ART && ok(IMG[art]) ? art : G.stand(el), K:{ ...e.K, n:G.n, tip:null, beh:'giant', face:-1 } });
   e.own = e.img !== 'e-golem' && e.img !== 'e-wolf'; e.hp = e.max = e.max * G.hp * (S.level === 1 ? .6 : 1);
@@ -8357,10 +8359,10 @@ function draw() {
     // each creature's own movement cycle (Codex, brief 24; A: "look like they're actually running and not just gliding"): walkers
     // step with the ground they cover, one frame per 14 px, so feet never slide; floaters and fliers keep their own beat
     let mk = null;
-    // a giant standing in as its plain creature art walks on that art's frames (brief 25 painted the stand-in Colossus and Alpha;
-    // the per-element giants from brief 10 have no movement frames yet)
-    if (e.giant && e.own && !froz && !wind && !rolling && /^e-/.test(e.img)) {
-      moveArt(e.img.slice(2)); const mv = Math.hypot(e.x - (e.mpx ?? e.x), e.y - (e.mpy ?? e.y)); e.mpx = e.x; e.mpy = e.y;
+    // the giants walk: the per-element giants on their own frames (brief 27), a plain stand-in on its creature frames (brief 25);
+    // a special pose (the Rammer stuck, the Colossus open, the Alpha howling) always wins
+    if (e.giant && e.own && !froz && !wind && !rolling && (e.img === e.gart || /^e-/.test(e.img))) {
+      if (/^e-/.test(e.img)) moveArt(e.img.slice(2)); const mv = Math.hypot(e.x - (e.mpx ?? e.x), e.y - (e.mpy ?? e.y)); e.mpx = e.x; e.mpy = e.y;
       e.mph = ((e.mph ?? e.ph) + Math.min(mv, 40) / 18) % 4; const k = e.img + '-m' + (1 + Math.floor(e.mph)); if (mv > .2 && ok(IMG[k])) { mk = k; im = IMG[k]; } }
     if (e.own && !e.boss && !e.giant && art === e.img && !froz && !S.bloom && !(e.rooted > 0) && !(e.dance > 0) && !wind && !rolling) {
       const mv = Math.hypot(e.x - (e.mpx ?? e.x), e.y - (e.mpy ?? e.y)); e.mpx = e.x; e.mpy = e.y;
