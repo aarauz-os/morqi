@@ -6611,7 +6611,8 @@ function pressureTick(dt) {
   const P = S.p; S.slams = S.slams || [];
   // Level 2 is gentle: no runaway, and a slam only finds a Keeper who has not moved in 18 s (QA, 2026-10-09: standing still could still win it)
   if (S.level < PRESS.from) { if (S.l2At == null) { S.l2At = S.t + 18; S.l2Pos = { x:P.x, y:P.y }; }
-    if (S.t >= S.l2At && !S.bossAt && P.hp > 0) { if (Math.hypot(P.x - S.l2Pos.x, P.y - S.l2Pos.y) < 150) { S.slams.push({ x:P.x, y:P.y, t:0, k:1 }); SFX.alarm && SFX.alarm(); } S.l2At = S.t + 18; S.l2Pos = { x:P.x, y:P.y }; }
+    if (S.t >= S.l2At && !S.bossAt && P.hp > 0) { const still = Math.hypot(P.x - S.l2Pos.x, P.y - S.l2Pos.y) < 150; S.l2Still = still ? Math.min(4, (S.l2Still || 0) + 1) : 0;
+      if (still) { S.slams.push({ x:P.x, y:P.y, t:0, k:1 + .5 * (S.l2Still - 1) }); SFX.alarm && SFX.alarm(); } S.l2At = S.t + (S.l2Still > 1 ? 12 : 18); S.l2Pos = { x:P.x, y:P.y }; }
     for (const m of S.slams) { m.t += dt; if (!m.done && m.t >= PRESS.wind) { m.done = true; S.shake = Math.max(S.shake, .35); SFX.thud && SFX.thud(); smoke(m.x, m.y + 10, 8, 40, '210,200,180');
       if (Math.hypot(P.x - m.x, (P.y - m.y) / .7) < PRESS.r) ouch(P.max * PRESS.hurt, m.x, m.y, { src:'slam', push:120, shake:.4 }); } }
     S.slams = S.slams.filter(m => m.t < PRESS.wind + .3); return; }
