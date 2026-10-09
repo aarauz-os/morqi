@@ -1401,6 +1401,18 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 @keyframes hmBob{50%{transform:translateY(-6px)}}
 .hm-go{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(98px + env(safe-area-inset-bottom));min-width:250px;z-index:3}
 /* the daily breath (A, 2026-10-08): a glass pill over Play that glows until today's breath is done */
+/* today: the daily breath and the day's goals side by side (phase 2b, 2026-10-09) */
+.hm-today{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(168px + env(safe-area-inset-bottom));z-index:3;display:flex;gap:8px;align-items:center;width:max-content;max-width:calc(100% - 24px)}
+.hm-today .hm-daily{position:static;transform:none}
+.hm-goals{display:flex;align-items:center;gap:8px;padding:7px 14px 7px 8px;border:0;border-radius:99px;background:rgba(14,20,52,.72);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22),0 8px 20px rgba(0,0,0,.3);color:#fff;cursor:pointer;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.hm-goals span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}.hm-goals b{font:900 15px var(--round)}.hm-goals em{font:800 11.5px var(--round);font-style:normal;opacity:.75}
+.hg-ring{width:30px;height:30px;border-radius:50%;background:conic-gradient(#FFE58A calc(var(--p,0) * 360deg),rgba(255,255,255,.14) 0);-webkit-mask:radial-gradient(circle,transparent 9px,#000 10px);mask:radial-gradient(circle,transparent 9px,#000 10px)}
+.gl-list{display:grid;gap:8px;margin:6px 0 8px}.gl-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px 8px 8px;border-radius:16px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.12)}
+.gl-row img{width:40px;height:40px;object-fit:contain}.gl-row b{display:block;font:900 14px var(--round)}.gl-row i{display:block;height:6px;margin-top:5px;border-radius:99px;background:linear-gradient(90deg,#FFE58A calc(var(--p) * 100%),rgba(255,255,255,.12) 0)}
+.gl-row em{font:900 12px var(--round);font-style:normal;color:#FFE58A;white-space:nowrap}.gl-row.done{box-shadow:inset 0 0 0 2px #7BE07A}.gl-row.done em{color:#7BE07A}
+.gl-qi{text-align:center;font:800 13px var(--round);opacity:.85;margin:2px 0 10px}
+.gr-wells{display:flex;justify-content:center;gap:10px;align-items:center;margin:-2px 0 10px}.gr-well{position:relative;width:38px;height:38px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p) * 360deg),rgba(255,255,255,.1) 0);display:grid;place-items:center}
+.gr-well img{width:26px;height:26px;border-radius:50%;background:rgba(14,20,52,.86);padding:3px}.gr-wcol{border:0;border-radius:99px;padding:8px 14px;background:linear-gradient(180deg,#7BE07A,#3FB45A);color:#0B2A12;font:900 13px var(--round);cursor:pointer}.gr-wcol[disabled]{opacity:.45;cursor:default}
 .hm-daily{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(168px + env(safe-area-inset-bottom));z-index:3;display:flex;align-items:center;gap:10px;padding:7px 18px 7px 8px;border:0;border-radius:99px;
   background:rgba(14,20,52,.78);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22),0 8px 20px rgba(0,0,0,.3);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;animation:hdGlow 2.4s ease-in-out infinite}
 .hm-daily .hd-orb{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#FBF7EE 45%,rgba(255,226,170,.7) 72%);box-shadow:0 0 16px rgba(255,226,170,.8);animation:hdBreathe 4s ease-in-out infinite}
@@ -1768,11 +1780,13 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
       </div>
     </div>
     <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="still-sky h" aria-hidden="true"><i></i></div><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa" id="hmPetFig"><img class="hm-a" id="hmPet" alt=""><i class="hm-zzz" aria-hidden="true">z<b>z</b></i><img class="hm-charm" id="hmCharm" alt="" hidden></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
-    <button class="hm-daily" id="hmDaily" aria-label="Daily breath with your spirit animal"><i class="hd-orb" aria-hidden="true"></i><span><b>Daily breath</b><em id="hmDayN">30 seconds</em></span></button>
+    <div class="hm-today"><button class="hm-daily" id="hmDaily" aria-label="Daily breath with your spirit animal"><i class="hd-orb" aria-hidden="true"></i><span><b>Daily breath</b><em id="hmDayN">30 seconds</em></span></button><button class="hm-goals" id="hmGoals" aria-label="Today's goals"><i class="hg-ring" id="hmGoalRing"></i><span><b>Goals</b><em id="hmGoalN">0 of 3</em></span></button></div>
     <button class="btn green hm-go" id="hmGo">Play</button>
     <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
-      <h3>Grow your Sanctuary</h3><div class="gr-wheel" id="grWheel" role="img"></div><p class="gr-sub">Each plot grows with its own element. Free creatures to fill your stones.</p>
+      <h3>Grow your Sanctuary</h3><div class="gr-wheel" id="grWheel" role="img"></div><p class="gr-sub">Each plot grows with its own element. Free creatures to fill your stones.</p><div class="gr-wells" id="grWells"></div>
       <div class="gr-list" id="grList"></div><h4 class="gr-h" id="grCallsH">Star Calls</h4><p class="gr-qi"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="grQi">0</b> Sparks</p><div class="gr-list" id="grCalls"></div><button class="btn green" id="grDone">Done</button></div></div>
+    <div class="hm-over" id="goalSheet" hidden><div class="hm-sheet">
+      <h3>Today's goals</h3><p class="gr-sub" id="glSub"></p><div class="gl-list" id="glList"></div><p class="gl-qi" id="glQi"></p><button class="btn green" id="glDone">Done</button></div></div>
     <div class="hm-over" id="charmSheet" hidden><div class="hm-sheet">
       <h3>Spirit Charms</h3><p class="gr-sub">Your spirit animal wears one. Each is earned by playing.</p>
       <div class="ch-grid" id="chGrid"></div><p class="ch-say" id="chSay" aria-live="polite"></p><button class="btn green" id="chDone">Done</button></div></div>
@@ -4200,6 +4214,8 @@ function startRun() {
   // the Sanctuary's growth carries into the run: Heart Spring raises health (the other plots act where they apply)
   // the Heart Spring: 8% a level to five, then 2 health a level to 1000
   { const lv = S.grow.water || 0, hp = Math.round(220 * (1 + .08 * Math.min(lv, 5)) + 2 * Math.max(0, lv - 5)); S.p.hp = S.p.max = hp; }
+  // the lifetime Qi level: practice makes the Keeper stronger, 1% power and health a level (and today's goals count in the run)
+  S.lifeMul = lifeMul(); S.p.hp = S.p.max = Math.round(S.p.max * S.lifeMul); S.goals = goalsToday();
   camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; S.cam = { x:camX, y:camY }; S.charm = (charmOn() || {}).c || null;
   if (!towersLevel(LVL)) paintThaw(S.p.x, S.p.y, 150);
   for (let i = 0; i < 3; i++) placeCrate(true);
@@ -4495,7 +4511,7 @@ function hurt(e, dmg, el, o = {}) {
   if (e.fade != null && e.fade < .7) return;
   if (e.K && e.K.beh === 'call' && (Math.abs(e.x - S.p.x) > VW * .5 || Math.abs(e.y - S.p.y) > VH * .5)) return;
   if (e.post && !e.posted) return;   // a shooter can't be freed on its way in, only once it holds its post (QA, 2026-10-08: they died before firing)
-  let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0)) * (surgeOn() ? SURGE.mul : 1) * (lbOn() ? LB.mul : 1);
+  let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0)) * (S.lifeMul || 1) * (surgeOn() ? SURGE.mul : 1) * (lbOn() ? LB.mul : 1);
   // (a boss is never 'barely hurt': at least an even hit on Level 1, where a Keeper may own one element, and at least 0.7 after;
   // Sammy's QA v2, 2026-10-08: a Wood Keeper took 2:45 on the water boss)
   const k0 = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), k = e.boss ? Math.max(S.level === 1 ? 1 : .7, k0) : k0, strong = k > 1, weak = k < 1;
@@ -6063,7 +6079,7 @@ function reactCheck(e, el) {
 // how far a point lies from a line segment: Chain Shock never draws a bolt through the Keeper (design review, 2026-10-08)
 function segDist(px, py, x0, y0, x1, y1) { const dx = x1 - x0, dy = y1 - y0, L = dx * dx + dy * dy || 1, t = clamp(((px - x0) * dx + (py - y0) * dy) / L, 0, 1); return Math.hypot(px - x0 - dx * t, py - y0 - dy * t); }
 function react(key, R, x, y) {
-  const dmg = 22 + 7 * S.lv, P = S.p; S.reacts = (S.reacts || 0) + 1; megaPts(3);
+  const dmg = 22 + 7 * S.lv, P = S.p; S.reacts = (S.reacts || 0) + 1; megaPts(3); goalTick('react');
   const full = S.t - (S.reactFxAt ?? -9) >= .6; if (full) S.reactFxAt = S.t;
   const said = (S.reactSaid = S.reactSaid || {}); said[key] = (said[key] || 0) + 1;
   if (said[key] <= 2) floatText(x, y - 90, R.n + '!', R.c, 24);
@@ -6510,7 +6526,7 @@ function lbTick(dt) {
 const EST_NEED = [80, 400, 400, 450, 550], EST_GAP = 45, estNeed = () => EST_NEED[S.level - 1] || 400;
 function estFree(e) {
   const el = e.el; if (!el || e.boss) return; S.efree = S.efree || {}; S.est = S.est || {};
-  S.efree[el] = (S.efree[el] || 0) + 1; if ((S.est[el] || 0) >= estNeed()) return;
+  S.efree[el] = (S.efree[el] || 0) + 1; goalTick('free', el); if ((S.est[el] || 0) >= estNeed()) return;
   S.est[el] = (S.est[el] || 0) + 1; if (S.est[el] >= estNeed()) { SFX.charge(); S.estFullAt = { el, t:S.t }; }
 }
 // the next full stone, in the order they filled, wakes its Surge as soon as one can start
@@ -6532,7 +6548,7 @@ function surgeStart() {
   const G = SG(), P = S.p;
   if (!G.ready || G.on || S.omni || S.omniSnap || hsOn() || S.over || !running || P.hp <= 0 || S.fall) return false;
   const el = typeof G.ready === 'string' ? G.ready : keeperEl; if (S.est) S.est[el] = 0;
-  G.ready = false; G.used = true; G.on = { t:0, life:SURGE.life, auraT:.3, el }; S.surges = (S.surges || 0) + 1;
+  G.ready = false; G.used = true; G.on = { t:0, life:SURGE.life, auraT:.3, el }; S.surges = (S.surges || 0) + 1; goalTick('surge');
   // no introduction (A, 2026-10-07: "just a quick flash of light coming from his cutout body image and it turns into their
   // respective surge form"): the Keeper's own figure lights up in the element's light, a burst rings out, and the form fades in
   // over a third of a second; play never stops. A local light, never a full-screen flash
@@ -10951,7 +10967,7 @@ function dailyDone() {
     { const g = grown(), gp = growp(), lo = PLOTS.map(p => p.el).filter(el => (g[el] || 0) < plotMax(el)).sort((a, b) => ((g[a] || 0) + (gp[a] || 0)) - ((g[b] || 0) + (gp[b] || 0)))[0];
       if (lo) { gp[lo] = (gp[lo] || 0) + .1; if (gp[lo] >= 1) { gp[lo] -= 1; g[lo] = (g[lo] || 0) + 1; store.set('morqi.grow', JSON.stringify(g)); }
         store.set('morqi.growp', JSON.stringify(gp)); d.grew = lo; checkHarmony(); } }
-    weekLog('breath', 1); }
+    weekLog('breath', 1); practice(10); goalTick('breath'); }
   return { bonus, line:`Day ${d.count} of breathing`, grew:d.grew ? PLOTS.find(p => p.el === d.grew).n : null };
 }
 function win() {
@@ -11846,6 +11862,7 @@ function liveDancers(x, W, A) {
 function renderHome() {
   // the garden's day: the birth element's drift, and the wilting or the warning the day before (once a day each)
   renderCharm();
+  { const G = goalsToday(), d = G.list.filter(g => g.done).length; $('#hmGoalN').textContent = d === 3 ? 'All done' : `${d} of 3`; $('#hmGoalRing').style.setProperty('--p', (d / 3).toFixed(3)); }
   { drift(); const w = wilt(), today = dayKey(), ev = eventNow();
     if (ev && store.get('morqi.eventSaid') !== today) { store.set('morqi.eventSaid', today); setTimeout(() => toast(`${ev.n}! ${ELNAME[ev.el]} creatures give double ${ELNAME[ev.el].toLowerCase()} qi this weekend.`, 4600), 2400); }
     if (w) setTimeout(() => toast(`Your garden wilted a little while you were away. One breath a day keeps it green.`, 4600), 900);
@@ -12010,6 +12027,50 @@ function weekLog(k, n) { let W; try { W = JSON.parse(store.get('morqi.week') || 
 function weekNote() { let W; try { W = JSON.parse(store.get('morqi.week') || '{}'); } catch (e) { W = {}; } const t = dayKey(), days = Object.keys(W).filter(d => dayGap(d, t) < 7);
   const sum = k => days.reduce((n, d) => n + (W[d][k] || 0), 0), br = days.filter(d => W[d].breath).length;
   return br || sum('runs') ? `This week: breathed ${br} of 7 days, played ${sum('runs')} ${sum('runs') === 1 ? 'run' : 'runs'}, freed ${sum('freed').toLocaleString()} creatures.` : ''; }
+/* Today's goals (A approved the daily-return loop, 2026-10-08: "daily practice goals ... They only ever add rewards"): three a day,
+   the same all day. The first is always the daily breath, the second frees the day's element, the third rotates (reactions, a Surge,
+   or creatures in all; a new player gets an easy one). Each pays 40 Sparks; all three pay 60 more; each counts toward the Qi level. */
+function goalsToday() {
+  const t = dayKey(); let G; try { G = JSON.parse(store.get('morqi.goals') || '{}'); } catch (e) { G = {}; } if (G.day === t && G.list) return G;
+  const seed = [...t].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 9973, 7), el = CYCLE[seed % 5], late = starsOf(1) > 0;
+  const third = late ? [{ k:'react', n:3, t:'Make 3 element reactions' }, { k:'surge', n:1, t:'Wake a Surge' }, { k:'free', n:300, t:'Free 300 creatures' }][seed % 3] : { k:'free', n:150, t:'Free 150 creatures' };
+  G = { day:t, paid:false, list:[{ k:'breath', n:1, got:0, t:'Breathe with your spirit animal' }, { k:'free', el, n:late ? 120 : 60, got:0, t:`Free ${late ? 120 : 60} ${ELNAME[el].toLowerCase()} creatures` }, { ...third, got:0 }] };
+  store.set('morqi.goals', JSON.stringify(G)); return G;
+}
+const saveGoals = G => store.set('morqi.goals', JSON.stringify(G));
+function goalTick(k, el, n = 1) {
+  const inRun = S && S.goals && !S.over, G = inRun ? S.goals : goalsToday(); if (G.day !== dayKey()) return;
+  for (const g of G.list) {
+    if (g.done || g.k !== k || (g.el && g.el !== el)) continue; g.got = Math.min(g.n, g.got + n);
+    if (g.got < g.n) continue; g.done = true; addQi(40); practice(5);
+    if (inRun) { BANNER.q.unshift({ id:'goal', title:'Goal done!', text:`${g.t}. +40 Sparks`, pic:'art4/icons/icon-spark.png?v=9' }); BANNER.t = Math.min(BANNER.t, .5); }
+    else setTimeout(() => toast(`Goal done: ${g.t}! +40 Sparks`, 3600), 600);
+    if (G.list.every(x => x.done) && !G.paid) { G.paid = true; addQi(60); practice(10); setTimeout(() => toast('All three goals done today! +60 Sparks', 4200), inRun ? 6000 : 4400); }
+    saveGoals(G);
+  }
+  if (!inRun) saveGoals(G);
+}
+/* the lifetime Qi level (A approved, 2026-10-08: "a child who practised for 60 days is stronger than one who practised for 5, and
+   the power is earned, never bought"): practice points come from each daily breath (10) and each goal (5; 10 more for a full day);
+   every 30 points is a level, to 50, and each level makes the Keeper 1% stronger with 1% more health */
+const qiLevel = () => Math.min(50, 1 + Math.floor((+(store.get('morqi.practice') || 0)) / 30));
+const lifeMul = () => 1 + .01 * (qiLevel() - 1);
+function practice(n) { const was = qiLevel(); store.set('morqi.practice', (+(store.get('morqi.practice') || 0)) + n); const now = qiLevel(); if (now > was) setTimeout(() => toast(`Qi level ${now}! Practice makes you stronger.`, 4200), 2800); }
+/* element wells (A approved, 2026-10-08: "fill over 24 to 48 hours. Come back to collect them. Missing a day means missing extra gains,
+   never losing what you have"): the five wells fill together to WELL_CAP of each element over 36 hours from the last collection, then
+   wait, full */
+const WELL_CAP = 60, WELL_H = 36;
+function wellsFill() { const t = +(store.get('morqi.wellsAt') || 0); if (!t) { store.set('morqi.wellsAt', String(Date.now())); return 0; } return Math.min(1, (Date.now() - t) / (WELL_H * 36e5)); }
+function collectWells() { const n = Math.floor(WELL_CAP * wellsFill()); if (n < 1) return; const E = eqi(); for (const el of CYCLE) E[el] = (E[el] || 0) + n; setEqi(E); store.set('morqi.wellsAt', String(Date.now())); SFX.levelup(); toast(`The wells gave you ${n} of each element.`, 3400); renderGrow(); }
+function openGoals() {
+  const G = goalsToday(), pic = g => g.k === 'breath' ? `art4/a-${animal}-y.png?v=8` : g.k === 'free' && g.el ? `art4/props/x-stone-${g.el}.png?v=8` : g.k === 'surge' ? `art4/props/x-stone-${keeperEl}.png?v=8` : 'art4/icons/icon-spark.png?v=9';
+  $('#glSub').textContent = 'Small goals that only add rewards. A new set every day.';
+  $('#glList').innerHTML = G.list.map(g => `<div class="gl-row${g.done ? ' done' : ''}"><img src="${pic(g)}" alt=""><div><b>${g.t}</b><i style="--p:${(g.got / g.n).toFixed(3)}"></i></div><em>${g.done ? 'Done' : '+40'}</em></div>`).join('');
+  const pts = +(store.get('morqi.practice') || 0), lv = qiLevel(); $('#glQi').textContent = lv >= 50 ? `Qi level ${lv}, the highest` : `Qi level ${lv}: ${30 - pts % 30} practice points to the next. Practice makes you stronger.`;
+  SFX.select(); openSheet('#goalSheet');
+}
+$('#hmGoals').onclick = () => openGoals();
+$('#glDone').onclick = () => { SFX.select(); closeSheet($('#goalSheet')); };
 /* the monthly element weekend (phase 2, live operations after Pikmin Bloom): the second weekend of every month that month's element
    pays double element qi; no setup, it simply arrives */
 const EVENT_EL = ['water', 'wood', 'wood', 'fire', 'fire', 'earth', 'earth', 'metal', 'metal', 'water', 'water', 'earth'];
@@ -12067,7 +12128,7 @@ function musicSparks() {
   if (store.get('morqi.themeBonus') === 'want:' + THEME.id) { store.set('morqi.themeBonus', 'paid:' + THEME.id); return 310; }
   return 10;
 }
-function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; bankElements(); S.qiMus = musicSparks(); S.musMile = S.qiMus ? musMilestone() : null;
+function payQi() { if (!S || S.qiPaid) return; S.qiPaid = true; bankElements(); if (S.goals) saveGoals(S.goals); S.qiMus = musicSparks(); S.musMile = S.qiMus ? musMilestone() : null;
   S.qiGot = Math.round((S.thawed + 9 * (S.hordeFreed || 0)) / 8) + (S.won ? 40 : 0) + S.qiMus + (S.musMile ? S.musMile.n : 0) + (S.lvSparks || 0); addQi(S.qiGot);
   if (S.won && S.qiGot && !S.quietPay && !SEEN.has('_sparks')) { markSeen('_sparks'); setTimeout(() => AU.vo('vo-sparks', 0, .5), 2600); } }
 function renderGrow() {
@@ -12080,6 +12141,9 @@ function renderGrow() {
     $('#grWheel').innerHTML = `<svg viewBox="0 0 220 210" aria-hidden="true"><polygon class="rim" points="${rim}"/>${[.4, .7].map(k => `<polygon class="ring" points="${CYCLE.map((el, i) => at(i, R * k).map(n => n.toFixed(1)).join(',')).join(' ')}"/>`).join('')}<polygon class="you" points="${pts}"/><text x="${cx}" y="${cy + 5}">${h ? 'Harmony ' + h : 'Balance'}</text></svg>`
       + CYCLE.map((el, i) => { const [x, y] = at(i, R + 22); return `<span class="gw-s" style="left:${(x / 220 * 100).toFixed(1)}%;top:${(y / 210 * 100).toFixed(1)}%;--c:${EL[el]}"><img src="art4/props/x-stone-${el}.png?v=8" alt=""><b>${(E[el] || 0).toLocaleString()}</b></span>`; }).join('');
     $('#grWheel').setAttribute('aria-label', `Your five elements. ${CYCLE.map(el => `${ELNAME[el]} ${E[el] || 0}`).join(', ')}. ${h ? 'Harmony ' + h : ''}`); }
+  { const f = wellsFill(), n = Math.floor(WELL_CAP * f);
+    $('#grWells').innerHTML = CYCLE.map(el => `<span class="gr-well" style="--c:${EL[el]};--p:${f.toFixed(3)}"><img src="art4/props/x-stone-${el}.png?v=8" alt=""></span>`).join('') + `<button class="gr-wcol" id="grWcol" ${n < 1 ? 'disabled' : ''}>${f >= 1 ? 'Collect' : n ? `Collect ${n}` : 'Filling'}</button>`;
+    $('#grWcol').onclick = () => collectWells(); $('#grWells').setAttribute('aria-label', `Element wells, ${Math.round(f * 100)}% full`); }
   $('#grList').innerHTML = PLOTS.map(p => { const lv = g[p.el] || 0, max = lv >= plotMax(p.el), cost = plotCost(lv, p.el), can = !max && (E[p.el] || 0) >= cost, deep = p.el === 'water' && lv >= PLOT_MAX;
     return `<div class="gr-row" style="--c:${EL[p.el]}"><img src="art4/icons/plot-${p.el}.png?v=9" alt=""><div class="gr-t"><b>${p.n}</b><span><svg class="gr-g" viewBox="0 0 24 24" aria-hidden="true">${p.g}</svg>${p.d}</span><i class="gr-lv${deep ? ' deep' : ''}">${deep ? `<em class="gr-n">Level ${lv}</em>` : ''}${[0, 1, 2, 3, 4].map(k => `<s class="${k < (deep ? lv % 5 : lv) ? 'on' : ''}"></s>`).join('')}</i></div>
       <button class="gr-go${can ? '' : ' off'}" data-el="${p.el}" ${max ? 'disabled' : ''} aria-label="${max ? p.n + ' is fully grown' : `Grow ${p.n} for ${cost} ${ELNAME[p.el]} qi: ${deep ? '2 more health' : p.per} each time`}">${max ? 'Grown' : `<img src="art4/props/x-stone-${p.el}.png?v=8" alt="">${cost}`}</button></div>`; }).join('');
