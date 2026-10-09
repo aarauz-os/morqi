@@ -82,6 +82,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
    ringed in its colour; a full one glows and wakes its Surge */
 #estones{position:absolute;right:10px;top:47%;display:flex;flex-direction:column;gap:7px;pointer-events:none;z-index:6}
 #estones:empty{display:none}
+.es[hidden]{display:none!important}
 .es{position:relative;width:32px;height:32px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p) * 360deg),rgba(14,20,52,.62) 0);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3),0 4px 10px rgba(4,6,22,.25);transition:transform .25s var(--spring)}
 .es img{position:absolute;inset:4px;width:24px;height:24px;object-fit:contain;border-radius:50%;background:rgba(14,20,52,.86);padding:2px;opacity:.82}
 .es.full{box-shadow:0 0 0 2px #fff,0 0 16px var(--c);animation:esFull 1.1s ease-in-out infinite}.es.full img{opacity:1}
@@ -4222,7 +4223,7 @@ const MOVE = 295;
 // (A, 2026-10-05: "every level should have max life of 6 starting off but capping at 3 for harder levels"). With none
 // left, the Last Light fills over thirty seconds of staying alive, a second sooner for every gem caught, and gives one
 // rise back, once a run. Rises past these will cost currency earned in play only, never bought (A, 2026-10-05)
-const RISES = [6, 6, 5, 4, 3], LAST_LIGHT = 30;
+const RISES = [6, 6, 5, 5, 4], LAST_LIGHT = 30;   // game director, 2026-10-09: Levels 4-5 +1 Rise each; the non-dodging bot lost L4 14/15 and L5 15/15 at skill tier 0, the floor a struggling child cannot go below
 let thaw, tg, thawGrid; const gridN = 60;
 let S, last = 0, running = false;
 function resetThaw() { resetTiles(); thaw = document.createElement('canvas'); thaw.width = thaw.height = WORLD * MASK; tg = thaw.getContext('2d'); thawGrid = new Uint8Array(gridN * gridN); }
@@ -4292,7 +4293,9 @@ function startRun() {
   const go = () => { AU.song(SONG_OF[worldOf()]); AU.music(true); keysCard(); startLoop(); };
   if (!tuneIn(go)) go();
 }
-function need(lv) { return Math.round(4 + lv * lv * 4.2); }
+// from Level 3 the climb is slower, so the Keeper meets each boss at about 18 / 24 / 30 (A, 2026-10-09: "by the time i get to omni
+// ive been insanely strong for too long"; the bot reached 69 on Level 5, while a full build stops growing near 28)
+function need(lv) { return Math.round(4 + lv * lv * (LVL >= 3 ? 5.2 : 4.2)); }
 
 // each world's scenery: two kinds of small prop, scattered across the shore on a jittered grid, never in the
 // clearing where you start
@@ -4560,7 +4563,7 @@ function hurt(e, dmg, el, o = {}) {
   if (e.fade != null && e.fade < .7) return;
   if (e.K && e.K.beh === 'call' && (Math.abs(e.x - S.p.x) > VW * .5 || Math.abs(e.y - S.p.y) > VH * .5)) return;
   if (e.post && !e.posted) return;   // a shooter can't be freed on its way in, only once it holds its post (QA, 2026-10-08: they died before firing)
-  let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0)) * (S.lifeMul || 1) * (surgeOn() ? SURGE.mul : 1) * (lbOn() ? LB.mul : 1);
+  let m = (1 + (S.gifts.kindling || 0) * .1) * (S.buffs.tiger > 0 ? 1.5 : 1) * (1 + .04 * (S.grow.fire || 0)) * (S.lifeMul || 1) * (surgeOn() ? (CONTROLS[keeperEl] === e.el ? 3 : SURGE.mul) : 1) * (lbOn() ? LB.mul : 1) * (e.plant && Math.hypot(S.p.x - e.x, S.p.y - e.y) > HOLD.brkNear ? .15 : 1);
   // (a boss is never 'barely hurt': at least an even hit on Level 1, where a Keeper may own one element, and at least 0.7 after;
   // Sammy's QA v2, 2026-10-08: a Wood Keeper took 2:45 on the water boss)
   const k0 = o.gift ? Math.max(1, eff(el, e.el)) : eff(el, e.el), k = e.boss ? Math.max(S.level === 1 ? 1 : .7, k0) : k0, strong = k > 1, weak = k < 1;
@@ -4569,6 +4572,8 @@ function hurt(e, dmg, el, o = {}) {
   if (strong && !surgeOn() && S.level < 3 && S.t - S.strongT > 1.4 && (S.saidStrong || 0) < 4) { S.strongT = S.t; S.saidStrong = (S.saidStrong || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Super effective!', '#FFE14A', 15); }
   if (weak && S.level < 3 && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
   if (e.giant) m *= giantArmour(e);
+  // the boss's guard (studio analysis, 2026-10-09: give Surge a job only it can do): only a Surge or a Last Breath breaks it
+  if (e.boss && e.guard) { if (surgeOn() || lbOn()) breakGuard(e); else m *= .1; }
   const dealt = dmg * m; e.lastHit = dealt; if (!o.react && dealt > (S.bestHit || 0)) S.bestHit = dealt;   // the Run Card's best hit: the player's own, never a crush
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
@@ -6576,16 +6581,78 @@ function lbTick(dt) {
    that fills while a Surge is on waits, full and glowing, for its turn. The run's frees are banked for the garden (bankElements). */
 // a Surge stays a moment, never a state: a stone needs hundreds of frees, and the next Surge rests EST_GAP s after the last ends
 // (bot, 2026-10-08: at 110 a Level 2 wood stone woke a Surge every 9 s, back to back)
-const EST_NEED = [80, 400, 400, 450, 550], EST_GAP = 45, estNeed = () => EST_NEED[S.level - 1] || 400;
+// the born stone holds 100. It fills on its own in about 110 s, and faster when you free what your element keeps in check: each one
+// is worth about a minute's share of that level's usual crowd (bot, 2026-10-09: the crowd's mix swings a born element's charge
+// from 0.6 to 37 creatures a second, so the count alone left wood-born players five minutes without a Surge)
+// (game director, 2026-10-09: the stone kept charging through a 45 s rest, so for most elements a Surge came every 54 s like a clock
+// whatever the child did; now the stone rests 25 s and does not charge while resting, so the gap is 34 s plus what the child earns;
+// at 15 a fire child on Level 2 surged every 31 s, too near a state)
+const EST_GAP = 25, estNeed = () => 100, EST_BASE = 100 / 110, EST_RATE = [4, 4, 6, 7, 15];
+const estFreeWorth = () => 100 / ((EST_RATE[S.level - 1] || 6) * 55);
+/* Surge comes only from your born element (A, 2026-10-09: "only surge with your born power"; the studio agreed unanimously): your
+   own stone fills when you free what your element keeps in check (+1), and a little from the element that feeds yours (+.5),
+   so the stone is charged by knowing the cycle. The other four stones still fill from their own frees, for the garden. */
+/* Something to dodge and something to chase on a phone (A, 2026-10-09: "you just barely have to pay attention ... still feels aimless
+   on a mobile device"; studio analysis): from Level 3, every 20-30 s a slam is marked in red where the Keeper stands and lands a
+   second later, and every 30-40 s a golden runaway appears and flees; catch it within 10 s and it drops a Spirit Chest. */
+const PRESS = { from:3, slam:[24, 34], wind:1.5, r:130, hurt:.15, run:[30, 40], life:10, near:70 };   // eased after the bot runs (2026-10-09)
+function pressureTick(dt) {
+  if (S.level < 2 || S.over || hsOn() || S.omni || S.omniSnap || lbOn() || S.bloom || S.fall) return;
+  const P = S.p; S.slams = S.slams || [];
+  // Level 2 is gentle: no runaway, and a slam only finds a Keeper who has not moved in 18 s (QA, 2026-10-09: standing still could still win it)
+  if (S.level < PRESS.from) { if (S.l2At == null) { S.l2At = S.t + 18; S.l2Pos = { x:P.x, y:P.y }; }
+    if (S.t >= S.l2At && !S.bossAt && P.hp > 0) { if (Math.hypot(P.x - S.l2Pos.x, P.y - S.l2Pos.y) < 150) { S.slams.push({ x:P.x, y:P.y, t:0, k:1 }); SFX.alarm && SFX.alarm(); } S.l2At = S.t + 18; S.l2Pos = { x:P.x, y:P.y }; }
+    for (const m of S.slams) { m.t += dt; if (!m.done && m.t >= PRESS.wind) { m.done = true; S.shake = Math.max(S.shake, .35); SFX.thud && SFX.thud(); smoke(m.x, m.y + 10, 8, 40, '210,200,180');
+      if (Math.hypot(P.x - m.x, (P.y - m.y) / .7) < PRESS.r) ouch(P.max * PRESS.hurt, m.x, m.y, { src:'slam', push:120, shake:.4 }); } }
+    S.slams = S.slams.filter(m => m.t < PRESS.wind + .3); return; }
+  if (S.slamAt == null) { S.slamAt = S.t + rnd(...PRESS.slam); S.runAt = S.t + rnd(...PRESS.run); }
+  // a Keeper who never moves meets slams sooner and harder (the studio's bar: standing still must lose Levels 3-5); a moving one never does
+  if (S.t >= S.slamAt && !S.bossAt && P.hp > 0) { const L = S.slamLast, still = L && Math.hypot(P.x - L.x, P.y - L.y) < 150; S.slamStill = still ? Math.min(3, (S.slamStill || 0) + 1) : 0; S.slamLast = { x:P.x, y:P.y };
+    S.slamAt = S.t + (S.slamStill ? rnd(10, 14) : rnd(...PRESS.slam)); S.slams.push({ x:P.x, y:P.y, t:0, k:1 + .4 * S.slamStill }); SFX.alarm && SFX.alarm(); }
+  for (const m of S.slams) { m.t += dt; if (!m.done && m.t >= PRESS.wind) { m.done = true; S.shake = Math.max(S.shake, .35); SFX.thud && SFX.thud(); smoke(m.x, m.y + 10, 8, 40, '210,200,180');
+    if (Math.hypot(P.x - m.x, (P.y - m.y) / .7) < PRESS.r) ouch(P.max * PRESS.hurt * (m.k || 1), m.x, m.y, { src:'slam', push:120, shake:.4 }); } }
+  S.slams = S.slams.filter(m => m.t < PRESS.wind + .3);
+  // the golden runaway: it keeps just ahead of the Keeper, never quite as fast, and glows its way off when its time is up
+  const R = S.runaway;
+  if (!R && S.t >= S.runAt && !S.bossSpawned && !S.bossAt) { const a = rnd(0, TAU); S.runaway = { x:clamp(P.x + Math.cos(a) * 360, 120, WORLD - 120), y:clamp(P.y + Math.sin(a) * 360, 120, WORLD - 120), t:0, a };
+    if (!SEEN.has('_runaway')) { markSeen('_runaway'); toast('A golden runaway! Catch it for a Spirit Chest!', 2600); } }
+  if (R) { R.t += dt; const d = Math.hypot(R.x - P.x, R.y - P.y) || 1;
+    if (d < PRESS.near) { dropChest(R.x, R.y); stars(R.x, R.y - 20, 26, '#FFE58A', 320); S.runaway = null; S.runAt = S.t + rnd(...PRESS.run); S.caught = (S.caught || 0) + 1; }
+    else if (R.t >= PRESS.life) { stars(R.x, R.y - 20, 12, '#FFF3C0', 200); S.runaway = null; S.runAt = S.t + rnd(...PRESS.run); }
+    else { R.a += rnd(-1.5, 1.5) * dt; const fx0 = (R.x - P.x) / d, fy0 = (R.y - P.y) / d, sp = MOVE * (d < 260 ? .62 : .35);
+      const vx = fx0 * .7 + Math.cos(R.a) * .3, vy = fy0 * .7 + Math.sin(R.a) * .3, n = Math.hypot(vx, vy) || 1;
+      R.x = clamp(R.x + vx / n * sp * dt, 80, WORLD - 80); R.y = clamp(R.y + vy / n * sp * dt, 80, WORLD - 80); R.fx = vx < 0 ? -1 : 1;
+      if (Math.random() < dt * 18) fx({ k:'star', x:R.x + rnd(-14, 14), y:R.y - rnd(10, 40), vx:rnd(-30, 30), vy:rnd(-60, -20), drag:.5, life:rnd(.4, .8), s:rnd(5, 9), c:['#FFE58A', '#FFF6D0', '#FFD24A'][(Math.random() * 3) | 0] }); } }
+}
+/* At half its life a Level 2-4 boss raises a guard (studio analysis, 2026-10-09: Surge felt pointless, so it gets a job only it can
+   do). Shots barely touch it; the next Surge breaks it, and the born stone is topped up so that Surge comes soon. It falls on its
+   own after 30 s, so nobody is ever stuck. Level 5's boss is Omni's. */
+const GUARD = { at:.5, life:30, boost:55 };
+function guardTick(dt) {
+  const B = S.boss; if (!B || B.dead || S.level < 2 || S.level > 4 || B.guardDone) return;
+  if (!B.guard && B.hp < B.max * GUARD.at) { B.guard = { t:0 }; S.surgeEndAt = -99; bornCharge(Math.max(GUARD.boost, estNeed() * .85 - (S.est[keeperEl] || 0))); SFX.charge && SFX.charge(); S.shake = Math.max(S.shake, .3);
+    ring(B.x, B.y - 60, 30, 260, '#DFF0FF', .6, 14, true); toast(SEEN.has('_guard') ? 'A guard! Your Surge breaks it.' : 'The boss raised a guard! Only your Surge can break it.', 2800); markSeen('_guard'); return; }
+  if (B.guard && (B.guard.t += dt) >= GUARD.life) breakGuard(B);
+}
+function breakGuard(B) {
+  if (!B.guard) return; B.guard = null; B.guardDone = true; S.shake = Math.max(S.shake, .5); SFX.boom && SFX.boom(true);
+  ring(B.x, B.y - 60, 30, 420, FORM_PAL[sEl()][0], .7, 18, true); stars(B.x, B.y - 80, 40, '#FFFFFF', 420); floatText(B.x, B.y - B.r - 60, 'Guard broken!', '#FFE14A', 22);
+}
 function estFree(e) {
   const el = e.el; if (!el || e.boss) return; S.efree = S.efree || {}; S.est = S.est || {};
-  S.efree[el] = (S.efree[el] || 0) + 1; goalTick('free', el); if ((S.est[el] || 0) >= estNeed()) return;
-  S.est[el] = (S.est[el] || 0) + 1; if (S.est[el] >= estNeed()) { SFX.charge(); S.estFullAt = { el, t:S.t }; }
+  S.efree[el] = (S.efree[el] || 0) + 1; goalTick('free', el);
+  const k = CONTROLS[keeperEl] === el ? 1 : FEEDS[el] === keeperEl ? .5 : 0;
+  if (k) bornCharge(k * estFreeWorth());
+}
+function bornCharge(n) {
+  if (S.level < SURGE.from || (S.est[keeperEl] || 0) >= estNeed() || S.t - (S.surgeEndAt ?? -99) < EST_GAP) return; S.est[keeperEl] = Math.min(estNeed(), (S.est[keeperEl] || 0) + n);
+  if (S.est[keeperEl] >= estNeed()) { SFX.charge(); S.estFullAt = { el:keeperEl, t:S.t }; }
 }
 // the next full stone, in the order they filled, wakes its Surge as soon as one can start
-function estTick() {
-  const G = SG(); if (G.on || G.ready || S.level < SURGE.from || !S.est || S.t - (S.surgeEndAt ?? -99) < EST_GAP) return;
-  const el = CYCLE.find(k => (S.est[k] || 0) >= estNeed() && surgeArt(k)); if (!el) return;
+function estTick(dt) {
+  S.est = S.est || {}; const G = SG(); if (!G.on && !G.ready) bornCharge(EST_BASE * dt);
+  if (G.on || G.ready || S.level < SURGE.from || S.t - (S.surgeEndAt ?? -99) < EST_GAP) return;
+  const el = keeperEl; if ((S.est[el] || 0) < estNeed() || !surgeArt(el)) return;
   G.ready = el; G.pulse = 1; ring(S.p.x, S.p.y - 30, 20, 260, FORM_PAL[el][0], .6, 12, true);
 }
 // (the birth element's own charge ring is retired: the stones charge every Surge now)
@@ -6620,7 +6687,7 @@ function surgeEnd() {
   if (!hsOn() && !S.omni && !S.over) AU.song(S.bossSpawned ? 'boss' : SONG_OF[worldOf()]);
 }
 function surgeTick(dt) {
-  estTick(); if (S.surge && typeof S.surge.ready === 'string') surgeStart();
+  estTick(dt); if (S.surge && typeof S.surge.ready === 'string') surgeStart();
   const G = S.surge, O = G && G.on, P = S.p; if (!O) return;
   O.t += dt;
   // it lands from the poster: one ring in its colour, outside the form
@@ -6881,7 +6948,12 @@ const towersLevel = lv => towersOn() && (lv === 2 || lv === 3 || lv === 4);
 // ...but never a place to rest (A, 2026-10-06: "i dont want it to be too easy ... enough that i should be looking for those
 // hearts ... feel the challenge but not ever lose the fun"): the guardians come three at a time, more of them wolves; a waking
 // temple's breath only pushes; a taken temple heals slowly and stops healing when the boss rises, so the arena's hearts matter
-const HOLD = { need:215, R:290, front:220, wake:.7, pack:3, cap:44, wolf:.4, heal:.02, fire:.5, bossFire:1.2, reach:800, dmg:(lv) => 22 + 5 * lv, ally:12, squad:5, help:1.2,
+// a taken temple's heal is gentle now (studio analysis, 2026-10-09: at .02 a second, standing in a ring out-healed everything);
+// brk: ring-breakers per level, [every s, how many, drain each per s]; they are shielded from shots fired from beyond brkNear
+// (game director, 2026-10-09: Level 3 eased from [12, 3, 1.8] to [14, 3, 1.5]; it is the first level with three rings, and a wood-born
+// bot's first ring went backward for a minute; Level 4 keeps the full pressure)
+const HOLD = { brk:{ 2:[14, 3, 2.4], 3:[14, 3, 1.5], 4:[12, 3, 1.8] }, brkHp:4, brkNear:230,
+  need:215, R:290, front:220, wake:.7, pack:3, cap:44, wolf:.4, heal:.003, fire:.5, bossFire:1.2, reach:800, dmg:(lv) => 22 + 5 * lv, ally:12, squad:5, help:1.2,
   wade:.25, pulse:5, heldPulse:2.5, wakeHit:.15, heart:.006,
   gHp:{ 2:1.7, 3:1.15, 4:1.1 }, gRush:{ 2:1.3, 3:1.15, 4:1.15 } };   // Level 2's guardians were freed before they ever reached you (bot, 2026-10-06)
 const HOLD_ELS = { 2:['wood'], 3:['wood', 'fire', 'earth'], 4:['fire', 'earth', 'metal'] };
@@ -6974,7 +7046,7 @@ function edgeIn(P, a, d) { for (const da of [0, .7, -.7, 1.4, -1.4, Math.PI]) { 
 function outpostKill(e) {
   const O = OUT(); let T = e.from && !e.from.held ? e.from : null, n;
   if (T) n = e.wise ? 2 : 1;
-  else { T = openOf(O).find(t => inRing(t, e.x, e.y)); if (!T) return; n = e.el === T.el ? .5 : .2; }
+  else { T = openOf(O).find(t => inRing(t, e.x, e.y)); if (!T || !inRing(T, S.p.x, S.p.y)) return; n = e.el === T.el ? .5 : .2; }
   T.fill = Math.min(needOf(T), T.fill + n); S.qi[T.el] = Math.floor(T.fill);
   if (n >= 1 || Math.random() < .3) T.souls.push({ x:e.x, y:e.y - 20, t:0, n:Math.max(1, n) });
   if (T.fill >= needOf(T)) captureOutpost(T);
@@ -6984,14 +7056,14 @@ function captureOutpost(T) {
   // which is its own fanfare and voice, so nothing else plays over it (design review, 2026-10-06)
   if (T.held) return; T.held = true; T.heldAt = S.t; T.fill = needOf(T); S.qi[T.el] = Math.floor(T.fill); S.shake = Math.max(S.shake, .4);
   // Level 5: the tower's stone goes home to the Great Tower, and Omni comes a tier higher (the fifth wakes the Warden)
-  if (S.l5) { S.l5.won++; for (const e of S.en) if (!e.dead && e.from === T) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, GROUND_RING[T.el], 160); }
+  if (S.l5) { S.l5.won++; for (const e of S.en) if (!e.dead && (e.from === T || e.breaker === T)) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, GROUND_RING[T.el], 160); }
     T.thawAt = S.t + 2.6; ring(T.cx, T.cy, 20, 760, GROUND_RING[T.el], 1.1, 20, true); stars(T.x, T.y - 160, 44, GROUND_RING[T.el], 560); collectStone(T.el); return; }
   S.qiStones[T.el] = true;
   const O = S.out, last = allStones(); O.won++;
   const solo = O.towers.length === 1;
   SFX.fanfare(false); AU.vo(O.won === 1 ? 'vo-temple-won' : 'vo-temple-won2', 1.1, .5, false);
   // everything its door sent out is freed with it
-  for (const e of S.en) if (!e.dead && e.from === T) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, GROUND_RING[T.el], 160); }
+  for (const e of S.en) if (!e.dead && (e.from === T || e.breaker === T)) { e.dead = true; S.thawed++; stars(e.x, e.y - 20, 3, GROUND_RING[T.el], 160); }
   T.thawAt = S.t + 2.6; ring(T.cx, T.cy, 20, 760, GROUND_RING[T.el], 1.1, 20, true); stars(T.x, T.y - 160, 44, GROUND_RING[T.el], 560);
   // a level with one temple still teaches its heal: Luma speaks, then Ascended comes (design review, 2026-10-06)
   if (last) O.ascAt = S.t + (solo ? 5.9 : 4);
@@ -7035,6 +7107,20 @@ function outpostTick(dt) {
     if (!T.held) {
       // standing in the ring wakes the temple: its own element pours out of its door at the Keeper
       const inside = fight && inRing(T, P.x, P.y); T.wake = Math.max(0, Math.min(1, T.wake + (inside ? dt * 2 : -dt)));
+      // ring-breakers (studio analysis, 2026-10-09: "Hold the ring" meant stand still, and A could "just stand there and win"): while
+      // you hold a ring, creatures of an element that beats yours plant on its far side and drain it; frost shields them from shots
+      // fired from far away, so the Keeper has to run out to them
+      const BK = HOLD.brk[S.level];
+      if (inside) S.lastRing = T;
+      // ...and keep coming to the ring you last stood in once you step out, so leaving it is a choice; other part-filled rings wait (QA)
+      if (BK && (inside || (S.lastRing === T && T.fill > 0)) && !hsOn()) { if ((T.bcd = (T.bcd ?? 8) - dt) <= 0) { T.bcd = BK[0];
+          const bel = weakTo(keeperEl)[0], base = Math.atan2(T.cy - P.y, T.cx - P.x);
+          for (let i = 0; i < BK[1]; i++) { const a = base + (i - (BK[1] - 1) / 2) * .55, px = T.cx + Math.cos(a) * HOLD.R * .92, py = T.cy + Math.sin(a) * HOLD.R * .92 / 1.6;
+            const e = spawn('critter', edgeIn(P, Math.atan2(py - P.y, px - P.x), Math.hypot(VW, VH) / 2 + 60), 1.3, bel);
+            if (e) { e.breaker = T; e.plant = { x:px, y:py }; e.hp = e.max = e.hp * HOLD.brkHp; e.r *= 1.15; e.size *= 1.2; } }
+          if (!SEEN.has('_breakers')) { markSeen('_breakers'); const t0 = S.t; coach('breakers', 'Ring-breakers!', 'They drain your ring. Their frost blocks shots from far away, so run out and free them up close.', () => { const b = S.en.find(e => !e.dead && e.breaker === T) || T; return { sx:clamp(((b.plant || b).x - camX) * Z, 30, W - 30), sy:clamp(((b.plant || b).y - camY) * Z, 150, H - 120) }; }); } } }
+      const bn = S.en.filter(e => !e.dead && e.breaker === T && e.planted).length; T.breakN = bn;
+      if (bn && BK) { T.fill = Math.max(0, T.fill - BK[2] * bn * dt); S.qi[T.el] = Math.floor(T.fill); }
       if (inside && !hsOn() && (T.cd -= dt) <= 0) { T.cd = HOLD.wake;
         for (let i = 0; i < HOLD.pack; i++) if (S.en.filter(e => !e.dead && e.from === T).length < HOLD.cap) { const away = Math.atan2(P.y - T.y, P.x - T.x), a = away + rnd(-1, 1), d = Math.hypot(VW, VH) / 2 + 60; const e = spawn(Math.random() < HOLD.wolf ? 'wolf' : 'critter', edgeIn(P, a, d), HOLD.gRush[S.level] || 1.15, T.el); if (e) { e.from = T; e.hp = e.max = e.max * (HOLD.gHp[S.level] || 1); } } }
       continue; }
@@ -7722,7 +7808,7 @@ function update(dt) {
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.004, dt); P.ry = (P.ry || 0) * Math.pow(.004, dt);
   if (S.motes) { for (const m of S.motes) m.t += dt; if (S.motes.some(m => m.t >= m.life)) { S.motes = S.motes.filter(m => m.t < m.life); const b = $('#lvPill'); if (b && (S.tickT || 0) <= S.t) { S.tickT = S.t + .15; b.classList.remove('tick'); void b.offsetWidth; b.classList.add('tick'); } } }
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); surgeTick(dt); lbTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); familiesTick(dt); dangerTick(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); surgeTick(dt); pressureTick(dt); guardTick(dt); lbTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); familiesTick(dt); dangerTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
@@ -7734,11 +7820,11 @@ function update(dt) {
     if (e.kb > 0) { e.kb -= dt; e.x += e.kx * dt; e.y += e.ky * dt; continue; }
     if (S.bloom && !e.boss) { bloomCreature(e, Math.hypot(P.x - e.x, P.y - e.y), dt); continue; }
     const d = Math.hypot(P.x - e.x, P.y - e.y) || 1, s = e.sp * (e.slow > 0 ? .5 : 1) * (e.boss && d > 360 ? 4 : 1);
-    if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
+    if (e.boss && (e.act || e.spiral > 0)) { /* the boss is attacking */ } else if (e.plant) { const L = e.plant, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 16) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } else e.planted = true; } else if (e.lure && d > 170 && S.shrines.includes(e.lure)) { const L = e.lure, ld = Math.hypot(L.x - e.x, L.y - e.y) || 1; if (ld > 55) { e.x += (L.x - e.x) / ld * s * dt; e.y += (L.y - e.y) / ld * s * dt; } } else if (!(e.K && !e.boss && brain(e, P, d, dt, s)) && d > e.r + P.r - 6) { e.x += (P.x - e.x) / d * s * dt; e.y += (P.y - e.y) / d * s * dt; }
     if (d < e.r + P.r && P.hurt <= 0 && !(P.safe > 0) && !S.bloom && !hsOn()) { P.hurt = .55; P.hitAt = S.t; const x0 = P.x, y0 = P.y; S.shake = Math.max(S.shake, .12); S.pet.hitAt = S.t; e.biteAt = S.t;
       const hit = (e.boss ? e.dmg * bossHit() : e.dmg * (1 + Math.min(1, S.t / (S.level === 1 ? 270 : 180))) * lvHit()) * armourVs(e.el) * titanSkin(); P.hp -= hit; S.hitsTaken = (S.hitsTaken || 0) + 1; S.lastHit = { src:e.boss ? 'hug' : 'touch', el:e.el, kid:e.kid, heavy:e.heavy };
       if (e.boss) { P.hurt = .8; const A = S.arena, px = P.x + (P.x - e.x) / d * 130, py = P.y + (P.y - e.y) / d * 130, q = A ? Math.hypot(px - A.x, py - A.y) : 0, lim = A ? (S.storm ? S.storm.r0 + 400 : A.r) - 34 : 0; P.x = A && q > lim ? A.x + (px - A.x) / q * lim : px; P.y = A && q > lim ? A.y + (py - A.y) / q * lim : py; ring(e.x, e.y + e.r * .5, 20, e.r * 2.2, '#FFFFFF', .3, 8, true); } keeperHit(e.x, e.y, e.el, e.boss || e.heavy, e.boss ? { x:P.x - x0, y:P.y - y0 } : null); SFX.hurt(); if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(15); }
-    if (d > 1500 && !e.boss && !S.arena) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
+    if (d > 1500 && !e.boss && !S.arena && !e.plant) { const a = rnd(0, TAU), r = Math.hypot(VW, VH) / 2 + 40; e.x = P.x + Math.cos(a) * r; e.y = P.y + Math.sin(a) * r; }
   }
   separate();
   if (S.arena && S.boss && !S.boss.dead) { const A = S.arena, b = S.boss, d = Math.hypot(b.x - A.x, b.y - A.y), lim = A.r - 60; if (d > lim) { b.x = A.x + (b.x - A.x) / d * lim; b.y = A.y + (b.y - A.y) / d * lim; } }
@@ -8369,6 +8455,12 @@ function draw() {
   if (S.bossFx) for (const f of S.bossFx) if (f.t >= 0) drawBossFx(f);
   // attack warnings: a red light fills up on the ground, then the attack lands
   for (const T of S.traps || []) if (!T.done) warnCircle(T.x, T.y, T.r, Math.min(1, T.t / T.wind));
+  for (const m of S.slams || []) if (!m.done) warnCircle(m.x, m.y, PRESS.r, Math.min(1, m.t / PRESS.wind));
+  if (S.runaway) { const R = S.runaway, hop = Math.abs(Math.sin(S.t * 12)) * 10, k = R.t > PRESS.life - 2 ? .5 + .5 * Math.sin(S.t * 20) : 1;
+    g.fillStyle = 'rgba(0,0,0,.2)'; g.beginPath(); g.ellipse(R.x, R.y + 4, 20, 7, 0, 0, TAU); g.fill();
+    add(() => glowAt(R.x, R.y - 24 - hop, 90, '#FFD24A', .8 * k));
+    const im = IMG['x-runaway']; if (im && ok(im)) { g.save(); g.globalAlpha = k; g.translate(R.x, R.y - hop); g.scale(R.fx || 1, 1); g.drawImage(im, -36, -66, 72, 72); g.restore(); }
+    else { g.globalAlpha = k; g.fillStyle = '#FFE58A'; g.beginPath(); g.arc(R.x, R.y - 26 - hop, 17, 0, TAU); g.fill(); g.fillStyle = '#FFFFFF'; g.beginPath(); g.arc(R.x - 5, R.y - 31 - hop, 6, 0, TAU); g.fill(); g.globalAlpha = 1; } }
   drawGiantFx();
   if (S.level === 5) drawTempleWarn();
   for (const e of S.en) { const a = e.act; if (!a || a.ph !== 0 || e.dead) continue; const p = Math.min(1, a.t / a.wind);
@@ -8420,7 +8512,11 @@ function draw() {
       if (mk) { hop *= fly ? .6 : .3; rot *= .4; } }
     const flip = e.own ? (e.K.face === -1 && toward > 0) : (e.type === 'wolf' && toward > 0);
     if (e.own && !e.boss && fly) { g.fillStyle = 'rgba(10,20,30,.25)'; g.beginPath(); g.ellipse(e.x, e.y + e.r * .6, e.r * .9, e.r * .35, 0, 0, TAU); g.fill(); }
-    if (e.boss) { drawBoss(e, hk); return; }
+    if (e.boss) { drawBoss(e, hk); if (e.guard) { const im = IMG['guard-' + e.realm], r = e.size * .62, cy = e.y - e.size * .38, pu = .85 + .15 * Math.sin(S.t * 5);
+        if (im && ok(im)) { g.globalAlpha = .85 * pu; g.drawImage(im, e.x - r, cy - r, r * 2, r * 2); g.globalAlpha = 1; }
+        else { g.save(); g.globalAlpha = .28 * pu; g.fillStyle = '#DFF0FF'; g.beginPath(); g.arc(e.x, cy, r, 0, TAU); g.fill(); g.globalAlpha = .8 * pu; g.strokeStyle = '#F4FAFF'; g.lineWidth = 6; g.stroke();
+          g.globalAlpha = .5; g.lineWidth = 2; for (let i = 0; i < 6; i++) { const a = i / 6 * TAU + .3; g.beginPath(); g.moveTo(e.x + Math.cos(a) * r * .35, cy + Math.sin(a) * r * .35); g.lineTo(e.x + Math.cos(a) * r, cy + Math.sin(a) * r); g.stroke(); } g.restore(); } }
+      return; }
     if (e.ringT != null) { const k = 1 - e.ringT / 1.8, j = Math.sin(S.t * (18 + 26 * k)); rot = j * (.05 + .13 * k); }   // a Caller shakes harder as its call builds
     g.save(); g.translate(e.x, e.y + e.r * .5 - hop); g.rotate(rot); if (flip) g.scale(-1, 1); g.scale(sx, sy);
     if (e.fade != null && e.fade < 1) g.globalAlpha = e.fade * e.fade;   // a Lantern Wisp fading in
@@ -9395,6 +9491,24 @@ function l4Pic() {
   { const p = pos[0], y = Math.max(16, p.y - 104); c.fillStyle = '#FFFFFF'; c.strokeStyle = 'rgba(14,20,40,.8)'; c.lineWidth = 3; c.beginPath(); c.moveTo(p.x, y + 22); c.lineTo(p.x - 14, y + 4); c.lineTo(p.x - 6, y + 4); c.lineTo(p.x - 6, y - 10); c.lineTo(p.x + 6, y - 10); c.lineTo(p.x + 6, y + 4); c.lineTo(p.x + 14, y + 4); c.closePath(); c.fill(); c.stroke(); }
   const url = cv.toDataURL('image/png'); if (all) L4_PIC = url; return url;
 }
+// the Ring-breakers card: the ring, the Keeper in it, and two frost-armoured breakers on the far edge where the band drains coral
+const BREAKER_PIC = {};
+function breakerPic(el = 'wood') {
+  const bel = weakTo(keeperEl)[0], key = el + bel; if (BREAKER_PIC[key]) return BREAKER_PIC[key];
+  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d'), col = GROUND_RING[el], bm = IMG['e-' + bel + '-a'], k = IMG['k' + keeper];
+  c.fillStyle = '#2E3A48'; c.fillRect(0, 0, 480, 320);
+  const rx = 190, ry = 82, cx = 240, cy = 180;
+  c.fillStyle = 'rgba(10,16,32,.4)'; c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, 0, TAU); c.fill();
+  c.strokeStyle = 'rgba(14,20,40,.7)'; c.lineWidth = 16; c.stroke(); c.strokeStyle = col; c.lineWidth = 12; c.lineCap = 'round';
+  c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, Math.PI * .25, Math.PI * 1.75); c.stroke();
+  for (const a of [-.32, .32]) { c.strokeStyle = '#FF5A4E'; c.lineWidth = 16; c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, a - .2, a + .2); c.stroke();
+    const x = cx + Math.cos(a) * rx, y = cy + Math.sin(a) * ry; c.fillStyle = 'rgba(214,236,255,.55)'; c.beginPath(); c.ellipse(x, y + 6, 46, 24, 0, 0, TAU); c.fill(); c.strokeStyle = 'rgba(240,250,255,.9)'; c.lineWidth = 3; c.stroke();
+    if (ok(bm)) c.drawImage(bm, x - 30, y - 44, 60, 60); }
+  if (ok(k)) c.drawImage(k, 150 - 40, cy - 70, 80, 80);
+  c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = 5; c.setLineDash([10, 9]); c.beginPath(); c.moveTo(200, cy - 20); c.lineTo(370, cy - 20); c.stroke(); c.setLineDash([]);
+  c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.moveTo(384, cy - 20); c.lineTo(366, cy - 31); c.lineTo(366, cy - 9); c.fill();
+  const url = cv.toDataURL('image/png'); if (ok(bm) && ok(k)) BREAKER_PIC[key] = url; return url;
+}
 function outpostPic(el = 'wood') {
   if (OUTPOST_PIC[el]) return OUTPOST_PIC[el];
   const cv = document.createElement('canvas'); cv.width = 480; cv.height = 320; const c = cv.getContext('2d'), col = GROUND_RING[el], t = IMG['x-temple-' + el], mw = IMG['e-' + el + '-a'], k = IMG['k' + keeper];
@@ -9472,6 +9586,10 @@ function drawOutpostRings(O, inView) {
     // player knows the ring is working (meeting 3, Sammy, 2026-10-08)
     if (here && !T.held && T.wake > 0) for (let i = 0; i < 2; i++) { const q = ((S.t + i * .6) % 1.2) / 1.2; g.globalAlpha = (1 - q) * .55; g.strokeStyle = col; g.lineWidth = 7; g.beginPath(); g.ellipse(T.cx, T.cy, R * q, ry * q, 0, 0, TAU); g.stroke(); }
     g.globalAlpha = 1;
+    if (!T.held && T.breakN) for (const e of S.en) if (!e.dead && e.breaker === T && e.planted) { const a = Math.atan2((e.y - T.cy) * 1.6, e.x - T.cx);
+      g.globalAlpha = .55 + .3 * pu; g.strokeStyle = '#FF5A4E'; g.lineWidth = 30; g.beginPath(); g.ellipse(T.cx, T.cy, R, ry, 0, a - .2, a + .2); g.stroke();
+      if (Math.hypot(P.x - e.x, P.y - e.y) > HOLD.brkNear) { g.globalAlpha = .5; g.fillStyle = 'rgba(214,236,255,.55)'; g.beginPath(); g.ellipse(e.x, e.y, e.r * 1.9, e.r * 1.1, 0, 0, TAU); g.fill();
+        g.strokeStyle = 'rgba(240,250,255,.9)'; g.lineWidth = 3; g.stroke(); } g.globalAlpha = 1; }
     g.restore(); g.lineWidth = 1;
   }
   // the freed marching down the tubes to help, in squads, happy and haloed in their temple's light
@@ -10214,7 +10332,11 @@ const THEME = { id:'haven', n:'Haven' };
 /* ================= levelling ================= */
 function gainXp(v) {
   S.xp += v * (1 + (S.gifts.shoot || 0) * .15);
-  while (S.xp >= S.need) { S.xp -= S.need; S.lv++; S.need = need(S.lv); if (S.pendingLevel) S.queued++; else levelUp(); }
+  // a full build stops levelling: each level's worth of XP fills a sixth of the born stone instead (studio analysis, 2026-10-09:
+  // A climbed from 36 to 53 on Level 5 and none of it changed anything)
+  while (S.xp >= S.need) { S.xp -= S.need;
+    if (S.buildFull) { S.est = S.est || {}; S.est[keeperEl] = Math.min(estNeed(), (S.est[keeperEl] || 0) + estNeed() / 6); continue; }
+    S.lv++; S.need = need(S.lv); if (S.pendingLevel) S.queued++; else levelUp(); }
 }
 // an element learned this level is an apprentice element: its powers stop at three stars for now
 const maxStars = id => POW[id].e === S.apprentice ? 3 : 5;
@@ -10281,7 +10403,7 @@ function levelUp() {
   // stop play (QA, 2026-10-06: a gem-chasing player met sixty sheets of only a pouch and tea)
   // (a MEGA ready is used up here too, paid once as its bonus in pouches, and counts as a sheet; studio QA, 2026-10-08: without
   // this a fully grown Keeper with a MEGA ready was paid a pouch every frame, forever)
-  if (opts.every(o => o.kind === 'sparks' || o.kind === 'heal')) { const n = (S.megaSolo ? 0 : 1) + (S.queued || 0) + (S.megaReady ? MEGA_BONUS : 0); if (S.megaReady) S.megaReady--;
+  if (opts.every(o => o.kind === 'sparks' || o.kind === 'heal')) { S.buildFull = true; const n = (S.megaSolo ? 0 : 1) + (S.queued || 0) + (S.megaReady ? MEGA_BONUS : 0); if (S.megaReady) S.megaReady--;
     for (let i = 0; i < n; i++) payPouch(); S.queued = 0; S.lastSheet = S.t; if (chain) resume(); return; }
   running = false; S.pendingLevel = true;
   // a banner the sheet would cover comes back after it, whole (QA, 2026-10-08: the sheet hid a new banner while its line played)
@@ -10537,6 +10659,7 @@ function tipArt(id) {
   if (id === 'l5temples') return `<div class="fbdemo"><img src="${l5Pic()}" alt=""></div>`;
   if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic(S && S.out ? S.out.els[0] : S && S.l5 ? (openOf(S.l5)[0] || SHRINES[0]).el : 'wood')}" alt=""></div>`;
   if (id === 'surge') return `<div class="fbdemo"><img src="${surgePic()}" alt=""></div>`;
+  if (id === 'breakers') return `<div class="fbdemo"><img src="${breakerPic(S && S.out ? (openOf(S.out)[0] || S.out.towers[0]).el : 'wood')}" alt=""></div>`;
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-omni.png?v=1" alt=""></div>`;
   if (id === 'ult') return `<div class="ultdemo" style="--c:${EL[ANIMAL[animal].e]}"><span class="ur"></span><img src="art4/a-${animal}-y.png?v=8" alt=""><i class="tap"></i></div>`;
   if (id.startsWith('call_')) { const cid = id.slice(5), D = CALL[cid], src = `art4/calls/${D.img}.png?v=9`;
@@ -10864,13 +10987,13 @@ function hud() {
   { const G = goalOf(), el = $('#goal'); S.goal = G; el.hidden = !G; if (G) { const k = G.t + G.el; if (el.dataset.k !== k) { el.dataset.k = k; S.goalAt = S.t; el.querySelector('span').textContent = G.t; el.style.setProperty('--c', GROUND_RING[G.el] || EL[G.el]); } } }
   $('#hud').classList.toggle('boss', !!(S.boss && !S.boss.dead));
   // the five element stones: fill, a small bump as one gains, a glow when full (it wakes its Surge)
-  { const box = $('#estones'), need = estNeed(), E = S.est || {}, key = CYCLE.map(el => Math.min(24, Math.floor((E[el] || 0) / need * 24))).join(',');
+  { const box = $('#estones'), need = estNeed(), E = S.est || {}, key = CYCLE.map(el => el === keeperEl ? Math.min(24, Math.floor((E[el] || 0) / need * 24)) : 0).join(',');
     if (box.dataset.k !== key) { const old = (box.dataset.k || '').split(','); box.dataset.k = key;
-      if (!box.children.length) box.innerHTML = CYCLE.map(el => `<i class="es" data-el="${el}" style="--c:${EL[el]};--p:0"><img src="art4/props/x-stone-${el}.png?v=8" alt=""></i>`).join('');
+      if (!box.children.length) box.innerHTML = CYCLE.map(el => `<i class="es" data-el="${el}" style="--c:${EL[el]};--p:0"${el === keeperEl ? '' : ' hidden'}><img src="art4/props/x-stone-${el}.png?v=8" alt=""></i>`).join('');
       CYCLE.forEach((el, k) => { const d = box.children[k], p = Math.min(1, (E[el] || 0) / need); d.style.setProperty('--p', p.toFixed(3)); d.classList.toggle('full', p >= 1);
         if (old[k] !== undefined && +old[k] < Math.floor(p * 24) && p < 1) { d.classList.add('tick'); setTimeout(() => d.classList.remove('tick'), 160); } }); } }
   { const G = S.surge, sp = G ? (G.on ? 1 - G.on.t / G.on.life : G.ready ? 1 : 0) : 0, lpS = $('#livesPill');
-    lpS.style.setProperty('--sp', sp.toFixed(3)); lpS.style.setProperty('--sc', FORM_PAL[sEl()][0]); lpS.classList.toggle('surge', !!(G && G.ready)); if (G && G.pulse && !COACH.cur) { G.pulse = 0; lpS.classList.remove('bump'); void lpS.offsetWidth; lpS.classList.add('bump'); } $('#surgeTag').hidden = !(G && G.ready); $('#surgeTag').textContent = FORM[keeperEl] + '!';
+    lpS.style.setProperty('--sp', sp.toFixed(3)); lpS.style.setProperty('--sc', FORM_PAL[sEl()][0]); lpS.classList.toggle('surge', !!(G && G.ready)); if (G && G.pulse && !COACH.cur) { G.pulse = 0; lpS.classList.remove('bump'); void lpS.offsetWidth; lpS.classList.add('bump'); } $('#surgeTag').hidden = !(G && G.ready); $('#surgeTag').textContent = FORM[sEl()] + '!';
     $('#surgeRing').hidden = S.level < SURGE.from || !surgeArt(); }
   { const lp = $('#livesPill'), last = S.rises === 0 && !S.lightUsed; $('#livesN').textContent = S.rises; lp.classList.toggle('last', last); lp.classList.toggle('none', S.rises === 0 && S.lightUsed);
     lp.style.setProperty('--p', last ? (S.lastLight / LAST_LIGHT).toFixed(3) : 1); }
