@@ -1416,6 +1416,22 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 /* today: the daily breath and the day's goals side by side (phase 2b, 2026-10-09) */
 .hm-today{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(168px + env(safe-area-inset-bottom));z-index:3;display:flex;gap:8px;align-items:center;width:max-content;max-width:calc(100% - 24px)}
 .hm-today .hm-daily{position:static;transform:none}
+/* Element Weekend (A, 2026-10-09, brief 29): a small chip under the top bar while it runs, and a sheet with its festival banner */
+.hm-event{position:absolute;left:50%;transform:translateX(-50%);top:calc(78px + env(safe-area-inset-top));z-index:3;display:flex;align-items:center;gap:8px;padding:4px 14px 4px 5px;border:0;border-radius:99px;background:rgba(14,20,52,.74);box-shadow:inset 0 0 0 1.5px var(--c,#fff),0 8px 20px rgba(0,0,0,.3);color:#fff;cursor:pointer;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);white-space:nowrap}
+.hm-event[hidden]{display:none!important}
+.hm-event img{width:34px;height:34px}
+.hm-event span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}.hm-event b{font:900 14px var(--round)}.hm-event em{font:800 11.5px var(--round);font-style:normal;color:var(--c,#fff)}
+.ev-sheet{padding-top:22px}
+.ev-ban{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:5/2;box-shadow:0 0 0 1.5px rgba(255,255,255,.18)}
+.ev-ban>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ev-ban::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 78% 85% at 50% 52%,rgba(8,12,36,.62),rgba(8,12,36,.38) 50%,rgba(8,12,36,0) 90%)}
+.ev-title{position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px}
+.ev-title img{width:52px;height:52px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
+.ev-title h3{color:#fff;font-size:24px;text-shadow:0 2px 0 rgba(0,0,0,.4),0 0 10px rgba(8,12,36,.7),0 4px 22px rgba(0,0,0,.65)}
+.hm-sheet .ev-say{text-align:center;font:700 15px/1.45 var(--round);color:rgba(255,255,255,.86);max-width:34ch;margin:0 auto}
+/* new this weekend: the chip rings softly twice, the one notice (design review: no toast over Play) */
+.hm-event.new{animation:evPulse 1.4s ease-out 2}
+@keyframes evPulse{0%{box-shadow:inset 0 0 0 1.5px var(--c),0 0 0 0 var(--c)}100%{box-shadow:inset 0 0 0 1.5px var(--c),0 0 0 12px transparent}}
 .hm-goals{display:flex;align-items:center;gap:8px;padding:7px 14px 7px 8px;border:0;border-radius:99px;background:rgba(14,20,52,.72);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22),0 8px 20px rgba(0,0,0,.3);color:#fff;cursor:pointer;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .hm-goals span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}.hm-goals b{font:900 15px var(--round)}.hm-goals em{font:800 11.5px var(--round);font-style:normal;opacity:.75}
 .hg-ring{width:30px;height:30px;border-radius:50%;background:conic-gradient(#FFE58A calc(var(--p,0) * 360deg),rgba(255,255,255,.14) 0);-webkit-mask:radial-gradient(circle,transparent 9px,#000 10px);mask:radial-gradient(circle,transparent 9px,#000 10px)}
@@ -1794,12 +1810,16 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
         <button class="hm-gear" id="hmGear" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4.9a7.5 7.5 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.4.9 2-3.4z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg></button>
       </div>
     </div>
+    <button class="hm-event" id="hmEvent" hidden><img id="hmEvBadge" alt=""><span><b id="hmEvName">Water Weekend</b><em id="hmEvSub">Double qi</em></span></button>
     <div class="art hm-art"><video class="hm-live" id="hmLive" muted loop playsinline preload="auto" aria-hidden="true"></video><div class="still-sky h" aria-hidden="true"><i></i></div><canvas class="hm-fx" id="hmFx" aria-hidden="true"></canvas><button class="hm-portal" id="hmPortal" aria-label="Play: the portal to the five realms"></button><div class="hm-stage"><span class="hm-fig hm-figa" id="hmPetFig"><img class="hm-a" id="hmPet" alt=""><i class="hm-zzz" aria-hidden="true">z<b>z</b></i><img class="hm-charm" id="hmCharm" alt="" hidden></span><span class="hm-fig"><img class="hm-k" id="hmKeeper" alt=""></span></div></div>
     <div class="hm-today"><button class="hm-daily" id="hmDaily" aria-label="Daily breath with your spirit animal"><i class="hd-orb" aria-hidden="true"></i><span><b>Daily breath</b><em id="hmDayN">30 seconds</em></span></button><button class="hm-goals" id="hmGoals" aria-label="Today's goals"><i class="hg-ring" id="hmGoalRing"></i><span><b>Goals</b><em id="hmGoalN">0 of 3</em></span></button></div>
     <button class="btn green hm-go" id="hmGo">Play</button>
     <div class="hm-over" id="growSheet" hidden><div class="hm-sheet">
       <h3>Grow your Sanctuary</h3><div class="gr-wheel" id="grWheel" role="img"></div><p class="gr-sub">Each plot grows with its own element. Free creatures to fill your stones.</p><div class="gr-wells" id="grWells"></div>
       <div class="gr-list" id="grList"></div><h4 class="gr-h" id="grCallsH">Star Calls</h4><p class="gr-qi"><img src="art4/icons/icon-spark.png?v=9" alt=""><b id="grQi">0</b> Sparks</p><div class="gr-list" id="grCalls"></div><button class="btn green" id="grDone">Done</button></div></div>
+    <div class="hm-over" id="eventSheet" hidden><div class="hm-sheet ev-sheet">
+      <div class="ev-ban"><img id="evBanner" alt=""><div class="ev-title"><img id="evBadge" alt=""><h3 id="evTitle">Water Weekend</h3></div></div>
+      <p class="ev-say" id="evSay"></p><button class="btn green" id="evDone">Let's go!</button></div></div>
     <div class="hm-over" id="homeSheet" hidden><div class="hm-sheet">
       <h3>Keep your garden safe</h3><img class="hs-icon" src="art4/app-icon-180.png" alt="MorQi's home-screen icon">
       <p class="gr-sub" id="hsSay"></p><button class="btn green" id="hsOk">Got it</button><button class="sbtn link" id="hsLater">Later</button></div></div>
@@ -11895,7 +11915,9 @@ function renderHome() {
   renderCharm(); askHomeScreen();
   { const G = goalsToday(), d = G.list.filter(g => g.done).length; $('#hmGoalN').textContent = d === 3 ? 'All done' : `${d} of 3`; $('#hmGoalRing').style.setProperty('--p', (d / 3).toFixed(3)); }
   { drift(); const w = wilt(), today = dayKey(), ev = eventNow();
-    if (ev && store.get('morqi.eventSaid') !== today) { store.set('morqi.eventSaid', today); setTimeout(() => toast(`${ev.n}! ${ELNAME[ev.el]} creatures give double ${ELNAME[ev.el].toLowerCase()} qi this weekend.`, 4600), 2400); }
+    eventChip(ev);
+    // the chip is the one notice: it rings softly once a day, never a toast over Play (design review, 2026-10-09)
+    if (ev && store.get('morqi.eventSaid') !== today) { store.set('morqi.eventSaid', today); const c = $('#hmEvent'); c.classList.remove('new'); void c.offsetWidth; c.classList.add('new'); }
     if (w) setTimeout(() => toast(`Your garden wilted a little while you were away. One breath a day keeps it green.`, 4600), 900);
     else if (gardenThirsty() && store.get('morqi.thirsty') !== today) { store.set('morqi.thirsty', today); setTimeout(() => toast('Your garden is thirsty. Breathe today, or it starts to wilt tomorrow.', 4600), 900); } }
   liveStart();
@@ -12146,8 +12168,20 @@ $('#scClose').onclick = () => { SFX.select(); $('#setCode').hidden = true; };
 $('#glDone').onclick = () => { SFX.select(); closeSheet($('#goalSheet')); };
 /* the monthly element weekend (phase 2, live operations after Pikmin Bloom): the second weekend of every month that month's element
    pays double element qi; no setup, it simply arrives */
+// the weekend's chip and sheet: the festival banner with its badge and name over the calm middle (brief 29)
+function eventChip(ev) {
+  const c = $('#hmEvent'); c.hidden = !ev; if (!ev) return;
+  const col = EL[ev.el]; c.style.setProperty('--c', col);
+  $('#hmEvBadge').src = `art4/events/event-${ev.el}-badge.png?v=1`; $('#hmEvName').textContent = ev.n; $('#hmEvSub').textContent = `Double ${ELNAME[ev.el].toLowerCase()} qi`;
+  c.onclick = () => { SFX.select(); c.classList.remove('new');
+    $('#evBanner').src = `art4/events/event-${ev.el}-banner.webp?v=1`; $('#evBadge').src = `art4/events/event-${ev.el}-badge.png?v=1`; $('#evTitle').textContent = ev.n;
+    $('#evSay').textContent = `All weekend, every ${ELNAME[ev.el].toLowerCase()} creature you free gives double ${ELNAME[ev.el].toLowerCase()} qi for your garden. It ends Sunday night.`;
+    openSheet('#eventSheet'); AU.vo('vo-event', .3, .45); };
+}
+$('#evDone').onclick = () => { SFX.select(); closeSheet($('#eventSheet')); };
 const EVENT_EL = ['water', 'wood', 'wood', 'fire', 'fire', 'earth', 'earth', 'metal', 'metal', 'water', 'water', 'earth'];
-function eventNow(d = new Date()) { const day = d.getDay(), date = d.getDate(); const sat = day === 6 ? date : day === 0 ? date - 1 : -1; if (sat < 8 || sat > 14) return null;
+function eventNow(d = new Date()) { { const f = /^(127\.\d+\.\d+\.\d+|localhost)$/.test(location.hostname) && new URLSearchParams(location.search).get('event'); if (f && EL[f]) return { el:f, n:`${ELNAME[f]} Weekend`, mul:2 }; }
+  const day = d.getDay(), date = d.getDate(); const sat = day === 6 ? date : day === 0 ? date - 1 : -1; if (sat < 8 || sat > 14) return null;
   const el = EVENT_EL[d.getMonth()]; return { el, n:`${ELNAME[el]} Weekend`, mul:2 }; }
 function eqi() { try { return JSON.parse(store.get('morqi.eqi') || '{}') || {}; } catch (e) { return {}; } }
 const setEqi = E => store.set('morqi.eqi', JSON.stringify(E));
