@@ -1,342 +1,398 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="MorQi: a five-element action game where kids master their feelings by freeing a frozen world. Investor pitch bible, one-pager and five playable levels.">
-</head><body>
+<!doctype html>
+<html lang="en" class="nojs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MorQi Pitch Bible</title>
+<meta name="description" content="MorQi: a five-element action game where kids learn to name their feelings by freeing a frozen world. Built for kids 7 to 11. Fun for the whole family.">
+<meta name="theme-color" content="#070920">
+<link rel="icon" href="img/stone-water.webp" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Shippori+Mincho+B1:wght@800&display=swap">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@900&text=%E6%B0%B4%E6%9C%A8%E7%81%AB%E5%9C%9F%E9%87%91&display=swap">
+<link rel="preload" as="image" href="img/world-s.webp" type="image/webp">
+<link rel="stylesheet" href="film.css">
+<script>document.documentElement.classList.remove('nojs');document.documentElement.classList.add('js');</script>
+</head>
+<body>
+<a class="skip" href="level1/?from=pitch">Skip to the game</a>
 
-<main>
-  <!-- 1 · cover -->
-  <section class="pg cover" id="cover">
-    <div class="art" role="img" aria-label="MorQi key art: a Keeper with the five Qi Stones, Keepers and spirit animals running in, the five realm bosses in the frozen fog."></div>
-    <div class="in">
-      <img class="logo" src="img/logo.png" alt="MorQi">
+<header class="bar" id="bar">
+  <a class="brand" href="#cover" aria-label="MorQi, back to the top"><img src="img/logo.webp" alt="MorQi" width="260" height="88"></a>
+  <span class="readout" aria-hidden="true"><b class="rn">01</b><span class="rt">MorQi</span></span>
+  <button class="mode" type="button" aria-pressed="false" data-off="Hide world" data-on="Show world" data-off-title="Hide the world behind the pages" data-on-title="Show the world behind the pages">Hide world</button>
+  <a class="go" href="level1/?from=pitch">Play Level 1 <i aria-hidden="true">▸</i></a>
+</header>
+
+<!-- the world: one painted map, frozen, that thaws island by island as the case is made -->
+<div class="stage" aria-hidden="true">
+  <div class="cam">
+    <canvas class="frozen" width="1024" height="680"></canvas>
+    <img class="thawed" src="img/world-s.webp" alt="" width="2048" height="1360" decoding="async">
+  </div>
+  <img class="eyes" src="img/eyes.webp" alt="" decoding="async">
+  <div class="sky"></div>
+  <div class="dim"></div>
+</div>
+
+<main id="top">
+
+  <!-- 01 · cover -->
+  <section class="ch over cover" id="cover" data-ch="01" data-name="MorQi">
+    <div class="card" data-stop="cover" data-side="left">
+      <h1 class="logo"><img src="img/logo.webp" alt="MorQi" width="260" height="88"></h1>
       <p class="tag">Balance is your superpower.</p>
       <p class="lede">A five-element action game where kids learn to name their feelings by freeing a frozen world. Built for kids 7 to 11. Fun for the whole family.</p>
-      <div class="meta"><span>Investor pitch bible</span><span>October 2026</span><span>Raising a $60K–$100K pre-seed</span></div>
-      <div class="ctas"><a class="cta" href="https://aarauz-os.github.io/morqi/level1/?from=pitch" target="_blank" rel="noopener">Open the MorQi app ▸</a><a class="cta fb" href="https://aarauz-os.github.io/morqi/feedback/" data-gate>Give feedback</a></div>
+      <p class="meta"><span>Pitch bible</span><span>October 2026</span><span>Five levels playable on the web</span></p>
+      <div class="ctas"><a class="cta" href="level1/?from=pitch">Play Level 1 <i aria-hidden="true">▸</i></a></div>
+    </div>
+    <span class="cue" aria-hidden="true"></span>
+  </section>
+
+  <!-- 02 · the need -->
+  <section class="ch over" id="need" data-ch="02" data-name="The need">
+    <div class="card" data-stop="need" data-side="right">
+      <p class="eyebrow">The need <span>02</span></p>
+      <h2 class="h">Parents want games that teach. Kids need the words for big feelings.</h2>
+      <div class="nums two">
+        <p class="num"><b>73%</b><span>of US parents would rather their kids spend screen time gaming than on social media.</span><small>ESA, 2026 [1]</small></p>
+        <p class="num"><b>49%</b><span>of US parents whose children play believe games teach important skills.</span><small>ESA, 2026 [2]</small></p>
+      </div>
+      <p class="body">MorQi builds emotional vocabulary through play. Kids 7 to 11 learn to name what they feel, the way they learn a creature’s weakness: by playing, never by a lesson. It is a game, not a treatment. Grown-ups learn alongside them, so the whole family can play together.</p>
     </div>
   </section>
 
-  <!-- 2 · the need -->
-  <section class="pg" id="need">
-    <div class="in split">
-      <div class="stack">
-        <span class="eyebrow">The need <span class="n">02</span></span>
-        <h2 class="h">Parents want games that teach. <em>Kids need the words for big feelings.</em></h2>
-        <div class="stats" style="grid-template-columns:1fr 1fr">
-          <div class="stat"><b>73%</b><span>of US parents would rather their kids spend screen time gaming than on social media.</span><small>ESA, 2026 [1]</small></div>
-          <div class="stat"><b>49%</b><span>of US parents whose children play believe games teach important skills.</span><small>ESA, 2026 [2]</small></div>
-        </div>
-        <p class="lede">MorQi builds emotional vocabulary through play. Kids 7 to 11 learn to name what they feel, the way they learn a creature's weakness: by playing, never by a lesson. It is a game, not a treatment. Grown-ups learn alongside them, so the whole family can play together.</p>
-      </div>
-      <figure class="named">
-        <div class="pair">
-          <div class="fig"><img src="img/boss-earth.png" alt="The Stone Matron, a stone golem carrying a basket of worry stones"><span class="feel">Worry</span></div>
-          <span class="arr" aria-hidden="true">→</span>
-          <div class="fig"><img class="up" src="img/free-earth.png" alt="The grandmother she was, freed, smiling with a basket of buns"><span class="feel freed">Freed</span></div>
-        </div>
-        <p class="quote">"I worried about everyone so much that I forgot to live."</p>
-        <figcaption class="who">The Stone Matron is a grandmother stuck in worry. Beat her and she changes back, and says what the worry cost her.</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- 3 · the game -->
-  <section class="pg" id="game">
-    <div class="in split">
-      <div class="stack">
-        <span class="eyebrow">The game <span class="n">03</span></span>
-        <h2 class="h">Run in. Free them. <em>Bring the world back.</em></h2>
-        <p class="lede">An action game in the genre where your powers fire on their own and you move through whole crowds of creatures. Every creature you free turns the frozen ground back into life around you, so progress is something you can see.</p>
-        <ul class="beats">
-          <li><i class="w">1</i><div><b>Drag to move</b><span>One thumb. Powers and your spirit animal fight beside you.</span></div></li>
-          <li><i class="wd">2</i><div><b>Use the right element</b><span>Each creature is weak to one element, the one that keeps it in check. Match it and it frees twice as fast.</span></div></li>
-          <li><i class="f">3</i><div><b>Hold the temple, wake the world</b><span>In the Grove, the Ridge and the Silver City, free creatures inside a frozen temple's ring and it lights up and fights for you. Giants crash in. Each needs its own trick. Everywhere, ice becomes beach and sea, bamboo, lanterns, harvest, a silver city.</span></div></li>
-        </ul>
-        <p class="small">Playable today on the web: 5 levels (four short realms and a finale of 10 minutes or more), 7 Keepers, 12 spirit animals, 15 creatures, 3 kinds of giant, 5 Star Calls, an original score.</p>
-      </div>
-      <div class="phones">
-        <figure><div class="phone sm lift"><img src="img/s-title.jpg" alt="The title screen"></div><figcaption>Title</figcaption></figure>
-        <figure><div class="phone"><img src="img/s-shore.jpg" alt="Play on the Pearl Shore: the Keeper on the thawing beach, the sea coming back behind her"></div><figcaption>The Pearl Shore, in play</figcaption></figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4 · the five worlds -->
-  <section class="pg" id="worlds">
-    <div class="in">
-      <span class="eyebrow">The lesson inside the fun <span class="n">04</span></span>
-      <h2 class="h">Every level is one element's world, <em>alive.</em></h2>
-      <div class="worlds">
-        <div class="world w"><div class="phone"><img src="img/s-shore.jpg" style="object-position:50% 36%" alt="The Pearl Shore"></div><span class="han">水</span><b>The Pearl Shore</b><small>Water</small></div>
-        <div class="world wd"><div class="phone"><img src="img/s-grove.jpg" style="object-position:50% 43%" alt="The Bamboo Grove"></div><span class="han">木</span><b>The Bamboo Grove</b><small>Wood</small></div>
-        <div class="world f"><div class="phone"><img src="img/s-ridge.jpg" style="object-position:50% 25%" alt="The Lantern Ridge"></div><span class="han">火</span><b>The Lantern Ridge</b><small>Fire</small></div>
-        <div class="world e"><div class="phone"><img src="img/s-harvest.jpg" style="object-position:50% 26%" alt="The Harvest Hills"></div><span class="han">土</span><b>The Harvest Hills</b><small>Earth</small></div>
-        <div class="world m"><div class="phone"><img src="img/s-city.jpg" style="object-position:50% 47%" alt="The Silver City"></div><span class="han">金</span><b>The Silver City</b><small>Metal</small></div>
-      </div>
-      <p class="lede">Kids learn the five elements of traditional Chinese medicine the way they learn type matchups in any monster game: by playing. Water puts out fire, wood drinks up water, metal chops wood. Using a creature's weakness frees it twice as fast and earns a star.</p>
-    </div>
-  </section>
-
-  <!-- 5 · balance wins -->
-  <section class="pg" id="balance">
-    <div class="in split rev">
-      <div class="phones">
-        <figure><div class="phone"><img src="img/s-omni.jpg" alt="The Keeper gone Omni, riding a storm of cloud and rainbow lightning"></div><figcaption>Omni</figcaption></figure>
-      </div>
-      <div class="stack">
-        <span class="eyebrow">The win condition <span class="n">05</span></span>
-        <h2 class="h">You can't win by grinding. <em>You win by balance.</em></h2>
-        <p class="lede">Each realm holds Qi Stones. Free enough creatures, or wake its temples, and its stones are yours. Hold them all and your Keeper goes Omni: they become the all-five form, riding a storm of cloud and rainbow lightning, untouchable for fifteen seconds while the five elements break in their generating order, with its own anthem. Only then does the boss appear. In the finale, every stone takes Omni one tier higher, and full Omni finishes the boss.</p>
-        <div class="dots" aria-hidden="true" style="gap:12px"><img src="img/stone-water.png" alt="" width="44"><img src="img/stone-wood.png" alt="" width="44"><img src="img/stone-fire.png" alt="" width="44"><img src="img/stone-earth.png" alt="" width="44"><img src="img/stone-metal.png" alt="" width="44"></div>
-        <p class="small">The reward is the lesson. Balance is literally the superpower.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6 · the cast (A, 2026-10-07: "show a few of the characters and enemy types") -->
-  <section class="pg" id="cast">
-    <div class="in">
-      <span class="eyebrow">The cast <span class="n">06</span></span>
-      <h2 class="h">Seven Keepers, <em>so every kid finds themselves.</em></h2>
-      <div class="keepers"><figure class="kp"><span class="pic"><img src="img/cast-k1.png" alt="Amara, a Keeper"></span><b>Amara</b><small>“Let’s gooo!”</small></figure><figure class="kp"><span class="pic"><img src="img/cast-k2.png" alt="Kai, a Keeper"></span><b>Kai</b><small>“Breathe. Then go.”</small></figure><figure class="kp"><span class="pic"><img src="img/cast-k3.png" alt="Priya, a Keeper"></span><b>Priya</b><small>“I’ve got a plan.”</small></figure><figure class="kp"><span class="pic"><img src="img/cast-k4.png" alt="Mateo, a Keeper"></span><b>Mateo</b><small>“I got you.”</small></figure><figure class="kp"><span class="pic"><img src="img/cast-k5.png" alt="Ruby, a Keeper"></span><b>Ruby</b><small>“Too slow!”</small></figure><figure class="kp"><span class="pic"><img src="img/cast-k6.png" alt="Malik, a Keeper"></span><b>Malik</b><small>“Not moving.”</small></figure><figure class="kp"><span class="pic"><img src="img/cast-k7.png" alt="Sina, a Keeper"></span><b>Sina</b><small>“It’s okay, little one.”</small></figure></div>
-      <span class="sub">What they face</span>
-      <div class="foes"><div class="fgrp"><span class="sub">15 creatures, three per realm</span><div class="frow"><figure class="fo"><span class="pic"><img src="img/cast-e-water-a.png" alt="Frost Jelly"></span><b>Frost Jelly</b><small>Comes by the hundred</small></figure><figure class="fo"><span class="pic"><img src="img/cast-e-wood-b.png" alt="Thorn Moth"></span><b>Thorn Moth</b><small>Drops thorns as it flies</small></figure><figure class="fo"><span class="pic"><img src="img/cast-e-fire-b.png" alt="Ember Beetle"></span><b>Ember Beetle</b><small>Swells, then bursts</small></figure><figure class="fo"><span class="pic"><img src="img/cast-e-earth-c.png" alt="Stone Ox"></span><b>Stone Ox</b><small>Stamps a danger ring</small></figure><figure class="fo"><span class="pic"><img src="img/cast-e-metal-b.png" alt="Blade Mantis"></span><b>Blade Mantis</b><small>Dashes down a line</small></figure></div></div><div class="fgrp g"><span class="sub">3 giants</span><div class="frow"><figure class="fo giant"><span class="pic"><img src="img/cast-g-rammer.png" alt="The Rammer"></span><b>The Rammer</b><small>Dodge, then hit its back</small></figure><figure class="fo giant"><span class="pic"><img src="img/cast-g-colossus.png" alt="The Colossus"></span><b>The Colossus</b><small>Hit its core when it opens</small></figure><figure class="fo giant"><span class="pic"><img src="img/cast-g-alpha.png" alt="The Pack Alpha"></span><b>The Pack Alpha</b><small>Free its pack first</small></figure></div></div></div>
-    </div>
-  </section>
-
-  <!-- 7 · villains who change: the five realm bosses, each with the person it was -->
-  <section class="pg" id="change">
-    <div class="in vill">
-      <div class="stack vh">
-        <span class="eyebrow">The heart <span class="n">07</span></span>
-        <h2 class="h">Every villain is a person <em>stuck in one feeling.</em></h2>
-      </div>
-      <div class="stack vt">
-        <p class="lede">Traditional Chinese medicine pairs each element with a feeling. Each realm's boss is a person frozen in that feeling. Beat the boss and they change back. Each one hands the Keeper a Star Call from their own story. Kids see that people can change, and so can they.</p>
-        <p class="quote">"I was so afraid of losing the shore that I stopped feeling anything at all."</p>
-        <p class="who">The fisherman of the Pearl Shore, freed from the Drowned Lantern</p>
-      </div>
-      <div class="rogues">
-        <figure class="rogue" style="--c:var(--water)"><div class="art"><img class="boss" src="img/boss-water.png" alt="The Drowned Lantern, a hooded sea-wraith with a cold lantern in its chest and a fisherman's hook"><img class="was" src="img/face-water.png" alt="The fisherman it was"></div><figcaption><b>The Drowned Lantern</b><span>Fear</span><small>was the fisherman</small><em class="gift"><img src="img/call-tide.png" alt="">Tide Call</em></figcaption></figure>
-        <figure class="rogue" style="--c:var(--wood)"><div class="art"><img class="boss" src="img/boss-wood.png" alt="The Thorn Tyrant, a thorned treant with a woodcarver's axe"><img class="was" src="img/face-wood.png" alt="The woodcarver it was"></div><figcaption><b>The Thorn Tyrant</b><span>Anger</span><small>was the woodcarver</small><em class="gift"><img src="img/call-root.png" alt="">Root Grasp</em></figcaption></figure>
-        <figure class="rogue" style="--c:var(--fire)"><div class="art"><img class="boss" src="img/boss-fire.png" alt="The Ember Drummer, a grinning horned fire-demon with festival drums"><img class="was" src="img/face-fire.png" alt="The drummer it was"></div><figcaption><b>The Ember Drummer</b><span>Restless excitement</span><small>was the drummer</small><em class="gift"><img src="img/call-ember.png" alt="">Ember Rain</em></figcaption></figure>
-        <figure class="rogue" style="--c:var(--earth)"><div class="art"><img class="boss" src="img/boss-earth.png" alt="The Stone Matron, a stone golem carrying a basket of worry stones"><img class="was" src="img/face-earth.png" alt="The grandmother she was"></div><figcaption><b>The Stone Matron</b><span>Worry</span><small>was the grandmother</small><em class="gift"><img src="img/call-stone.png" alt="">Stone Shelter</em></figcaption></figure>
-        <figure class="rogue" style="--c:var(--metal)"><div class="art"><img class="boss" src="img/boss-metal.png" alt="The Bell Sentinel, an armoured knight built around a cracked bell"><img class="was" src="img/face-metal.png" alt="The bell ringer she was"></div><figcaption><b>The Bell Sentinel</b><span>Grief</span><small>was the bell ringer</small><em class="gift"><img src="img/call-bell.png" alt="">Bell Strike</em></figcaption></figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8 · the long game: what continues after the five realms (A, 2026-10-05) -->
-  <section class="pg" id="long">
-    <div class="in split">
-      <div class="stack">
-        <span class="eyebrow">The long game <span class="n">08</span></span>
-        <h2 class="h">Five realms is chapter one. <em>The world is still frozen.</em></h2>
-        <p class="lede">The Stillmaker froze far more than five lands. A chapter is five realms; a season adds one realm, so the story runs for years. The demo ends as he arrives.</p>
-        <ul class="beats">
-          <li><i class="w">1</i><div><b>A new land every season</b><span>Once the seed round lands, about every ten weeks: a new realm, new creatures, a new person to free and the Star Call they give. The first realm of every chapter is free to try.</span></div></li>
-          <li><i class="wd">2</i><div><b>Luma's nine tails</b><span>Luma grows one tail each season, and each brings back a memory of the hearth and the child who lived there. Nine tails lead to why the Stillmaker froze the world.</span></div></li>
-          <li><i class="f">3</i><div><b>Deeper feelings as players grow</b><span>The first five lands hold fear, anger, restlessness, worry and grief. Later lands, some where two elements meet, bring loneliness, jealousy, pride and shame.</span></div></li>
-          <li><i class="e">4</i><div><b>Mastery with no ceiling</b><span>Omni, Surge and fusions today; next, spirit animals that grow for months and a Sanctuary that grows with everyone you free; later, every Keeper's own art for each Surge form.</span></div></li>
-          <li><i class="m">5</i><div><b>A reason to return every day, every year</b><span>Later: family co-op where the hardest bosses need a team in balance, a daily Rift, and yearly festivals like Lunar New Year and Mid-Autumn.</span></div></li>
-        </ul>
-      </div>
-      <div class="stack" style="gap:12px">
-        <figure class="world"><img src="img/world.jpg" alt="The five realms glowing warm in one corner of a vast frozen world: a mountain monastery, a coral kingdom under a frozen sea, a glass desert, a sky market of lanterns, an ancient forest, all still waiting to be thawed."></figure>
-        <div class="realms" aria-label="Six of the realms still to come"><figure><img src="img/realm-steam-springs.jpg" alt="Steam Springs, a realm still to come: water and fire."><figcaption>Steam Springs</figcaption></figure><figure><img src="img/realm-glass-desert.jpg" alt="Glass Desert, a realm still to come: fire and earth."><figcaption>Glass Desert</figcaption></figure><figure><img src="img/realm-coral-kingdom.jpg" alt="Coral Kingdom, a realm still to come: water, its depths."><figcaption>Coral Kingdom</figcaption></figure><figure><img src="img/realm-sky-market.jpg" alt="Sky Market, a realm still to come: fire, its festivals."><figcaption>Sky Market</figcaption></figure><figure><img src="img/realm-iron-orchard.jpg" alt="Iron Orchard, a realm still to come: wood and metal."><figcaption>Iron Orchard</figcaption></figure><figure><img src="img/realm-mountain-monastery.jpg" alt="Mountain Monastery, a realm still to come: earth, its heights."><figcaption>Mountain Monastery</figcaption></figure></div>
-        <div class="tails" aria-label="Luma's nine tails: one grown, eight to come"><span class="lbl">Luma's tails</span><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><span class="lbl">Now → Season 8</span></div>
-        <p class="small">Planned, except what is marked today. The five realms, Omni, Surge, fusions and the Freed Book are playable on the web now. A $100K raise funds the first season; a season about every ten weeks comes with the seed round.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 9 · proof -->
-  <section class="pg" id="proof">
-    <div class="in">
-      <span class="eyebrow">In the room <span class="n">09</span></span>
-      <h2 class="h">Two players. One said: <em>"I can't just leave right now."</em></h2>
+  <!-- 03 · the game -->
+  <section class="ch over" id="game" data-ch="03" data-name="The game">
+    <div class="card wide" data-stop="game" data-side="right">
+      <p class="eyebrow">The game <span>03</span></p>
+      <h2 class="h">Run in. Free them. Bring the world back.</h2>
       <div class="split">
-        <div class="photos">
-          <img src="img/pt-joy.jpg" alt="Abby smiling at the game beside Demaris">
-          <img src="img/pt-together.jpg" alt="Demaris and Abby playing side by side, leaning over a phone">
-          <img src="img/pt-focus.jpg" alt="Demaris and Abby heads-down, playing">
+        <div>
+          <p class="body">An action game in the genre where your powers fire on their own and you move through whole crowds of creatures. Every creature you free turns the frozen ground back into life around you, so progress is something you can see.</p>
+          <ol class="steps">
+            <li><i>1</i><div><b>Drag to move</b><span>One thumb. Powers and your spirit animal fight beside you.</span></div></li>
+            <li><i>2</i><div><b>Use the right element</b><span>Each creature is weak to one element, the one that keeps it in check. Match it and it frees twice as fast.</span></div></li>
+            <li><i>3</i><div><b>Hold the temple, wake the world</b><span>In the Grove, the Ridge and the Silver City, free creatures inside a frozen temple’s ring and it lights up and fights for you. Giants crash in. Each needs its own trick.</span></div></li>
+          </ol>
         </div>
+        <figure class="phone"><img src="img/s-shore.webp" alt="The Pearl Shore, in play" width="480" height="1038" loading="lazy" decoding="async"><figcaption>The Pearl Shore, in play</figcaption></figure>
+      </div>
+      <p class="small">Playable today on the web: 5 levels (four short realms and a finale of 10 minutes or more), 7 Keepers, 12 spirit animals, 15 creatures, 3 kinds of giant, 5 Star Calls, an original score.</p>
+    </div>
+  </section>
+
+  <!-- 04 · the lesson: one island per element -->
+  <section class="ch over lesson" id="lesson" data-ch="04" data-name="The lesson">
+    <div class="card" data-stop="lesson" data-side="right">
+      <p class="eyebrow">The lesson inside the fun <span>04</span></p>
+      <h2 class="h">Every level is one element’s world, alive.</h2>
+      <p class="body">Kids learn the five elements of traditional Chinese medicine the way they learn type matchups in any monster game: by playing. Water puts out fire, wood drinks up water, metal chops wood. Using a creature’s weakness frees it twice as fast and earns a star.</p>
+    </div>
+    <div class="realm" data-stop="shore" data-side="right" style="--c:var(--water)"><span class="han">水</span><div><b>The Pearl Shore</b><span>Water</span></div><img src="img/s-shore.webp" alt="" width="480" height="1038" loading="lazy" decoding="async"></div>
+    <div class="realm" data-stop="grove" data-side="right" style="--c:var(--wood)"><span class="han">木</span><div><b>The Bamboo Grove</b><span>Wood</span></div><img src="img/s-grove.webp" alt="" width="480" height="1038" loading="lazy" decoding="async"></div>
+    <div class="realm" data-stop="ridge" data-side="right" style="--c:var(--fire)"><span class="han">火</span><div><b>The Lantern Ridge</b><span>Fire</span></div><img src="img/s-ridge.webp" alt="" width="480" height="1038" loading="lazy" decoding="async"></div>
+    <div class="realm" data-stop="harvest" data-side="right" style="--c:var(--earth)"><span class="han">土</span><div><b>The Harvest Hills</b><span>Earth</span></div><img src="img/s-harvest.webp" alt="" width="480" height="1038" loading="lazy" decoding="async"></div>
+    <div class="realm" data-stop="city" data-side="right" style="--c:var(--metal)"><span class="han">金</span><div><b>The Silver City</b><span>Metal</span></div><img src="img/s-city.webp" alt="" width="480" height="1038" loading="lazy" decoding="async"></div>
+  </section>
+
+  <!-- 05 · the win condition -->
+  <section class="ch over" id="win" data-ch="05" data-name="The win condition">
+    <div class="card" data-stop="win" data-side="right">
+      <p class="eyebrow">The win condition <span>05</span></p>
+      <h2 class="h">You can’t win by grinding. You win by balance.</h2>
+      <div class="stones" role="img" aria-label="The five Qi Stones">
+        <img src="img/stone-water.webp" alt="" width="120" height="120" loading="lazy"><img src="img/stone-wood.webp" alt="" width="120" height="120" loading="lazy"><img src="img/stone-fire.webp" alt="" width="120" height="120" loading="lazy"><img src="img/stone-earth.webp" alt="" width="120" height="120" loading="lazy"><img src="img/stone-metal.webp" alt="" width="120" height="120" loading="lazy">
+      </div>
+      <p class="body">Each realm holds Qi Stones. Free enough creatures, or wake its temples, and its stones are yours. Hold them all and your Keeper goes Omni: they become the all-five form, riding a storm of cloud and rainbow lightning, untouchable for fifteen seconds while the five elements break in their generating order, with its own anthem. Only then does the boss appear. In the finale, every stone takes Omni one tier higher, and full Omni finishes the boss.</p>
+      <div class="omni"><img src="img/omni.webp" alt="A Keeper in the Omni form" width="360" height="360" loading="lazy"><p class="say">The reward is the lesson. Balance is literally the superpower.</p></div>
+    </div>
+  </section>
+
+  <!-- 06 · the cast -->
+  <section class="ch over" id="cast" data-ch="06" data-name="The cast">
+    <div class="card wide" data-stop="cast" data-side="left">
+      <p class="eyebrow">The cast <span>06</span></p>
+      <h2 class="h">Seven Keepers, so every kid finds themselves.</h2>
+      <ul class="keepers">
+        <li><img src="img/k1.webp" alt="" width="220" height="220" loading="lazy"><b>Amara</b><span>“Let’s gooo!”</span></li>
+        <li><img src="img/k2.webp" alt="" width="220" height="220" loading="lazy"><b>Kai</b><span>“Breathe. Then go.”</span></li>
+        <li><img src="img/k3.webp" alt="" width="220" height="220" loading="lazy"><b>Priya</b><span>“I’ve got a plan.”</span></li>
+        <li><img src="img/k4.webp" alt="" width="220" height="220" loading="lazy"><b>Mateo</b><span>“I got you.”</span></li>
+        <li><img src="img/k5.webp" alt="" width="220" height="220" loading="lazy"><b>Ruby</b><span>“Too slow!”</span></li>
+        <li><img src="img/k6.webp" alt="" width="220" height="220" loading="lazy"><b>Malik</b><span>“Not moving.”</span></li>
+        <li><img src="img/k7.webp" alt="" width="220" height="220" loading="lazy"><b>Sina</b><span>“It’s okay, little one.”</span></li>
+      </ul>
+      <p class="sub">What they face</p>
+      <div class="foes">
+        <div><p class="small">15 creatures, three per realm</p>
+          <ul class="mini">
+            <li style="--c:var(--water)"><img src="img/e-water-a.webp" alt="" width="150" height="150" loading="lazy"><b>Frost Jelly</b><span>Comes by the hundred</span></li>
+            <li style="--c:var(--wood)"><img src="img/e-wood-b.webp" alt="" width="150" height="150" loading="lazy"><b>Thorn Moth</b><span>Drops thorns as it flies</span></li>
+            <li style="--c:var(--fire)"><img src="img/e-fire-b.webp" alt="" width="150" height="150" loading="lazy"><b>Ember Beetle</b><span>Swells, then bursts</span></li>
+            <li style="--c:var(--earth)"><img src="img/e-earth-c.webp" alt="" width="150" height="150" loading="lazy"><b>Stone Ox</b><span>Stamps a danger ring</span></li>
+            <li style="--c:var(--metal)"><img src="img/e-metal-b.webp" alt="" width="150" height="150" loading="lazy"><b>Blade Mantis</b><span>Dashes down a line</span></li>
+          </ul></div>
+        <div><p class="small">3 giants</p>
+          <ul class="mini">
+            <li><img src="img/g-rammer.webp" alt="" width="180" height="180" loading="lazy"><b>The Rammer</b><span>Dodge, then hit its back</span></li>
+            <li><img src="img/g-colossus.webp" alt="" width="180" height="180" loading="lazy"><b>The Colossus</b><span>Hit its core when it opens</span></li>
+            <li><img src="img/g-alpha.webp" alt="" width="180" height="180" loading="lazy"><b>The Pack Alpha</b><span>Free its pack first</span></li>
+          </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 · the heart: the one tap -->
+  <section class="ch over" id="heart" data-ch="07" data-name="The heart">
+    <div class="card wide" data-stop="heart" data-side="right">
+      <p class="eyebrow">The heart <span>07</span></p>
+      <h2 class="h">Every villain is a person stuck in one feeling.</h2>
+      <p class="body">Traditional Chinese medicine pairs each element with a feeling. Each realm’s boss is a person frozen in that feeling. Beat the boss and they change back. Each one hands the Keeper a Star Call from their own story. Kids see that people can change, and so can they.</p>
+      <div class="free" id="free">
+        <div class="free-art">
+          <img class="was" src="img/boss-earth.webp" alt="The Stone Matron" width="300" height="300" loading="lazy">
+          <img class="now" src="img/free-earth.webp" alt="The grandmother, freed" width="300" height="300" loading="lazy">
+          <span class="burst" aria-hidden="true"></span>
+        </div>
+        <div class="free-ask">
+          <p class="q">Which feeling is she stuck in?</p>
+          <div class="picks" role="group" aria-label="Which feeling is she stuck in?">
+            <button type="button" data-f="fear">Fear</button>
+            <button type="button" data-f="worry">Worry</button>
+            <button type="button" data-f="grief">Grief</button>
+          </div>
+          <div class="freed" aria-live="polite">
+            <p class="quote">“I worried about everyone so much that I forgot to live.”</p>
+            <p class="small">The Stone Matron is a grandmother stuck in worry. Beat her and she changes back, and says what the worry cost her.</p>
+          </div>
+        </div>
+      </div>
+      <ul class="bosses">
+        <li style="--c:var(--water)"><span class="pair"><img src="img/boss-water.webp" alt="" width="300" height="300" loading="lazy"><img class="face" src="img/face-water.webp" alt="" width="140" height="140" loading="lazy"></span><b>The Drowned Lantern</b><span class="f">Fear</span><span>was the fisherman</span><span class="call"><img src="img/call-tide.webp" alt="" width="96" height="96" loading="lazy">Tide Call</span></li>
+        <li style="--c:var(--wood)"><span class="pair"><img src="img/boss-wood.webp" alt="" width="300" height="300" loading="lazy"><img class="face" src="img/face-wood.webp" alt="" width="140" height="140" loading="lazy"></span><b>The Thorn Tyrant</b><span class="f">Anger</span><span>was the woodcarver</span><span class="call"><img src="img/call-root.webp" alt="" width="96" height="96" loading="lazy">Root Grasp</span></li>
+        <li style="--c:var(--fire)"><span class="pair"><img src="img/boss-fire.webp" alt="" width="300" height="300" loading="lazy"><img class="face" src="img/face-fire.webp" alt="" width="140" height="140" loading="lazy"></span><b>The Ember Drummer</b><span class="f">Restless excitement</span><span>was the drummer</span><span class="call"><img src="img/call-ember.webp" alt="" width="96" height="96" loading="lazy">Ember Rain</span></li>
+        <li style="--c:var(--earth)"><span class="pair"><img src="img/boss-earth.webp" alt="" width="300" height="300" loading="lazy"><img class="face" src="img/face-earth.webp" alt="" width="140" height="140" loading="lazy"></span><b>The Stone Matron</b><span class="f">Worry</span><span>was the grandmother</span><span class="call"><img src="img/call-stone.webp" alt="" width="96" height="96" loading="lazy">Stone Shelter</span></li>
+        <li style="--c:var(--metal)"><span class="pair"><img src="img/boss-metal.webp" alt="" width="300" height="300" loading="lazy"><img class="face" src="img/face-metal.webp" alt="" width="140" height="140" loading="lazy"></span><b>The Bell Sentinel</b><span class="f">Grief</span><span>was the bell ringer</span><span class="call"><img src="img/call-bell.webp" alt="" width="96" height="96" loading="lazy">Bell Strike</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 08 · the long game -->
+  <section class="ch over" id="long" data-ch="08" data-name="The long game">
+    <div class="card wide" data-stop="long" data-side="left">
+      <p class="eyebrow">The long game <span>08</span></p>
+      <h2 class="h">Five realms is chapter one. The world is still frozen.</h2>
+      <p class="body">The Stillmaker froze far more than five lands. A chapter is five realms; a season adds one realm, so the story runs for years. The demo ends as he arrives.</p>
+      <p class="planned"><span class="tag-p">Planned</span></p>
+      <ul class="realms" aria-label="Six of the realms still to come">
+        <li><img src="img/realm-steam-springs.webp" alt="Steam Springs, a realm still to come: water and fire." width="400" height="225" loading="lazy"><span>Steam Springs</span></li>
+        <li><img src="img/realm-glass-desert.webp" alt="Glass Desert, a realm still to come: fire and earth." width="400" height="225" loading="lazy"><span>Glass Desert</span></li>
+        <li><img src="img/realm-coral-kingdom.webp" alt="Coral Kingdom, a realm still to come: water, its depths." width="400" height="225" loading="lazy"><span>Coral Kingdom</span></li>
+        <li><img src="img/realm-sky-market.webp" alt="Sky Market, a realm still to come: fire, its festivals." width="400" height="225" loading="lazy"><span>Sky Market</span></li>
+        <li><img src="img/realm-iron-orchard.webp" alt="Iron Orchard, a realm still to come: wood and metal." width="400" height="225" loading="lazy"><span>Iron Orchard</span></li>
+        <li><img src="img/realm-mountain-monastery.webp" alt="Mountain Monastery, a realm still to come: earth, its heights." width="400" height="225" loading="lazy"><span>Mountain Monastery</span></li>
+      </ul>
+      <ol class="steps long">
+        <li><i>1</i><div><b>A new land every season</b><span>Once MorQi is growing, about every ten weeks: a new realm, new creatures, a new person to free and the Star Call they give. The first realm of every chapter is free to try.</span></div></li>
+        <li><i>2</i><div><b>Luma’s nine tails</b><span>Luma grows one tail each season, and each brings back a memory of the hearth and the child who lived there. Nine tails lead to why the Stillmaker froze the world.</span></div></li>
+        <li><i>3</i><div><b>Deeper feelings as players grow</b><span>The first five lands hold fear, anger, restlessness, worry and grief. Later lands, some where two elements meet, bring loneliness, jealousy, pride and shame.</span></div></li>
+        <li><i>4</i><div><b>Mastery with no ceiling</b><span>Omni, Surge and fusions today; next, spirit animals that grow for months and a Sanctuary that grows with everyone you free; later, every Keeper’s own art for each Surge form.</span></div></li>
+        <li><i>5</i><div><b>A reason to return every day, every year</b><span>Later: family co-op where the hardest bosses need a team in balance, a daily Rift, and yearly festivals like Lunar New Year and Mid-Autumn.</span></div></li>
+      </ol>
+      <p class="small">Planned, except what is marked today. The five realms, Omni, Surge, fusions and the Freed Book are playable on the web now.</p>
+    </div>
+  </section>
+
+  <!-- 09 · in the room (the world dims; the rest is read, not watched) -->
+  <section class="ch solid" id="room" data-ch="09" data-name="In the room">
+    <div class="wrap" data-stop="room">
+      <p class="eyebrow">In the room <span>09</span></p>
+      <h2 class="h">Two players. One said: “I can’t just leave right now.”</h2>
+      <div class="photos">
+        <img src="img/pt-joy.webp" alt="Playtest: a player smiling at the game" width="560" height="776" loading="lazy">
+        <img src="img/pt-together.webp" alt="Playtest: two players at the game together" width="560" height="816" loading="lazy">
+        <img src="img/pt-focus.webp" alt="Playtest: a player focused on the game" width="560" height="697" loading="lazy">
+      </div>
+      <p class="caption">Real playtest stills · October 2026 · shared with consent</p>
+      <blockquote class="quote big">“I was so into this, my leg fell asleep … I can’t just leave right now.”<cite>Said during Playtest Two</cite></blockquote>
+      <div class="facts">
+        <p><i style="--c:var(--go)">↑</i><b>Abby got better fast</b><span>Between two sessions an hour apart, on an updated build, her Level 2 went from 3 falls and 1 ultimate to 0 falls and 3 ultimates. Sixteen minutes heads-down in session two.</span></p>
+        <p><i style="--c:var(--jade)">✓</i><b>Demaris: “Still challenging, but I can get out in the ways that I should.”</b><span>An experienced player, and a co-founder, so we count his word as feedback, not proof.</span></p>
+      </div>
+      <p class="small">Abby had never played this kind of game. Two players are a story, not data. Next, we measure retention with about 100 families.</p>
+    </div>
+  </section>
+
+  <!-- 10 · the market -->
+  <section class="ch solid" id="market" data-ch="10" data-name="The market">
+    <div class="wrap" data-stop="market">
+      <p class="eyebrow">The market <span>10</span></p>
+      <h2 class="h">A proven genre, a family audience, and a gap for trust.</h2>
+      <div class="nums four">
+        <p class="num"><b>27M+</b><span>players for Vampire Survivors, the genre’s breakout hit on PC.</span><small>VGC, 2026 [3]</small></p>
+        <p class="num"><b>$500M+</b><span>in in-app purchases for Survivor.io in its first 20 months on mobile, by tracker estimate.</span><small>Sensor Tower estimate, 2024 [4]</small></p>
+        <p class="num"><b>81%</b><span>of US parents who game weekly play with their kids; 52% at least weekly.</span><small>ESA, 2026 [2]</small></p>
+        <p class="num"><b>$120M</b><span>raised by Lingokids in 2025 on ad-free, family subscriptions: the model MorQi uses.</span><small>Lingokids, 2025 [5]</small></p>
+      </div>
+      <p class="body">The soft launch measures what it costs to reach a family.</p>
+      <div class="screens">
+        <img src="img/s-shore.webp" alt="" width="480" height="1038" loading="lazy"><img src="img/s-grove.webp" alt="" width="480" height="1038" loading="lazy"><img src="img/s-ridge.webp" alt="" width="480" height="1038" loading="lazy"><img src="img/s-harvest.webp" alt="" width="480" height="1038" loading="lazy"><img src="img/s-city.webp" alt="" width="480" height="1038" loading="lazy">
+      </div>
+      <p class="caption">In play today: whole crowds of creatures, freed one realm at a time.</p>
+    </div>
+  </section>
+
+  <!-- 11 · why we win -->
+  <section class="ch solid" id="why" data-ch="11" data-name="Why we win">
+    <div class="wrap" data-stop="why">
+      <p class="eyebrow">Why we win <span>11</span></p>
+      <h2 class="h">Easy to love. Hard to copy.</h2>
+      <div class="nums three">
+        <p class="num"><b>~$20K</b><strong>A playable game for about $20K</strong><span>Six months, two founders, a mechanics consultant and an AI-assisted pipeline built five playable levels.</span></p>
+        <p class="num"><b>0 ads</b><strong>Safe by design</strong><span>No ads, no open chat, no typed names. Nothing is sold to kids: one family plan, bought by a grown-up. Epic paid $520M: a $275M COPPA penalty and $245M refunds for purchase tricks [6].</span></p>
+        <p class="num"><b>5 elements</b><strong>Real roots, and the lesson is the game</strong><span>The five elements are rooted in the practice of a co-founder who is a Qigong master and studied Traditional Chinese Medicine. Kids learn them by playing, never by a quiz.</span></p>
+      </div>
+      <p class="planned"><span class="tag-p">Planned</span>Once MorQi is growing, a new season about every ten weeks, Luma’s nine tails as the story’s spine, and new realms that explore one element or join two.</p>
+      <p class="say">Anyone can copy the genre. A copy would still need the trust-first design, the roots, the world, and a team that builds this much for this little.</p>
+    </div>
+  </section>
+
+  <!-- 12 · the business -->
+  <section class="ch solid" id="business" data-ch="12" data-name="The business">
+    <div class="wrap" data-stop="business">
+      <p class="eyebrow">The business <span>12</span></p>
+      <h2 class="h">Free to try. One family plan. Safe by design.</h2>
+      <p class="body">Every story chapter is free to try: its first realm is free. One family plan, about $5.99 a month, unlocks every realm, season and look. No power is ever sold on its own: every power is earned by playing. Only a grown-up can buy the plan.</p>
+      <div class="split">
+        <dl class="plan">
+          <div><dt>The first realm of every story chapter</dt><dd>Free</dd></div>
+          <div><dt>Family plan: all realms, seasons and looks</dt><dd>$5.99 a month</dd></div>
+          <div><dt>Who can buy it</dt><dd>A grown-up, behind a parent gate</dd></div>
+          <div><dt>Ads, or anything sold to a child</dt><dd>None</dd></div>
+        </dl>
         <div class="stack">
-          <span class="label">Real playtest stills · October 2026 · shared with consent</span>
-          <p class="quote">"I was so into this, my leg fell asleep … I can't just leave right now."</p>
-          <p class="who">Said during Playtest Two</p>
-          <ul class="beats">
-            <li><i class="e">↑</i><div><b>Abby got better fast</b><span>Between two sessions an hour apart, on an updated build, her Level 2 went from 3 falls and 1 ultimate to 0 falls and 3 ultimates. Sixteen minutes heads-down in session two.</span></div></li>
-            <li><i class="wd">✓</i><div><b>Demaris: "Still challenging, but I can get out in the ways that I should."</b><span>An experienced player, and a co-founder, so we count his word as feedback, not proof.</span></div></li>
-          </ul>
-          <p class="small">Abby had never played this kind of game. Two players are a story, not data. This round buys the data.</p>
+          <p class="num"><b>~$72</b><span>a year per subscribing family ($5.99 a month), one plan per family.</span></p>
+          <p class="check"><i>✓</i><b>One purchase, made by a grown-up</b><span>The family plan sits behind a parent gate. Nothing is sold to kids.</span></p>
+          <p class="check"><i>✓</i><b>No ads, no open chat, no typed names</b><span>Built for COPPA, the US children’s privacy law, from day one.</span></p>
+          <p class="check warn"><i>!</i><b>Why it matters</b><span>Epic Games paid $520M in 2022: a $275M COPPA penalty and $245M refunds for purchase tricks [6]. Stricter COPPA rules began in April 2026 [7].</span></p>
         </div>
       </div>
+      <p class="sub">What a season brings <span>About every ten weeks once MorQi is growing. Nothing in a season expires. Illustrative.</span></p>
+      <ul class="season">
+        <li><img src="img/realm-coral-kingdom.webp" alt="" width="400" height="225" loading="lazy"><b>A new realm</b><span>A land to thaw</span></li>
+        <li><img src="img/face-wood.webp" alt="" width="140" height="140" loading="lazy"><b>A person to free</b><span>Stuck in one feeling</span></li>
+        <li><img src="img/call-root.webp" alt="" width="96" height="96" loading="lazy"><b>A Star Call</b><span>Their gift to you</span></li>
+        <li><img src="img/path-look.webp" alt="" width="200" height="200" loading="lazy"><b>A Keeper look</b><span>A new style</span></li>
+        <li><img src="img/k1-hero.webp" alt="" width="260" height="260" loading="lazy"><b>A hero outfit</b><span>The season’s finale</span></li>
+      </ul>
     </div>
   </section>
 
-  <!-- 10 · market -->
-  <section class="pg" id="market">
-    <div class="in">
-      <span class="eyebrow">The market <span class="n">10</span></span>
-      <h2 class="h">A proven genre, a family audience, <em>and a gap for trust.</em></h2>
-      <div class="stats four">
-        <div class="stat" style="--c:var(--fire)"><b>27M+</b><span>players for Vampire Survivors, the genre's breakout hit on PC.</span><small>VGC, 2026 [3]</small></div>
-        <div class="stat" style="--c:var(--earth)"><b>$500M+</b><span>in in-app purchases for Survivor.io in its first 20 months on mobile, by tracker estimate.</span><small>Sensor Tower estimate, 2024 [4]</small></div>
-        <div class="stat" style="--c:var(--wood)"><b>81%</b><span>of US parents who game weekly play with their kids; 52% at least weekly.</span><small>ESA, 2026 [2]</small></div>
-        <div class="stat" style="--c:var(--jade)"><b>$120M</b><span>raised by Lingokids in 2025 on ad-free, family subscriptions: the model MorQi uses.</span><small>Lingokids, 2025 [5]</small></div>
-      </div>
-      <p class="lede">The soft launch measures what it costs to reach a family, with $6,000 of test marketing; at $100K it also measures how many subscribe.</p>
-      <figure class="strip">
-        <img src="img/s-shore.jpg" style="object-position:50% 34%" alt="The Pearl Shore in play: a Keeper on the thawing beach among a crowd of creatures">
-        <img src="img/s-surge.jpg" alt="The Bamboo Grove in play: a Keeper in Surge, riding a storm of fire cloud inside a temple ring">
-        <img src="img/s-ridge.jpg" style="object-position:50% 50%" alt="The Lantern Ridge in play">
-        <img src="img/s-harvest.jpg" style="object-position:50% 50%" alt="The Harvest Hills in play">
-        <img src="img/s-city.jpg" style="object-position:50% 50%" alt="The Silver City in play">
-        <figcaption>In play today: whole crowds of creatures, freed one realm at a time.</figcaption>
-      </figure>
+  <!-- 13 · the plan -->
+  <section class="ch solid" id="plan" data-ch="13" data-name="The plan">
+    <div class="wrap" data-stop="plan">
+      <p class="eyebrow">The plan <span>13</span></p>
+      <h2 class="h">From five playable levels to a game families come back to.</h2>
+      <ol class="road">
+        <li class="done"><span class="when">Done</span><b>The game, playable</b><span>Design, five web levels, original score, two playtests.</span></li>
+        <li><span class="when">Months 1–2</span><b>The web game, family-ready</b><span>Saved to the home screen, progress kept online, a grown-ups’ area.</span></li>
+        <li><span class="when">Months 3–4</span><b>The loop around the run</b><span>A home base and spirit animal growth.</span></li>
+        <li><span class="when">Months 5–6</span><b>Families, then soft launch</b><span>About 100 families playing on the web from month 5, so day-30 numbers land by month 6; then one or two markets. Targets: day 1 at 35–50%, day 7 at 15–25%, day 30 at 5–15%.</span></li>
+        <li><span class="when">Then</span><b>Grow</b><span>On real retention data: the full team, five seasons a year, then native iPhone and Android apps.</span></li>
+      </ol>
+      <p class="say">Later, play together. Each family member brings an element, and the hardest bosses fall only to a team in balance. The game’s lesson becomes its multiplayer.</p>
     </div>
   </section>
 
-  <!-- 11 · why we win: the moat, and how far ahead the team thinks (A, 2026-10-07: "i would love a why we win page") -->
-  <section class="pg" id="win">
-    <div class="in split">
-      <div class="stack">
-        <span class="eyebrow">Why we win <span class="n">11</span></span>
-        <h2 class="h">Easy to love. <em>Hard to copy.</em></h2>
-        <ul class="claims">
-          <li><b>~$20K</b><div><strong>A playable game for about $20K</strong><span>Six months, two founders, a mechanics consultant and an AI-assisted pipeline built five playable levels.</span></div></li>
-          <li><b>0 ads</b><div><strong>Safe by design</strong><span>No ads, no open chat, no typed names. Nothing is sold to kids: one family plan, bought by a grown-up. Epic paid $520M: a $275M COPPA penalty and $245M refunds for purchase tricks [6].</span></div></li>
-          <li><b>5<small>elements</small></b><div><strong>Real roots, and the lesson is the game</strong><span>The five elements are rooted in the practice of a co-founder who is a Qigong master and studied Traditional Chinese Medicine. Kids learn them by playing, never by a quiz.</span></div></li>
-        </ul>
-        <div class="later"><div class="tails" aria-label="Luma's nine tails: one grown, eight to come"><span class="lbl">Planned</span><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span>After the seed round, a new season about every ten weeks, Luma’s nine tails as the story’s spine, and new realms that explore one element or join two.</span></div>
-        <p class="lede">Anyone can copy the genre. A copy would still need the trust-first design, the roots, the world, and a team that builds this much for this little.</p>
-        <p class="src">[6] FTC, Dec 2022.</p>
-      </div>
-      <figure class="winart"><img src="img/win-art.jpg" alt="MorQi key art: the Keepers, their spirit animals and the five realm bosses in the frozen fog."></figure>
+  <!-- 14 · the team -->
+  <section class="ch solid" id="team" data-ch="14" data-name="The team">
+    <div class="wrap" data-stop="team">
+      <p class="eyebrow">The team <span>14</span></p>
+      <h2 class="h">Two founders, one playable game.</h2>
+      <p class="body">It started with Qigong. Filming Demaris’s masterclasses, Amos also saw him as a father, and was struck by his kids: calm, sharp and able to name what they felt. Two lifelong gamers asked if a game could carry some of that practice to every child.</p>
+      <ul class="people">
+        <li><div><b>Amos A.</b><span>Co-founder and Creative Director, DP Media. Lead concept, story and contact.</span></div></li>
+        <li><div><b>Demaris Parker</b><span>Co-founder and Wellness Director, DP Media. Qigong master and bodywork practitioner who studied Traditional Chinese Medicine. Shaped the concept, rooted in the Qigong at its heart.</span></div></li>
+        <li><div><b>Sammy P.</b><span>Consultant on game mechanics, strategy and tactics.</span></div></li>
+      </ul>
+      <p class="small">Recruiting next: a licensed child psychologist and a cultural advisor. Neither is on board yet.</p>
+      <p class="say">In six months and for about $20K, DP Media’s two founders and a mechanics consultant built all of this with an AI-assisted pipeline: five levels, seven Keepers, twelve spirit animals, fifteen creatures, three giants and an original score. The founders take no salary.</p>
     </div>
   </section>
 
-  <!-- 12 · business -->
-  <section class="pg" id="business">
-    <div class="in">
-      <div class="split">
-      <div class="stack">
-        <span class="eyebrow">The business <span class="n">12</span></span>
-        <h2 class="h"><span class="nw">Free to try.</span> <span class="nw">One family plan.</span> <em class="nw">Safe by design.</em></h2>
-        <p class="lede">Every story chapter is free to try: its first realm is free. One family plan, about $5.99 a month, unlocks every realm, season and look. No power is ever sold on its own: every power is earned by playing. Only a grown-up can buy the plan.</p>
-        <table class="tbl">
-          <tr><td>The first realm of every story chapter</td><td>Free</td></tr>
-          <tr><td>Family plan: all realms, seasons and looks</td><td>$5.99 a month</td></tr>
-          <tr><td>Who can buy it</td><td>A grown-up, behind a parent gate</td></tr>
-          <tr><td>Ads, or anything sold to a child</td><td>None</td></tr>
-        </table>
-      </div>
-      <div class="stack">
-        <div class="stats" style="grid-template-columns:1fr">
-          <div class="stat" data-own><b>~$72</b><span>a year per subscribing family ($5.99 a month). If 3–5% of monthly playing families subscribe (one plan per family), 100,000 families gross about $216K–$359K a year, and 1,000,000 families about <span class="nw">$2.2M–$3.6M</span>.</span><small>Our model: illustrative, not a forecast. Gross, before app-store fees.</small></div>
-        </div>
-        <ul class="beats">
-          <li><i class="wd">✓</i><div><b>One purchase, made by a grown-up</b><span>The family plan sits behind a parent gate. Nothing is sold to kids.</span></div></li>
-          <li><i class="wd">✓</i><div><b>No ads, no open chat, no typed names</b><span>Built for COPPA, the US children's privacy law, from day one.</span></div></li>
-          <li><i class="f">!</i><div><b>Why it matters</b><span>Epic Games paid $520M in 2022: a $275M COPPA penalty and $245M refunds for purchase tricks [6]. Stricter COPPA rules began in April 2026 [7].</span></div></li>
-        </ul>
-      </div>
-    </div>
-      <div class="season" aria-label="What a season brings, illustrated">
-        <div class="season-head"><b>What a season brings</b><span>About every ten weeks once the seed round lands. Nothing in a season expires. Illustrative.</span></div>
-        <ul class="season-row">
-          <li><span class="ring"><img src="img/path-story.jpg" alt=""></span><b>A new realm</b><small>A land to thaw</small></li>
-          <li><span class="ring"><img src="img/face-wood.png" alt=""></span><b>A person to free</b><small>Stuck in one feeling</small></li>
-          <li><span class="ring"><img src="img/call-root.png" alt=""></span><b>A Star Call</b><small>Their gift to you</small></li>
-          <li><span class="ring"><img src="img/path-look.png" alt=""></span><b>A Keeper look</b><small>A new style</small></li>
-          <li class="big"><span class="ring"><img src="img/k1-hero.png" alt=""></span><b>A hero outfit</b><small>The season's finale</small></li>
-        </ul>
-      </div>
-    </div>
-  </section>
+  <aside class="src" aria-label="Sources">
+  <p>[1] ESA Essential Facts 2026, as reported by Outlook Respawn, 4 Jun 2026. [2] ESA Essential Facts 2026, YouGov, 13,545 people. [3] VGC, 22 Apr 2026. [4] Sensor Tower via WN Hub, Aug 2022–Apr 2024. [5] Lingokids, Sep 2025. [6] FTC, Dec 2022: $275M COPPA penalty and $245M in refunds. [7] Amended FTC COPPA Rule, compliance from 22 Apr 2026. Games named appear only inside cited market data.</p>
+  <p>© 2026 DP Media</p>
+</aside>
 
-  <!-- 13 · roadmap -->
-  <section class="pg" id="roadmap">
-    <div class="in">
-      <span class="eyebrow">The plan <span class="n">13</span></span>
-      <h2 class="h">From five playable levels to a game <em>families come back to.</em></h2>
-      <div class="road">
-        <div class="step done"><span class="when">Done</span><b>The game, playable</b><span>Design, five web levels, original score, two playtests.</span></div>
-        <div class="step"><span class="when">Months 1–2</span><b>Native iPhone</b><span>Level 1 rebuilt as a native game: the run, powers, spirit animal.</span></div>
-        <div class="step"><span class="when">Months 3–4</span><b>The loop around the run</b><span>A home base and spirit animal growth. At $100K, also the first season and the family plan.</span></div>
-        <div class="step"><span class="when">Months 5–6 (to 9 at $100K)</span><b>Families, then soft launch</b><span>About 100 families on TestFlight from month 5, so day-30 numbers land by month 6; then one or two markets. Targets: day 1 at 35–50%, day 7 at 15–25%, day 30 at 5–15%.</span></div>
-        <div class="step" style="--c:var(--gold)"><span class="when">Then</span><b>The seed round</b><span>$1.75M–$4M on real retention data: the full team, five seasons a year, Android.</span></div>
-      </div>
-      <div class="split" style="align-items:start">
-        <p class="lede">Later, play together. Each family member brings an element, and the hardest bosses fall only to a team in balance. The game's lesson becomes its multiplayer.</p>
-        <div class="dots" aria-hidden="true" style="justify-content:flex-end;gap:12px"><i class="w" style="width:22px;height:22px"></i><i class="wd" style="width:22px;height:22px"></i><i class="f" style="width:22px;height:22px"></i><i class="e" style="width:22px;height:22px"></i><i class="m" style="width:22px;height:22px"></i></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 14 · team -->
-  <section class="pg" id="team">
-    <div class="in">
-      <span class="eyebrow">The team <span class="n">14</span></span>
-      <h2 class="h">Two founders, <em>one playable game.</em></h2>
-      <p class="lede">It started with Qigong. Filming Demaris's masterclasses, Amos also saw him as a father, and was struck by his kids: calm, sharp and able to name what they felt. Two lifelong gamers asked if a game could carry some of that practice to every child.</p>
-      <div class="team">
-        <div class="person"><span class="av">A</span><b>Amos A.</b><span>Co-founder and Creative Director, DP Media. Lead concept, story and contact.</span></div>
-        <div class="person"><span class="av">D</span><b>Demaris Parker</b><span>Co-founder and Wellness Director, DP Media. Qigong master and bodywork practitioner who studied Traditional Chinese Medicine. Shaped the concept, rooted in the Qigong at its heart.</span></div>
-        <div class="person"><span class="av">S</span><b>Sammy P.</b><span>Consultant on game mechanics, strategy and tactics.</span></div>
-      </div>
-      <p class="small recruit">Recruiting next: a licensed child psychologist and a cultural advisor. Neither is on board yet.</p>
-      <p class="lede">In six months and for about $20K, DP Media's two founders and a mechanics consultant built all of this with an AI-assisted pipeline: five levels, seven Keepers, twelve spirit animals, fifteen creatures, three giants and an original score. The founders take no salary, so every dollar goes into the game.</p>
-    </div>
-  </section>
-
-  <!-- 15 · the raise -->
-  <section class="pg" id="raise">
-    <div class="in split" style="align-items:start">
-      <div class="stack">
-        <span class="eyebrow">The raise <span class="n">15</span></span>
-        <h2 class="h">$60K to put MorQi <em>in families' hands.</em></h2>
-        <div class="stats" style="grid-template-columns:1fr 1fr">
-          <div class="stat" data-own><b>$60K</b><span>Target. About six months to a soft launch.</span></div>
-          <div class="stat" data-own style="--c:var(--jade)"><b>$100K</b><span>The most we'd take. Nine months and a bigger test.</span></div>
-        </div>
-        <p class="lede" style="font-size:16px">What it proves: day-1, day-7 and day-30 retention from real families; the calm check (how parents say their child feels after playing, and whether the child can name the feeling each boss is stuck in); and, at $100K, whether parents subscribe. For scale, Nurture raised a $2.8M pre-seed in 2024 for empathy play [8].</p>
-        
-        <!--TERMS--><div class="contact"><b>DP Media</b><span>347-414-2753</span></div>
-        <div class="ctas"><a class="cta" href="https://aarauz-os.github.io/morqi/level1/?from=pitch" target="_blank" rel="noopener">Open the MorQi app ▸</a><a class="cta fb" href="https://aarauz-os.github.io/morqi/feedback/" data-gate>Give feedback</a></div>
-        <p class="small">PDFs: <a href="https://aarauz-os.github.io/morqi/MorQi-Pitch-Bible.pdf" target="_blank" rel="noopener">this bible</a> · <a href="https://aarauz-os.github.io/morqi/MorQi-One-Pager.pdf" target="_blank" rel="noopener">the one-pager</a></p>
-      </div>
-      <div class="stack">
-        <table class="tbl">
-          <tr><td>Native iPhone build: a contract game developer for about five months</td><td>$30,000</td></tr>
-          <tr><td>Art, animation and effects: our pipeline plus a contract artist</td><td>$9,000</td></tr>
-          <tr><td>Legal: company and IP assignment, COPPA and App Store family rules</td><td>$6,000</td></tr>
-          <tr><td>Soft-launch test marketing in one or two markets</td><td>$6,000</td></tr>
-          <tr><td>Music and sound</td><td>$3,000</td></tr>
-          <tr><td>Tools: Apple developer account, cloud and art credits</td><td>$3,000</td></tr>
-          <tr><td>Contingency, about 5%</td><td>$3,000</td></tr>
-          <tr class="total"><td>Total at $60K</td><td>$60,000</td></tr>
-        </table>
-        <p class="src">[1] ESA Essential Facts 2026, as reported by Outlook Respawn, 4 Jun 2026. [2] ESA Essential Facts 2026, YouGov, 13,545 people. [3] VGC, 22 Apr 2026. [4] Sensor Tower via WN Hub, Aug 2022–Apr 2024. [5] Lingokids, Sep 2025. [6] FTC, Dec 2022: $275M COPPA penalty and $245M in refunds. [7] Amended FTC COPPA Rule, compliance from 22 Apr 2026. [8] Seedcamp, Sep 2024.<!--SRC9--> Games named appear only inside cited market data.</p>
+  <!-- 15 · play it: the path ends at the TV, and the game is already on -->
+  <section class="ch room" id="play" data-ch="15" data-name="Play it">
+    <div class="wrap" data-stop="play">
+      <a class="tv" href="level1/?from=pitch" aria-label="Play Level 1">
+        <svg viewBox="0 -40 1000 740" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="tvShell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAE5F4"/><stop offset=".5" stop-color="#C9C2DA"/><stop offset="1" stop-color="#8A83A2"/></linearGradient>
+            <radialGradient id="tvShellAO" cx=".5" cy=".45" r=".62"><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#140F2A" stop-opacity=".45"/></radialGradient>
+            <linearGradient id="tvRecess" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#080A14"/><stop offset="1" stop-color="#262A45"/></linearGradient>
+            <radialGradient id="tvKnob" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D8D2E6"/><stop offset="1" stop-color="#8A83A2"/></radialGradient>
+            <pattern id="tvDots" width="12" height="12" patternUnits="userSpaceOnUse" x="668" y="332"><circle cx="6" cy="6" r="3.1" fill="#12142A"/></pattern>
+            <linearGradient id="tvBench" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#323C6E"/><stop offset="1" stop-color="#1A2148"/></linearGradient>
+            <linearGradient id="tvBenchF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#141A3A"/><stop offset="1" stop-color="#0A0E22"/></linearGradient>
+            <radialGradient id="tvPeb" cx=".42" cy=".3" r=".9"><stop offset="0" stop-color="#F4F0FA"/><stop offset=".6" stop-color="#B9B2CC"/><stop offset="1" stop-color="#5E5878"/></radialGradient>
+            <radialGradient id="tvPebTop" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#CFC8DF"/></radialGradient>
+            <radialGradient id="tvGlass" cx=".5" cy=".45" r=".7"><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#05071A" stop-opacity=".7"/></radialGradient>
+            <filter id="tvSoft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter>
+            <filter id="tvShadow" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>
+            <filter id="tvSnow" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .62  0 0 0 0 .66  0 0 0 0 .78  0 0 0 .55 0"/></filter>
+            <clipPath id="tvScreen"><rect x="262" y="186" width="360" height="270" rx="34"/></clipPath>
+          </defs>
+          <path d="M338 650 C 410 646, 430 606, 486 586" fill="none" stroke="#0A0E20" stroke-width="7" stroke-linecap="round"/>
+          <rect x="186" y="572" width="20" height="40" rx="6" fill="#0C1029"/><rect x="794" y="572" width="20" height="40" rx="6" fill="#0C1029"/>
+          <rect x="142" y="522" width="716" height="58" rx="16" fill="url(#tvBenchF)"/>
+          <rect x="130" y="504" width="740" height="22" rx="11" fill="url(#tvBench)"/>
+          <rect x="146" y="505" width="708" height="2.5" rx="1.25" fill="#5A66A8" opacity=".55"/>
+          <ellipse cx="500" cy="508" rx="250" ry="9" fill="#000" opacity=".55" filter="url(#tvShadow)"/>
+          <rect x="292" y="488" width="64" height="20" rx="9" fill="#5F5878"/><rect x="644" y="488" width="64" height="20" rx="9" fill="#5F5878"/>
+          <rect x="225" y="148" width="550" height="348" rx="66" fill="url(#tvShell)"/>
+          <rect x="225" y="148" width="550" height="348" rx="66" fill="url(#tvShellAO)"/>
+          <path d="M300 164 C 420 152, 600 152, 712 166" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity=".55" filter="url(#tvSoft)"/>
+          <rect x="246" y="170" width="392" height="302" rx="48" fill="url(#tvRecess)"/>
+          <g clip-path="url(#tvScreen)">
+            <rect x="262" y="186" width="360" height="270" fill="#090B16"/>
+            <image href="img/s-shore.webp" x="262" y="40" width="360" height="779" preserveAspectRatio="xMidYMid slice"/>
+            <rect class="snow" x="262" y="186" width="360" height="270" filter="url(#tvSnow)"/>
+            <rect x="262" y="186" width="360" height="270" fill="url(#tvGlass)"/>
+          </g>
+          <g transform="translate(707 222)"><circle r="31" fill="#000" opacity=".28" cy="3"/><circle r="30" fill="#8A83A2"/><circle r="24" fill="url(#tvKnob)"/><rect x="-3.5" y="-21" width="7" height="15" rx="3.5" fill="#7B7494"/></g>
+          <g transform="translate(707 290)"><circle r="23" fill="#000" opacity=".28" cy="3"/><circle r="22" fill="#8A83A2"/><circle r="17" fill="url(#tvKnob)"/><rect x="-3" y="-15" width="6" height="11" rx="3" fill="#7B7494"/></g>
+          <rect x="668" y="332" width="78" height="126" rx="20" fill="#2B2C48" opacity=".55"/>
+          <rect x="668" y="332" width="78" height="126" rx="20" fill="url(#tvDots)"/>
+          <circle class="led" cx="707" cy="476" r="5.5" fill="#6FF2CF"/>
+          <ellipse cx="236" cy="694" rx="132" ry="13" fill="#000" opacity=".6" filter="url(#tvShadow)"/>
+          <ellipse cx="232" cy="656" rx="120" ry="44" fill="url(#tvPeb)"/>
+          <ellipse cx="232" cy="642" rx="104" ry="29" fill="url(#tvPebTop)"/>
+          <ellipse cx="232" cy="642" rx="17" ry="5.5" fill="none" stroke="#F4F0FA" stroke-width="2.2"/>
+          <g><ellipse cx="232.0" cy="627.5" rx="12" ry="6.5" fill="#000" opacity=".35"/><ellipse cx="232.0" cy="625.0" rx="11" ry="6" fill="#4E9BE0"/><ellipse cx="229.0" cy="623.0" rx="4.5" ry="2" fill="#fff" opacity=".55"/></g><g><ellipse cx="289.1" cy="639.2" rx="12" ry="6.5" fill="#000" opacity=".35"/><ellipse cx="289.1" cy="636.7" rx="11" ry="6" fill="#6FBF4A"/><ellipse cx="286.1" cy="634.7" rx="4.5" ry="2" fill="#fff" opacity=".55"/></g><g><ellipse cx="267.3" cy="658.3" rx="12" ry="6.5" fill="#000" opacity=".35"/><ellipse cx="267.3" cy="655.8" rx="11" ry="6" fill="#FF9A4A"/><ellipse cx="264.3" cy="653.8" rx="4.5" ry="2" fill="#fff" opacity=".55"/></g><g><ellipse cx="196.7" cy="658.3" rx="12" ry="6.5" fill="#000" opacity=".35"/><ellipse cx="196.7" cy="655.8" rx="11" ry="6" fill="#FFD24A"/><ellipse cx="193.7" cy="653.8" rx="4.5" ry="2" fill="#fff" opacity=".55"/></g><g><ellipse cx="174.9" cy="639.2" rx="12" ry="6.5" fill="#000" opacity=".35"/><ellipse cx="174.9" cy="636.7" rx="11" ry="6" fill="#C9D3DB"/><ellipse cx="171.9" cy="634.7" rx="4.5" ry="2" fill="#fff" opacity=".55"/></g>
+          <ellipse cx="500" cy="152" rx="70" ry="7" fill="#140F2A" opacity=".35" filter="url(#tvSoft)"/>
+          <image class="pet" href="img/pet-sleep.webp" x="400" y="-6" width="200" height="200"/>
+        </svg>
+      </a>
+      <div class="play-copy">
+        <p class="eyebrow">Play it <span>15</span></p>
+        <h2 class="h">Five levels, playable today.</h2>
+        <p class="body">Open it on a phone or computer. No download, no sign-in, no ads. Then tell us what your family felt.</p>
+        <div class="ctas"><a class="cta" href="level1/?from=pitch">Play Level 1 <i aria-hidden="true">▸</i></a><a class="cta fb" href="feedback/" data-gate>Give feedback</a></div>
+        <p class="contact"><b>DP Media</b><a href="tel:+13474142753">347-414-2753</a></p>
+        <p class="small">PDFs: <a href="MorQi-Pitch-Bible.pdf">this bible</a> · <a href="MorQi-One-Pager.pdf">the one-pager</a></p>
       </div>
     </div>
   </section>
 </main>
 
-<script src="stillgate.js"></script>
-<script>
-// the feedback buttons open through the Stillmaker's gate
-document.querySelectorAll('a[data-gate]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); stillGate(a.href, 'img/still-eyes.png'); }));
-// ?paged lays the bible out as 16:9 pages, the way it prints
-(function () {
-  const paged = () => document.documentElement.classList.add('paged');
-  try { if (/[?&]paged/.test(location.search)) paged(); } catch (e) {}
-  addEventListener('beforeprint', paged);
-})();
-</script>
-</body></html>
+
+<script src="stillgate.js" defer></script>
+<script src="film.js" defer></script>
+</body>
+</html>

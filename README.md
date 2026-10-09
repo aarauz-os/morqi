@@ -1,6 +1,6 @@
 # MorQi
 
-Balance is your superpower. A five-element action game where kids master their feelings by freeing a frozen world.
+Balance is your superpower. A five-element action game where kids learn to name their feelings by freeing a frozen world.
 
 - Pitch bible: https://aarauz-os.github.io/morqi/
 - One-pager: https://aarauz-os.github.io/morqi/onepager.html

@@ -1,4 +1,4 @@
-/* MorQi investor materials: the bible and the one-pager share this sheet, so they read as one family.
+/* MorQi pitch materials: the bible and the one-pager share this sheet, so they read as one family.
    The game's own night: deep indigo turning to dawn gold, the five element colours used only to mean their element,
    the game's rounded type, and real screens in phone frames. On screen each page is a band you scroll; printed (or
    with ?paged) each band becomes one 16:9 page, and the one-pager one letter-size sheet. */
@@ -87,6 +87,9 @@ figcaption{font-size:12.5px;color:var(--faint);text-align:center}
 .tbl td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}
 .tbl td:last-child{text-align:right;white-space:nowrap;padding-left:16px;font-weight:800}
 .tbl tr.total td{border-bottom:0;font-weight:900;color:var(--gold)}
+/* the use of funds at both ends of the raise, side by side (private cut) */
+.tbl2{font-size:13.5px}.tbl2 td{padding:7px 0}.tbl2 td:nth-child(2){text-align:right;white-space:nowrap;padding-left:12px;font-weight:800}
+.tbl2 tr.hd td{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 
 /* timeline */
 .road{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
@@ -170,13 +173,13 @@ html.paged .photos img{aspect-ratio:4/5}
 .op .pt img{width:100%;aspect-ratio:4/3;object-fit:cover;object-position:50% 30%;border-radius:14px;display:block}
 .op .pt b{font-size:15.5px;line-height:1.25}
 .op .pt span{font-size:13px;line-height:1.45;color:var(--muted)}
-.op .ask{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start;padding:20px;border-radius:22px;background:linear-gradient(135deg,rgba(255,212,90,.12),rgba(255,255,255,.04));box-shadow:inset 0 0 0 1px rgba(255,212,90,.3)}
-.op .ask > *{min-width:0}
-.op .ask .amt{font-size:46px;font-weight:900;line-height:1;color:var(--gold);letter-spacing:-.03em}
-.op .ask .tbl{font-size:13px}
-.op .ask .tbl td{padding:5px 0}
+.op .panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px;align-items:start;padding:20px;border-radius:22px;background:linear-gradient(135deg,rgba(255,212,90,.12),rgba(255,255,255,.04));box-shadow:inset 0 0 0 1px rgba(255,212,90,.3)}
+.op .panel > *{min-width:0}
+.op .panel .amt{font-size:46px;font-weight:900;line-height:1;color:var(--gold);letter-spacing:-.03em}
+.op .panel .tbl{font-size:13px}
+.op .panel .tbl td{padding:5px 0}
 .op .foot{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;justify-content:space-between}
-@media (max-width:760px){.op .three,.op .ask{grid-template-columns:1fr}.op .band,.op .body{padding-inline:16px}}
+@media (max-width:760px){.op .three,.op .panel{grid-template-columns:1fr}.op .band,.op .body{padding-inline:16px}}
 html.paged.letter body{width:8.5in}
 html.paged.letter .op{width:8.5in;height:11in;max-width:none;overflow:hidden;grid-template-rows:auto 1fr}
 html.paged #worlds .lede{font-size:15.5px}
@@ -194,7 +197,7 @@ html.paged .phones .phone.sm{width:150px}
 html.paged .phone.lift{transform:translateY(-22px)}
 html.paged .cover .art{background-image:url(img/hero-wide.jpg)}
 html.paged .op .three{grid-template-columns:repeat(3,minmax(0,1fr))}
-html.paged .op .ask{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
+html.paged .op .panel{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}
 html.paged .op .band,html.paged .op .body{padding-inline:32px}
 html.paged .cta{box-shadow:inset 0 2px 0 rgba(255,255,255,.55)}
 html.paged .phone{box-shadow:0 0 0 1px rgba(255,255,255,.12)}
@@ -349,7 +352,7 @@ html.paged #team .lede{max-width:80ch}
 #market .strip img{display:block;width:100%;height:170px;object-fit:cover;border-radius:16px;box-shadow:0 0 0 1px var(--line)}
 #market .strip figcaption{grid-column:1/-1;text-align:left}
 @media (max-width:860px){html:not(.paged) #market .strip{grid-template-columns:repeat(3,minmax(0,1fr))}html:not(.paged) #market .strip img:nth-of-type(n+4){display:none}html:not(.paged) #market .strip img{height:130px}}
-/* the one-pager in print (round 2): the ask and the footer each carry one more line, so the sheet's gaps tighten a little */
+/* the one-pager in print (round 2): the panel and the footer each carry one more line, so the sheet's gaps tighten a little */
 html.paged.letter .op .body{gap:16px;padding-bottom:20px}
 html.paged.letter .op .band{padding-bottom:22px}
 html.paged.letter .op .pt img{aspect-ratio:16/9}
