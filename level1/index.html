@@ -32,7 +32,12 @@ try { var bfS = localStorage.getItem('morqi.seen') || '', bfP = localStorage.get
   color-scheme:light;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:#0C1420;color:var(--ink);font-family:var(--body);font-weight:700;overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased}
+html,body{height:100%;margin:0;background:#0C1420;color:var(--ink);font-family:var(--body);font-weight:700;overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased;-webkit-touch-callout:none}
+/* a long press is a breath in MorQi, never the browser's "Save image" menu (Sammy, 2026-10-09: it opened on the breath screen in
+   Chrome on an iPhone); pictures can't be dragged or picked, and the screens that are pressed and held take the touch themselves */
+img{-webkit-touch-callout:none;-webkit-user-drag:none;user-select:none}
+#breathe,#breathe *,#brOrb{-webkit-touch-callout:none;touch-action:none}
+#breathe img{pointer-events:none}
 #stage{position:relative;height:100%;width:min(100vw,calc(100dvh * 0.4615));max-width:100vw;margin:0 auto;overflow:hidden;background:#0C1420;touch-action:none}
 @media (max-aspect-ratio:1/1){#stage{width:100%}}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
@@ -80,6 +85,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 .ribbon{display:inline-block;font-family:var(--round);font-weight:900;font-size:27px;letter-spacing:-.015em;color:var(--ink);white-space:nowrap}
 .rb.red .ribbon{color:var(--coral-2)}
 .fbdemo{position:absolute;inset:0;display:grid;place-items:center;background:#22252E}
+/* stand-in for the frozen people's card until Codex's art (brief 34) */
+.rescuedemo img{width:46%!important;height:auto!important;filter:saturate(.35) brightness(1.15)}.rescuedemo .ice{position:absolute;left:28%;right:28%;top:14%;bottom:12%;border-radius:22px;background:linear-gradient(160deg,rgba(220,240,255,.55),rgba(150,200,240,.25));box-shadow:inset 0 0 0 2px rgba(240,250,255,.8)}
 .rundemo{background:radial-gradient(circle at 50% 55%,rgba(255,214,90,.35),rgba(34,37,46,0) 60%),#22252E}.rundemo img{width:62%!important;height:auto!important;filter:drop-shadow(0 0 18px rgba(255,214,90,.7))}.fbdemo img{width:100%!important;height:100%!important;max-width:none;object-fit:contain}
 .lu-pips[hidden]{display:none}
 /* a Mega Level Up says how far its one pick grows, with the chest when one joined it (A, 2026-10-08) */
@@ -247,6 +254,9 @@ select{font:inherit;font-size:22px;font-weight:900;color:var(--ink);background:v
 #bossWrap.on{display:block}
 .bossname{font-family:var(--round);font-weight:900;font-size:15px;text-align:center;margin-bottom:4px;text-shadow:0 1px 6px rgba(0,0,0,.45)}
 #bossBar{height:12px;border-radius:99px;background:rgba(16,22,34,.5);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);overflow:hidden}
+/* the boss's health in quarters, not numbers (design review, 2026-10-09, on Sammy's "HP count over bosses?"): "two more chunks" at a glance */
+#bossBar{position:relative}
+#hud #bossBar::after{content:'';position:absolute;inset:0;border-radius:99px;pointer-events:none;z-index:2;background:linear-gradient(90deg,transparent calc(25% - 1px),rgba(12,16,44,.75) 0 calc(25% + 1px),transparent 0 calc(50% - 1px),rgba(12,16,44,.75) 0 calc(50% + 1px),transparent 0 calc(75% - 1px),rgba(12,16,44,.75) 0 calc(75% + 1px),transparent 0)}
 #bossBar i{display:block;height:100%;width:100%;border-radius:99px;background:linear-gradient(90deg,#FF9A7A,var(--coral));box-shadow:0 0 12px rgba(255,106,87,.7);transition:width .15s}
 .skills{display:flex;gap:6px;flex-wrap:nowrap;align-items:center}
 .slot{position:relative;width:30px;height:30px;flex:none;border-radius:9px;background:rgba(16,22,34,.4);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--c,transparent),0 3px 8px rgba(0,0,0,.25)}
@@ -3156,7 +3166,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal', 'rescue'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -4536,6 +4546,8 @@ function spawnBoss() {
   // growing there (the long Level 5 left a boss that took two and a half minutes to reach half its life)
   const blv = S.level === 5 ? Math.min(S.lv, 28) : S.lv;
   e.hp = e.max = Math.round((1 + .15 * (S.hard || 0)) * 10500 * Math.pow(Math.max(8, blv) / 14, 1.5) * [2.6, 3, 3.3, 3.5, 3.8][S.level - 1] * (S.out ? (S.level === 4 ? 2.2 : 1.6) : S.l5 ? 2.4 : 1));   // a real fight: about a minute
+  // each person freed takes a share off the boss (batch 3): their family coming back loosens its hold
+  if (S.freedPeople) { e.hp = e.max = Math.round(e.max * (1 - RESCUE.cut * S.freedPeople)); }
   S.en.push(e); S.boss = e;
   if (eff(e.el, keeperEl) > 1) S.items.push({ x:S.p.x + 80, y:S.p.y + 40, kind:'ward', t:0, z:10, vz:260 });
   // room to dodge, so the boss can really attack; the whole arena always sits inside the world (playtest 2: a boss that
@@ -5648,7 +5660,7 @@ function direct(dt) {
     }
     if (S.warn) { S.warn.t += dt; if (S.warn.t >= 2.2) { launchWave(S.warn); S.warn = null; S.waveIdx++; } }
     // the Warden comes once every stone is gathered and Ascended has had its moment
-    if (S.bossAt && t >= S.bossAt && !S.warn) {
+    if (S.bossAt && t >= S.bossAt && !S.warn && rescueReady()) {
       // level-ups held through Ascended come first, then the boss a moment after the last pick, so its card never stacks
       // with them (A's playthrough, 2026-10-05: three cards in a row froze the fight's first fifteen seconds)
       if (S.holdLevels && S.lvlDefer) { releaseLevels(); S.bossAt = t + .8; } else spawnBoss(); }
@@ -6015,6 +6027,8 @@ function drawGiant(e) {
       g.setLineDash([]); g.restore(); } }
   const w = 170; g.fillStyle = 'rgba(10,14,40,.7)'; g.beginPath(); g.roundRect(e.x - w / 2 - 3, top - 22, w + 6, 14, 7); g.fill();
   g.fillStyle = c; g.beginPath(); g.roundRect(e.x - w / 2, top - 19, w * Math.max(0, e.hp / e.max), 8, 4); g.fill();
+  // in quarters, like the boss's bar
+  g.fillStyle = 'rgba(10,14,40,.85)'; for (const q of [.25, .5, .75]) g.fillRect(e.x - w / 2 + w * q - 1, top - 19, 2, 8);
 }
 // the Colossus's blobs in the air and their red circles on the ground
 function drawGiantFx() {
@@ -6655,6 +6669,72 @@ function breakGuard(B) {
   if (!B.guard) return; B.guard = null; B.guardDone = true; S.shake = Math.max(S.shake, .5); SFX.boom && SFX.boom(true);
   ring(B.x, B.y - 60, 30, 420, FORM_PAL[sEl()][0], .7, 18, true); stars(B.x, B.y - 80, 40, '#FFFFFF', 420); floatText(B.x, B.y - B.r - 60, 'Guard broken!', '#FFE14A', 22);
 }
+/* The frozen people (A, 2026-10-09: "the goal of every game is to free specific special 'frozen people' that can help"; batch 3, the
+   design room's spec in codex-inbox/BATCH3-SPEC.md). Each is the boss's own family, frozen mid-moment. Stand in their ring for a
+   breath (1.5 s) to free them; stepping out drains it twice as fast; a hit pauses it, never resets it; three guards come when the
+   thaw starts. Nobody can ever be lost. Step 1 (2026-10-09): Level 1's two follow the Keeper and help with their craft; the boss
+   waits until both are free and comes in weaker for each one. Stand-in art (another Keeper in ice) until Codex's brief 34. */
+const RESCUE = { R:90, breath:1.5, guards:3, follow:80, cut:.1,
+  who:{ 1:[{ id:'isla', n:'Isla', el:'water', at:[-150, -260] }, { id:'pip', n:'Pip', el:'water', at:[-700, -820] }],
+    2:[{ id:'bo', n:'Bo', el:'wood', keep:true }, { id:'tam', n:'Tam', el:'wood', at:[-420, 380] }],
+    3:[{ id:'kit', n:'Kit', el:'wood', keep:true }, { id:'pops', n:'Pops', el:'fire', keep:true }, { id:'pema', n:'Pema', el:'earth', keep:true }],
+    4:[{ id:'ravi', n:'Ravi', el:'fire', keep:true }, { id:'bram', n:'Bram', el:'earth', keep:true }, { id:'ines', n:'Ines', el:'metal', keep:true }] },
+  // (game director, batch 3 balance, 2026-10-09: keepFill 1.8 -> 1.4, so one planted breaker outweighs a keeper and the Keeper's own
+  // frees carry more of the ring; inRing doubling, keepAt and tiredAfter kept)
+  keepFill:1.4, inRing:2, tiredAfter:8, keepAt:.55 };
+// each person's craft, by element (game director, batch 3): water a net, wood a bamboo fence, fire a drumbeat, earth a bun, metal a bell
+// ice poses waiting on a repaint (design review, 2026-10-09: Ravi still smiled, Pops read scared): shown iced over until brief 37
+const ICE_HOLD = ['ravi', 'pops'];
+const PEOPLE_ART = ['isla', 'pip', 'bo', 'tam', 'kit', 'pops', 'pema', 'ravi', 'bram', 'ines'], PEOPLE_POSES = ['ice', 'gasp', 'run1', 'run2', 'hold', 'craft', 'tired'];
+const CRAFT = { water:{ every:8, R:120, n:6, root:2 }, wood:{ every:10, R:140, n:8, root:3 }, fire:{ every:6, R:140, hit:1 }, earth:{ every:20, heal:.1 }, metal:{ every:10, R:180, n:12, root:1 } };
+// a stand-in look until Codex paints them (brief 34): another Keeper, never the player's own
+const standFor = i => { const ks = [1, 2, 3, 4, 5, 6, 7].filter(k => k !== keeper); return ks[i % ks.length]; };
+function craftAt(q, x, y) {
+  const C = CRAFT[q.el]; if (!C || S.bossSpawned) return; let n = 0;
+  if (C.heal) { const P = S.p; if (Math.hypot(P.x - x, P.y - y) < 420 && P.hp < P.max) { P.hp = Math.min(P.max, P.hp + P.max * C.heal); for (let i = 0; i < 8; i++) fx({ k:'plus', x:P.x + rnd(-24, 24), y:P.y - rnd(0, 30), vx:0, vy:-80, life:.7, s:9, c:'#8FF0A0' }); n = 1; } }
+  else for (const e of S.en) { if (C.n && n >= C.n) break; if (e.dead || e.boss || Math.hypot(e.x - x, e.y - y) > C.R) continue;
+    if (C.hit) hurt(e, HOLD.dmg(S.lv) * .8, q.el, { kb:420, fx:x, fy:y }); else e.rooted = Math.max(e.rooted || 0, C.root); n++; }
+  if (n) { ring(x, y, 10, C.R || 120, EL[q.el], .5, 8, true); q.castAt = S.t; }
+}
+function rescueInit() {
+  const L = RESCUE.who[S.level]; if (!L || S.people) return; const P = S.p;
+  // a keeper waits frozen on the way from the hearth to their own temple; a follower where the level puts them
+  const O = S.out, spot = q => { const T = q.keep && O && O.towers.find(t => t.el === q.el); return T ? { x:O.hub.x + (T.cx - O.hub.x) * RESCUE.keepAt, y:O.hub.y + (T.cy - O.hub.y) * RESCUE.keepAt, T } : { x:P.x + (q.at || [0, -300])[0], y:P.y + (q.at || [0, -300])[1] }; };   // (?towers=0: no temple, so they wait near the start; QA)
+  S.people = L.map((q, i) => { const p = spot(q); return { ...q, stand:standFor(i), T:p.T, x:clamp(p.x, 140, WORLD - 140), y:clamp(p.y, 140, WORLD - 140), thaw:0, state:'ice', cd:3 + i * 2.5, ph:i * 1.7 }; });
+  // their own art where Codex has painted them (brief 34: Isla, Pip, Bo, Tam), another Keeper in ice until then
+  for (const q of S.people) { if (PEOPLE_ART.includes(q.id)) { for (const p of PEOPLE_POSES) if (!IMG['p-' + q.id + '-' + p]) load('p-' + q.id + '-' + p, `art4/people/p-${q.id}-${p}.png?v=2`); }
+    else if (!IMG['k' + q.stand]) load('k' + q.stand, `art4/k${q.stand}.png?v=13`); }
+}
+const rescueLeft = () => (S.people || []).filter(q => q.state === 'ice');
+const rescueReady = () => !S.people || !rescueLeft().length;
+function freePerson(q, quiet) {
+  q.state = 'free'; q.thaw = 1; q.freedAt = S.t; S.freedPeople = (S.freedPeople || 0) + 1;
+  if (!quiet) { stars(q.x, q.y - 50, 30, EL[q.el], 360); ring(q.x, q.y - 20, 20, 220, EL[q.el], .5, 12, true); SFX.cleared && SFX.cleared(); floatText(q.x, q.y - 110, 'Thank you!', '#FFFFFF', 18); }
+  // the people you free are kept for the Hearth Circle later
+  try { const c = JSON.parse(store.get('morqi.circle') || '[]'); if (!c.includes(q.id)) { c.push(q.id); store.set('morqi.circle', JSON.stringify(c)); } } catch (e) {}
+}
+function rescueTick(dt) {
+  if (!S.people) { rescueInit(); if (!S.people) return; }
+  const P = S.p;
+  for (const q of S.people) {
+    if (q.state === 'ice') {
+      const near = Math.hypot(P.x - q.x, P.y - q.y) < RESCUE.R && P.hp > 0, hit = S.t - (P.hitAt ?? -9) < .4;
+      if (near && !q.taught && !SEEN.has('_rescue')) { q.taught = true; markSeen('_rescue'); coach('rescue', `${q.n} is frozen!`, 'Stay by them and breathe to free them.', () => ({ sx:clamp((q.x - camX) * Z, 30, W - 30), sy:clamp((q.y - camY) * Z, 150, H - 120) })); }
+      if (near && !hit) { if (!q.guarded) { q.guarded = true; for (let i = 0; i < RESCUE.guards; i++) { const a = i / RESCUE.guards * TAU; spawn('critter', { x:q.x + Math.cos(a) * 380, y:q.y + Math.sin(a) * 300 }, 1.2, worldOf()); } } q.thaw = Math.min(1, q.thaw + dt / RESCUE.breath); }
+      else if (!near) q.thaw = Math.max(0, q.thaw - 2 * dt / RESCUE.breath);
+      if (q.thaw >= 1) freePerson(q);
+    } else if (q.state === 'free' && q.T) { q.state = 'run'; }
+    else if (q.state === 'run') { const tx = q.T.cx + 60, ty = q.T.cy - 20, d = Math.hypot(tx - q.x, ty - q.y);
+      if (d < 14) { q.state = 'keeper'; q.T.keeper = q; q.x = tx; q.y = ty; } else { const sp = MOVE * .9 * dt; q.x += (tx - q.x) / d * Math.min(d, sp); q.y += (ty - q.y) / d * Math.min(d, sp); q.mv = 1; q.fx = tx < q.x ? -1 : 1; } }
+    else if (q.state === 'keeper') { q.mv = 0; if (!q.tired && (q.cd -= dt) <= 0) { q.cd = (CRAFT[q.el] || {}).every || 8; craftAt(q, q.x, q.y); } }
+    else if (q.state === 'free') {
+      // they keep close behind the Keeper, each on their own side, and help with their craft
+      const k = S.people.indexOf(q), a = (P.face || 1) < 0 ? 0 : Math.PI, side = k % 2 ? .7 : -.7, tx = P.x + Math.cos(a + side) * RESCUE.follow, ty = P.y + Math.sin(a + side) * RESCUE.follow * .6;
+      const mx = (tx - q.x) * Math.min(1, dt * 4), my = (ty - q.y) * Math.min(1, dt * 4); q.x += mx; q.y += my; q.mv = Math.hypot(mx, my); if (Math.abs(mx) > .3) q.fx = mx < 0 ? -1 : 1;
+      if ((q.cd -= dt) <= 0) { q.cd = (CRAFT[q.el] || {}).every || 8; craftAt(q, q.x, q.y); }
+    }
+  }
+}
 function estFree(e) {
   const el = e.el; if (!el || e.boss) return; S.efree = S.efree || {}; S.est = S.est || {};
   S.efree[el] = (S.efree[el] || 0) + 1; goalTick('free', el);
@@ -6970,7 +7050,7 @@ const towersLevel = lv => towersOn() && (lv === 2 || lv === 3 || lv === 4);
 // (game director, 2026-10-09: Level 3 eased from [12, 3, 1.8] to [14, 3, 1.5]; it is the first level with three rings, and a wood-born
 // bot's first ring went backward for a minute; Level 4 keeps the full pressure)
 const HOLD = { brk:{ 2:[14, 3, 2.4], 3:[14, 3, 1.5], 4:[12, 3, 1.8] }, brkHp:4, brkNear:230,
-  need:215, R:290, front:220, wake:.7, pack:3, cap:44, wolf:.4, heal:.003, fire:.5, bossFire:1.2, reach:800, dmg:(lv) => 22 + 5 * lv, ally:12, squad:5, help:1.2,
+  need:400, R:290, front:220, wake:.7, pack:3, cap:44, wolf:.4, heal:.003, fire:.5, bossFire:1.2, reach:800, dmg:(lv) => 22 + 5 * lv, ally:12, squad:5, help:1.2,
   wade:.25, pulse:5, heldPulse:2.5, wakeHit:.15, heart:.006,
   gHp:{ 2:1.7, 3:1.15, 4:1.1 }, gRush:{ 2:1.3, 3:1.15, 4:1.15 } };   // Level 2's guardians were freed before they ever reached you (bot, 2026-10-06)
 const HOLD_ELS = { 2:['wood'], 3:['wood', 'fire', 'earth'], 4:['fire', 'earth', 'metal'] };
@@ -6989,7 +7069,10 @@ function makeOutposts(lv) {
   // one temple on its own takes longer, so Level 2 is as long as a level should be
   // the Keeper starts in the middle of the first temple's ring, so the whole temple stands on screen under the HUD
   // Level 4's rings ask a little more than Level 3's, so each level is longer than the last (bot, 2026-10-07: same need, same 3.5 min)
-  return { hub, towers, els, ordered:!!HOLD_ORDERED[lv], need:els.length === 1 ? 500 : lv === 4 ? 275 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy } };
+  // (game director, batch 3 balance, 2026-10-09: with keepers holding the rings, Level 2 went 500 -> 760 (about 3 min), Level 3 215 -> 400
+  // (about 6 min) and Level 4 275 -> 400 (about 5 min; it stays short of 6-8 min until its falls come down, since every extra
+  // minute there is another fall))
+  return { hub, towers, els, ordered:!!HOLD_ORDERED[lv], need:els.length === 1 ? 760 : lv === 4 ? 400 : HOLD.need, march:[], bolts:[], won:0, start:{ x:towers[0].cx, y:towers[0].cy } };
 }
 const towerList = () => S.level === 5 ? [TOWER, ...SHRINES] : S && S.out ? S.out.towers : [];
 /* Level 5 holds the temples too, evolved (A, 2026-10-07: "Go on level 5 temple rules"; Claude's proposal: five rings in
@@ -7063,7 +7146,9 @@ function edgeIn(P, a, d) { for (const da of [0, .7, -.7, 1.4, -1.4, Math.PI]) { 
 function outpostKill(e) {
   const O = OUT(); let T = e.from && !e.from.held ? e.from : null, n;
   if (T) n = e.wise ? 2 : 1;
-  else { T = openOf(O).find(t => inRing(t, e.x, e.y)); if (!T || !inRing(T, S.p.x, S.p.y)) return; n = e.el === T.el ? .5 : .2; }
+  else { T = openOf(O).find(t => inRing(t, e.x, e.y)); if (!T || !inRing(T, S.p.x, S.p.y)) return; n = (e.el === T.el ? .5 : .2) * (S.people && T.keeper ? RESCUE.inRing : 1); }
+  // (batch 3: while the frozen people are on a level, a ring fills only while its rescued keeper holds it, and not while they are tired)
+  if (S.people && S.out && !(T.keeper && !T.keeper.tired)) return;
   T.fill = Math.min(needOf(T), T.fill + n); S.qi[T.el] = Math.floor(T.fill);
   if (n >= 1 || Math.random() < .3) T.souls.push({ x:e.x, y:e.y - 20, t:0, n:Math.max(1, n) });
   if (T.fill >= needOf(T)) captureOutpost(T);
@@ -7129,14 +7214,23 @@ function outpostTick(dt) {
       // fired from far away, so the Keeper has to run out to them
       const BK = HOLD.brk[S.level];
       if (inside) S.lastRing = T;
+      // its keeper fills it, unless the ring-breakers have tired them out
+      const K = S.people && T.keeper; if (K && !K.tired && fight && open.includes(T)) { T.fill = Math.min(needOf(T), T.fill + RESCUE.keepFill * dt); S.qi[T.el] = Math.floor(T.fill); if (T.fill >= needOf(T)) { captureOutpost(T); continue; } }
       // ...and keep coming to the ring you last stood in once you step out, so leaving it is a choice; other part-filled rings wait (QA)
-      if (BK && (inside || (S.lastRing === T && T.fill > 0)) && !hsOn()) { if ((T.bcd = (T.bcd ?? 8) - dt) <= 0) { T.bcd = BK[0];
+      // (game director, batch 3 balance, 2026-10-09: with keepers every held ring drew its own breakers, so on Level 3 three rings piled
+      // them up wherever the Keeper wasn't; a metal bot found nine-plus 4x-health fire breakers per ring and never took one in 15 min.
+      // A keeper's ring now draws its next wave only once the last is freed, which leaves a calm to fill in)
+      if (BK && (S.people ? !!(K && open.includes(T) && !S.en.some(e => !e.dead && e.breaker === T)) : (inside || (S.lastRing === T && T.fill > 0))) && !hsOn()) { if ((T.bcd = (T.bcd ?? 8) - dt) <= 0) { T.bcd = BK[0];
           const bel = weakTo(keeperEl)[0], base = Math.atan2(T.cy - P.y, T.cx - P.x); if (!IMG['breaker-' + bel]) load('breaker-' + bel, `art4/breaker-${bel}.png?v=2`);
-          for (let i = 0; i < BK[1]; i++) { const a = base + (i - (BK[1] - 1) / 2) * .55, px = T.cx + Math.cos(a) * HOLD.R * .92, py = T.cy + Math.sin(a) * HOLD.R * .92 / 1.6;
+          for (let i = 0; i < BK[1]; i++) { const a = base + (i - (BK[1] - 1) / 2) * .55, ox = K ? K.x : T.cx, oy = K ? K.y : T.cy, rr = K ? 140 : HOLD.R * .92, px = ox + Math.cos(a) * rr, py = oy + Math.sin(a) * rr / 1.6;
             const e = spawn('critter', edgeIn(P, Math.atan2(py - P.y, px - P.x), Math.hypot(VW, VH) / 2 + 60), 1.3, bel);
             if (e) { e.breaker = T; e.plant = { x:px, y:py }; e.hp = e.max = e.hp * HOLD.brkHp; e.r *= 1.15; e.size *= 1.2; } }
           if (!SEEN.has('_breakers')) { markSeen('_breakers'); const t0 = S.t; coach('breakers', 'Ring-breakers!', 'They drain your ring. Their frost blocks shots from far away, so run out and free them up close.', () => { const b = S.en.find(e => !e.dead && e.breaker === T) || T; return { sx:clamp(((b.plant || b).x - camX) * Z, 30, W - 30), sy:clamp(((b.plant || b).y - camY) * Z, 150, H - 120) }; }); } } }
-      const bn = S.en.filter(e => !e.dead && e.breaker === T && e.planted).length; T.breakN = bn;
+      const bn = S.en.filter(e => !e.dead && e.breaker === T && e.planted).length;
+      // left alone with ring-breakers for 8 s, the keeper is tired (never frozen again); freeing one stands them back up
+      if (K) { if (bn && bn >= (T.breakN || 0)) T.brkT = (T.brkT || 0) + dt; if (bn < (T.breakN || 0)) { T.brkT = 0; if (K.tired) { K.tired = false; K.cd = 1; floatText(K.x, K.y - 100, 'Thank you!', '#FFFFFF', 15); } }
+        if (!bn) T.brkT = 0; if (!K.tired && T.brkT >= RESCUE.tiredAfter) { K.tired = true; SFX.alarm && SFX.alarm(); } }
+      T.breakN = bn;
       if (bn && BK) { T.fill = Math.max(0, T.fill - BK[2] * bn * dt); S.qi[T.el] = Math.floor(T.fill); }
       if (inside && !hsOn() && (T.cd -= dt) <= 0) { T.cd = HOLD.wake;
         for (let i = 0; i < HOLD.pack; i++) if (S.en.filter(e => !e.dead && e.from === T).length < HOLD.cap) { const away = Math.atan2(P.y - T.y, P.x - T.x), a = away + rnd(-1, 1), d = Math.hypot(VW, VH) / 2 + 60; const e = spawn(Math.random() < HOLD.wolf ? 'wolf' : 'critter', edgeIn(P, a, d), HOLD.gRush[S.level] || 1.15, T.el); if (e) { e.from = T; e.hp = e.max = e.max * (HOLD.gHp[S.level] || 1); } } }
@@ -7825,7 +7919,7 @@ function update(dt) {
   P.hurt -= dt; S.shake = Math.max(0, S.shake - dt); S.flashT = Math.max(0, S.flashT - dt); S.freeze = Math.max(0, S.freeze - dt); S.buffs.tiger = Math.max(0, S.buffs.tiger - dt); S.buffs.ward = Math.max(0, S.buffs.ward - dt);
   P.rx = (P.rx || 0) * Math.pow(.004, dt); P.ry = (P.ry || 0) * Math.pow(.004, dt);
   if (S.motes) { for (const m of S.motes) m.t += dt; if (S.motes.some(m => m.t >= m.life)) { S.motes = S.motes.filter(m => m.t < m.life); const b = $('#lvPill'); if (b && (S.tickT || 0) <= S.t) { S.tickT = S.t + .15; b.classList.remove('tick'); void b.offsetWidth; b.classList.add('tick'); } } }
-  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); surgeTick(dt); pressureTick(dt); guardTick(dt); lbTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); familiesTick(dt); dangerTick(dt); gems(dt); hazards(dt); updateFX(dt);
+  direct(dt); powers(dt); spiritShot(dt); petShots(dt); awakeTick(dt); fuseTick(dt); ultTick(dt); callTick(dt); crates(dt); shrines(dt); bloomTick(dt); hsTick(dt); surgeTick(dt); pressureTick(dt); guardTick(dt); rescueTick(dt); lbTick(dt); spikeTick(dt); finisherTick(); giantsTick(dt); familiesTick(dt); dangerTick(dt); gems(dt); hazards(dt); updateFX(dt);
   for (const e of S.en) {
     if (e.dead) continue;
     e.wob += dt * 6; if (e.tagT > 0) e.tagT -= dt; e.flash = Math.max(0, (e.flash || 0) - dt); e.slow = Math.max(0, e.slow - dt); e.frozen = Math.max(0, e.frozen - dt);
@@ -8475,6 +8569,36 @@ function draw() {
   // attack warnings: a red light fills up on the ground, then the attack lands
   for (const T of S.traps || []) if (!T.done) warnCircle(T.x, T.y, T.r, Math.min(1, T.t / T.wind));
   for (const m of S.slams || []) if (!m.done) warnCircle(m.x, m.y, PRESS.r, Math.min(1, m.t / PRESS.wind));
+  // the frozen people: an ice block in a soft ring whose band fills with the breath; once free they follow on their own feet
+  for (const q of S.people || []) { const own = PEOPLE_ART.includes(q.id), pic = p => IMG['p-' + q.id + '-' + p];
+    if (own) { const pose = q.state === 'ice' ? 'ice' : S.t - (q.freedAt ?? -9) < .9 ? 'gasp' : q.tired ? 'tired' : q.castAt && S.t - q.castAt < .7 ? 'craft' : q.mv > .4 ? (Math.floor((S.t * 7 + q.ph)) % 2 ? 'run1' : 'run2') : q.state === 'keeper' ? 'hold' : 'run1';
+      let im = ok(pic(pose)) ? pic(pose) : pic('run1'); if (!im || !ok(im)) continue; const sz = 124;
+      // a frozen pose waiting on its repaint: their own figure, iced over and still, so no wrong face shows
+      if (pose === 'ice' && ICE_HOLD.includes(q.id) && ok(pic('hold'))) im = frozenArt(pic('hold'), q.el);
+      g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(q.x, q.y + 4, 26, 8, 0, 0, TAU); g.fill();
+      if (q.state === 'ice') { const pu = .75 + .25 * Math.sin(S.t * 3 + q.ph), ry = RESCUE.R * .62; g.save();
+        // "come here", before the child steps in (design review): a soft fill and dashes drifting inward in their element's colour
+        g.globalAlpha = .16 + .1 * pu; g.fillStyle = EL[q.el]; g.beginPath(); g.ellipse(q.x, q.y, RESCUE.R, ry, 0, 0, TAU); g.fill();
+        g.globalAlpha = .55; g.strokeStyle = EL[q.el]; g.lineWidth = 4; g.setLineDash([14, 12]); for (const k of [0, .5]) { const f = 1 - ((S.t * .5 + k) % 1); g.globalAlpha = .5 * (1 - f * .5); g.beginPath(); g.ellipse(q.x, q.y, RESCUE.R * (1 + f * .45), ry * (1 + f * .45), 0, 0, TAU); g.stroke(); } g.setLineDash([]); g.globalAlpha = 1;
+        g.strokeStyle = `rgba(200,232,255,${.45 + .2 * pu})`; g.lineWidth = 6; g.beginPath(); g.ellipse(q.x, q.y, RESCUE.R, ry, 0, 0, TAU); g.stroke();
+        if (q.thaw > 0) { g.strokeStyle = EL[q.el]; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.ellipse(q.x, q.y, RESCUE.R, ry, 0, -Math.PI / 2, -Math.PI / 2 + TAU * q.thaw); g.stroke(); } g.restore(); add(() => glowAt(q.x, q.y - 50, 90, '#CFEAFF', .25 + .15 * pu)); }
+      if (q.state === 'keeper') { add(() => glowAt(q.x, q.y - 30, 80, q.tired ? '#9AA8B8' : EL[q.el], q.tired ? .25 : .45)); if (q.tired) { g.save(); g.font = '900 16px ui-rounded, system-ui'; g.textAlign = 'center'; g.fillStyle = '#FFFFFF'; g.strokeStyle = 'rgba(14,20,52,.85)'; g.lineWidth = 5; g.strokeText('Help!', q.x, q.y - sz - 6); g.fillText('Help!', q.x, q.y - sz - 6); g.restore(); } }
+      // the art faces right: turn to the way they run
+      g.save(); g.translate(q.x, q.y + sz * .035); g.scale(q.state === 'ice' ? 1 : (q.fx || 1), 1); g.drawImage(im, -sz / 2, -sz, sz, sz);
+      if (pose === 'ice' && ICE_HOLD.includes(q.id)) { g.fillStyle = 'rgba(214,236,255,.5)'; g.strokeStyle = 'rgba(240,250,255,.9)'; g.lineWidth = 3; g.beginPath(); g.roundRect(-sz * .32, -sz * .98, sz * .64, sz * .96, 16); g.fill(); g.stroke(); }
+      g.restore(); continue; }
+    const im = IMG['k' + q.stand]; if (!im || !ok(im)) continue; const sz = 82;
+    g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(q.x, q.y + 4, 26, 8, 0, 0, TAU); g.fill();
+    if (q.state === 'ice') { const pu = .75 + .25 * Math.sin(S.t * 3 + q.ph), ry = RESCUE.R * .62;
+      g.save(); g.strokeStyle = `rgba(200,232,255,${.35 + .2 * pu})`; g.lineWidth = 6; g.beginPath(); g.ellipse(q.x, q.y, RESCUE.R, ry, 0, 0, TAU); g.stroke();
+      if (q.thaw > 0) { g.strokeStyle = EL[q.el]; g.lineWidth = 9; g.lineCap = 'round'; g.beginPath(); g.ellipse(q.x, q.y, RESCUE.R, ry, 0, -Math.PI / 2, -Math.PI / 2 + TAU * q.thaw); g.stroke(); }
+      g.globalAlpha = .9; g.drawImage(frozenArt(im, q.el), q.x - sz / 2, q.y - sz, sz, sz); g.globalAlpha = 1;
+      g.fillStyle = 'rgba(214,236,255,.38)'; g.strokeStyle = 'rgba(240,250,255,.9)'; g.lineWidth = 2.5; g.beginPath(); g.roundRect ? g.roundRect(q.x - sz * .36, q.y - sz * 1.02, sz * .72, sz * 1.02, 14) : g.rect(q.x - sz * .36, q.y - sz * 1.02, sz * .72, sz * 1.02); g.fill(); g.stroke();
+      g.restore(); add(() => glowAt(q.x, q.y - 40, 90, '#CFEAFF', .25 + .15 * pu)); }
+    else { const hop = q.mv > .4 ? Math.abs(Math.sin(S.t * 12 + q.ph)) * 6 : 0;
+      if (q.state === 'keeper') { add(() => glowAt(q.x, q.y - 30, 80, q.tired ? '#9AA8B8' : EL[q.el], q.tired ? .25 : .45)); if (q.tired) { g.save(); g.font = '900 16px ui-rounded, system-ui'; g.textAlign = 'center'; g.fillStyle = '#FFFFFF'; g.strokeStyle = 'rgba(14,20,52,.85)'; g.lineWidth = 5; g.strokeText('Help!', q.x, q.y - 92); g.fillText('Help!', q.x, q.y - 92); g.restore(); g.globalAlpha = .7; } }
+      g.save(); g.translate(q.x, q.y - hop); g.scale(-(q.fx || 1), 1); g.drawImage(im, -sz / 2 * .85, -sz * .85, sz * .85, sz * .85); g.restore(); g.globalAlpha = 1;
+      if (q.castAt && S.t - q.castAt < .5) add(() => glowAt(q.x, q.y - 30, 70, EL[q.el], .6 * (1 - (S.t - q.castAt) / .5))); } }
   if (S.runaway) { const R = S.runaway, hop = Math.abs(Math.sin(S.t * 12)) * 10, k = R.t > PRESS.life - 2 ? .5 + .5 * Math.sin(S.t * 20) : 1;
     g.fillStyle = 'rgba(0,0,0,.2)'; g.beginPath(); g.ellipse(R.x, R.y + 4, 20, 7, 0, 0, TAU); g.fill();
     add(() => glowAt(R.x, R.y - 24 - hop, 90, '#FFD24A', .8 * k));
@@ -10682,6 +10806,7 @@ function tipArt(id) {
   if (id === 'outposts') return `<div class="fbdemo"><img src="${outpostPic(S && S.out ? S.out.els[0] : S && S.l5 ? (openOf(S.l5)[0] || SHRINES[0]).el : 'wood')}" alt=""></div>`;
   if (id === 'surge') return `<div class="fbdemo"><img src="${surgePic()}" alt=""></div>`;
   // the golden runaway's card shows the runaway itself, mid-dash (QA from A's play, 2026-10-09: it fell back to the logo)
+  if (id === 'rescue') return `<div class="fbdemo rundemo"><img src="art4/people/p-${(S && S.people && S.people[0] && PEOPLE_ART.includes(S.people[0].id)) ? S.people[0].id : 'isla'}-ice.png?v=2" alt=""></div>`;
   if (id === 'runaway') return `<div class="fbdemo rundemo"><img src="art4/x-runaway-m2.png?v=1" alt=""></div>`;
   if (id === 'breakers') return `<div class="fbdemo"><img src="${breakerPic(S && S.out ? (openOf(S.out)[0] || S.out.towers[0]).el : 'wood')}" alt=""></div>`;
   if (id === 'highest') return `<div class="hsdemo"><img src="art4/k${keeper}-omni.png?v=1" alt=""></div>`;
@@ -10707,7 +10832,7 @@ function tipArt(id) {
   return `<div class="hsdemo logo"><img class="logo-pic" src="art4/logo-morqi.png?v=11" alt=""></div>`;
 }
 // every card is also said aloud by Luma, in a few words, for players who cannot read yet (A, 2026-10-05)
-const CARD_VO = { lastbreath:'lastbreath', react:'react', chesthold:'chesthold', lvhold:'lvhold', evoteach:'evoteach', giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', wall:'wall', shooters:'shooters', l4temples:'l4temples', l5temples:'l5temples', surge:'surge', breakers:'breakers', runaway:'runaway', goal:'goal' };
+const CARD_VO = { lastbreath:'lastbreath', react:'react', chesthold:'chesthold', lvhold:'lvhold', evoteach:'evoteach', giant_rammer:'rammer', giant_colossus:'colossus', giant_alpha:'alpha', storm:'storm', move:'move', enemy:'rings', stone:'stone', bloom:'bloom', shrine:'shrine', ult:'ult', call_bell:'call', call_tide:'call-tide', call_root:'call-root', call_ember:'call-ember', call_stone:'call-stone', firebar:'firebar', outposts:'outposts', well:'well', wall:'wall', shooters:'shooters', l4temples:'l4temples', l5temples:'l5temples', surge:'surge', breakers:'breakers', runaway:'runaway', goal:'goal', rescue:'rescue' };
 function showCoach(c) {
   // (the same card never twice in a row; Sammy's QA v2 #8)
   if (c.id && COACH.lastId === c.id && performance.now() - (COACH.lastAt || 0) < 8000) { hideCoach(); return; }
@@ -10994,11 +11119,18 @@ function goalOf() {
   if (B) return null;
   if (S.bossAt && !S.bossSpawned) return { t:'Get ready: the boss is coming!', el:worldOf() };
   if (S.well && !S.well.sealed && Math.hypot(S.well.x - P.x, S.well.y - P.y) < 900) return { t:'Seal the frost well!', el:S.well.el, x:S.well.x, y:S.well.y };
+  // a tired keeper calls the Keeper back first (batch 3)
+  { const K = (S.people || []).find(q => q.tired); if (K) return { t:`Help ${K.n}!`, el:K.el, x:K.x, y:K.y }; }
+  // the frozen people come first: they are what the level is for (batch 3)
+  { const q = rescueLeft().sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y))[0];
+    if (q && (S.freedPeople || S.bossAt || q.taught || Math.hypot(q.x - P.x, q.y - P.y) < 900 || S.t > 8)) return { t:`Free ${q.n} from the ice!`, el:q.el, x:q.x, y:q.y }; }
   const st = S.items.find(it => it.kind === 'stone' && !it.got);
   if (st) return { t:`Grab the ${ELNAME[st.el].toLowerCase()} stone!`, el:st.el, x:st.x, y:st.y };
   const O = OUT();
   if (O) { const open = openOf(O); if (!open.length) return null;
     const T = open.slice().sort((a, b) => Math.hypot(a.cx - P.x, a.cy - P.y) - Math.hypot(b.cx - P.x, b.cy - P.y))[0], nm = ELNAME[T.el].toLowerCase();
+    // a rescued keeper holds it now: the child helps them, never "hold the ring" alone (batch 3)
+    if (T.keeper) return inRing(T, P.x, P.y) ? { t:`Free creatures by ${T.keeper.n}!`, el:T.el } : { t:`Help ${T.keeper.n} at the ${nm} temple`, el:T.el, x:T.cx, y:T.cy };
     if (inRing(T, P.x, P.y)) return { t:`Hold the ${nm} ring!`, el:T.el };
     return { t:`Go to the ${nm} temple`, el:T.el, x:T.cx, y:T.cy }; }
   const el = behind(); if (el) return { t:`Free creatures to fill the ${ELNAME[el].toLowerCase()} stone`, el };
@@ -11048,7 +11180,9 @@ function hud() {
       // Level 5: water first, as the temples are woken; the next one to wake pulses (design review, 2026-10-07)
       const nx = OUT() && OUT().ordered && !S.bossSpawned && openOf(OUT())[0];
       row.innerHTML = (S.l5 ? TOWER.order : ELS).filter(el => stoneEls().includes(el)).map(el => `<i class="sk${S.qiStones[el] ? ' got' : freeMore || (nx && nx.el === el) ? ' need' : ''}" style="--c:${EL[el]};--p:${Math.min(1, (S.qi[el] || 0) / stoneNeed(el)).toFixed(2)}">${S.qiStones[el] ? `<img src="art4/props/x-stone-${el}.png?v=8" alt="${ELNAME[el]} stone">` : ''}</i>`).join(''); } }
-  if (S.boss) { const bw = Math.max(0, S.boss.hp / S.boss.max * 100) + '%', hk = Math.max(0, 1 - (S.t - (S.boss.hitAt ?? -9)) / .15); $('#bossBar i').style.width = bw; $('#bossBar b').style.width = bw; $('#bossWrap').style.transform = hk ? `translateX(${((Math.random() * 2 - 1) * 3 * hk).toFixed(1)}px)` : ''; $('#bossName').textContent = bossOf(S.boss).name; $('#bossBar i').style.background = EL[S.boss.el]; }
+  if (S.boss) { const bw = Math.max(0, S.boss.hp / S.boss.max * 100) + '%', hk = Math.max(0, 1 - (S.t - (S.boss.hitAt ?? -9)) / .15); $('#bossBar i').style.width = bw; $('#bossBar b').style.width = bw; $('#bossWrap').style.transform = hk ? `translateX(${((Math.random() * 2 - 1) * 3 * hk).toFixed(1)}px)` : ''; $('#bossName').textContent = bossOf(S.boss).name; $('#bossBar i').style.background = EL[S.boss.el];
+    // each quarter cleared: a small pop and a soft chime, so the chunk feels earned
+    { const q = Math.ceil(Math.max(0, S.boss.hp / S.boss.max) * 4); if (S.boss.q4 != null && q < S.boss.q4) { $('#bossWrap').animate([{ transform:'scale(1)' }, { transform:'scale(1.05)' }, { transform:'scale(1)' }], { duration:120 }); SFX.ting && SFX.ting(); } S.boss.q4 = q; } }
 }
 function loop(now, id) {
   if (!running || id !== loopId) return;
@@ -11171,6 +11305,8 @@ function dailyDone() {
   return { bonus, line:`Day ${d.count} of breathing`, grew:d.grew ? PLOTS.find(p => p.el === d.grew).n : null };
 }
 function win() {
+  // anyone still frozen is freed when the boss falls: nobody is ever left behind (batch 3)
+  if (S && S.people) for (const q of rescueLeft()) freePerson(q, true);
   if (S.won) return; S.won = true; S.over = true; running = false; skillWin(S.t, S.falls || 0);
   // no hurt tint frozen on the Keeper through the slow freeing (A's playthrough, 2026-10-05)
   S.p.hitAt = -9; S.p.hurt = 0;
@@ -11545,7 +11681,11 @@ function results(quiet) {
 }
 
 // a test hook: step the simulation without relying on animation frames
-window.__morqi = { au:AU, lb:() => ({ on:lbOn(), t:S.lb && S.lb.t, burst:S.lb && S.lb.burst, img:ok(IMG['k' + keeper + 'breath']), cam:[camX, camY, Z] }), react:(key, x, y) => react(key, REACT[key], x, y), reactKeys:() => Object.keys(REACT), giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+// no browser menu on a long press anywhere in the game (the press is the breath); text fields keep theirs
+addEventListener('contextmenu', e => { if (!(e.target.closest && e.target.closest('input, textarea'))) e.preventDefault(); });
+// ...and on the breath screen a held thumb never starts iOS's text magnifier or selection (buttons keep their taps)
+$('#breathe').addEventListener('touchstart', e => { if (!e.target.closest('button')) e.preventDefault(); }, { passive:false });
+window.__morqi = { rescueAll:() => { for (const q of rescueLeft()) freePerson(q, true); }, au:AU, lb:() => ({ on:lbOn(), t:S.lb && S.lb.t, burst:S.lb && S.lb.burst, img:ok(IMG['k' + keeper + 'breath']), cam:[camX, camY, Z] }), react:(key, x, y) => react(key, REACT[key], x, y), reactKeys:() => Object.keys(REACT), giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => win(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = (S.offered || options()).find(x => x.kind !== 'sparks'); if (o) { applyPick(o, true); megaRest(o); } else { payPouch(); S.mega = 1; S.megaNow = false; } show(null); afterPick(); }
       if (COACH.cur) { if (!auto) break; if (COACH.cur.card) show(null); hideCoach(); COACH.cur = null; }
