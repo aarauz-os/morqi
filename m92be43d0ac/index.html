@@ -8,6 +8,12 @@
 try { var bfS = localStorage.getItem('morqi.seen') || '', bfP = localStorage.getItem('morqi.profile');
   // (a returning player lands in their Sanctuary, so the title never shows for them either)
   if (/[?&]from=pitch/.test(location.search) || bfP || bfS.split(',').indexOf('_open') < 0) document.documentElement.classList.add('bf1-pre'); } catch (e) {}</script>
+<script>/* MorQi opens only from its pitch (A, 2026-10-09: the game is "only accessible through the link we create from the bible"): the
+bible's links carry a key, this device remembers it, and anything else goes to the pitch. Local testing stays open. Not a lock:
+a soft gate on a public host. */
+(function(){try{var h=location.hostname;if(!h||/^(127\.\d+\.\d+\.\d+|localhost)$/.test(h))return;var q=new URLSearchParams(location.search);
+if(q.get('k')==='thaw')localStorage.setItem('morqi.access','1');if(localStorage.getItem('morqi.access')==='1')return;}catch(e){return;}
+location.replace('https://aarauz-os.github.io/thaw/');})();</script>
 <style>html.bf1-pre,html.bf1-pre body,html.bf1-pre #stage{background:#000}html.bf1-pre #stage > .scr,html.bf1-pre #stage > .tabs{visibility:hidden}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12005,7 +12011,7 @@ function stillGate(url, eyesSrc, onStart) {
 }
 
 // the feedback form, through the Stillmaker's gate (A, 2026-10-07)
-$('#thxFeedback').onclick = () => { THX_T.forEach(clearTimeout); SFX.select(); stillGate('https://aarauz-os.github.io/morqi/feedback/', 'art4/still/eyes.png?v=9', () => { AU.music(false); setTimeout(() => SFX.whoosh(true), 1000); }); };
+$('#thxFeedback').onclick = () => { THX_T.forEach(clearTimeout); SFX.select(); stillGate('https://aarauz-os.github.io/thaw/feedback/', 'art4/still/eyes.png?v=9', () => { AU.music(false); setTimeout(() => SFX.whoosh(true), 1000); }); };
 $('#thxAgain').onclick = () => { THX_T.forEach(clearTimeout); SFX.select(); show(null); startRun(); };
 
 /* ================= the front door ================= */
@@ -12649,7 +12655,7 @@ function openReveal(id) { const D = CALL[id]; if (!D || !S) return; S.revealed =
     $('#crvDemo video').onerror = () => { $('#crvDemo').innerHTML = tipArt('call_' + id); }; }
   $('#crvArt').closest('.crv').querySelector('.crv-k').textContent = S.giftNew === id ? 'New Star Call!' : 'Star Call'; show('callReveal'); SFX.bx('call-seal', 1, 0); }
 $('#crvGo').onclick = () => { SFX.select(); show('results'); };
-$('#resShare').onclick = async () => { SFX.select(); const url = location.origin + location.pathname + '?from=pitch', text = 'One breath, a frozen world comes back. Ten seconds:';
+$('#resShare').onclick = async () => { SFX.select(); const url = location.origin + location.pathname + '?from=pitch&k=thaw', text = 'One breath, a frozen world comes back. Ten seconds:';
   try { if (navigator.share) { await navigator.share({ text:text + ' ' + url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(text + ' ' + url); toast('Link copied'); } catch (e) { toast(url, 6000); } };
 $('#ascBtn').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (!S || S.over || hsOn() || S.omni || S.finisherUsed) return; S.finisherUsed = true; $('#ascBtn').hidden = true; hsStart(false, 5, true); });
