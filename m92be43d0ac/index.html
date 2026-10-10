@@ -8157,7 +8157,7 @@ function hearthHurt(n) {
 }
 /* ---------- night creatures ---------- */
 function hearthWave(N, n, thr) {
-  const H = HS(), L = N.lanes, k = Math.max(2, Math.round(n * Math.pow(.85, H.ease)));
+  const H = HS(), L = N.lanes, k = Math.max(2, Math.round(n * Math.pow(.85, Math.min(2, H.ease))));
   for (let i = 0; i < k; i++) H.q.push({ at:H.pt + i * 4 / k, lane:L[i % L.length], el:N.el });
   for (let i = 0; i < thr; i++) H.q.push({ at:H.pt + 1.2 + i * 1.6, lane:L[i % L.length], el:N.el, thrower:true });
   SFX.alarm();
@@ -8307,7 +8307,9 @@ function hearthRetry(paid) {
   const H = HS(), st = H.stone;
   for (const q of S.people || []) q.tired = false;
   if (!paid && S.rises <= 0) { S.p.hp = 0; return; }   // no Rises left: the fall takes it from here
-  if (!paid) S.rises--; H.ease++;   // the next try is quietly a little easier (CEO, conflict 7); never said
+  // the next try is quietly a little easier (CEO, conflict 7), never said: a night's waves shrink, at most twice; the boss never
+  // weakens, so standing still can't win by losing over and over (QA's "standing still never wins", 2026-10-09)
+  if (!paid) S.rises--; H.ease++;
   st.hp = st.max; H.sq = Math.max(H.sq, 40); S.p.hp = Math.max(S.p.hp, S.p.max * .6);
   const lp = $('#livesPill'); lp.classList.remove('bump'); void lp.offsetWidth; lp.classList.add('bump');
   hearthPhase('dusk');
@@ -8320,7 +8322,7 @@ function hearthBossNight() {
   spawnBoss(); const b = S.boss; if (!b) return;
   b.hh = 1; b.x = st.x + Math.cos(a) * 1050; b.y = st.y + Math.sin(a) * 1050; // a Keeper whose element barely hurts this boss (water against the Pearl Shore's water boss) meets it a little weaker (bot, 2026-10-09:
   // water Keepers lost a Rise in 80-90 s fights while every other element won in 20-40 s)
-  b.hp = b.max = Math.round(b.max * HH.bossHp * Math.pow(.9, H.ease) * (eff(keeperEl, b.el) < 1 ? .65 : 1));
+  b.hp = b.max = Math.round(b.max * HH.bossHp * (eff(keeperEl, b.el) < 1 ? .65 : 1));
   // the frost closes into a ring round home: the boss night is fought round the stone
   S.arena = { x:st.x, y:st.y, r:1250 };
 }
