@@ -3254,7 +3254,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', 'vo-hearth-shells', 'vo-hearth-frost', 'vo-hearth-back', 'vo-hearth-build', 'vo-hearth-dusk', 'vo-hearth-gift', 'vo-hearth-relight', 'vo-hearth-tonight', 'vo-hearth-guard', 'vo-rise-water', 'vo-rise-wood', 'vo-rise-fire', 'vo-rise-earth', 'vo-rise-metal', 'vo-isla-papa', 'vo-luma-scared', 'vo-feel-ask', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal', 'rescue'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', 'vo-hearth-shells', 'vo-hearth-frost', 'vo-hearth-back', 'vo-hearth-build', 'vo-hearth-dusk', 'vo-hearth-gift', 'vo-hearth-relight', 'vo-hearth-tonight', 'vo-hearth-guard', 'vo-hearth-spread', 'vo-hearth-feet', 'vo-fear-notbad', 'vo-fear-breath', 'vo-fear-jitter', 'vo-fear-gasp', 'vo-fear-loom', 'vo-fear-shush', 'vo-break-heart', 'vo-thanks-pip', 'vo-thanks-rowan', 'vo-thanks-nell', 'vo-folk-thanks-1', 'vo-folk-thanks-2', 'vo-folk-thanks-3', 'vo-folk-thanks-4', 'vo-rise-water', 'vo-rise-wood', 'vo-rise-fire', 'vo-rise-earth', 'vo-rise-metal', 'vo-isla-papa', 'vo-luma-scared', 'vo-feel-ask', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal', 'rescue'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -6025,7 +6025,7 @@ function bossFight(b, ph, dt) {
   // and sprays its own shots (orbs, thorn spears, fireballs, stones, blades) all round it
   const near = Math.hypot(P.x - b.x, P.y - b.y); b.close = near < 290 ? (b.close || 0) + dt : Math.max(0, (b.close || 0) - dt * 2); b.shoveCd = (b.shoveCd ?? 0) - dt;
   if (b.close > (enraged ? .7 : 1) && b.shoveCd <= 0 && !b.spiral && !b.fan && !b.blink && !S.bossFx.some(f => f.k === 'quake' && !f.done)) {
-    b.shoveCd = enraged ? 3 : 4; b.close = 0; b.atk = Math.max(b.atk, 1.3); S.bossFx.push({ k:'quake', shove:1, x:b.x, y:b.y, r:280, t:0, wind:enraged ? .5 : .65 }); SFX.bx(B.snd.charge, 1, 200); }
+    b.shoveCd = S.hearth ? (enraged ? 4.5 : 6) : enraged ? 3 : 4; b.close = 0; b.atk = Math.max(b.atk, 1.3); S.bossFx.push({ k:'quake', shove:1, x:b.x, y:b.y, r:280, t:0, wind:enraged ? .5 : .65 }); SFX.bx(B.snd.charge, 1, 200); }
   // its living presence: mist off the Lantern, leaves off the Tyrant, embers off the Drummer, dust off the Matron, glints off the Sentinel
   if ((b.wispT = (b.wispT || 0) - dt) <= 0) { b.wispT = el === 'fire' ? .08 : .06;
     if (el === 'fire') flames(b.x + rnd(-60, 60), b.y + rnd(-30, 30), 1, 10, 26, 160);
@@ -6110,7 +6110,11 @@ function bossFxTick(b, B, f, ph, dt) {
   else { b.slamAt = S.t; ring(f.x, f.y, 20, f.r * 1.15, B.glow, .5, 16, true); SFX.stomp(); SFX.bx(B.snd.slam, 1, 200); S.shake = Math.max(S.shake, .45);
     if (el === 'water') drops(f.x, f.y, 26, 460); else if (el === 'wood') leaves(f.x, f.y, 18, 380); else if (el === 'fire') flames(f.x, f.y, 14, f.r * .6, 40); else if (el === 'metal') stars(f.x, f.y, 20, '#FFFFFF', 420);
     debris(f.x, f.y, el === 'earth' ? 26 : 12, 360);
-    if (inside && ouch(f.shove ? 18 : 28, f.x, f.y, { push:f.shove ? 320 : 110, el, src:f.shove ? 'shove' : 'stomp', shake:f.shove ? .4 : .12 })) S.hitstop = .09;
+    // a Hearth boss's shove is a swat that throws you out from the lamp, a half-second flight, with a close-up; you land safe (game director, 2026-10-10)
+    { const HH0 = S.hearth, st0 = HH0 && HH0.stone, near = st0 && f.shove && Math.hypot(S.p.x - st0.x, S.p.y - st0.y) < 600, far = near && Math.hypot(S.p.x - st0.x, S.p.y - st0.y) > 40;
+      const ox = near ? (far ? st0.x : f.x) : f.x, oy = near ? (far ? st0.y : f.y) : f.y;
+      if (inside && ouch(f.shove ? 18 : 28, ox, oy, near ? { push:560, fly:1, el, src:'shove', shake:.5 } : { push:f.shove ? 320 : 110, el, src:f.shove ? 'shove' : 'stomp', shake:f.shove ? .4 : .12 })) {
+        S.hitstop = .09; if (near) { clash('swat'); S.p.safe = Math.max(S.p.safe || 0, 1.7); } } }
     const n = (f.shove ? 9 : 10) + ph * (f.shove ? 3 : 4), v = f.shove ? 320 : 230; for (let i = 0; i < n; i++) { const an = i / n * TAU + (f.shove ? rnd(0, .3) : 0); S.eshots.push({ k:B.shot, x:b.x, y:b.y - (f.shove ? 50 : 0), vx:Math.cos(an) * v, vy:Math.sin(an) * v, life:2.6, rot:an, el, boss:1 }); } }
 }
 // a ground strike, dressed in its boss's element
@@ -6295,7 +6299,8 @@ function ouch(dmg, fx, fy, o = {}) {
   const P = S.p; if (P.hurt > 0 || P.safe > 0 || S.bloom || hsOn()) return false;
   const hit = dmg * armourVs(o.el) * (BOSS_SRC.has(o.src) ? bossHit() : lvHit()) * titanSkin();
   P.hurt = .55; P.hitAt = S.t; const d = Math.hypot(P.x - fx, P.y - fy) || 1, x0 = P.x, y0 = P.y;
-  if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30);
+  if (o.fly) { P.flyT = .5; P.fvx = (P.x - fx) / d * o.push / .5; P.fvy = (P.y - fy) / d * o.push / .5; }   // (a swat: you fly, not jump-cut)
+  else if (o.push) { P.x = clamp(P.x + (P.x - fx) / d * o.push, 30, WORLD - 30); P.y = clamp(P.y + (P.y - fy) / d * o.push, 30, WORLD - 30);
     if (S.arena) { const A = S.arena, q = Math.hypot(P.x - A.x, P.y - A.y), lim = (S.storm ? S.storm.r0 + 400 : A.r) - 34; if (q > lim) { P.x = A.x + (P.x - A.x) / q * lim; P.y = A.y + (P.y - A.y) / q * lim; } } }
   keeperHit(fx, fy, o.el, (o.push || 0) >= 100 || o.shake > .3, o.push ? { x:P.x - x0, y:P.y - y0 } : null);
   if (o.slow) P.slowT = Math.max(P.slowT || 0, o.slow);
@@ -8113,7 +8118,7 @@ function update(dt) {
   // instead of snapping (A, 2026-10-05: "movement is very slow … make it more flowy"); a hard turn kicks up a skid of dust
   const vx0 = P.vx || 0, vy0 = P.vy || 0, ease = 1 - Math.exp(-(m > .1 ? 18 : 9) * dt);
   if (m > .1 && vx0 * mx + vy0 * my < -.5 * spd && (S.skidT = (S.skidT || 0) - dt) <= 0) { S.skidT = .35; for (let i = 0; i < 3; i++) fx({ k:'smoke', x:P.x + rnd(-10, 10), y:P.y + 28, vx:vx0 * .25 + rnd(-30, 30), vy:-rnd(10, 30), drag:3, life:.5, s:rnd(10, 15), c:'200,190,170' }); }
-  P.vx = vx0 + (mx * spd - vx0) * ease; P.vy = vy0 + (my * spd - vy0) * ease;
+  if (P.flyT > 0) { P.flyT -= dt; P.vx = P.fvx; P.vy = P.fvy; } else { P.vx = vx0 + (mx * spd - vx0) * ease; P.vy = vy0 + (my * spd - vy0) * ease; }
   const px0 = P.x, py0 = P.y;
   P.x = clamp(P.x + P.vx * dt, 30, WORLD - 30); P.y = clamp(P.y + P.vy * dt, 30, WORLD - 30);
   if (m > .1) S.lastMove = { x:mx, y:my };
@@ -8232,20 +8237,21 @@ const HH = { plotR:260, ring:1100, rush:1.6, stoneR:58, hold:.8, holdR:95, pick:
 // gathering too (A: "i also dont see the villagers that i free actually doing anything but sitting there")
 const HSTORM = { r0:1450, home:330, bite:.035, beds:{ 1:[10, 6], 2:[14, 10, 6] }, carry:.8 };
 const HEARTH = {
-  1:{ stone:{ x:1800, y:1800, art:'lamp', goal:'Keep the lamp lit till dawn', out:'The light went out' }, mat:'shell', cost:[6, 12], drop:.45,
+  1:{ stone:{ x:1800, y:1800, art:'lamp', goal:'Keep the lamp lit till dawn', out:'The light went out' }, mat:'shell', cost:[6, 10], drop:.3,   // (fixed prices; the beds are the income, crabs a bonus: game director, A asked 2026-10-10)
+   
       // the game director's Level 1 map (2026-10-10; A approved): named places round home, each with a job; beds placed by hand and
       // taken by the frost at known seconds; the storm closes from a new side each day (from it, its centre drifts away), and the
       // first wave of the night comes down that same side
       map:{ lm:[{ id:'pier', x:430, y:-680 }, { id:'boat', x:-880, y:-170 }, { id:'nets', x:-450, y:660 }, { id:'rocks', x:720, y:520 }, { id:'clam', x:-150, y:-800 }, { id:'drowned', x:0, y:-1050 }],
-        beds:[[['pier', 3], ['boat', 6], ['nets', 3], ['home', 2]], [['boat', 2], ['rocks', 3], ['clam', 'pearl'], ['home', 2]]], heart:'boat',
+        beds:[[['home', 3], ['pier', 3], ['nets', 3], ['rocks', 3], ['boat', 4]], [['home', 2], ['pier', 3], ['boat', 3], ['rocks', 3], ['clam', 'pearl']]], heart:'boat',
         storm:[{ from:-Math.PI / 4, D:300 }, { from:-Math.PI / 2, D:250 }] },
       // Isla north-east, Pip south-west, and tonight's fire comes down those two lanes (CEO, conflict 2)
       plots:[{ id:'isla', n:'Isla', el:'water', role:'well', a:-Math.PI / 4, ice:[430, -680] }, { id:'pip', n:'Pip', el:'water', role:'trap', a:Math.PI * .75, ice:[-450, 660] }],
-      reunion:{ who:'isla', word:'Papa?' }, dayCap:45, days:[45, 20], nights:[{ el:'fire', len:45, waves:[[0, 8], [15, 10], [30, 12]], throwers:2, lanes:[-Math.PI / 4, Math.PI * .75] }],
+      reunion:{ who:'isla', word:'Papa?' }, dayCap:45, days:[45, 30], nights:[{ el:'fire', len:45, waves:[[0, 8], [15, 10], [30, 12]], throwers:2, lanes:[-Math.PI / 4, Math.PI * .75] }],
       boss:{ from:-Math.PI / 2, lanes:[-Math.PI / 4, Math.PI * .75] } },
   // the Bamboo Grove: the Whistle Bird Bo carved for his mother at six, on a living bamboo stump (creative's decision); two nights,
   // earth first so Bo's wood pays off, then metal so Tam's fire does; the element lesson starts here (CEO, conflict 3)
-  2:{ reunion:{ who:'bo', word:'Mama?' }, stone:{ x:1800, y:1800, art:'bird', goal:'Keep the Whistle Bird safe till dawn', out:'The bird went quiet' }, mat:'bamboo', cost:[10, 20], drop:.5,
+  2:{ reunion:{ who:'bo', word:'Mama?' }, stone:{ x:1800, y:1800, art:'bird', goal:'Keep the Whistle Bird safe till dawn', out:'The bird went quiet' }, mat:'bamboo', cost:[8, 14], drop:.5,
       plots:[{ id:'bo', n:'Bo', el:'wood', role:'wall', a:-Math.PI / 4, ice:[540, -620] }, { id:'tam', n:'Tam', el:'fire', role:'hive', a:Math.PI * .75, ice:[-560, 600] }],
       days:[35, 30, 15], nights:[{ el:'earth', len:40, waves:[[0, 10], [15, 12], [30, 14]], throwers:3, lanes:[-Math.PI / 4, Math.PI * .75] },
         { el:'metal', len:45, waves:[[0, 10], [15, 12], [30, 14]], throwers:3, lanes:[-Math.PI / 4, Math.PI * .75] }],
@@ -8338,7 +8344,7 @@ function hearthTick(dt) {
       H.storm.x = st.x - Math.cos(Sd.from) * Sd.D * k; H.storm.y = st.y - Math.sin(Sd.from) * Sd.D * k; }
     if (H.pt >= HH.dawn) { st.hp = st.max; hearthPhase('day'); hearthDawnGifts(); }
   } else if (H.phase === 'boss') {
-    H.sq = Math.min(100, H.sq + .5 * dt);
+    H.sq = Math.min(100, H.sq + (Math.hypot(S.p.x - st.x, S.p.y - st.y) < HSTORM.home + 30 ? 3 : .5) * dt);   // (Surge charges fast in home's warm circle: the lamp is where you are strong)
     // he reaches the lamp, and his daughter knows him (A approved, 2026-10-10: her one word, the freed's only exception to "thank you")
     { const B0 = S.boss; if (HMUSIC && B0 && !B0.dead && !H.introOff && (B0.act || B0.atStone)) { H.introOff = true; AU.holdIntro(false); } }
     const B = S.boss; if (B && !B.dead && B.atStone && !H.papa && C.reunion) { H.papa = true; const q = (S.people || []).find(q => q.id === C.reunion.who && q.state === 'keeper');
@@ -8377,7 +8383,7 @@ function hearthTick(dt) {
     H.shim = (H.phase === 'dusk' || H.phase === 'night') && !hearthBossNext() && late >= (H.lv === 1 ? 0 : 3) ? H.plots.find(p => p.lvl >= 1 && p.lvl < 3 && CONTROLS[p.el] === N.el && p.upAt < H.duskAt) || null : null; }
   // the stone: creatures at it and the boss beside it wear it down; frost creeps over the lamp in three stages
   if (H.phase === 'night' || H.phase === 'boss') {
-    let dps = 0; for (const e of S.en) if (!e.dead && e.hh && e.atStone && !(e.frozen > 0) && !(e.rooted > 0)) { dps += e.boss ? HH.dmg.boss : HH.dmg.touch; H.cause = e.el; }
+    let dps = 0; for (const e of S.en) if (!e.dead && e.hh && !e.boss && e.atStone && !(e.frozen > 0) && !(e.rooted > 0)) { dps += e.boss ? HH.dmg.boss : HH.dmg.touch; H.cause = e.el; }
     if (dps) hearthHurt(dps * dt);
     if (!H.surged && st.hp < st.max * HH.surgeAt) hearthSurge();
     // the boss's guard: Surge rises for home a moment after it comes up, even if it was spent tonight
@@ -8448,7 +8454,13 @@ function hearthSpawn(o) {
 // defends it); a frost-thrower stops out of reach and spits; the boss walks to the stone and stays at it
 function hearthMove(e, d, dt, s) {
   const H = HS(), st = H.stone, P = S.p, dx = st.x - e.x, dy = st.y - e.y, ds = Math.hypot(dx, dy) || 1;
-  if (e.boss) { if (ds > 160) { const v = HH.bossSp * dt; e.x += dx / ds * v; e.y += dy / ds * v; e.atStone = false; } else e.atStone = true; return true; }
+  // the boss hunts the Keeper, not the lamp (A chose this, 2026-10-10; game director's design): he walks at you, and when he steps into home's
+  // warm circle he hesitates for 2 s (at most every 12 s), the window to hit him hard; the first hesitation is still "Papa?"
+  if (e.boss) { const near = ds < HSTORM.home + 30;
+    if (near && S.t - (e.hesAt ?? -99) > 12) { e.hesAt = S.t; e.act = null; e.atk = Math.max(e.atk || 0, 2); e.stagAt = S.t; }
+    e.atStone = ds < 300; if (S.t - (e.hesAt ?? -99) < 2) return true;
+    const tx = P.hp > 0 ? P.x : st.x, ty = P.hp > 0 ? P.y : st.y, px = tx - e.x, py = ty - e.y, pd = Math.hypot(px, py) || 1;
+    if (pd > 170) { const v = HH.bossSp * dt; e.x += px / pd * v; e.y += py / pd * v; } return true; }
   if (e.thrower) { const T = e.thrower;
     if (ds > HH.throwAt) { e.x += dx / ds * s * dt; e.y += dy / ds * s * dt; }
     else { if (!T.posted) { T.posted = true; T.cd = .6; } const was = T.cd; if (was > .5 && was - dt <= .5 && Math.hypot(e.x - P.x, e.y - P.y) < 900) SFX.dangerSmall && SFX.dangerSmall(); if ((T.cd -= dt) <= 0) { T.cd = HH.boltEvery; e.spitAt = S.t; H.bolts.push({ x:e.x, y:e.y - e.size * .4, x0:e.x, y0:e.y - e.size * .4, t:0, life:ds / 520, el:e.el }); SFX.thwip && SFX.thwip(); } }
@@ -11821,15 +11833,18 @@ function drawItem(it) {
    zoom): the night falling, the boss's arrival, Surge (his guard breaking, when that is what the Surge breaks), and the last blow, which
    whites out into the Wake. At most one every 15 s (the last blow always). The world holds still under it, so nothing lands while it plays;
    about a second long, no words, one soft burst, never a strobe (photosensitivity: under 3 flashes a second); off with reduced motion. */
-const CLASH = { night:{ len:1.2, hit:.45 }, face:{ len:1.35, hit:.32 }, surge:{ len:1, hit:.22 }, guard:{ len:1, hit:.26 }, final:{ len:1.3, hit:.42 } };
-const CLASH_POSE = { face:'throw', surge:'summon', guard:'push', final:'slam' }, CLASH_BOSS = { face:'-up', guard:'-slam', final:'-slam' };
+const CLASH = { swat:{ len:1.1, hit:.3 }, night:{ len:1.2, hit:.45 }, face:{ len:1.35, hit:.32 }, surge:{ len:1, hit:.22 }, guard:{ len:1, hit:.26 }, final:{ len:1.3, hit:.42 } };
+const CLASH_POSE = { face:'throw', surge:'summon', guard:'push', final:'slam', swat:'push' }, CLASH_BOSS = { face:'-up', guard:'-slam', final:'-slam', swat:'-slam' };
 // the painted close-ups (brief 49 for Amara, Malik, Sina and the Drowned Giant; brief 48 for the Thorn Tyrant), loaded with a Hearth level;
 // anyone not painted yet clashes with their borrowed poses
-const CLASH_PAINTED = { k:[1, 6, 7], boss:['water', 'wood'] };
+const CLASH_PAINTED = { k:[1, 6, 7], boss:['water', 'wood'] }, CINE_PAINTED = ['water', 'wood'];
 function clashArt() {
   const L = n => IMG['c-' + n] || load('c-' + n, `art4/clash/${n}.png?v=1`), realm = worldOf();
   if (CLASH_PAINTED.k.includes(keeper)) for (const n of ['clash', 'clash-eyes', 'clash-rise']) L(`k${keeper}-${n}`);
   if (CLASH_PAINTED.boss.includes(realm)) for (const n of ['clash', 'clash-eyes', 'clash-break']) L(`${realm}-${n}`);
+  if (CLASH_PAINTED.k.includes(keeper)) L(`k${keeper}-clash-hit`);
+  // the animatic's painted panels (brief 50): square film stills, cropped to the screen
+  if (CINE_PAINTED.includes(realm)) for (const n of ['arrive-1', 'arrive-2', 'arrive-3', 'change-1', 'change-2', 'change-3']) IMG['cn-' + realm + '-' + n] || load('cn-' + realm + '-' + n, `art4/cine/${realm}-${n}.jpg?v=1`);
 }
 const hr = i => { const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); };
 function clash(k) {
@@ -11841,7 +11856,7 @@ function clash(k) {
     bim:k === 'night' ? IMG['boss-' + realm + '-ice' + (stage + 1)] : B ? IMG[B.img + (CLASH_BOSS[k] || '')] || IMG[B.img] : null,
     kc:FORM_PAL[keeperEl] || [EL[keeperEl], '#FFFFFF'], bc:EL[realm] || '#8FD0FF' };
   { const P = n => ok(IMG['c-' + n]) ? IMG['c-' + n] : null, kn = `k${keeper}-`, bn = realm + '-';   // the painted close-ups, when they're here
-    S.clash.kp = P(kn + (k === 'night' ? 'clash-eyes' : k === 'surge' ? 'clash-rise' : 'clash')); S.clash.bp = P(bn + (k === 'night' ? 'clash-eyes' : k === 'final' ? 'clash-break' : 'clash')); }
+    S.clash.kp = P(kn + (k === 'night' ? 'clash-eyes' : k === 'surge' ? 'clash-rise' : k === 'swat' ? 'clash-hit' : 'clash')); S.clash.bp = P(bn + (k === 'night' ? 'clash-eyes' : k === 'final' ? 'clash-break' : 'clash')); }
   S.clashAt = S.t; SFX.sweep && SFX.sweep(); return C.len;
 }
 function clashTick(dt) {
@@ -11930,6 +11945,16 @@ function drawCine() {
   g.globalAlpha = A; const bg = g.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * .7);
   if (C.k === 'arrive') { bg.addColorStop(0, '#1C3358'); bg.addColorStop(1, '#03050C'); } else { bg.addColorStop(0, '#2A2238'); bg.addColorStop(1, '#020208'); }
   g.fillStyle = bg; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
+  { const slot = C.k === 'arrive' ? (t < 1.7 ? ['arrive-1', 0, 1.7] : t < 3.1 ? ['arrive-2', 1.7, 1.4] : ['arrive-3', 3.1, 2.9]) : t < .6 ? null : t < 2.5 ? ['change-1', .6, 1.9] : t < 3.4 ? ['change-2', 2.5, .9] : ['change-3', 3.4, 1.8];
+    const pan = slot && IMG['cn-' + C.realm + '-' + slot[0]];
+    if (slot && ok(pan)) { const k = Math.min(1, (t - slot[1]) / slot[2]), z = 1.02 + .07 * k, s = Math.max(W / pan.width, H / pan.height) * z, al = C.k === 'change' && slot[0] === 'change-1' ? Math.min(1, (t - .6) / .4) : A;
+      g.globalAlpha = al; g.drawImage(pan, cx - pan.width * s / 2, cy - pan.height * s / 2, pan.width * s, pan.height * s); g.globalAlpha = 1;
+      if (C.k === 'arrive' && t >= 1.7 && t < 3.1) { for (let i = 0; i < 30; i++) { const a = i * 2.39996, d = (t - 1.7) * H * (.5 + (i % 5) * .18); g.fillStyle = '#DDF1FF'; g.globalAlpha = Math.max(0, 1 - (t - 1.7) / 1.1) * A; g.save(); g.translate(cx + Math.cos(a) * d, cy + Math.sin(a) * d * .8); g.rotate(a); g.fillRect(-4, -11, 8, 22); g.restore(); }
+        g.globalAlpha = 1; const fl = Math.max(0, .35 - (t - 1.7) * .7); if (fl > 0) { g.fillStyle = `rgba(230,244,255,${fl})`; g.fillRect(0, 0, W, H); } }
+      if (C.k === 'change' && t >= 2.5 && t < 3.4) { const fl = Math.max(0, .35 - (t - 2.5) * .5); if (fl > 0) { g.fillStyle = `rgba(255,246,226,${fl})`; g.fillRect(0, 0, W, H); } }
+      if (C.k === 'arrive' && t >= 3.1) { const v = g.createRadialGradient(cx, cy, H * .25, cx, cy, H * .8); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(0,0,0,${.45 * A})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
+      g.fillStyle = '#000'; const bar = H * .11 * Math.min(1, t / .3); g.fillRect(0, 0, W, bar); g.fillRect(0, H - bar, W, bar); g.restore(); return; } }
+  if (C.k === 'change' && t < .6) { g.fillStyle = `rgba(2,2,8,${t / .6})`; g.fillRect(0, 0, W, H); }
   if (C.k === 'arrive') {
     if (t < 1.7) { const im = I('boss-' + C.realm + '-ice' + (t < 1 ? 1 : 2)), k = t / 1.7; add(() => glowAt(cx, cy, H * .32, '#9FD8FF', (.25 + .2 * Math.sin(t * 5)) * A)); pic(im, cx, cy + H * .04, H * .55 * (1 + .08 * k), A); }
     else if (t < 3.1) { const k = (t - 1.7) / 1.4, im = t < 1.9 ? I('boss-' + C.realm + '-ice3') : I(C.img + '-up') || I(C.img);
