@@ -3224,7 +3224,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal', 'rescue'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', 'vo-hearth-shells', 'vo-hearth-frost', 'vo-hearth-back', 'vo-hearth-build', 'vo-hearth-dusk', 'vo-hearth-gift', 'vo-hearth-relight', 'vo-hearth-tonight', 'vo-rise-water', 'vo-rise-wood', 'vo-rise-fire', 'vo-rise-earth', 'vo-rise-metal', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal', 'rescue'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -8151,7 +8151,7 @@ function hearthStart() {
 const hearthNight = () => { const H = HS(); return H.C.nights[Math.min(H.night, H.C.nights.length - 1)]; };
 const hearthBossNext = () => { const H = HS(); return H.night >= H.C.nights.length; };
 function hearthPhase(ph) { const H = HS(); H.phase = ph; H.pt = 0;
-  if (ph === 'dusk') { SFX.horn(); H.banner = 0; hearthBanner(true); }
+  if (ph === 'dusk') { SFX.horn(); H.banner = 0; hearthBanner(true); if (!hearthBossNext()) AU.vo('vo-hearth-dusk', 1.4, .5); }
   if (ph === 'night') { H.surged = false; H.waveI = 0; H.left = 0; }
   if (ph === 'dawn') { SFX.dawn(); hearthClear(false); for (const p of H.plots) if (p.lvl >= 1) { if (p.down) smoke(p.x, p.y, 10, 40, '240,232,214'); hearthFix(p); } }
   if (ph === 'dusk') H.duskAt = S.t;
@@ -8211,7 +8211,8 @@ function hearthTick(dt) {
     // doesn't hold is breathed with after a few seconds, never blocked
     if (S.rises <= 0) { if (H.pt >= 3.4) hearthRetry(); return; }   // no Rise left: the fall takes it from here, no breath to waste
     const B = H.br || (H.br = { st:'wait', k:0, t:0 }); B.t += dt;
-    if (B.st === 'wait' && H.pt > 1.2) { B.st = 'ready'; B.t = 0; AU.vo('vo-breathe-in', 0, .5); }
+    if (B.st === 'wait' && !B.said) { B.said = true; B.spoke = AU.vo('vo-hearth-relight', .3, .4); }
+    if (B.st === 'wait' && H.pt > (B.spoke ? 4.6 : 1.2)) { B.st = 'ready'; B.t = 0; if (!B.spoke) AU.vo('vo-breathe-in', 0, .5); }
     else if (B.st === 'ready' && (H.holding || B.t > 5)) { B.st = 'in'; B.t = 0; B.auto = !H.holding; }
     else if (B.st === 'in') { B.k = Math.min(1, B.k + dt / 2); if ((B.auto ? B.k >= 1 : !H.holding && B.k > .6) || B.k >= 1 && !H.holding || B.t > 3.5) { B.st = 'out'; B.t = 0; AU.vo('vo-breathe-out', 0, .5); } }
     else if (B.st === 'out') { B.k = Math.max(0, B.k - dt / 3); if (B.k <= 0) { H.br = null; hearthRetry(); const st = H.stone; ring(st.x, st.y - 150, 20, 520, '#FFE08A', .8, 16, true); stars(st.x, st.y - 160, 34, '#FFE58A', 420); SFX.levelup(); } }
@@ -8250,9 +8251,11 @@ function hearthStorm(dt) {
   // outside: chilled (slowed) and bitten once a heartbeat, gently; the frost marks round the feet fill as it goes on
   if (out && P.hp > 0 && !(P.safe > 0) && !hsOn()) { St.out = Math.min(STORM.out, St.out + dt); P.slowT = Math.max(P.slowT || 0, .25);
     if ((St.beat -= dt) <= 0) { St.beat = 1; SFX.heartbeat(); P.hp -= P.max * HSTORM.bite; P.hitAt = S.t; S.lastHit = { src:'still' }; shards(P.x, P.y - 40, '#DDF1FF', 6, 200); }
-    if (!St.wasOut) { const m = fewTimes('_hstorm', 3); if (m) { markSeen(m); floatText(P.x, P.y - 120, 'Back inside the light!', '#FFE6A3', 22); } } }
+    if (!St.wasOut) { const m = fewTimes('_hstorm', 3); if (m) { markSeen(m); if (!AU.vo('vo-hearth-back', 0, .5)) floatText(P.x, P.y - 120, 'Back inside the light!', '#FFE6A3', 22); } } }
   else { St.out = Math.max(0, St.out - dt * 2.5); St.beat = 0; }
   St.wasOut = out;
+  if (stormOn() && H.day === 0 && H.pt > 4 && !SEEN.has('_hfrostvo')) { markSeen('_hfrostvo'); AU.vo('vo-hearth-frost', 0, .5, false); }
+  if (H.phase === 'day' && !SEEN.has('_hbuildvo') && hearthAfford() && Math.hypot(P.x - H.stone.x, P.y - H.stone.y) < 600) { markSeen('_hbuildvo'); AU.vo('vo-hearth-build', 0, .5, false); }
   // (no card: the wall, the minimap and "Back inside the light!" teach it; every card must be voiced, and the level maps will open with a glide instead)
   // anything the storm passes over freezes: shells left out are lost
   if (stormOn()) for (const d of H.drops) if (!d.got && Math.hypot(d.x - St.x, d.y - St.y) > St.r + 10) { d.got = true; d.lost = true; H.frostTook = (H.frostTook || 0) + 1; shards(d.x, d.y - 10, '#DDF1FF', 5, 160); }
@@ -8427,7 +8430,7 @@ function hearthDrops(dt) {
     if (d.fly) { const v = Math.max(420, 1400 - dd * 4) * dt; d.x += (P.x - d.x) / (dd || 1) * Math.min(dd, v); d.y += (P.y - 30 - d.y) / (dd || 1) * Math.min(dd, v);
       if (dd < 34) { d.got = true; H.mat += d.worth || 1; H.matAt = S.t; SFX.gem && SFX.gem(); if (d.prize) { ring(P.x, P.y - 30, 20, 260, '#FFE08A', .6, 12, true); stars(P.x, P.y - 60, 24, '#FFE58A', 360); SFX.chestDrop(); }
         // the first shell is named once (the voice line is still to record: "Shells! Bring them home.")
-        if (!SEEN.has('_' + H.C.mat)) { markSeen('_' + H.C.mat); floatText(P.x, P.y - 110, H.C.mat === 'shell' ? 'Shells! They make workshops stronger' : 'Bamboo! It makes workshops stronger', '#FFF1D6', 17); } } }
+        if (!SEEN.has('_' + H.C.mat)) { markSeen('_' + H.C.mat); if (!(H.C.mat === 'shell' && AU.vo('vo-hearth-shells', .1, .5))) floatText(P.x, P.y - 110, H.C.mat === 'shell' ? 'Shells! Bring them home' : 'Bamboo! Bring it home', '#FFF1D6', 17); } } }
     if (d.t > HH.shellLife && !d.bed && !d.claim) d.got = true; }
   H.drops = H.drops.filter(d => !d.got);
 }
@@ -8454,6 +8457,7 @@ function hearthSurge(why) {
   { const cx = (S.cam ? S.cam.x : camX) + VW / 2; floatText(clamp(st.x, cx - VW / 2 + 190, cx + VW / 2 - 190), st.y - 200, 'Your ' + ELNAME[keeperEl].toLowerCase() + ' rises for home!', '#FFFFFF', 20); }
   for (const q of S.people || []) if (q.state === 'keeper') q.castAt = S.t;
   const G = SG(); if (!G.on) { G.ready = keeperEl; if (!surgeStart()) G.ready = false; }
+  AU.vo('vo-rise-' + keeperEl, .25, .45);
 }
 /* ---------- a frozen stone costs a Rise; only the night restarts ---------- */
 function hearthOut() {
@@ -8545,7 +8549,7 @@ function hearthBanner(on) {
   b.querySelector('em').textContent = boss ? 'THE LAST NIGHT' : 'NIGHT ' + (H.night + 1);
   b.querySelector('b').innerHTML = boss ? `Tonight: <span style="color:${EL[el]}">${BOSSES[worldOf()].name}</span>` : `Tonight: <span style="color:${GROUND_RING[el] || EL[el]}">${el}</span> creatures`;
   const im = b.querySelector('img'), kid = boss ? null : el + '-a', pic = boss ? IMG['bz-' + worldOf()] : kid && IMG['e-' + kid];
-  if (boss) { b.querySelector('b').innerHTML = `Tonight, <span style="color:${EL[el]}">he comes</span>`; setTimeout(() => S && !S.over && luma('vo-boss-' + worldOf(), true), 600); } im.hidden = !(pic && ok(pic)); if (pic && ok(pic)) im.src = pic.src;
+  if (boss) { b.querySelector('b').innerHTML = `Tonight, <span style="color:${EL[el]}">he comes</span>`; AU.vo('vo-hearth-tonight', 1.4, .4); } im.hidden = !(pic && ok(pic)); if (pic && ok(pic)) im.src = pic.src;
   b.classList.add('on');   // hidden by hearthTick when dusk ends, so a pause holds it
 }
 /* ---------- drawing (stand-ins until brief 38) ---------- */
@@ -11476,7 +11480,7 @@ function levelUp() {
   else if (opts.some(o => o.kind === 'evo') && !S.taught.luevo) { S.taught.luevo = 1; tip.innerHTML = '<b>EVOLVE!</b> Take it.'; tip.hidden = false; }
   else if (opts.some(o => o.kind === 'gift') && !S.taught.lugift) { S.taught.lugift = 1; tip.innerHTML = '<b>Gifts</b> (round) unlock evolutions.'; tip.hidden = false; }
   else tip.hidden = true;
-  if (giving && !S.taught.dawngift) { S.taught.dawngift = 1; const N = hearthTonight(); tip.innerHTML = `Gifts from the people you freed. Tonight: <b>${N}</b>. The <b>glowing</b> card beats it.`; tip.hidden = false; }
+  if (giving && !S.taught.dawngift) { S.taught.dawngift = 1; const N = hearthTonight(); tip.innerHTML = `Gifts from the people you freed. Tonight: <b>${N}</b>. The <b>glowing</b> card beats it.`; tip.hidden = false; AU.vo('vo-hearth-gift', .2, .5); }
   // the first MEGA says what it is and how the next one is earned
   if (S.megaNow && !SEEN.has('_megateach')) { markSeen('_megateach'); tip.innerHTML = `<b>MEGA!</b> Your pick grows ${S.mega} levels. Free creatures with the element that beats them to earn the next.`; tip.hidden = false; }
   renderLoadout(); renderCards(opts);
