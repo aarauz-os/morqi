@@ -8259,7 +8259,8 @@ function hearthBeds() {
       for (let k = 0; k < ns[i]; k++) { const a = k / ns[i] * TAU + rnd(0, .5); Hh.drops.push({ x:cx + Math.cos(a) * 34, y:cy + Math.sin(a) * 20, t:.5, z:0, vz:0, bed:true }); } });
     if (Hh.day === 0 && M.heart) { const L = lm(M.heart); S.items.push({ x:st.x + L.x + 60, y:st.y + L.y + 40, kind:'heart', t:0, z:10, vz:0 }); }
     return; }
-  const Hh2 = Hh; void Hh2; n = (HSTORM.beds[Hh.lv] || [])[Hh.day] || 0, st = Hh.stone; let k = 0;
+  // (no map: beds scattered round home)
+  const n = (HSTORM.beds[Hh.lv] || [])[Hh.day] || 0, st = Hh.stone; let k = 0;
   while (k < n) { const a = rnd(0, TAU), r = 420 + Math.pow(Math.random(), .7) * (HSTORM.r0 - 520), m = Math.min(n - k, 2 + (Math.random() < .5 ? 1 : 0));
     for (let i = 0; i < m; i++, k++) Hh.drops.push({ x:clamp(st.x + Math.cos(a) * r + rnd(-40, 40), 200, WORLD - 200), y:clamp(st.y + Math.sin(a) * r + rnd(-30, 30), 200, WORLD - 200), t:.5, z:0, vz:0, bed:true }); }
 }
