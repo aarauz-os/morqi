@@ -8081,7 +8081,7 @@ function makeHearth(lv) {
   for (const q of S.people) { if (PEOPLE_ART.includes(q.id)) { for (const ps of PEOPLE_POSES) if (!IMG['p-' + q.id + '-' + ps]) load('p-' + q.id + '-' + ps, `art4/people/p-${q.id}-${ps}.png?v=3`); }
     else if (!IMG['k' + q.stand]) load('k' + q.stand, `art4/k${q.stand}.png?v=13`); }
   // Codex's brief 38 (2026-10-09): the Heartstone in four states, each workshop in four, the material, the dusk banner and the horn
-  const A = (n, v = 1) => IMG[n] || load(n, `art4/hearth/${n}.png?v=${v}`);
+  const A = (n, v = 1) => IMG[n] || load(n, `art4/hearth/${n}.png?v=${n.startsWith('hs-') ? 2 : v}`);
   for (const k of ['whole', 'hurt', 'frozen', 'surge']) A(`hs-${st.art}-${k}`);
   for (const p of plots) for (const k of ['ruin', 'built', 'u1', 'u2']) A(`ws-${p.id}-${k}`);
   A('mat-' + C.mat); A('horn-' + (C.mat === 'shell' ? 'conch' : 'bamboo'));
@@ -8095,7 +8095,7 @@ const MAT_ICON = { shell:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M
 function hearthStart() {
   const H = HS(), st = H.stone, P = S.p; P.x = st.x; P.y = st.y + 150; S.pet.x = P.x - 40; S.pet.y = P.y + 30; paintThaw(st.x, st.y, 380);
   $('#hud').classList.add('hearth'); $('#hsBar').style.setProperty('--kc', FORM_PAL[keeperEl][0]); $('#duskBanner').classList.remove('on');
-  $('#hsBar .hsi').innerHTML = `<img src="art4/hearth/hs-${st.art}-whole.png?v=1" alt="" onerror="this.outerHTML=HS_ICON['${st.art}']">`;
+  $('#hsBar .hsi').innerHTML = `<img src="art4/hearth/hs-${st.art}-whole.png?v=2" alt="" onerror="this.outerHTML=HS_ICON['${st.art}']">`;
   $('#matPill').firstElementChild.outerHTML = `<img src="art4/hearth/mat-${H.C.mat}-icon.png?v=1" alt="" onerror="this.outerHTML=MAT_ICON['${H.C.mat}']">`;
   const db = $('#duskBanner'); db.classList.add('art'); db.style.backgroundImage = `url(art4/hearth/banner-dusk-${H.C.mat === 'shell' ? 'water' : 'wood'}.png?v=1)`; $('#matPill').setAttribute('aria-label', H.C.mat === 'shell' ? 'Shells' : 'Bamboo');
 }
@@ -8434,7 +8434,9 @@ function drawHearthStone(st) {
           const gr = g.createLinearGradient(0, 0, Math.cos(a) * L, Math.sin(a) * L); gr.addColorStop(0, pal[i % 5]); gr.addColorStop(1, 'rgba(255,255,255,0)');
           g.globalAlpha = .35 * k; g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, L, a - .07, a + .07); g.closePath(); g.fill(); } g.restore(); }); }
       const glowK = out ? 0 : (.25 + .75 * f) * (sg ? 1.4 : 1); if (glowK > 0) add(() => glowAt(x, y - D * (lamp ? .62 : .42), (lamp ? 170 : 150) + 90 * nk + (sg ? 120 : 0), sg ? FORM_PAL[keeperEl][1] : lamp ? '#FFD98A' : '#7FE0A8', Math.min(1, .4 + .4 * nk) * glowK));
-      g.drawImage(im, dx, dy, D, D);
+      // (brief 39's surge pictures paint the stone about a fifth smaller to make room for the burst, so they are drawn larger round the
+      // same base, and the stone never shrinks at its moment of triumph)
+      if (sg) { const K = 1.2, D2 = D * K; g.drawImage(im, x - D2 / 2, y + 6 - D2 * ay / 512, D2, D2); } else g.drawImage(im, dx, dy, D, D);
       if (!out && !sg && f < 1 / 3 && ok(P('frozen'))) { g.globalAlpha = Math.min(.7, (1 / 3 - f) * 2.4); g.drawImage(P('frozen'), dx, dy, D, D); g.globalAlpha = 1; }
       g.restore(); return; } }
   if (st.art === 'bird') { drawBirdStone(st, f, nk, sg, out); g.restore(); return; }
