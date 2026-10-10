@@ -1815,6 +1815,12 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #duskBanner b{font:900 20px/1.1 ui-rounded,system-ui;color:#fff}
 /* the companion's ring keeps its slot in the strip, just right of the lamp's bar (the strip's right side is fixed: Rises 65 px, shells 48 px) */
 #hud.hearth #ultBtn{left:auto;right:calc(10px + 6px + 48px + 8px + 65px + 8px - 15px)}
+/* the dusk banner on Codex's night-glass frame (brief 38): its emblem sits at the left, so tonight's creature moves to the right */
+#duskBanner.art{background-color:transparent;background-size:100% 100%;background-repeat:no-repeat;background-position:center;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0 14px 0 58px}
+#duskBanner.art img{order:2;margin-left:auto;width:44px;height:44px}
+#hsBar .hsi img{position:relative;width:30px;height:30px;object-fit:contain}
+#matPill img{width:24px;height:24px;object-fit:contain}
+#duskBanner.art b{font-size:17px;white-space:nowrap}
 </style>
 
 <div id="stage">
@@ -6736,7 +6742,7 @@ const RESCUE = { R:90, breath:1.5, guards:3, follow:80, cut:.1,
   keepFill:1.4, inRing:2, tiredAfter:8, keepAt:.55 };
 // each person's craft, by element (game director, batch 3): water a net, wood a bamboo fence, fire a drumbeat, earth a bun, metal a bell
 // ice poses waiting on a repaint (design review, 2026-10-09: Ravi still smiled, Pops read scared): shown iced over until brief 37
-const ICE_HOLD = ['ravi', 'pops'];
+const ICE_HOLD = [];   // brief 37 landed (2026-10-09): Ravi and Pops have calm ice faces now
 const PEOPLE_ART = ['isla', 'pip', 'bo', 'tam', 'kit', 'pops', 'pema', 'ravi', 'bram', 'ines'], PEOPLE_POSES = ['ice', 'gasp', 'run1', 'run2', 'hold', 'craft', 'tired'];
 const CRAFT = { water:{ every:8, R:120, n:6, root:2 }, wood:{ every:10, R:140, n:8, root:3 }, fire:{ every:6, R:140, hit:1 }, earth:{ every:20, heal:.1 }, metal:{ every:10, R:180, n:12, root:1 } };
 // a stand-in look until Codex paints them (brief 34): another Keeper, never the player's own
@@ -6754,7 +6760,7 @@ function rescueInit() {
   const O = S.out, spot = q => { const T = q.keep && O && O.towers.find(t => t.el === q.el); return T ? { x:O.hub.x + (T.cx - O.hub.x) * RESCUE.keepAt, y:O.hub.y + (T.cy - O.hub.y) * RESCUE.keepAt, T } : { x:P.x + (q.at || [0, -300])[0], y:P.y + (q.at || [0, -300])[1] }; };   // (?towers=0: no temple, so they wait near the start; QA)
   S.people = L.map((q, i) => { const p = spot(q); return { ...q, stand:standFor(i), T:p.T, x:clamp(p.x, 140, WORLD - 140), y:clamp(p.y, 140, WORLD - 140), thaw:0, state:'ice', cd:3 + i * 2.5, ph:i * 1.7 }; });
   // their own art where Codex has painted them (brief 34: Isla, Pip, Bo, Tam), another Keeper in ice until then
-  for (const q of S.people) { if (PEOPLE_ART.includes(q.id)) { for (const p of PEOPLE_POSES) if (!IMG['p-' + q.id + '-' + p]) load('p-' + q.id + '-' + p, `art4/people/p-${q.id}-${p}.png?v=2`); }
+  for (const q of S.people) { if (PEOPLE_ART.includes(q.id)) { for (const p of PEOPLE_POSES) if (!IMG['p-' + q.id + '-' + p]) load('p-' + q.id + '-' + p, `art4/people/p-${q.id}-${p}.png?v=3`); }
     else if (!IMG['k' + q.stand]) load('k' + q.stand, `art4/k${q.stand}.png?v=13`); }
 }
 const rescueLeft = () => (S.people || []).filter(q => q.state === 'ice');
@@ -8072,8 +8078,13 @@ function makeHearth(lv) {
   const plots = C.plots.map((p, i) => ({ ...p, x:Math.round(st.x + Math.cos(p.a) * HH.plotR), y:Math.round(st.y + Math.sin(p.a) * HH.plotR), lvl:0, cd:1 + i, upAt:-9, popAt:-9, firedAt:-9, shakeAt:-9 }));
   // the people wait frozen out on the shore, each on the far side of their own workshop
   S.people = plots.map((p, i) => ({ id:p.id, n:p.n, el:p.el, stand:standFor(i), x:st.x + p.ice[0], y:st.y + p.ice[1], thaw:0, state:'ice', cd:3, ph:i * 1.7, hh:p }));
-  for (const q of S.people) { if (PEOPLE_ART.includes(q.id)) { for (const ps of PEOPLE_POSES) if (!IMG['p-' + q.id + '-' + ps]) load('p-' + q.id + '-' + ps, `art4/people/p-${q.id}-${ps}.png?v=2`); }
+  for (const q of S.people) { if (PEOPLE_ART.includes(q.id)) { for (const ps of PEOPLE_POSES) if (!IMG['p-' + q.id + '-' + ps]) load('p-' + q.id + '-' + ps, `art4/people/p-${q.id}-${ps}.png?v=3`); }
     else if (!IMG['k' + q.stand]) load('k' + q.stand, `art4/k${q.stand}.png?v=13`); }
+  // Codex's brief 38 (2026-10-09): the Heartstone in four states, each workshop in four, the material, the dusk banner and the horn
+  const A = (n, v = 1) => IMG[n] || load(n, `art4/hearth/${n}.png?v=${v}`);
+  for (const k of ['whole', 'hurt', 'frozen', 'surge']) A(`hs-${st.art}-${k}`);
+  for (const p of plots) for (const k of ['ruin', 'built', 'u1', 'u2']) A(`ws-${p.id}-${k}`);
+  A('mat-' + C.mat); A('horn-' + (C.mat === 'shell' ? 'conch' : 'bamboo'));
   return { lv, C, stone:st, plots, phase:'day', pt:0, trickT:HH.trickle, day:0, night:0, mat:0, drops:[], bolts:[], q:[], sq:0, surged:false, surgeT:0, hold:null, ease:0, tries:0, allAt:null, cause:null, minT:0 };
 }
 // the Keeper starts just below the stone, with home on screen
@@ -8084,7 +8095,9 @@ const MAT_ICON = { shell:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M
 function hearthStart() {
   const H = HS(), st = H.stone, P = S.p; P.x = st.x; P.y = st.y + 150; S.pet.x = P.x - 40; S.pet.y = P.y + 30; paintThaw(st.x, st.y, 380);
   $('#hud').classList.add('hearth'); $('#hsBar').style.setProperty('--kc', FORM_PAL[keeperEl][0]); $('#duskBanner').classList.remove('on');
-  $('#hsBar .hsi').innerHTML = HS_ICON[st.art]; $('#matPill').firstElementChild.outerHTML = MAT_ICON[H.C.mat]; $('#matPill').setAttribute('aria-label', H.C.mat === 'shell' ? 'Shells' : 'Bamboo');
+  $('#hsBar .hsi').innerHTML = `<img src="art4/hearth/hs-${st.art}-whole.png?v=1" alt="" onerror="this.outerHTML=HS_ICON['${st.art}']">`;
+  $('#matPill').firstElementChild.outerHTML = `<img src="art4/hearth/mat-${H.C.mat}-icon.png?v=1" alt="" onerror="this.outerHTML=MAT_ICON['${H.C.mat}']">`;
+  const db = $('#duskBanner'); db.classList.add('art'); db.style.backgroundImage = `url(art4/hearth/banner-dusk-${H.C.mat === 'shell' ? 'water' : 'wood'}.png?v=1)`; $('#matPill').setAttribute('aria-label', H.C.mat === 'shell' ? 'Shells' : 'Bamboo');
 }
 const hearthNight = () => { const H = HS(); return H.C.nights[Math.min(H.night, H.C.nights.length - 1)]; };
 const hearthBossNext = () => { const H = HS(); return H.night >= H.C.nights.length; };
@@ -8099,6 +8112,9 @@ function hearthPhase(ph) { const H = HS(); H.phase = ph; H.pt = 0;
 function hearthTick(dt) {
   const H = HS(), C = H.C, st = H.stone, P = S.p; H.pt += dt;
   H.surgeT = Math.max(0, H.surgeT - dt);
+  // while Surge holds, the stone fountains its element: sparks leap up and out in the Keeper's colours
+  if (H.surgeT > 0 && (H.sparkT = (H.sparkT || 0) - dt) <= 0) { H.sparkT = .03; const pal = FORM_PAL[keeperEl], a = -Math.PI / 2 + rnd(-1.1, 1.1), v = rnd(260, 520);
+    fx({ k:'star', x:st.x + rnd(-20, 20), y:st.y - 150, vx:Math.cos(a) * v, vy:Math.sin(a) * v, drag:1.6, life:rnd(.6, 1.1), s:rnd(7, 13), c:pal[(Math.random() * 5) | 0] }); }
   // the sky: day is clear, dusk deepens to blue hour, night is lit blue round home (never truly dark: 7-year-olds play this)
   const nightK = H.phase === 'dusk' ? Math.min(.72, H.pt / HH.dusk * .72) : H.phase === 'night' || H.phase === 'out' ? .72 : H.phase === 'dawn' ? Math.max(0, .72 * (1 - H.pt / HH.dawn)) : H.phase === 'boss' ? Math.max(S.night || 0, .72) : 0;
   if (H.phase !== 'boss') S.night = nightK;
@@ -8199,7 +8215,7 @@ function hearthClear(all) {
 function hearthPeople(dt) {
   const H = HS();
   for (const q of S.people || []) { const p = q.hh; if (!p || q.state === 'ice') continue;
-    const hx = p.x + 78, hy = p.y + 34;
+    const hx = p.x + 128, hy = p.y + 40;
     if (q.state === 'free') { q.state = 'run'; q.runAt = S.t + .9; }   // a gasp, a look at you, then home
     if (q.state === 'run') { if (S.t < q.runAt) continue; const d = Math.hypot(hx - q.x, hy - q.y);
       if (d < 12) { q.state = 'craft'; q.craftT = 2; q.mv = 0; q.x = hx; q.y = hy; q.fx = -1; }
@@ -8264,7 +8280,7 @@ function hearthDrops(dt) {
     if (d.fly) { const v = Math.max(420, 1400 - dd * 4) * dt; d.x += (P.x - d.x) / (dd || 1) * Math.min(dd, v); d.y += (P.y - 30 - d.y) / (dd || 1) * Math.min(dd, v);
       if (dd < 34) { d.got = true; H.mat++; H.matAt = S.t; SFX.gem && SFX.gem();
         // the first shell is named once (the voice line is still to record: "Shells! Bring them home.")
-        if (!SEEN.has('_shell')) { markSeen('_shell'); floatText(P.x, P.y - 110, 'Shells! They make workshops stronger', '#FFF1D6', 17); } } }
+        if (!SEEN.has('_' + H.C.mat)) { markSeen('_' + H.C.mat); floatText(P.x, P.y - 110, H.C.mat === 'shell' ? 'Shells! They make workshops stronger' : 'Bamboo! It makes workshops stronger', '#FFF1D6', 17); } } }
     if (d.t > HH.shellLife) d.got = true; }
   H.drops = H.drops.filter(d => !d.got);
 }
@@ -8339,7 +8355,7 @@ function hearthGoal() {
   const busy = (S.people || []).find(q => q.state === 'run' || q.state === 'craft' || q.state === 'free');
   if (busy) return { t:`${busy.n} is rebuilding!`, el:busy.el, k:'day' };
   const up = hearthAfford(); if (up) return { t:H.C.mat === 'shell' ? 'Stand by a workshop to make it stronger' : 'Stand by a workshop to grow it', el:'earth', k:'day', x:up.x, y:up.y };
-  return { t:hearthBossNext() ? 'Get ready: the boss comes tonight' : 'Free creatures for shells', el:'water', k:'day' };
+  return { t:hearthBossNext() ? 'Get ready: the boss comes tonight' : H.C.mat === 'shell' ? 'Free creatures for shells' : 'Free creatures for bamboo', el:'water', k:'day' };
 }
 const hearthAfford = () => { const H = HS(); return H.plots.filter(p => p.lvl >= 1 && p.lvl < 3 && H.mat >= H.C.cost[p.lvl - 1]).sort((a, b) => Math.hypot(a.x - S.p.x, a.y - S.p.y) - Math.hypot(b.x - S.p.x, b.y - S.p.y))[0] || null; };
 function hearthHud() {
@@ -8387,7 +8403,7 @@ function hearthGround(inView) {
     add(() => glowAt(d.x, d.y - 10 - d.z, 60, H.C.mat === 'shell' ? '#FFE2C8' : '#C8F0A8', .5 * bl)); matAt(H.C.mat, d.x, d.y - 10 - d.z - Math.abs(Math.sin(S.t * 3 + d.x)) * 4, 15); g.globalAlpha = 1; }
   g.restore();
 }
-function matAt(kind, x, y, r) { if (kind === 'shell') return shellAt(x, y, r);
+function matAt(kind, x, y, r) { const im = IMG['mat-' + kind]; if (ok(im)) { const s = r * 3; g.drawImage(im, x - s / 2, y - s / 2, s, s); return; } if (kind === 'shell') return shellAt(x, y, r);
   g.save(); g.translate(x, y); g.rotate(-.6); g.fillStyle = '#7CC456'; g.strokeStyle = '#3F7A2A'; g.lineWidth = 2; g.beginPath(); g.roundRect(-r * .38, -r, r * .76, r * 2, r * .3); g.fill(); g.stroke();
   g.beginPath(); g.moveTo(-r * .38, -r * .2); g.lineTo(r * .38, -r * .2); g.moveTo(-r * .38, r * .5); g.lineTo(r * .38, r * .5); g.stroke(); g.restore(); }
 function shellAt(x, y, r) {
@@ -8405,9 +8421,22 @@ function drawHearthStone(st) {
   g.save();
   g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(x, y + 8, 70, 22, 0, 0, TAU); g.fill();
   // the lamp's beam sweeps the shore at night (the shot to protect)
-  if (nk > .2 && !out && st.art === 'lamp') { const a = S.t * .6, L = 900; add(() => { g.save(); g.globalAlpha = .16 * nk * (.4 + .6 * f); const gr = g.createRadialGradient(x, y - 170, 0, x, y - 170, L); gr.addColorStop(0, '#FFE9B0'); gr.addColorStop(1, 'rgba(255,233,176,0)'); g.fillStyle = gr;
+  if (nk > .2 && !out && st.art === 'lamp') { const a = S.t * .6, L = 900, oy = y - (ok(IMG['hs-lamp-whole']) ? 213 : 170); add(() => { g.save(); g.globalAlpha = .16 * nk * (.4 + .6 * f); const gr = g.createRadialGradient(x, oy, 0, x, oy, L); gr.addColorStop(0, '#FFE9B0'); gr.addColorStop(1, 'rgba(255,233,176,0)'); g.fillStyle = gr;
     g.beginPath(); g.moveTo(x, y - 170); g.arc(x, y - 170, L, a - .16, a + .16); g.closePath(); g.fill(); g.beginPath(); g.moveTo(x, y - 170); g.arc(x, y - 170, L, a + Math.PI - .16, a + Math.PI + .16); g.closePath(); g.fill(); g.restore(); }); }
   const sh = hit * 4 * Math.sin(S.t * 60); g.translate(sh, 0);
+  // the painted Heartstone (brief 38): whole, hurt below two thirds, frozen when the light is out, surge while Surge holds; below a
+  // third the frozen picture creeps in over the hurt one
+  { const P = k => IMG[`hs-${st.art}-${k}`], lamp = st.art === 'lamp', D = lamp ? 320 : 340, ay = lamp ? 452 : 388, im = P(out ? 'frozen' : sg ? 'surge' : f < 2 / 3 ? 'hurt' : 'whole');
+    if (ok(im)) { const dx = x - D / 2, dy = y + 6 - D * ay / 512;
+      // Surge is a burst of delight (A, 2026-10-09): slow-turning rays of the Keeper's element behind the stone, swelling in and out
+      if (sg) { const cy = y - D * (lamp ? .55 : .35), k = Math.min(1, (S.t - H.surgeAt) / .3) * Math.min(1, H.surgeT / .6), pal = FORM_PAL[keeperEl];
+        add(() => { g.save(); g.translate(x, cy); g.rotate(S.t * .5); for (let i = 0; i < 12; i++) { const a = i / 12 * TAU, L = (260 + 60 * Math.sin(S.t * 4 + i)) * k;
+          const gr = g.createLinearGradient(0, 0, Math.cos(a) * L, Math.sin(a) * L); gr.addColorStop(0, pal[i % 5]); gr.addColorStop(1, 'rgba(255,255,255,0)');
+          g.globalAlpha = .35 * k; g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, L, a - .07, a + .07); g.closePath(); g.fill(); } g.restore(); }); }
+      const glowK = out ? 0 : (.25 + .75 * f) * (sg ? 1.4 : 1); if (glowK > 0) add(() => glowAt(x, y - D * (lamp ? .62 : .42), (lamp ? 170 : 150) + 90 * nk + (sg ? 120 : 0), sg ? FORM_PAL[keeperEl][1] : lamp ? '#FFD98A' : '#7FE0A8', Math.min(1, .4 + .4 * nk) * glowK));
+      g.drawImage(im, dx, dy, D, D);
+      if (!out && !sg && f < 1 / 3 && ok(P('frozen'))) { g.globalAlpha = Math.min(.7, (1 / 3 - f) * 2.4); g.drawImage(P('frozen'), dx, dy, D, D); g.globalAlpha = 1; }
+      g.restore(); return; } }
   if (st.art === 'bird') { drawBirdStone(st, f, nk, sg, out); g.restore(); return; }
   // the tower: whitewashed, tapering, with a red band
   g.fillStyle = '#F3EEE4'; g.strokeStyle = '#3A3550'; g.lineWidth = 3; g.beginPath(); g.moveTo(x - 40, y); g.lineTo(x - 27, y - 130); g.lineTo(x + 27, y - 130); g.lineTo(x + 40, y); g.closePath(); g.fill(); g.stroke();
@@ -8453,6 +8482,15 @@ function drawBirdStone(st, f, nk, sg, out) {
 function drawWorkshop(p) {
   const H = HS(), x = p.x, y = p.y, L = p.lvl, sc = [1, 1, 1.2, 1.4][L], pop = Math.max(0, 1 - (S.t - p.popAt) / .4), up = Math.max(0, 1 - (S.t - p.upAt) / .5), fired = Math.max(0, 1 - (S.t - p.firedAt) / .3);
   const shake = Math.max(0, 1 - (S.t - p.shakeAt) / .4) * Math.sin(S.t * 50) * 5, k = sc * (1 + .18 * Math.max(pop, up) - .06 * fired);
+  // the painted workshop (brief 38): ruin, built, upgrade 1, upgrade 2, all on one footprint, so it grows in place
+  const pic = IMG[`ws-${p.id}-${L < 1 || p.down ? 'ruin' : ['', 'built', 'u1', 'u2'][L]}`];
+  if (ok(pic)) { const D = 300, kk = 1 + .14 * Math.max(pop, up) - .05 * fired;
+    g.save(); g.translate(x + shake, y + 18); g.scale(kk, kk);
+    if (L >= 1 && !p.down) add(() => glowAt(0, -90, 190, EL[p.el], .14 + .1 * (S.night || 0) + .35 * Math.max(fired, up)));
+    if (L >= 1 && !p.down && H.surgeT > 0) add(() => glowAt(0, -90, 240, FORM_PAL[keeperEl][0], .35 + .15 * Math.sin(S.t * 8)));
+    g.drawImage(pic, -D / 2, -D * 455 / 512, D, D);
+    if (p.role === 'wall' && L >= 1 && !p.down && p.max && p.hp < p.max) { const k = p.hp / p.max; g.fillStyle = 'rgba(14,20,52,.7)'; g.fillRect(-40, 22, 80, 8); g.fillStyle = k < .34 ? '#FF7A6E' : '#FFFFFF'; g.fillRect(-39, 23, 78 * k, 6); }
+    g.restore(); hearthShimmerChip(p, x, y, 1.45, shake); return; }
   g.save(); g.translate(x + shake, y);
   g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(0, 6, 78 * sc, 24 * sc, 0, 0, TAU); g.fill();
   g.scale(k, k); g.strokeStyle = '#2E2A44'; g.lineWidth = 3; g.lineJoin = 'round';
@@ -8505,17 +8543,23 @@ function drawWorkshop(p) {
   add(() => glowAt(0, -50, 160, col, .18 + .12 * (S.night || 0) + .4 * Math.max(fired, up)));
   if (H.surgeT > 0) add(() => glowAt(0, -50, 220, FORM_PAL[keeperEl][0], .35 + .15 * Math.sin(S.t * 8)));
   g.restore();
+  hearthShimmerChip(p, x, y, sc, shake);
+}
+function hearthShimmerChip(p, x, y, sc, shake) {
+  const H = HS(), L = p.lvl;
   // the workshop that beats tonight's element shimmers gold (gold means growth)
   if (H.shim === p) { const q = .5 + .5 * Math.sin(S.t * 5); add(() => glowAt(x, y - 60 * sc, 220 * sc, '#FFE08A', .35 + .3 * q));
     for (let i = 0; i < 5; i++) { const a = S.t * 1.2 + i * TAU / 5, r = 80 * sc; fx({ k:'star', x:x + Math.cos(a) * r, y:y - 50 * sc + Math.sin(a) * r * .5, vx:0, vy:-30, drag:1, life:.35, s:6, c:'#FFE58A' }); } }
   // the cost chip: a shell and a number, grey when short; only near the Keeper, so nothing appears unexplained
-  if (L < 3 && Math.hypot(S.p.x - x, S.p.y - y) < 340) { const cost = H.C.cost[L - 1], short = H.mat < cost, cy = y - 150 * sc - 26, sx = x + shake;
+  if (L >= 1 && L < 3 && !p.down && Math.hypot(S.p.x - x, S.p.y - y) < 340) { const cost = H.C.cost[L - 1], short = H.mat < cost, cy = y - 150 * sc - 26, sx = x + shake;
     g.save(); g.globalAlpha = .92; g.fillStyle = 'rgba(14,20,52,.82)'; g.strokeStyle = short ? 'rgba(255,255,255,.25)' : '#FFD86A'; g.lineWidth = 2.5; g.beginPath(); g.roundRect(sx - 40, cy - 20, 80, 40, 20); g.fill(); g.stroke();
     if (short) g.globalAlpha = .5; matAt(H.C.mat, sx - 15, cy + 1, 13); g.font = '900 22px ui-rounded, system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#FFFFFF'; g.fillText(cost, sx + 16, cy + 2); g.restore(); }
 }
 // the bolts, the well's bubbles, and the guide arrow: above the crowd
 function hearthTop() {
   const H = HS(), st = H.stone, P = S.p;
+  { const hn = IMG['horn-' + (H.C.mat === 'shell' ? 'conch' : 'bamboo')]; if (H.phase === 'dusk' && H.pt < 2 && ok(hn)) { const k = Math.min(1, H.pt / .25) * Math.min(1, (2 - H.pt) / .4), s = 110, bob = Math.sin(H.pt * 9) * 4;
+    g.globalAlpha = k; add(() => glowAt(st.x, st.y - 320, 200, '#FFE08A', .5 * k)); g.drawImage(hn, st.x - s / 2, st.y - 320 - s / 2 + bob, s, s); g.globalAlpha = 1; } }
   for (const b of H.bolts) { add(() => glowAt(b.x, b.y, 54, '#CFEAFF', .9)); g.fillStyle = '#F2FAFF'; g.strokeStyle = '#7FB6E8'; g.lineWidth = 2; g.beginPath(); g.arc(b.x, b.y, 9, 0, TAU); g.fill(); g.stroke(); }
   // a net over each held creature
   for (const e of S.en) if (!e.dead && e.rooted > 0 && S.t - (e.netAt ?? -9) < 2.1) { g.save(); g.globalAlpha = .8; g.strokeStyle = '#F4E7C8'; g.lineWidth = 2; const r = e.r * 1.3, cy = e.y - e.size * .3;
