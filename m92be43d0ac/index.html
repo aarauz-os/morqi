@@ -8552,7 +8552,10 @@ function drawBossFigure() {
 function hearthBossNight() {
   const H = HS(), st = H.stone, a = H.C.boss.from; hearthPhase('boss'); H.surged = false; H.minT = 6;
   spawnBoss(); const b = S.boss; if (!b) return;
-  b.hh = 1; { const sp = bossSpot(); b.x = sp.x; b.y = sp.y; } if (BOSS_V2[b.realm]) { b.size = 440; b.r = 92; b.hp = b.max = Math.round(b.max * 1.2); }   // (the bigger body is easier to hit; bot, 2026-10-10: 1x gave 14-20 s fights, 1.6x and 2.3x froze the lamp for weak matchups; 1.2x)   // (the Drowned Giant towers over the lamp) $('#bossWrap').classList.remove('on'); b.barOn = false; // a Keeper whose element barely hurts this boss (water against the Pearl Shore's water boss) meets it a little weaker (bot, 2026-10-09:
+  b.hh = 1; { const sp = bossSpot(); b.x = sp.x; b.y = sp.y; } $('#bossWrap').classList.remove('on'); b.barOn = false;
+  if (BOSS_V2[b.realm]) { b.size = 440; b.r = 92; b.hp = b.max = Math.round(b.max * 1.2); }   // (the Drowned Giant towers over the lamp; the bigger body is easier to hit; bot, 2026-10-10: 1x gave 14-20 s fights, 1.6x and 2.3x froze the lamp for weak matchups; 1.2x)
+  // (the boss bar stays hidden here: a line pasted ahead of it on 2026-10-10 had commented it out; game director's audit)
+  // a Keeper whose element barely hurts this boss (water against the Pearl Shore's water boss) meets it a little weaker (bot, 2026-10-09:
   // water Keepers lost a Rise in 80-90 s fights while every other element won in 20-40 s)
   b.hp = b.max = Math.round(b.max * HH.bossHp * (eff(keeperEl, b.el) < 1 ? .55 : 1));
   // the frost closes into a ring round home: the boss night is fought round the stone
