@@ -2951,10 +2951,14 @@ const EVO_DESC = {
 
 /* ================= assets ================= */
 const IMG = {};
-const KEEPERS = 7;   // Keeper avatars to choose from
+const KEEPERS = 7;   // Keeper avatars painted
+// the Keepers open while we test and polish: Amara, Malik and Sina (A, 2026-10-10: "gate this to 3 characters. Amara, Malik, and Sina ...
+// until we polish everything up and have the game functioning and playing the way we envisioned"). The other four stay in the code,
+// painted and waiting; add their numbers here to open them again
+const KEEPERS_OPEN = [1, 6, 7];
 const LD = { n:0, d:0 };   // images asked for and images arrived, for the loading screen's stones
 function load(name, src) { const i = new Image(); LD.n++; i.onload = i.onerror = () => LD.d++; i.src = src; IMG[name] = i; return i; }
-for (let k = 1; k <= KEEPERS; k++) { load('k' + k, `art4/k${k}.png?v=13`); for (let r = 1; r <= 3; r++) load(`k${k}r${r}`, `art4/run/k${k}-r${r}.png?v=13`); ['dash', 'hurt', 'cheer'].forEach(p => load(`k${k}${p}`, `art4/k${k}-${p}.png?v=13`)); }   // idle pose plus a three-frame run cycle
+for (const k of KEEPERS_OPEN) { load('k' + k, `art4/k${k}.png?v=13`); for (let r = 1; r <= 3; r++) load(`k${k}r${r}`, `art4/run/k${k}-r${r}.png?v=13`); ['dash', 'hurt', 'cheer'].forEach(p => load(`k${k}${p}`, `art4/k${k}-${p}.png?v=13`)); }   // idle pose plus a three-frame run cycle
 ZOD.forEach(z => { load(z + 'y', `art4/a-${z}-y.png?v=8`); load(z + 'm', `art4/a-${z}-m.png?v=8`); });
 ['e-critter','e-wolf','e-golem','b-warden','b-fisher','b-free-wood','b-free-fire','b-free-earth','b-free-metal'].forEach(n => load(n, `art4/${n}.png?v=8`));
 ['f1', 'up', 'slam', 'dash', 'cast'].forEach(n => load('w-' + n, `art4/warden/${n}.png?v=8`));   // the Warden's poses
@@ -2962,7 +2966,7 @@ ZOD.forEach(z => { load(z + 'y', `art4/a-${z}-y.png?v=8`); load(z + 'm', `art4/a
 // (loaded when its level starts, so a run only fetches the one boss it will meet)
 // the bosses stay monsters (A, 2026-10-10: "why are we going with the boss being a frozen person and not a monster?! That's such a baby
 // move. I want to introduce and carry real weight and depth"); brief 41's toy-ice repaint is withdrawn; the person is revealed only when freed
-const BOSS_V2 = { water:true };   // the Drowned Giant (brief 46; A chose concept B, 2026-10-10)
+const BOSS_V2 = { water:true, wood:true };   // the Drowned Giant (brief 46; A chose concept B, 2026-10-10); the Thorn Tyrant (brief 48; A chose concept C)
 function loadBoss(b) { if (IMG['bz-' + b]) return; const v = BOSS_V2[b] ? 11 : 9; if (BOSS_V2[b]) for (const n of ['hesitate', 'shatter-1', 'shatter-2', 'shatter-3']) load(`bz-${b}-${n}`, `art4/bosses/${b}-${n}.png?v=11`); load('bz-' + b, `art4/bosses/${b}.png?v=${v}`); for (const n of ['up', 'slam', 'dash', 'cast']) load(`bz-${b}-${n}`, `art4/bosses/${b}-${n}.png?v=${v}`); for (let n = 1; n <= 4; n++) load(`bz-${b}-w${n}`, BOSS_V2[b] ? `art4/bosses/${b}-w${n}.png?v=11` : `art4/bosses/${b}-w${n}.webp?v=1`); }
 // every element sends its own creatures: a swarm creature (a), a specialist with its own trick (b) and a brute (c)
 const ROLE = { critter:'a', wolf:'b', golem:'c', minion:'m' };
@@ -3024,7 +3028,7 @@ const AU = (() => {
   // voices (A, 2026-10-05): Luma's short reminders and the spirit voice's "Ascended!", on their own bus and switch
   let vox, voSrc, voOn = pref('morqi.voice', true), voEnd = 0;
   const last = {};
-  const MUSVOL = .15, SFXVOL = .42; let musRide, sfxRide;   // effects a touch lower than before (QA, 2026-10-06: a crowded Star Call level ran -12 LUFS)   // music at about 5 out of 10 (A, 2026-10-04; it was 4)
+  const MUSVOL = .15, SFXVOL = .42; let musRide, sfxRide, easeG;   // (easeG: the ease-in's own stage, so a voice dip or a duck never cancels it)   // effects a touch lower than before (QA, 2026-10-06: a crowded Star Call level ran -12 LUFS)   // music at about 5 out of 10 (A, 2026-10-04; it was 4)
   function init() {
     if (c) { if (c.state === 'suspended') c.resume(); return c; }
     try { c = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
@@ -3044,7 +3048,7 @@ const AU = (() => {
     const trim = c.createGain(); trim.gain.value = .7;   // the compressors' own makeup gain, taken back out before the ceiling
     comp = bq('highpass', 28, 0, .7); chain(comp, bq('highshelf', 7000, 2), glue, master, lim, trim, ceil, c.destination); outNode = ceil;
     // effects: their own fast compressor tames the spikes, the boxy low-mids are carved out, the sub below the booms trimmed
-    sfx = c.createGain(); sfx.gain.value = SFXVOL;
+    sfx = c.createGain(); sfx.gain.setValueAtTime(SFXVOL / 4, c.currentTime); sfx.gain.linearRampToValueAtTime(SFXVOL, c.currentTime + 2);   // (12 dB down for the first 2 s; Kenji)
     const sfxComp = c.createDynamicsCompressor(); sfxComp.threshold.value = -24; sfxComp.knee.value = 6; sfxComp.ratio.value = 4; sfxComp.attack.value = .003; sfxComp.release.value = .12;
     // sfxSpeech carves the effects out of the speech band while a voice line plays (QA, 2026-10-06: in a crowd the voice sat under the action)
     sfxSpeech = bq('peaking', 2000, 0, .6);
@@ -3052,7 +3056,7 @@ const AU = (() => {
     // voices: no rumble, a touch of presence, clear over the music but no longer ~20 dB above it (they were what spiked)
     vox = c.createGain(); vox.gain.value = .36; chain(vox, bq('highpass', 110, 0, .7), bq('peaking', 300, -2, 1), bq('peaking', 3200, 2.5, .9), comp);   // effects sit under the music: measured in play, about 4 dB below it on average, and even their peaks stay below the music's (A, 2026-10-04)
     // music: the same low-mid carve, so the bass and the effects each have their own room
-    mus = c.createGain(); mus.gain.value = MUSVOL; musLP = c.createBiquadFilter(); musLP.type = 'lowpass'; musLP.frequency.value = 20000; musRide = c.createGain(); chain(mus, musRide, musLP, bq('peaking', 320, -3.5, .9), comp);
+    mus = c.createGain(); mus.gain.value = MUSVOL; musLP = c.createBiquadFilter(); musLP.type = 'lowpass'; musLP.frequency.value = 20000; musRide = c.createGain(); easeG = c.createGain(); chain(mus, easeG, musRide, musLP, bq('peaking', 320, -3.5, .9), comp);
     noiseBuf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     return c;
   }
@@ -3124,6 +3128,8 @@ const AU = (() => {
     levelup() { [0, 4, 7, 12, 16].forEach((s, i) => tone({ f:523.25 * Math.pow(2, s / 12), type:'triangle', dur:.35, vol:.13, at:i * .055 }));
       noise({ ft:'highpass', f:3000, f1:9000, dur:.5, vol:.06, at:.1 }); tone({ f:130, f1:65, dur:.3, vol:.25 }); },
     cardIn(i) { tone({ f:330 + i * 110, f1:660 + i * 160, dur:.09, vol:.08, at:i * .09 }); },
+    // the first touch of a session: low and round, with a slow attack, so loud speakers never jump (Kenji, 2026-10-10)
+    soft() { tone({ f:293.66, type:'triangle', dur:.35, vol:.05, att:.04, lp:1400 }); tone({ f:440, type:'triangle', dur:.4, vol:.035, att:.04, at:.09, lp:1400 }); },
     select() { tone({ f:784, type:'square', dur:.08, vol:.06 }); tone({ f:1175, type:'square', dur:.14, vol:.06, at:.07, lp:3000 }); noise({ ft:'highpass', f:6000, dur:.2, vol:.04, at:.05 }); },
     tick(p) { tone({ f:1400 + (p || 0) * 40, type:'square', dur:.025, vol:.05, lp:4000 }); },
     fanfare(big) { const root = 523.25; [[0, 4, 7], [5, 9, 12], [7, 11, 14, 19]].forEach((ch, k) => ch.forEach(s => tone({ f:root * Math.pow(2, s / 12), type:'sawtooth', dur:.32, vol:.045, at:k * .14, lp:2600 })));
@@ -3139,7 +3145,7 @@ const AU = (() => {
     // (music head, 2026-10-10) a conch, falling G to C, "come home", landing on the next downbeat; the last dusk an octave lower with one
     // Warden bell, "he comes". The old G to D clashed with the song's A-flat chord and fired mid-bar
     conch(low) { if (!c) return; const at = toBar(), k = low ? .5 : 1;
-      for (const [f, d, len] of [[196 * k, 0, .7], [130.81 * k, .55, 1.3]]) { tone({ f, f0:f * .97, dur:len, vol:.12, att:.09, type:'triangle', lp:900, at:at + d }); tone({ f:f * 2, dur:len * .8, vol:.03, att:.12, type:'sine', lp:1200, at:at + d }); noise({ ft:'bandpass', f:f * 3, q:2.5, dur:len, vol:.018, at:at + d }); }
+      for (const [f, d, len] of [[220 * k, 0, .7], [146.83 * k, .55, 1.3]]) {   /* A falling to D: the Call's own fifth (Kenji, A said yes 2026-10-10) */ tone({ f, f0:f * .97, dur:len, vol:.12, att:.09, type:'triangle', lp:900, at:at + d }); tone({ f:f * 2, dur:len * .8, vol:.03, att:.12, type:'sine', lp:1200, at:at + d }); noise({ ft:'bandpass', f:f * 3, q:2.5, dur:len, vol:.018, at:at + d }); }
       if (low) setTimeout(() => toll(c.currentTime, 73.42, .1), (at + .2) * 1000); },
     // a low conch call from the side the wave comes from, so the ear says where
     waveCall(pan = 0) { if (!c || !sfxOn) return; const t = c.currentTime, p = c.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pan)); p.connect(sfx);
@@ -3237,7 +3243,7 @@ const AU = (() => {
   let voices = 0;
   function loadSamples() { for (const n of SFILES) fetch(`art4/sfx/${n}.mp3?v=9`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {});
     for (const n of VFILES) fetch(`art4/voice/${n}.mp3?v=19`).then(r => r.arrayBuffer()).then(b => c.decodeAudioData(b)).then(buf => { SMP[n] = buf; }).catch(() => {}); }
-  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', 'vo-hearth-shells', 'vo-hearth-frost', 'vo-hearth-back', 'vo-hearth-build', 'vo-hearth-dusk', 'vo-hearth-gift', 'vo-hearth-relight', 'vo-hearth-tonight', 'vo-rise-water', 'vo-rise-wood', 'vo-rise-fire', 'vo-rise-earth', 'vo-rise-metal', 'vo-isla-papa', 'vo-luma-scared', 'vo-feel-ask', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal', 'rescue'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
+  const VFILES = ['vo-ascended', 'vo-thanks-demo', 'vo-ascend-tap', 'vo-temple', 'vo-temple-won', 'vo-temple-won2', 'vo-still-1', 'vo-still-2', 'vo-still-3', 'vo-lastrise', 'vo-another', 'vo-fusion', 'vo-booknew', 'vo-sparks', 'vo-newcreature', 'vo-wait-1', 'vo-wait-2', 'vo-heart-1', 'vo-heart-2', 'vo-surge-go', 'vo-omni-tease', 'vo-hearth-shells', 'vo-hearth-frost', 'vo-hearth-back', 'vo-hearth-build', 'vo-hearth-dusk', 'vo-hearth-gift', 'vo-hearth-relight', 'vo-hearth-tonight', 'vo-hearth-guard', 'vo-rise-water', 'vo-rise-wood', 'vo-rise-fire', 'vo-rise-earth', 'vo-rise-metal', 'vo-isla-papa', 'vo-luma-scared', 'vo-feel-ask', ...['move', 'howto', 'chart', 'rings', 'gem', 'levelup', 'stone', 'chest', 'bloom', 'shrine', 'ult', 'beast', 'call', 'call-tide', 'call-root', 'call-ember', 'call-stone', 'pick', 'firebar', 'outposts', 'storm', 'rammer', 'colossus', 'alpha', 'surge', 'l4temples', 'l5temples', 'well', 'caller', 'wisp', 'wall', 'shooters', 'react', 'chesthold', 'lvhold', 'evoteach', 'lastbreath', 'runaway', 'breakers', 'goal', 'rescue'].map(k => 'vo-card-' + k), ...['untouched', 'lastbreath', 'comeback', 'giants', 'mixer', 'weakness', 'brave'].map(k => 'vo-title-' + k), ...['in', 'out', 'done'].map(k => 'vo-breathe-' + k), 'vo-pause-tip', 'vo-open-keepers', 'vo-open-thumb', 'vo-open-pitch', 'vo-open-together', 'vo-welcome-back', 'vo-event', 'vo-lastrise2', 'vo-gift-qiwind', 'vo-warm', 'vo-crate', ...GIFT_VO.map(k => 'vo-gift-' + k), ...['water', 'wood', 'fire', 'earth', 'metal'].flatMap(e => ['vo-stone-' + e, 'vo-boss-' + e, 'vo-thanks-' + e])];
   // one voice line at a time; the music dips under it (less under the anthem, which the spirit voice rides)
   // a line answering what is on screen (a card, Ascended, a thank-you) cuts off a passing reminder; a reminder waits its turn
   function vo(name, delay = 0, dip = .5, cut = true) {
@@ -3931,16 +3937,24 @@ const AU = (() => {
   function music(play, listen) {
     if (!c) return;
     M.listen = !!(play && listen) || (play && M.listen);
-    if (!play) { M.listen = false; if (M.timer) { clearInterval(M.timer); M.timer = null; } return; }
+    if (!play) { M.listen = false; if (M.timer) { clearInterval(M.timer); M.timer = null; M.offAt = performance.now(); } if (M.take) takeStop(c.currentTime); return; }
     // back from a fall's slow motion
-    if (musLP) { const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(20000, t); mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(MUSVOL, t); }
+    // (A, 2026-10-10: "if ... they have their speakers loud and forgot to turn it down ... i dont want them to jump so ease it in"; Kenji's
+    // curve: from silence, an S-curve in dB from -45 to full over 8 s on a cold start or after a minute away, 4 s when music is switched
+    // back on, while a low-pass opens from 500 Hz so it arrives as if from another room; moments inside play, like the Wake, stay instant)
+    if (musLP) { const t = c.currentTime, away = M.offAt == null || performance.now() - M.offAt > 60000, len = M.easeNext || (!M.timer && away ? 8 : 0); M.easeNext = 0; M.lastEase = { len, timer:!!M.timer, away, at:+t.toFixed(2) };
+      musLP.frequency.cancelScheduledValues(t); mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(MUSVOL, t);
+      if (len) { const n = 64, cv = new Float32Array(n); for (let i = 0; i < n; i++) { const x = i / (n - 1), s = x * x * (3 - 2 * x); cv[i] = Math.pow(10, -45 * (1 - s) / 20); }
+        easeG.gain.cancelScheduledValues(t); easeG.gain.setValueCurveAtTime(cv, t, len); musLP.frequency.setValueAtTime(500, t); musLP.frequency.exponentialRampToValueAtTime(20000, t + len); }
+      else musLP.frequency.setValueAtTime(20000, t); }
     mBuild(); if (M.timer) return;
     M.next = c.currentTime + .08;
     M.timer = setInterval(() => {
       if (!c) return; if (M.next < c.currentTime - .1) M.next = c.currentTime + .05;  // back from a hidden tab: skip, don't pile up
       while (M.next < c.currentTime + .2) {
         if (M.pend && (M.step & 15) === 0) startSong(M.pend, M.next);
-        if (musOn || M.listen) ({ boss:wardStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, omni:omniStep, blossom:blossomStep, home:havenStep, still:stillStep }[M.song] || pathStep)(M.step, M.next);
+        if (!musOn && !M.listen && M.take) takeStop(M.next);
+        if (musOn || M.listen) ({ boss:wardStep, shore:shoreStep, lantern:lanternStep, rise:riseStep, grove:groveStep, harvest:harvestStep, highest:highestStep, omni:omniStep, blossom:blossomStep, home:havenStep, still:stillStep }[M.song] || pathStep)(M.step, M.next);
         if (musOn && M.bloom && M.song !== 'boss' && M.song !== 'highest' && M.song !== 'omni' && M.song !== 'blossom') bloomLayer(M.step, M.next);
         if (sfxOn && M.world) ambStep(M.step, M.next);
         M.next += SIX * (TEMPO[M.song] || 1); M.step++;
@@ -3955,6 +3969,7 @@ const AU = (() => {
     for (const [n, v] of [[musRide, big ? 1.26 : 1], [sfxRide, big ? .84 : 1]]) { n.gain.cancelScheduledValues(now); n.gain.setValueAtTime(n.gain.value, now); n.gain.setTargetAtTime(v, Math.max(now, t || now), .6); } }
   function startSong(name, t) {
     mixFor(name, t); M.hushed = false; if (name !== 'rise') M.major = false;
+    if (M.take) takeStop(t, name === 'boss' ? SIX * 4 : SIX * 2); M.cue = null;
     M.pend = null; M.song = name; M.step = 0; M.t0 = t; M.bloom = false; if (name !== 'boss') { M.world = null; M.rest = 0; } M.sw = -1; M.threat = 0; M.tier = M.want = name === 'boss' ? 1 : 0;
     if (!c || !M.built) return;
     // a song never starts on a stale muffle; but a wind-up that is live right now keeps its hold, or the filter flutters (QA, 2026-10-07)
@@ -3982,6 +3997,7 @@ const AU = (() => {
   // silence: the level song chokes out (the Omni build-up); the next song() swaps onto a fresh deck
   function hush() { if (!c || !M.built) return; const t = c.currentTime; M.pend = null; M.hushed = true; mBus.gain.cancelScheduledValues(t); mBus.gain.setValueAtTime(mBus.gain.value, t); mBus.gain.linearRampToValueAtTime(0, t + .1); }
   function song(name, tier = 0) {
+    if (M.score && name === 'rise') name = 'shore';
     // (a hushed song really starts again; render check, 2026-10-10: after the lamp relit, song('rise') kept the silent deck)
     if (name === M.song && name !== 'boss' && c && M.built && M.timer && !M.hushed) { M.want = tier; M.threat = 0; M.world = null; M.rest = 0; return; }   // already playing: keep the groove, let it settle
     if (c && M.built && M.timer && (EVENT[name] || EVENT[M.song])) return swap(name, tier, !!EVENT[name]);
@@ -4019,7 +4035,75 @@ const AU = (() => {
   function holdIntro(on) { const was = M.holdIntro; M.holdIntro = !!on; if (was && !on && c && M.built) { const t = c.currentTime + .05; crash(t, .12); kick(t, .8); } }
   // "Papa?": the drums fall away for two bars, just a pad and Isla's three notes (Afterglow's opening), then the beat crashes back
   function papa() { if (!c || !M.built || !musOn) return; const t = c.currentTime, B2 = SIX * 32 * (TEMPO[M.song] || 1); mBus.gain.cancelScheduledValues(t); mBus.gain.setValueAtTime(mBus.gain.value, t); mBus.gain.linearRampToValueAtTime(.12, t + .25); mBus.gain.setValueAtTime(.12, t + B2); mBus.gain.linearRampToValueAtTime(1, t + B2 + .15);
-    pad(t + .1, [130.81, 155.56, 196], B2, .02, 'triangle'); [[0, 392], [SIX * 3, 392], [SIX * 6, 466.16]].forEach(([d, f]) => tone({ f, dur:.9, vol:.05, at:.6 + d, type:'triangle', lp:1600, bus:'mus' })); setTimeout(() => { if (c) crash(c.currentTime, .1); }, (B2 + .05) * 1000); }
+    // the Call, unanswered: A, F... E over B-flat major 7, and it never lands on D (Kenji, A said yes 2026-10-10: the code never played the Call)
+    pad(t + .1, [116.54, 146.83, 174.61, 220], B2, .02, 'triangle'); [[0, 440, .8], [SIX * 3, 349.23, .8], [SIX * 7, 329.63, 1.8]].forEach(([d, f, len]) => tone({ f, dur:len, vol:.05, at:.6 + d, type:'triangle', lp:1300, bus:'mus' })); setTimeout(() => { if (c) crash(c.currentTime, .1); }, (B2 + .05) * 1000); }
+  /* Level 1's score, "The Pearl Shore" (music head, 2026-10-10; A on the takes: "i like the music choices. good job"). A's generated
+     takes, cut into bar-exact 8-bar loops (26.67 s; mp3 decodes sample-exact in Chrome and Safari, checked 2026-10-10), loop on this
+     clock with the Warden's own kit and sliding 808 under them, mixed as in the gate renders A heard (tools/audio/render-gate.mjs): the
+     take high-passed so the 808 owns the sub, its lows ducked under each kick. Cues change on a bar line: the day; the day once Isla is
+     free (her "ooh" comes in); the night's build from dusk (the drums drop for two bars, then swell); the night; the Wake. The day's
+     808 sits on D, the Warden's key (music head's lean, decided 2026-10-10). The boss keeps the code Warden. */
+  const SC = {
+    'day-a':{ f:'l1-day-a-loop', g:2.66, hp:50, roots:[36.71], tier:1 },
+    'day-b':{ f:'l1-day-b-loop', g:2.66, hp:50, roots:[36.71], tier:1 },
+    'night-in':{ f:'l1-night-intro', g:.955, hp:90, roots:[36.71, 36.71, 36.71, 36.71, 36.71, 36.71, 58.27, 58.27], tiers:[0, 0, 1, 1, 1, 1, 1, 1], then:'night' },
+    night:{ f:'l1-night-loop', g:.955, hp:90, roots:[36.71, 36.71, 32.7, 32.7, 36.71, 36.71, 58.27, 58.27], tier:2 },
+    wake:{ f:'l1-wake-loop', g:1.26, hp:90, roots:[36.71, 55, 49, 55], tier:2 } };
+  const SC_BUF = {}, SC_BAR = SIX * 32, ready = n => SC_BUF[n] && SC_BUF[n] !== 'loading';
+  // one at a time, in the order given, so the day's loop is first in
+  function scoreLoad(names) { if (!c) return; const n = names.find(x => !SC_BUF[x]); if (!n) return; SC_BUF[n] = 'loading';
+    fetch(`art4/music/l1/${SC[n].f}.mp3?v=1`).then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(a => c.decodeAudioData(a))
+      .then(b => { SC_BUF[n] = b; scoreLoad(names); }, () => { delete SC_BUF[n]; }); }
+  function takeStop(t, fade = SIX * 2) { const k = M.take; if (!k) return; M.take = null;
+    try { k.g.gain.cancelScheduledValues(t); k.g.gain.setTargetAtTime(.0001, t, fade / 4); k.src.stop(t + fade + .1); } catch (e) {} }
+  function takeStart(n, t, off) {
+    const C = SC[n], src = c.createBufferSource(); src.buffer = SC_BUF[n]; src.loop = true;   // the loop is sample-exact, so the buffer repeats itself
+    let x = src; for (let k = 0; k < 2; k++) { const h = c.createBiquadFilter(); h.type = 'highpass'; h.frequency.value = C.hp; h.Q.value = .707; x.connect(h); x = h; }
+    const lo = c.createBiquadFilter(), hi = c.createBiquadFilter(), dLo = c.createGain(), dHi = c.createGain(), g = c.createGain();
+    lo.type = 'lowpass'; lo.frequency.value = 200; hi.type = 'highpass'; hi.frequency.value = 200;
+    x.connect(lo).connect(dLo).connect(g); x.connect(hi).connect(dHi).connect(g); g.connect(mBus);
+    g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(C.g, t + (off ? SIX * 2 : .004));   // (back mid-loop, after a mute: it fades in)
+    src.start(t, off); M.take = { src, g, dLo, dHi };
+  }
+  // a kick that ducks the take's lows under it (the gate's depths: lows to 35%, the rest to 89%)
+  function skick(t, v) { kick(t, v); const k = M.take; if (!k) return;
+    for (const [gn, d] of [[k.dLo, .35], [k.dHi, .89]]) { gn.gain.setValueAtTime(1, t - .001); gn.gain.linearRampToValueAtTime(d, t + .008); gn.gain.setTargetAtTime(1, t + .01, .06); } }
+  // which cue plays at 72-bar B, and which of its bars, given what plays now (no side effects). The night is asked for from dusk, and
+  // comes in through its build, which plays out into the loop; back from an event theme mid-night, it goes straight to the loop
+  function cueAt(B) {
+    const w = M.cueWant, C = SC[M.cue], j = B - M.cueAt, go = n => ready(n) ? { n, j:0 } : null, stay = { n:M.cue, j:j & 7 };
+    if (!C) return w ? go(w) : null;
+    if (w && w !== M.cue && C.then !== w) return go(w === 'night' ? 'night-in' : w) || stay;
+    if (C.then && j >= 8) return go(C.then) || stay;
+    return stay;
+  }
+  const tierOf = (x, B) => { if (!x) return 0; const C = SC[x.n]; if (C.tiers) return C.tiers[x.j];
+    if (M.scoreIntro && B < 2) return 0; return x.n.startsWith('day') && M.hurry > .7 ? 2 : C.tier; };   // the storm closing: the hats roll
+  function scoreBar(B, t) {
+    if (B >= 2) M.scoreIntro = false;
+    const x = cueAt(B); if (M.cueWant && !ready(M.cueWant)) scoreLoad(Object.keys(SC)); if (!x) return;
+    if (x.n !== M.cue) { takeStop(t); M.cue = x.n; M.cueAt = B - x.j; takeStart(x.n, t, 0); }
+    else if (!M.take) takeStart(x.n, t, x.j * SC_BAR);   // back from a mute or a pause of the clock
+    const C = SC[x.n]; M.cuePrev = M.cueTier || 0; M.cueTier = tierOf(x, B); M.cuePrevRoot = M.cueRoot || C.roots[0]; M.cueRoot = C.roots[x.j % C.roots.length];
+  }
+  function shoreStep(s, t) {   // the Warden's groove note for note (not his intro, bell or pad: those mean *him*)
+    const i = s & 15, bar = s >> 4, B = s >> 5, h = bar & 1;
+    if ((s & 31) === 0) scoreBar(B, t);
+    if (!M.cue) return; const tier = M.cueTier, r = M.cueRoot;
+    if (h === 1 && i === 0 && tier > 0 && tierOf(cueAt(B + 1), B + 1) > tier) { riser(t, SIX * 16, .1); breath(t + SIX * 14, SIX * 2); }   // the switch-up, going in
+    if (!tier) return;
+    if (h === 0 && i === 0 && tier !== M.cuePrev) { crash(t, M.cuePrev ? .13 : .12); skick(t, M.cuePrev ? .85 : .8); }   // the arrival
+    const ks = WARD.kicks[bar & 1], at = ks.indexOf(i);
+    if (at >= 0) { skick(t, .68); const gap = (ks[at + 1] ?? 16) - i, up = (bar & 1) && at === ks.length - 1;
+      b808(t, up ? r * 2 : r, Math.max(SIX * gap, .2) + .08, up ? r : (i === 0 && h === 0 ? M.cuePrevRoot : null)); }
+    if (i === 8) { clap(t, .34, .4); mv({ t, f:1800, type:'triangle', dur:.06, vol:.03 }); mv({ t, f:2650, type:'triangle', dur:.05, vol:.02 }); }
+    hats(t, bar, i, tier >= 2 ? 2 : 1, .04);
+    if (tier >= 2 && (i === 4 || i === 12)) skick(t, .4);
+  }
+  // a Level 1 run turns the score on: the Pearl Shore's level song becomes it, and the game names the cue each frame
+  function score(on) { M.score = !!on; M.cue = null; M.cueWant = on ? 'day-a' : null; M.scoreIntro = true; M.hurry = 0;
+    if (!on) { if (c) takeStop(c.currentTime); for (const n in SC_BUF) if (ready(n)) delete SC_BUF[n]; } else scoreLoad(['day-a', 'night-in', 'night', 'day-b', 'wake']); }
+  function cue(name, hurry) { if (!M.score) return; M.cueWant = name; M.hurry = hurry || 0; }
   // the Element Bloom: the theme jumps to full power and a low chant joins on the backbeat, with a four-on-the-floor kick
   const BLOOM_ROOT = { water:130.81, wood:164.81, fire:146.83, earth:103.83, metal:174.61 };
   function bloom(on) { M.bloom = !!on; if (on) { M.want = 2; if (c && M.built) { riser(c.currentTime, SIX * 8, .09); filt(5200, c.currentTime + SIX * 8); } } }
@@ -4031,7 +4115,7 @@ const AU = (() => {
   // jump the playing song to a bar: a skipped Stillmaker scene goes straight to his peace (QA, 2026-10-06)
   function songAt(name, bar) { if (M.song !== name || !M.timer) song(name); M.step = bar * 16; }
   // (a hidden app sleeps its sound; coming back wakes it from 'suspended' or iOS's 'interrupted'; Sammy's QA #4)
-  return { init, sleep() { if (c && c.state === 'running') c.suspend(); }, wake() { if (c && c.state !== 'running' && c.state !== 'closed') c.resume(); }, S, music, song, songAt, hush, tensionTo, release, threat, world, beat, bloom, hearthMusic, major, holdIntro, papa, toBar, rec() { const d = c.createMediaStreamDestination(); mus.connect(d); return d.stream; }, recAll() { const d = c.createMediaStreamDestination(); outNode.connect(d); return d.stream; },
+  return { init, sleep() { if (c && c.state === 'running') c.suspend(); }, wake() { if (c && c.state !== 'running' && c.state !== 'closed') c.resume(); }, S, music, song, songAt, hush, tensionTo, release, threat, world, beat, bloom, hearthMusic, major, holdIntro, papa, toBar, score, cue, rec() { const d = c.createMediaStreamDestination(); musLP.connect(d); return d.stream; }, recAll() { const d = c.createMediaStreamDestination(); outNode.connect(d); return d.stream; },
     meter() {   // test hook: the loudness of the effects and the music right now, in dB
       if (!c) return null; if (!this._m) { const m = n => { const a = c.createAnalyser(); a.fftSize = 2048; n.connect(a); return a; }; this._m = { s:m(sfx), u:m(mus), b:new Float32Array(2048) }; }
       const db = a => { a.getFloatTimeDomainData(this._m.b); let e = 0; for (const x of this._m.b) e += x * x; return 10 * Math.log10(e / this._m.b.length + 1e-12); };
@@ -4042,7 +4126,7 @@ const AU = (() => {
     muffle(on) { if (!musLP) return; const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(musLP.frequency.value, t);
       musLP.frequency.exponentialRampToValueAtTime(on ? 700 : 20000, t + (on ? .15 : .35)); mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(MUSVOL * (on ? .7 : 1), t + .3); },
     slowmo() { if (!musLP) return; const t = c.currentTime; musLP.frequency.cancelScheduledValues(t); musLP.frequency.setValueAtTime(musLP.frequency.value, t); musLP.frequency.exponentialRampToValueAtTime(160, t + 1.1);
-      mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(0, t + 1.4); }, get mstate() { return { song:M.song, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
+      mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(mus.gain.value, t); mus.gain.linearRampToValueAtTime(0, t + 1.4); }, get mstate() { return { ease:M.lastEase, song:M.song, cue:M.cue, cueTier:M.cueTier, take:!!M.take, tier:M.tier, want:M.want, threat:+M.threat.toFixed(2), sw:M.sw }; }, toggleMusic() { musOn = !musOn; save('morqi.music2', musOn); if (musOn) M.easeNext = 4; return musOn; }, toggleSfx() { sfxOn = !sfxOn; save('morqi.sfx', sfxOn); return sfxOn; },
     get on() { return sfxOn; }, get musicOn() { return musOn; }, vo, toggleVoice() { voOn = !voOn; save('morqi.voice', voOn); return voOn; }, get voiceOn() { return voOn; }, get vmiss() { return VFILES.filter(n => !SMP[n]); }, get ctx() { return c; }, get sfxBus() { return sfx; }, get beatLen() { return SIX * 4; } };
 })();
 const SFX = AU.S;
@@ -4152,7 +4236,10 @@ const jar = { get(k) { const m = document.cookie.match(new RegExp('(?:^|; )' + k
   set(k, v) { try { document.cookie = `${k}=${encodeURIComponent(v)}; max-age=31536000; path=/; SameSite=Lax`; } catch (e) {} } };
 const store = { get(k) { try { const v = localStorage.getItem(k); return v ?? jar.get(k); } catch (e) { return jar.get(k); } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { jar.set(k, v); } } };
 // a level asked for in the link (?level=) counts as open; the level being looked at on the title does not
-const LVL0 = LVL, unlocked = () => Math.max(LVL0, +(store.get('morqi.unlocked') || 1));
+// the levels open to families; the rest stay locked until each is finished and approved for shipping (A, 2026-10-10: "keep levels 3-5
+// locked for now and unlock them as we finish creating and approving the levels for shipping"). A saved unlock past it waits, and opens when this rises
+const SHIPPED = 2;
+const LVL0 = LVL, unlocked = () => Math.max(LVL0, Math.min(SHIPPED, +(store.get('morqi.unlocked') || 1)));
 const SEEN = new Set((store.get('morqi.seen') || '').split(',').filter(Boolean));
 const markSeen = kid => { SEEN.add(kid); store.set('morqi.seen', [...SEEN].join(',')); if (kid === '_stillmaker') stillSky(); };
 // the Stillmaker watches from the sky of the title and the home (A, 2026-10-06: "a almost transparent view of the still
@@ -4176,7 +4263,7 @@ addEventListener('pointerup', e => { if (tapHold != null && e.pointerId === tapH
 addEventListener('pointercancel', e => { if (tapHold != null && e.pointerId === tapHold) { tapHold = null; tapUntil = performance.now() + 600; } }, true);
 addEventListener('click', e => { if (tapHold != null && performance.now() - tapHoldAt > 1500) tapHold = null; if ((tapHold != null || performance.now() < tapUntil) && e.isTrusted && e.target.closest && e.target.closest('.scr, #coach, #tipCard')) { e.stopPropagation(); e.preventDefault(); } }, true);
 const kb = $('#keepers'), ksImg = $('#ksImg');
-for (let k = 1; k <= KEEPERS; k++) { const i = new Image(); i.src = `art4/k${k}-hi.png?v=13`; }
+for (const k of KEEPERS_OPEN) { const i = new Image(); i.src = `art4/k${k}-hi.png?v=13`; }
 // the seven Keepers have names and one line each (design review, 2026-10-04: kids bond with a name they can say); each line
 // opens with the Keeper's catchphrase (A approved them 2026-10-06; the pitch bible's cast page quotes them)
 const KEEPER_INFO = [
@@ -4189,20 +4276,20 @@ const KEEPER_INFO = [
 // transformation code ... just pause or disable the ones that arent available"). As Codex delivers forms the rule follows itself
 function keeperReady(k) { const all = new Set(Object.values(SURGE_ART).flat()); return !!OMNI_PAINTED[k] && [...all].every(f => (SURGE_ART[k] || []).includes(f)); }
 // grey the not-yet-painted Keepers whenever the picker shows (QA, 2026-10-07: Sina only greyed after the first tap)
-function markKeepers() { const ready = keeperReady(keeper); [...kb.children].forEach((c, i) => c.classList.toggle('soon', !keeperReady(i + 1)));
+function markKeepers() { const ready = keeperReady(keeper); [...kb.children].forEach(c => c.classList.toggle('soon', !keeperReady(+c.dataset.k)));
   ksImg.classList.toggle('soon', !ready); $('#keeperNext').classList.toggle('soon', !ready);
   $('#ksLine').textContent = ready ? KEEPER_INFO[keeper - 1].l : `${KEEPER_INFO[keeper - 1].n} is coming soon!`; }
 function pickKeeper(k, dir) {
-  keeper = ((k - 1 + KEEPERS) % KEEPERS) + 1;
+  { const O = KEEPERS_OPEN, at = O.indexOf(keeper); keeper = O.includes(k) ? k : O[((at < 0 ? 0 : at) + (dir || 1) + O.length) % O.length]; }   // (prev and next step through the open Keepers)
   { const I = KEEPER_INFO[keeper - 1]; $('#ksName').textContent = I.n; $('#ksLine').textContent = I.l; $('#pickKeeper').style.setProperty('--kc', I.c); }
-  [...kb.children].forEach((c, i) => { c.classList.toggle('on', i === keeper - 1); c.setAttribute('aria-checked', i === keeper - 1); });
+  [...kb.children].forEach(c => { const on = +c.dataset.k === keeper; c.classList.toggle('on', on); c.setAttribute('aria-checked', on); });
   ksImg.src = lookSrc(`art4/k${keeper}-hi.png?v=13`); ksImg.alt = KEEPER_INFO[keeper - 1].n;
   markKeepers();
   ksImg.style.setProperty('--dx', (dir || 1) * 40 + 'px'); ksImg.classList.remove('swap'); void ksImg.offsetWidth; ksImg.classList.add('swap');
   SFX.pop();
 }
-for (let k = 1; k <= KEEPERS; k++) {
-  const b = document.createElement('button'); b.className = 'kp' + (k === 1 ? ' on' : ''); b.setAttribute('role', 'radio');
+for (const k of KEEPERS_OPEN) {
+  const b = document.createElement('button'); b.className = 'kp' + (k === 1 ? ' on' : ''); b.setAttribute('role', 'radio'); b.dataset.k = k;
   b.setAttribute('aria-checked', k === 1); b.setAttribute('aria-label', KEEPER_INFO[k - 1].n);
   b.innerHTML = `<img src="art4/k${k}-face.png?v=13" alt="">`;
   b.onclick = () => pickKeeper(k, k > keeper ? 1 : -1);
@@ -4349,7 +4436,7 @@ function startRun() {
   if (LVL === 5) { S.p.x = L5_START.x; S.p.y = L5_START.y; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
   S.out = towersLevel(LVL) ? makeOutposts(LVL) : null;
   // Hold the Hearth (A, 2026-10-09): Level 1 is a home to defend
-  S.hearth = hearthLevel(LVL) ? makeHearth(LVL) : null; $('#hud').classList.toggle('hearth', !!S.hearth); $('#hsBar').hidden = $('#matPill').hidden = !S.hearth; $('#goal').classList.remove('hday', 'hnight'); $('#goal').style.removeProperty('--hsun'); if (S.hearth) { hearthStart(); camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
+  S.hearth = hearthLevel(LVL) ? makeHearth(LVL) : null; AU.score(HSCORE && !!S.hearth && S.hearth.lv === 1); $('#hud').classList.toggle('hearth', !!S.hearth); $('#hsBar').hidden = $('#matPill').hidden = !S.hearth; $('#goal').classList.remove('hday', 'hnight'); $('#goal').style.removeProperty('--hsun'); if (S.hearth) { hearthStart(); camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
   // Level 5 holds the temples too (A, 2026-10-07)
   S.l5 = LVL === 5 && towersOn() ? makeL5() : null; S.well = LVL === 5 ? makeWell() : null;
   if (S.out) { S.p.x = S.out.start.x; S.p.y = S.out.start.y; S.pet.x = S.p.x - 40; S.pet.y = S.p.y + 30; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
@@ -4695,7 +4782,9 @@ function hurt(e, dmg, el, o = {}) {
   if (weak && S.level < 3 && S.t - (S.weakT ?? -9) > 2.6 && !e.boss && (S.saidWeak || 0) < 3) { S.weakT = S.t; S.saidWeak = (S.saidWeak || 0) + 1; floatText(e.x, e.y - e.r - 20, 'Resisted', '#B8C4CC', 13); }
   if (e.giant) m *= giantArmour(e);
   // the boss's guard (studio analysis, 2026-10-09: give Surge a job only it can do): only a Surge or a Last Breath breaks it
-  if (e.boss && e.guard) { if (surgeOn() || lbOn()) breakGuard(e); else m *= .1; }
+  // (a Hearth boss's guard holds until someone from his family is free; game director, 2026-10-10, A: "make standing never win on level 1 too":
+  // a Keeper who never leaves the lamp frees no one, so the guard never drops, while anyone who rescued sees no change. The guard drops for his daughter)
+  if (e.boss && e.guard) { if ((surgeOn() || lbOn()) && !(S.hearth && !S.freedPeople)) breakGuard(e); else { m *= .1; if (S.hearth && !S.freedPeople && (surgeOn() || lbOn())) hearthGuardHint(); } }
   const dealt = dmg * m; e.lastHit = dealt; if (!o.react && dealt > (S.bestHit || 0)) S.bestHit = dealt;   // the Run Card's best hit: the player's own, never a crush
   e.hp -= dealt; e.flash = .08; e.hitAt = S.t;
   // freed with the element that beats it: counted for the third star
@@ -4948,7 +5037,7 @@ function powersRun(dt) {
     // nudged, so they stay in the ring (balance run, 2026-10-05: Level 5 freed fewer than Level 3)
     for (const o of S.orbs) {
       if (Math.random() < .25) fx({ k:'drop', x:o.x, y:o.y, z:8, vx:rnd(-40, 40), vy:rnd(-40, 40), vz:rnd(40, 120), life:.4, s:rnd(2, 4) });
-      inArea(o.x, o.y, st.size + 8, e => { if ((e.hitCd.tide || 0) <= S.t) { e.hitCd.tide = S.t + (e.boss ? .12 : .3); hurt(e, st.dmg, 'water', { kb:L >= 4 ? 70 : 120, fx:P.x, fy:P.y }); drops(e.x, e.y - 10, 6, 180); SFX.splash();
+      inArea(o.x, o.y, st.size + 8, e => { if ((e.hitCd.tide || 0) <= S.t) { e.hitCd.tide = S.t + (e.boss ? .12 : .3);   // (.2 for every boss was tried 2026-10-10: wood and earth landed at 33-46 s, but water lost a Rise every run and fire went to 61-119 s with a fall, so it went back; a per-matchup fix is with the game director) hurt(e, st.dmg, 'water', { kb:L >= 4 ? 70 : 120, fx:P.x, fy:P.y }); drops(e.x, e.y - 10, 6, 180); SFX.splash();
         if (L >= 4) { e.slow = Math.max(e.slow, 1); ring(e.x, e.y, 6, 46, '#9CD2FF', .25, 4, true); } } });
     }
     if (ev.tide && cool('surge', st.surge, dt)) { S.waves.push({ k:'tide', r:40, max:300, dmg:44, w:26, hit:new Set() }); SFX.wave(); }
@@ -6782,7 +6871,7 @@ function guardTick(dt) {
   if (!B.guard && B.hp < B.max * GUARD.at && S.hearth) { B.guard = { t:0 }; SFX.charge && SFX.charge(); ring(B.x, B.y - 60, 30, 260, '#DFF0FF', .6, 14, true); S.hearth.guardAt = S.t; return; }
   if (!B.guard && B.hp < B.max * GUARD.at) { B.guard = { t:0 }; S.surgeEndAt = -99; bornCharge(Math.max(GUARD.boost, estNeed() * .85 - (S.est[keeperEl] || 0))); SFX.charge && SFX.charge(); S.shake = Math.max(S.shake, .3);
     ring(B.x, B.y - 60, 30, 260, '#DFF0FF', .6, 14, true); toast(SEEN.has('_guard') ? 'A shield! Your Surge breaks it.' : 'The boss has a shield! Use your Surge.', 2800); markSeen('_guard'); return; }
-  if (B.guard && (B.guard.t += dt) >= GUARD.life) breakGuard(B);
+  if (B.guard && (B.guard.t += dt) >= GUARD.life && !(S.hearth && !S.freedPeople)) breakGuard(B);   // (on a Hearth level it waits for a freed family member: 4-game.js hurt)
 }
 function breakGuard(B) {
   if (!B.guard) return; B.guard = null; B.guardDone = true; S.shake = Math.max(S.shake, .5); SFX.boom && SFX.boom(true);
@@ -8107,6 +8196,8 @@ function floatText(x, y, s, c, size = 14) {
 // the interim Level 1 music pass (2026-10-10) is off: A heard it and asked for a new custom score instead ("right now it just sounds cheap");
 // the music head is designing that score. Turning this on restores the interim pass's cues
 const HMUSIC = false;
+// Level 1's score (A's takes with the Warden's kit, 3-core.js SC): the cue follows the phase, and Isla's freeing brings her voice in
+const HSCORE = true;
 const hearthOn = () => !/[?&]hearth=0/.test(location.search);
 const hearthLevel = lv => hearthOn() && (lv === 1 || lv === 2);
 // the game director's numbers (HEARTH-SPEC, "MAP" to "BOSS NIGHT"), with the creatures' walk shortened so a wave reaches home
@@ -8160,6 +8251,7 @@ function makeHearth(lv) {
   const A = (n, v = 1) => IMG[n] || load(n, `art4/hearth/${n}.png?v=${n.startsWith('hs-') || n.endsWith('-ruin') ? 2 : v}`)   // (briefs 39 and 40 repainted the stones and the ruins);
   for (const k of ['whole', 'hurt', 'frozen', 'surge']) A(`hs-${st.art}-${k}`);
   if (BOSS_V2[worldOf()]) for (let k = 1; k <= 3; k++) { const n = `boss-${worldOf()}-ice${k}`; IMG[n] || load(n, `art4/hearth/${n}.png?v=3`); }
+  clashArt();
   if (worldOf() === 'water' && !IMG['b-fisher-reach']) load('b-fisher-reach', 'art4/b-fisher-reach.png?v=1');
   if (C.reunion && !IMG['p-' + C.reunion.who + '-papa']) load('p-' + C.reunion.who + '-papa', `art4/people/p-${C.reunion.who}-papa.png?v=1`);
   for (const p of plots) for (const k of ['ruin', 'built', 'u1', 'u2']) A(`ws-${p.id}-${k}`);
@@ -8187,8 +8279,8 @@ function hearthStart() {
 const hearthNight = () => { const H = HS(); return H.C.nights[Math.min(H.night, H.C.nights.length - 1)]; };
 const hearthBossNext = () => { const H = HS(); return H.night >= H.C.nights.length; };
 function hearthPhase(ph) { const H = HS(); H.phase = ph; H.pt = 0;
-  if (ph === 'dusk') { if (HMUSIC) SFX.conch(hearthBossNext()); else SFX.horn(); H.banner = 0; hearthBanner(true); if (!hearthBossNext()) AU.vo('vo-hearth-dusk', 1.4, .5); }
-  if (ph === 'night') { H.surged = false; H.waveI = 0; H.left = 0; }
+  if (ph === 'dusk') { if (HMUSIC || HSCORE && H.lv === 1) SFX.conch(hearthBossNext()); else SFX.horn(); H.banner = 0; hearthBanner(true); if (!hearthBossNext()) AU.vo('vo-hearth-dusk', 1.4, .5); }
+  if (ph === 'night') { H.surged = false; H.waveI = 0; H.left = 0; clash('night'); }
   if (ph === 'boss') H.introOff = false;
   if (ph === 'dawn') { SFX.dawn(); hearthClear(false); for (const p of H.plots) if (p.lvl >= 1) { if (p.down) smoke(p.x, p.y, 10, 40, '240,232,214'); hearthFix(p); } }
   if (ph === 'dusk') H.duskAt = S.t;
@@ -8242,7 +8334,7 @@ function hearthTick(dt) {
       H.hesAt = S.t; B.act = null; B.atk = Math.max(B.atk || 0, 3);
       if (q) { q.papaAt = S.t; q.fx = B.x < q.x ? -1 : 1; floatText(q.x, q.y - 150, C.reunion.word, '#FFFFFF', 28); B.stagAt = S.t;
         // Isla's own voice (A cast Siren for her, 2026-10-10), then Luma, softly, naming what the child just saw
-        if (C.reunion.who === 'isla') { AU.vo('vo-isla-papa', .1, .3); AU.vo('vo-luma-scared', 1.2, .4, false); } if (HMUSIC) AU.papa(); } }
+        if (C.reunion.who === 'isla') { AU.vo('vo-isla-papa', .1, .3); AU.vo('vo-luma-scared', 1.2, .4, false); } if (HMUSIC || HSCORE && H.lv === 1) AU.papa(); } }
     // minions down the lanes every 8 s, and every other time a frost-thrower too, so standing at home still can't win it
     if ((H.minT -= dt) <= 0) { H.minT = HH.minions[0]; H.minN = (H.minN || 0) + 1; const L = C.boss.lanes, el = S.boss ? S.boss.el : worldOf();
       for (let i = 0; i < HH.minions[1]; i++) H.q.push({ at:H.pt + i * .4, lane:L[i % L.length], el });
@@ -8265,8 +8357,9 @@ function hearthTick(dt) {
     let want = 0, hurry = 0; const N = H.phase === 'night' && hearthNight();
     if (H.phase === 'day') hurry = Math.min(1, (H.dayT || 0) / C.days[Math.min(H.day, C.days.length - 1)]);
     else if (N) { const near = S.en.some(e => !e.dead && e.hh && Math.hypot(e.x - st.x, e.y - st.y) < 700); want = H.waveI >= N.waves.length ? 2 : (near || H.pt > 9) ? 1 : 0; }
-    if (HMUSIC) AU.hearthMusic({ want, hurry }); }
-  hearthGiftTick(dt); hearthStorm(dt); hearthPeople(dt); hearthBuildings(dt); hearthDrops(dt); hearthBolts(dt); hearthHold(dt);
+    if (HMUSIC) AU.hearthMusic({ want, hurry });
+    if (HSCORE && H.lv === 1 && H.phase !== 'out' && H.phase !== 'boss') AU.cue(H.phase === 'dusk' || H.phase === 'night' ? 'night' : (S.people || []).some(q => q.id === 'isla' && q.state !== 'ice') ? 'day-b' : 'day-a', hurry); }
+  hearthGiftTick(dt); shoreTick(dt); hearthStorm(dt); hearthPeople(dt); hearthBuildings(dt); hearthDrops(dt); hearthBolts(dt); hearthHold(dt);
   for (const t of H.throws) t.t += dt; H.throws = H.throws.filter(t => t.t < t.life);
   // the workshop whose element beats tonight's shimmers at dusk; from Level 2 only after 3 s, so the help fades as the lesson sticks
   { const N = hearthNight(), late = S.t - (H.duskAt ?? 1e9);
@@ -8499,7 +8592,7 @@ function hearthHold(dt) {
 /* ---------- Surge rises for home ---------- */
 function hearthSurge(why) {
   const H = HS(), st = H.stone; if (H.surged) return; H.surged = true;
-  const k = .5 + .5 * Math.min(1, H.sq / 100); H.sq = 0; H.surgeT = HH.surgeLife * (.75 + .25 * k); H.surgeAt = S.t; H.heal = HH.surgeHeal * k;
+  const k = .5 + .5 * Math.min(1, H.sq / 100); H.sq = 0; H.surgeT = HH.surgeLife * (.75 + .25 * k); H.surgeAt = S.t; clash(S.boss && S.boss.guard ? 'guard' : 'surge'); H.heal = HH.surgeHeal * k; st.hp = Math.min(st.max, st.hp + H.heal);   // (the heal was computed but never applied; game director, 2026-10-10)
   ring(st.x, st.y - 40, 30, 900, FORM_PAL[keeperEl][0], .9, 22, true); ring(st.x, st.y - 40, 20, 520, '#FFFFFF', .6, 12, true); stars(st.x, st.y - 90, 40, FORM_PAL[keeperEl][1], 520); S.shake = Math.max(S.shake, .3);
   { const cx = (S.cam ? S.cam.x : camX) + VW / 2; floatText(clamp(st.x, cx - VW / 2 + 190, cx + VW / 2 - 190), st.y - 200, 'Your ' + ELNAME[keeperEl].toLowerCase() + ' rises for home!', '#FFFFFF', 20); }
   for (const q of S.people || []) if (q.state === 'keeper') q.castAt = S.t;
@@ -8515,7 +8608,11 @@ function hearthOut() {
   const el = H.cause || hearthNight().el, by = Object.keys(CONTROLS).find(k => CONTROLS[k] === el);
   cue(H.C.stone.out, `${ELNAME[el]} came. ${ELNAME[by]} stops ${ELNAME[el].toLowerCase()}.`, 2600); H.br = null; H.holding = false;
   for (const q of S.people || []) if (q.state === 'keeper') q.tired = true;
-  hearthClear(true); if (H.wasBoss && S.boss) { S.boss.dead = true; S.en = S.en.filter(e => e !== S.boss); S.boss = null; S.bossSpawned = false; S.arena = null; $('#bossWrap').classList.remove('on'); AU.song(SONG_OF[worldOf()]); }
+  hearthClear(true); if (H.wasBoss && S.boss) {
+    // he keeps his wounds through a relight, once you've freed someone (game director, 2026-10-10: he came back at full health, so a
+    // near-miss replayed the same lost race every ~70 s, burning every Rise; the freed-people gate keeps "standing still never wins")
+    if (S.freedPeople > 0) { H.bossLeft = S.boss.hp / S.boss.max; H.bossGD = !!S.boss.guardDone; }
+    S.boss.dead = true; S.en = S.en.filter(e => e !== S.boss); S.boss = null; S.bossSpawned = false; S.arena = null; $('#bossWrap').classList.remove('on'); AU.song(SONG_OF[worldOf()]); }
 }
 function hearthRetry(paid) {
   const H = HS(), st = H.stone;
@@ -8553,19 +8650,23 @@ function hearthBossNight() {
   const H = HS(), st = H.stone, a = H.C.boss.from; hearthPhase('boss'); H.surged = false; H.minT = 6;
   spawnBoss(); const b = S.boss; if (!b) return;
   b.hh = 1; { const sp = bossSpot(); b.x = sp.x; b.y = sp.y; } $('#bossWrap').classList.remove('on'); b.barOn = false;
-  if (BOSS_V2[b.realm]) { b.size = 440; b.r = 92; b.hp = b.max = Math.round(b.max * 1.2); }   // (the Drowned Giant towers over the lamp; the bigger body is easier to hit; bot, 2026-10-10: 1x gave 14-20 s fights, 1.6x and 2.3x froze the lamp for weak matchups; 1.2x)
-  // (the boss bar stays hidden here: a line pasted ahead of it on 2026-10-10 had commented it out; game director's audit)
+  if (BOSS_V2[b.realm]) { b.size = 440; b.r = 92; if (b.realm === 'water') b.hp = b.max = Math.round(b.max * 1.2); }   // (the Drowned Giant towers over the lamp; the bigger body is easier to hit; bot, 2026-10-10: 1x gave 14-20 s fights, 1.6x and 2.3x froze the lamp for weak matchups; 1.2x)
+  // (the boss bar stays hidden here: a line pasted ahead of it on 2026-10-10 had commented it out in the live build; game director's audit)
   // a Keeper whose element barely hurts this boss (water against the Pearl Shore's water boss) meets it a little weaker (bot, 2026-10-09:
   // water Keepers lost a Rise in 80-90 s fights while every other element won in 20-40 s)
   b.hp = b.max = Math.round(b.max * HH.bossHp * (eff(keeperEl, b.el) < 1 ? .55 : 1));
+  if (H.bossLeft != null) { b.hp = Math.max(1, Math.round(b.max * H.bossLeft)); b.guardDone = H.bossGD; }   // (and his guard stays broken, or it would eat the Surge while he walks in)
   // the frost closes into a ring round home: the boss night is fought round the stone
   S.arena = { x:st.x, y:st.y, r:1250 }; if (HMUSIC) AU.holdIntro(true);
+  clash('face');
 }
 /* ---------- the screen: goal line, stone bar, shells, dusk banner ---------- */
 function hearthGoal() {
   const H = HS(), P = S.p;
   if (H.phase === 'out') return null;
-  if (H.phase === 'boss') return null;
+  // his guard holds until someone from his family is free: the arrow points to them (game director, 2026-10-10)
+  if (H.phase === 'boss') { const B = S.boss, ice = rescueLeft(); if (B && B.guard && !S.freedPeople && ice.length) { const q = ice.find(q => q.id === H.C.reunion.who) || ice[0];
+    return { t:H.lv === 1 ? `Free ${q.n}! He'll listen to her.` : `Free ${q.n}!`, el:q.el, k:'day', x:q.x, y:q.y }; } return null; }
   if (H.phase === 'night') return { t:H.C.stone.goal, el:hearthNight().el, k:'night' };
   if (H.phase === 'dusk') return { t:'Night is coming: go home!', el:'fire', k:'night', x:H.stone.x, y:H.stone.y };
   const ice = rescueLeft();
@@ -8579,6 +8680,8 @@ function hearthGoal() {
   const up = hearthAfford(); if (up) return { t:H.C.mat === 'shell' ? 'Stand by a workshop to make it stronger' : 'Stand by a workshop to grow it', el:'earth', k:'day', x:up.x, y:up.y };
   return { t:hearthBossNext() ? 'Get ready: the boss comes tonight' : H.C.mat === 'shell' ? 'Free creatures for shells' : 'Free creatures for bamboo', el:'water', k:'day' };
 }
+// a Surge that bounces off the guard because no one is free yet: Luma says why, at most every 12 s (A records vo-hearth-guard)
+function hearthGuardHint() { const H = HS(); if (!H || H.lv !== 1 || S.t - (H.guardHintAt ?? -99) < 12) return; H.guardHintAt = S.t; AU.vo('vo-hearth-guard', 0, .5); }
 const hearthAfford = () => { const H = HS(); return H.plots.filter(p => p.lvl >= 1 && p.lvl < 3 && H.mat >= H.C.cost[p.lvl - 1]).sort((a, b) => Math.hypot(a.x - S.p.x, a.y - S.p.y) - Math.hypot(b.x - S.p.x, b.y - S.p.y))[0] || null; };
 function hearthHud() {
   const H = HS(), st = H.stone, bar = $('#hsBar'), mp = $('#matPill');
@@ -8658,8 +8761,8 @@ function shellAt(x, y, r) {
 }
 // the stone and the workshops stand among the creatures, drawn in depth order
 let HDQ = [], HDI = 0;
-function hearthDepth() { const H = HS(), b = bossSpot(); HDQ = [{ k:'stone', y:H.stone.y + 20, o:H.stone }, { k:'figure', y:b.y, o:null }, ...H.plots.map(p => ({ k:'plot', y:p.y + 30, o:p }))].sort((a, b) => a.y - b.y); HDI = 0; }
-function hearthTo(y) { while (HDI < HDQ.length && HDQ[HDI].y <= y) { const d = HDQ[HDI++]; d.k === 'stone' ? drawHearthStone(d.o) : d.k === 'figure' ? drawBossFigure() : drawWorkshop(d.o); } }
+function hearthDepth() { const H = HS(), b = bossSpot(); HDQ = [{ k:'stone', y:H.stone.y + 20, o:H.stone }, { k:'figure', y:b.y, o:null }, ...H.plots.map(p => ({ k:'plot', y:p.y + 30, o:p })), ...(HZ.ready ? HZ.posts.map(p => ({ k:'post', y:p.y, o:p })) : [])].sort((a, b) => a.y - b.y); HDI = 0; }
+function hearthTo(y) { while (HDI < HDQ.length && HDQ[HDI].y <= y) { const d = HDQ[HDI++]; d.k === 'stone' ? drawHearthStone(d.o) : d.k === 'figure' ? drawBossFigure() : d.k === 'post' ? drawPost(d.o) : drawWorkshop(d.o); } }
 function drawHearthStone(st) {
   { const H = HS(), n = Math.min(8, (H.gifts || 0) + (H.giftPicks || 0)); for (let i = 0; i < n; i++) { const a = S.t * 1.4 + i * TAU / Math.max(n, 1), x = st.x + Math.cos(a) * 70, y = st.y - 120 + Math.sin(a) * 26 + Math.sin(S.t * 3 + i) * 6;
       add(() => glowAt(x, y, 46, '#FFE08A', .85)); g.fillStyle = '#FFF6D8'; g.beginPath(); g.arc(x, y, 5, 0, TAU); g.fill(); } }
@@ -8896,8 +8999,9 @@ function hearthBossBadge() {
 }
 // the Wake (studio review; Codex brief 42): when the boss is freed, the ice cracks out in a ring, the shore bursts alive and the land
 // thaws from the stone outward, on its own clock so the victory sequence can't stall it
-function hearthWake() { const H = HS(); if (!H || H.wake) return; H.wake = { t0:performance.now() + 3300, x:S.boss ? S.boss.x : H.stone.x, y:S.boss ? S.boss.y : H.stone.y, r:0 };
-  if (HMUSIC) setTimeout(() => { if (!S || !S.hearth) return; AU.holdIntro(false); AU.music(true); AU.major(true); AU.world('water', 1); AU.song('rise', 2); }, 3300); }
+function hearthWake(lead = 0) { const H = HS(); if (!H || H.wake) return; H.wake = { t0:performance.now() + 3300 + lead * 1000, x:S.boss ? S.boss.x : H.stone.x, y:S.boss ? S.boss.y : H.stone.y, r:0 };
+  if (HMUSIC) setTimeout(() => { if (!S || !S.hearth) return; AU.holdIntro(false); AU.music(true); AU.major(true); AU.world('water', 1); AU.song('rise', 2); }, 3300 + lead * 1000);
+  else if (HSCORE && H.lv === 1) setTimeout(() => { if (!S || !S.hearth) return; AU.music(true); AU.cue('wake'); AU.song('rise', 2); }, 3300 + lead * 1000); }   // the Wake: "Morning Tide" lands as the ice shatters
 function drawWake() {
   const H = HS(), Wk = H && H.wake; if (!Wk) return; const t = (performance.now() - Wk.t0) / 1000; if (t < 0 || t > 4.5) return;
   const st = H.stone, R = Math.min(1600, t * 520); if (R > Wk.r + 120) { Wk.r = R; paintThaw(st.x, st.y, R); }
@@ -8916,6 +9020,76 @@ function hearthSky() {
   else if (Hh.phase === 'day' && Hh.day === 0) { k = Math.max(0, ((Hh.dayT || 0) / Hh.C.days[0] - .7) / .3) * .6; c = '#FFB45A'; }   // the sun visibly lowers if a child dawdles
   if (!c || k <= 0) return;
   g.save(); g.globalCompositeOperation = 'soft-light'; g.globalAlpha = .55 * k; g.fillStyle = c; g.fillRect(0, 0, W, H); g.restore();
+}
+
+/* ================= the living Pearl Shore, phase 1 (brief 45; living-world spec, A approved 2026-10-10) =================
+   A: "the living breathing alive world that interacts with players in a good and bad way depending on what's going on and who's in
+   control." Ground sections, each with its own frozen and alive look; lantern posts that light when their ground thaws and hold a circle
+   of land at night; and the defended edge (A: thawed land stays thawed): at night the frost takes back only land no light holds. */
+// (first look, 2026-10-10: at half scale the deck planks were character-sized and the frozen rocks and nets crowded the creatures out;
+// so the textures are drawn at a third, under a calming wash, and the zone edges are softer)
+const SHORE = { on:true, zones:['tide', 'rock', 'yard', 'board'], post:180, reclaim:.045, every:1, scale:.3, wash:{ frozen:'rgba(214,232,246,.32)', alive:'rgba(240,214,160,.14)' } };
+const HZ = { ready:false, ZM:{}, box:{}, pat:{}, posts:[] };
+function shoreImg(n) { return IMG['sh-' + n] || load('sh-' + n, `art4/shore/${n}?v=1`); }
+function shoreInit() {
+  const H = HS(); if (!H || H.lv !== 1 || !SHORE.on) return; const st = H.stone, N = WORLD * MASK;
+  for (const z of ['dune', ...SHORE.zones]) { shoreImg(`t-pl-${z}-frozen.jpg`); shoreImg(`t-pl-${z}-alive.jpg`); }
+  for (const k of ['lit', 'gutter', 'frozen']) shoreImg(`lantern-post-${k}.png`);
+  const jit = (a, s) => 1 + .09 * Math.sin(a * 3 + s) + .06 * Math.sin(a * 7 + s * 2);
+  const blob = (cx, cy, rx, ry, seed) => { const P = []; for (let i = 0; i < 48; i++) { const a = i / 48 * TAU; P.push([cx + Math.cos(a) * rx * jit(a, seed), cy + Math.sin(a) * ry * jit(a, seed)]); } return P; };
+  const shapes = {
+    tide:() => { const P = []; for (let x = -40; x <= WORLD + 40; x += 60) P.push([x, seaLine(x) - 40]); for (let x = WORLD + 40; x >= -40; x -= 60) P.push([x, seaLine(x) + 240 + 30 * Math.sin(x * .007)]); return [P]; },
+    rock:() => [blob(st.x + 760, st.y + 480, 480, 360, 1)],
+    yard:() => [blob(st.x - 520, st.y + 680, 520, 380, 2)],
+    board:() => { const ring = blob(st.x, st.y, 330, 330, 3), px = st.x + 430, py = st.y - 680, d = Math.hypot(px - st.x, py - st.y), ux = (px - st.x) / d, uy = (py - st.y) / d, w = 45;
+      return [ring, [[st.x - uy * w, st.y + ux * w], [px - uy * w, py + ux * w], [px + uy * w, py - ux * w], [st.x + uy * w, st.y - ux * w]]]; } };
+  for (const z of SHORE.zones) { const c = document.createElement('canvas'); c.width = c.height = N; const x = c.getContext('2d'); x.setTransform(MASK, 0, 0, MASK, 0, 0); x.filter = 'blur(10px)'; x.fillStyle = '#fff';
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const P of shapes[z]()) { x.beginPath(); P.forEach(([a, b], i) => { i ? x.lineTo(a, b) : x.moveTo(a, b); x0 = Math.min(x0, a); y0 = Math.min(y0, b); x1 = Math.max(x1, a); y1 = Math.max(y1, b); }); x.closePath(); x.fill(); }
+    HZ.ZM[z] = c; HZ.box[z] = [x0 - 60, y0 - 60, x1 + 60, y1 + 60]; }
+  // ten posts: six round the boardwalk, four lighting the way out to the Pier, the Boat, the Net Shed and the Rock Pools
+  HZ.posts = [...[.35, 1.25, 2.95, 3.6, 4.3, 5.0].map(a => ({ x:st.x + Math.cos(a) * 300, y:st.y + Math.sin(a) * 300 })), ...[[430, -680], [-880, -170], [-450, 660], [720, 520]].map(([dx, dy]) => ({ x:st.x + dx * .58, y:st.y + dy * .58 }))]
+    .map((p, i) => ({ ...p, home:i < 6, lit:i < 6, litAt:-9 }));   // (home's six are lit from the start: home is yours)
+  HZ.ready = true; HZ.checkT = 0; HZ.reclaimT = 0; H.hz = HZ;   // (reachable for the bots)
+}
+const shoreArt = () => HZ.ready && ['dune', ...SHORE.zones].every(z => ok(IMG[`sh-t-pl-${z}-frozen.jpg`]) && ok(IMG[`sh-t-pl-${z}-alive.jpg`]));
+function shorePat(x, name) { const k = name; if (!HZ.pat[k] && ok(IMG['sh-' + name])) HZ.pat[k] = x.createPattern(IMG['sh-' + name], 'repeat'); return HZ.pat[k]; }
+// paints a ground tile's zones, frozen or alive, into ctx (already transformed to world coords for the tile)
+const tmpZ = document.createElement('canvas'), tmpZX = tmpZ.getContext('2d');
+function shoreTile(ctx, ox, oy, SZ, alive) {
+  const m = new DOMMatrix(); m.a = m.d = SHORE.scale; const side = alive ? 'alive' : 'frozen';
+  const base = shorePat(ctx, `t-pl-dune-${side}.jpg`); if (base) { base.setTransform(m); ctx.fillStyle = base; ctx.fillRect(ox, oy, SZ, SZ); }
+  for (const z of SHORE.zones) { const b = HZ.box[z]; if (ox > b[2] || ox + SZ < b[0] || oy > b[3] || oy + SZ < b[1]) continue;
+    const p = shorePat(tmpZX, `t-pl-${z}-${side}.jpg`); if (!p) continue; if (tmpZ.width !== TPX) tmpZ.width = tmpZ.height = TPX;
+    tmpZX.globalCompositeOperation = 'source-over'; tmpZX.setTransform(TS, 0, 0, TS, -ox * TS, -oy * TS); p.setTransform(m); tmpZX.fillStyle = p; tmpZX.fillRect(ox, oy, SZ, SZ);
+    tmpZX.setTransform(1, 0, 0, 1, 0, 0); tmpZX.globalCompositeOperation = 'destination-in'; tmpZX.drawImage(HZ.ZM[z], ox * MASK, oy * MASK, SZ * MASK, SZ * MASK, 0, 0, TPX, TPX); tmpZX.globalCompositeOperation = 'source-over';
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(tmpZ, 0, 0); ctx.restore(); }
+  ctx.fillStyle = SHORE.wash[side]; ctx.fillRect(ox, oy, SZ, SZ);
+}
+const shoreThaw = (x, y) => { try { return tg.getImageData(Math.round(x * MASK), Math.round(y * MASK), 1, 1).data[3] > 50; } catch (e) { return false; } };
+const lampLight = () => { const H = HS(); return 330 + 470 * Math.max(0, H.stone.hp / H.stone.max); };
+function shoreTick(dt) {
+  const H = HS(); if (!HZ.ready) { if (H && H.lv === 1) shoreInit(); return; }
+  // the posts light when their ground thaws (and go dark if the frost takes it back)
+  if ((HZ.checkT -= dt) <= 0) { HZ.checkT = .5; for (const p of HZ.posts) { const t = p.home || shoreThaw(p.x, p.y); if (t && !p.lit) { p.lit = true; p.litAt = S.t; ring(p.x, p.y - 80, 10, 160, '#FFD98A', .5, 8, true); SFX.ting && SFX.ting(); } else if (!t && p.lit) p.lit = false; } }
+  // the defended edge: at night the frost creeps back over every patch of thawed land no light holds
+  if ((H.phase === 'night' || H.phase === 'boss') && (HZ.reclaimT -= dt) <= 0) { HZ.reclaimT = SHORE.every; const st = H.stone;
+    tg.save(); tg.setTransform(MASK, 0, 0, MASK, 0, 0); tg.globalCompositeOperation = 'destination-out'; tg.fillStyle = `rgba(0,0,0,${SHORE.reclaim})`;
+    tg.beginPath(); tg.rect(0, 0, WORLD, WORLD); tg.moveTo(st.x + lampLight(), st.y); tg.arc(st.x, st.y, lampLight(), 0, TAU); for (const p of HZ.posts) if (p.lit) { tg.moveTo(p.x + SHORE.post, p.y); tg.arc(p.x, p.y, SHORE.post, 0, TAU); }
+    tg.fill('evenodd'); tg.restore(); resetTiles(); }
+}
+// the posts stand in the scene; their light pools on the ground at night (screen space, over the night grade)
+function drawPost(p) {
+  const H = HS(), nk = S.night || 0, gut = p.lit && H.stone.hp < H.stone.max * .3 && (H.phase === 'night' || H.phase === 'boss'), im = IMG['sh-lantern-post-' + (p.lit ? gut ? 'gutter' : 'lit' : 'frozen') + '.png'];
+  const pop = Math.max(0, 1 - (S.t - p.litAt) / .4), w = 70 * (1 + .15 * pop), h = w * 1.5;
+  g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(p.x, p.y + 2, 22, 7, 0, 0, TAU); g.fill();
+  if (ok(im)) g.drawImage(im, p.x - w * .4, p.y - h * .95, w, h);
+  if (p.lit) add(() => glowAt(p.x + w * .1, p.y - h * .62, 90 + 60 * nk, '#FFD98A', (.35 + .4 * nk) * (gut ? .5 + .5 * Math.sin(S.t * 13) : 1)));
+}
+function shoreLights() {
+  const H = HS(), nk = S.night || 0; if (!HZ.ready || nk < .1) return; const cam = S.cam || { x:camX, y:camY };
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (const p of HZ.posts) if (p.lit) { const sx = (p.x - cam.x) * Z, sy = (p.y - cam.y) * Z; if (sx < -300 || sx > W + 300 || sy < -300 || sy > H_px() + 300) continue; glowAt(sx, sy, SHORE.post * 2.4 * Z, '#FFD9A0', .22 * nk); }
+  g.restore();
 }
 
 /* ================= drawing ================= */
@@ -8990,13 +9164,16 @@ function renderTile(t, i, j) {
   if (!grassPat && ok(tm)) grassPat = t.x.createPattern(mirror(tm), 'repeat');
   const ox = i * TILE - TPAD, oy = j * TILE - TPAD, SZ = TILE + TPAD * 2, m = new DOMMatrix(); m.a = m.d = .5;
   const x = t.x; x.setTransform(TS, 0, 0, TS, -ox * TS, -oy * TS);
-  if (icePat) { icePat.setTransform(m); x.fillStyle = icePat; } else x.fillStyle = '#2B3640';
-  x.fillRect(ox, oy, SZ, SZ);
+  const shore = S && S.hearth && shoreArt();   // the living Pearl Shore's ground sections (brief 45)
+  if (shore) shoreTile(x, ox, oy, SZ, false);
+  else { if (icePat) { icePat.setTransform(m); x.fillStyle = icePat; } else x.fillStyle = '#2B3640';
+  x.fillRect(ox, oy, SZ, SZ); }
   if (sf) shoreLayer(x, ox, oy, SZ, seaIcePat, m, false);
   tmpX.globalCompositeOperation = 'source-over'; tmpX.setTransform(TS, 0, 0, TS, -ox * TS, -oy * TS);
   const mg = new DOMMatrix(); mg.a = mg.d = .9;   // the meadow at a larger scale than the ice, softened so creatures read on top
-  if (grassPat) { grassPat.setTransform(mg); tmpX.fillStyle = grassPat; } else tmpX.fillStyle = '#5E9A3A';
-  tmpX.fillRect(ox, oy, SZ, SZ);
+  if (shore) shoreTile(tmpX, ox, oy, SZ, true);
+  else { if (grassPat) { grassPat.setTransform(mg); tmpX.fillStyle = grassPat; } else tmpX.fillStyle = '#5E9A3A';
+  tmpX.fillRect(ox, oy, SZ, SZ); }
   if (sf) shoreLayer(tmpX, ox, oy, SZ, seaPat, mg, true);
   tmpX.fillStyle = sf ? 'rgba(24,52,58,.1)' : 'rgba(24,52,58,.22)'; tmpX.fillRect(ox, oy, SZ, SZ);
   tmpX.setTransform(1, 0, 0, 1, 0, 0); tmpX.globalCompositeOperation = 'destination-in';
@@ -9051,7 +9228,7 @@ function drawNight(cx, cy) {
   // left the fight "muddled in fog")
   const mix = (a, b) => `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * n)).join(',')})`, wt = [255, 255, 255];
   // while the frost closes in, the warm light itself is the lit area: no night inside it, only the frost outside
-  const AR = S.storm ? { x:S.storm.x, y:S.storm.y, r:S.storm.r * 1.4 } : S.arena || (S.hearth ? { x:S.hearth.stone.x, y:S.hearth.stone.y - 60, r:560 } : null), ax = AR ? (AR.x - cx) * Z : px, ay = AR ? (AR.y - cy) * Z : py, ar = AR ? AR.r * Z : 220, R = Math.max(ar * 1.35, 260);
+  const AR = S.storm ? { x:S.storm.x, y:S.storm.y, r:S.storm.r * 1.4 } : S.arena || (S.hearth ? { x:S.hearth.stone.x, y:S.hearth.stone.y - 60, r:HZ.ready ? lampLight() : 560 } : null), ax = AR ? (AR.x - cx) * Z : px, ay = AR ? (AR.y - cy) * Z : py, ar = AR ? AR.r * Z : 220, R = Math.max(ar * 1.35, 260);
   const v = g.createRadialGradient(ax, ay, 0, ax, ay, R);
   v.addColorStop(0, mix(wt, [240, 238, 255])); v.addColorStop(ar / R * .9, mix(wt, [214, 212, 248]));
   v.addColorStop(Math.min(.99, ar / R * 1.12), mix(wt, [118, 122, 196])); v.addColorStop(1, mix(wt, [40, 44, 112]));
@@ -9857,7 +10034,7 @@ function draw() {
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
   if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
-  if (S.hearth) { g.setTransform(DPR, 0, 0, DPR, 0, 0); hearthSky(); hearthBossBadge(); hearthBreathOrb(); world(g); }
+  if (S.hearth) { g.setTransform(DPR, 0, 0, DPR, 0, 0); hearthSky(); shoreLights(); hearthBossBadge(); hearthBreathOrb(); world(g); }
   drawFX(true);
   // a waiting Qi Stone: a glowing beacon at your side leans toward it, small at first and growing brighter and bigger the
   // longer it waits (A, 2026-10-05: a reminder that does not get in the way)
@@ -9964,6 +10141,7 @@ function draw() {
   // (a spotlight: the Keeper, at the centre of the view, stays lit)
   if (lbOn() && !S.lb.burst) { const k = .7 * Math.min(1, S.lb.t / .2), sx = (P.x - camX) * Z, sy = (P.y - 40 - camY) * Z, v = g.createRadialGradient(sx, sy, 70 * Z, sx, sy, H * .5); v.addColorStop(0, 'rgba(8,10,28,0)'); v.addColorStop(1, `rgba(8,10,28,${k})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
   if (S.freeze > 0) { g.fillStyle = `rgba(160,220,255,${Math.min(.18, S.freeze * .08)})`; g.fillRect(0, 0, W, H); }
+  if (S.clash) drawClash();
   if (P.hp < P.max * .3 && !S.fall) { const v = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); v.addColorStop(0, 'rgba(200,40,30,0)'); v.addColorStop(1, `rgba(200,40,30,${.4 * (1 - P.hp / (P.max * .3)) * (.7 + .3 * Math.sin(S.t * 8))})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
 }
 
@@ -11427,6 +11605,87 @@ function drawItem(it) {
   }
   g.lineWidth = 1;
 }
+
+/* ---------- the clash: anime cut-ins (A, 2026-10-10: "close up clashes anime-style with cool effects whenever we do big damage on the boss
+   or whenever we need a visual transition especially during the night ... up until the wake where it transitions into the next scene
+   seamlessly"). Rare and earned, so they stay special (Persona 5's All-Out Attack, Street Fighter 6's Critical Arts, Smash's Final Smash
+   zoom): the night falling, the boss's arrival, Surge (his guard breaking, when that is what the Surge breaks), and the last blow, which
+   whites out into the Wake. At most one every 15 s (the last blow always). The world holds still under it, so nothing lands while it plays;
+   about a second long, no words, one soft burst, never a strobe (photosensitivity: under 3 flashes a second); off with reduced motion. */
+const CLASH = { night:{ len:1.2, hit:.45 }, face:{ len:1.35, hit:.32 }, surge:{ len:1, hit:.22 }, guard:{ len:1, hit:.26 }, final:{ len:1.3, hit:.42 } };
+const CLASH_POSE = { face:'throw', surge:'summon', guard:'push', final:'slam' }, CLASH_BOSS = { face:'-up', guard:'-slam', final:'-slam' };
+// the painted close-ups (brief 49 for Amara, Malik, Sina and the Drowned Giant; brief 48 for the Thorn Tyrant), loaded with a Hearth level;
+// anyone not painted yet clashes with their borrowed poses
+const CLASH_PAINTED = { k:[1, 6, 7], boss:['water', 'wood'] };
+function clashArt() {
+  const L = n => IMG['c-' + n] || load('c-' + n, `art4/clash/${n}.png?v=1`), realm = worldOf();
+  if (CLASH_PAINTED.k.includes(keeper)) for (const n of ['clash', 'clash-eyes', 'clash-rise']) L(`k${keeper}-${n}`);
+  if (CLASH_PAINTED.boss.includes(realm)) for (const n of ['clash', 'clash-eyes', 'clash-break']) L(`${realm}-${n}`);
+}
+const hr = i => { const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); };
+function clash(k) {
+  const C = CLASH[k]; if (!C || !S || reduce || S.clash || S.omni || S.omniSnap || (typeof hsOn === 'function' && hsOn())) return 0;
+  if (k !== 'final' && S.t - (S.clashAt ?? -99) < 15) return 0;
+  const kp = n => n ? IMG['k' + keeper + n] || load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`) : IMG['k' + keeper];
+  const B = S.boss, realm = (B && B.realm) || worldOf(), stage = Math.min(2, S.freedPeople || 0);
+  S.clash = { k, t:0, len:C.len, hit:C.hit, done:false, kim:kp(CLASH_POSE[k]) || IMG['k' + keeper],
+    bim:k === 'night' ? IMG['boss-' + realm + '-ice' + (stage + 1)] : B ? IMG[B.img + (CLASH_BOSS[k] || '')] || IMG[B.img] : null,
+    kc:FORM_PAL[keeperEl] || [EL[keeperEl], '#FFFFFF'], bc:EL[realm] || '#8FD0FF' };
+  { const P = n => ok(IMG['c-' + n]) ? IMG['c-' + n] : null, kn = `k${keeper}-`, bn = realm + '-';   // the painted close-ups, when they're here
+    S.clash.kp = P(kn + (k === 'night' ? 'clash-eyes' : k === 'surge' ? 'clash-rise' : 'clash')); S.clash.bp = P(bn + (k === 'night' ? 'clash-eyes' : k === 'final' ? 'clash-break' : 'clash')); }
+  S.clashAt = S.t; SFX.sweep && SFX.sweep(); return C.len;
+}
+function clashTick(dt) {
+  const C = S.clash; if (!C) return; C.t += dt;
+  if (!C.done && C.t >= C.hit) { C.done = true; S.shake = Math.max(S.shake, C.k === 'final' ? .9 : .5);
+    if (C.k === 'surge') SFX.power && SFX.power(); else if (C.k === 'guard') { SFX.shatter && SFX.shatter(); SFX.boom && SFX.boom(true); } else if (C.k !== 'night') SFX.boom && SFX.boom(true); else SFX.freeze && SFX.freeze(); }
+  if (C.t >= C.len) S.clash = null;
+}
+function drawClash() {
+  const C = S.clash; if (!C || !ok(C.kim)) return;
+  const u = Math.min(W, H), t = C.t, ein = 1 - Math.pow(1 - Math.min(1, t / .16), 3), out = Math.min(1, Math.max(0, (C.len - t) / .2)), a = Math.min(ein, out), seed = Math.floor(t * 18) * 97;
+  const pic = (im, cx, cy, h, fx, fy, flip) => { if (!ok(im)) return; const w = im.width * h / im.height; g.save(); g.translate(cx, cy); if (flip) g.scale(-1, 1); g.drawImage(im, -fx * w, -fy * h, w, h); g.restore(); };
+  const lines = (cx, cy, r0, R, n, col, al) => { g.strokeStyle = col; for (let i = 0; i < n; i++) { const an = hr(seed + i) * TAU, r1 = r0 * (.8 + hr(seed + i + 7) * .7);
+      g.lineWidth = (.8 + hr(seed + i + 99) * 2.6) * u / 600; g.globalAlpha = al * (.2 + hr(seed + i + 3) * .5); g.beginPath(); g.moveTo(cx + Math.cos(an) * r1, cy + Math.sin(an) * r1); g.lineTo(cx + Math.cos(an) * R, cy + Math.sin(an) * R); g.stroke(); } g.globalAlpha = 1; };
+  const panel = (pts, fill) => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fillStyle = fill; g.fill(); };
+  const grad = (x0, y0, x1, y1, c0, c1) => { const q = g.createLinearGradient(x0, y0, x1, y1); q.addColorStop(0, c0); q.addColorStop(1, c1); return q; };
+  const burst = (cx, cy, r, n, col, al) => { g.globalAlpha = al; g.fillStyle = col; g.beginPath(); for (let i = 0; i < n * 2; i++) { const an = i / (n * 2) * TAU + seed * .001, rr = i % 2 ? r * .42 : r * (.8 + hr(i + seed) * .4); g.lineTo(cx + Math.cos(an) * rr, cy + Math.sin(an) * rr); } g.closePath(); g.fill(); g.globalAlpha = 1; };
+  const push = 1 + .07 * Math.min(1, t / C.len), hk = Math.max(0, 1 - Math.abs(t - C.hit) / .22);
+  const cover = (im, x0, y0, w, h, ax = .5, ay = .5) => { if (!ok(im)) return; const s = Math.max(w / im.width, h / im.height) * push, dw = im.width * s, dh = im.height * s; g.drawImage(im, x0 + (w - dw) * ax, y0 + (h - dh) * ay, dw, dh); };
+  g.save(); g.fillStyle = `rgba(5,7,20,${.66 * a})`; g.fillRect(0, 0, W, H);
+  if (C.k === 'night') {   // two bands: the Keeper's eyes, and the frozen one on the horizon watching back
+    const bh = H * .26, y1 = H * .2, y2 = H * .54, sx = (1 - ein) * W * .7;
+    g.save(); g.globalAlpha = a; g.translate(-sx, 0); g.beginPath(); g.rect(0, y1, W, bh); g.clip();
+    panel([[0, y1], [W, y1], [W, y1 + bh], [0, y1 + bh]], grad(0, y1, W, y1, '#0E1638', C.kc[0])); lines(W * .5, y1 + bh / 2, u * .2, W, 34, '#FFFFFF', .7);
+    if (C.kp) cover(C.kp, 0, y1, W, bh); else pic(C.kim, W * .5, y1 + bh * .5, u * 2.5 * push, .5, .33); g.restore();
+    g.save(); g.globalAlpha = a; g.translate(sx, 0); g.beginPath(); g.rect(0, y2, W, bh); g.clip();
+    panel([[0, y2], [W, y2], [W, y2 + bh], [0, y2 + bh]], grad(0, y2, W, y2, '#CFE6FF', '#0B1530')); lines(W * .5, y2 + bh / 2, u * .2, W, 34, '#DDF1FF', .5);
+    if (C.bp) cover(C.bp, 0, y2, W, bh); else pic(C.bim, W * .5, y2 + bh * .5, u * 1.25 * push, .5, .32); g.restore();
+    g.globalAlpha = a * hk * .5; g.fillStyle = '#DDF1FF'; g.fillRect(0, y2 - 3, W, 6); g.globalAlpha = 1;
+  } else if (C.k === 'surge') {   // one tilted band: the Keeper's power fills the screen
+    const y0 = H * .5, bh = H * .42, tl = H * .06, sx = (1 - ein) * W;
+    g.save(); g.globalAlpha = a; g.translate(-sx, 0); g.beginPath(); g.moveTo(0, y0 - bh / 2 + tl); g.lineTo(W, y0 - bh / 2 - tl); g.lineTo(W, y0 + bh / 2 - tl); g.lineTo(0, y0 + bh / 2 + tl); g.closePath(); g.clip();
+    g.fillStyle = grad(0, 0, W, 0, C.kc[2] || C.kc[0], C.kc[1]); g.fillRect(0, 0, W, H); lines(W * .5, y0, u * .22, W, 48, '#FFFFFF', .8);
+    burst(W * .5, y0, u * .32 * (1 + hk * .4), 14, '#FFFFFF', hk * .5); if (C.kp) pic(C.kp, W * .5, y0 + bh * .55, bh * 1.25 * push, .5, 1); else pic(C.kim, W * .5, y0 - bh * .02, u * 1.25 * push, .5, .42); g.restore();
+  } else {   // the clash: a diagonal split, the Keeper against the boss, meeting at the seam
+    const tx = W * .58, bx = W * .42, sl = (1 - ein) * W * .65, mid = [W * .5, H * .5];
+    g.save(); g.globalAlpha = a; g.translate(-sl, 0); g.beginPath(); g.moveTo(0, 0); g.lineTo(tx, 0); g.lineTo(bx, H); g.lineTo(0, H); g.closePath(); g.clip();
+    g.fillStyle = grad(0, 0, tx, 0, '#0B1230', C.kc[0]); g.fillRect(0, 0, W, H); lines(W * .26, H * .42, u * .2, W, 40, '#FFFFFF', .7);
+    if (C.kp) pic(C.kp, W * .27, H * .5, Math.max(H * .92, W * 1.1) * push, .5, .5); else pic(C.kim, W * .3, H * .47, u * 1.5 * push, .5, .3); g.restore();
+    g.save(); g.globalAlpha = a; g.translate(sl, 0); g.beginPath(); g.moveTo(tx, 0); g.lineTo(W, 0); g.lineTo(W, H); g.lineTo(bx, H); g.closePath(); g.clip();
+    g.fillStyle = grad(W, 0, tx, 0, '#06081A', C.bc); g.fillRect(0, 0, W, H); lines(W * .74, H * .4, u * .2, W, 40, '#DDF1FF', .55);
+    if (C.bp) pic(C.bp, W * .74, H * .52, Math.max(H * .95, W * 1.15) * push, .5, .5); else pic(C.bim, W * .7, H * .52, u * 2 * push, .5, .3); g.restore();
+    // the seam blazes where they meet; at the hit, a burst in both colours
+    g.globalAlpha = a; g.strokeStyle = '#FFFFFF'; g.lineWidth = u * (.006 + .02 * hk); g.shadowColor = C.kc[1]; g.shadowBlur = u * .05; g.beginPath(); g.moveTo(tx + sl * 0, 0); g.lineTo(bx, H); g.stroke(); g.shadowBlur = 0;
+    if (hk > 0) { const r0 = C.kp ? .16 : .3; burst(mid[0], mid[1], u * r0 * (1 + hk), 16, C.kc[1], hk * .5); burst(mid[0], mid[1], u * r0 * .6 * (1 + hk), 12, '#FFFFFF', hk * .65); }
+    if (C.k === 'guard' && t > C.hit) for (let i = 0; i < 26; i++) { const an = hr(i) * TAU, d = (t - C.hit) * u * (.6 + hr(i + 5) * 1.2); g.fillStyle = '#DDF1FF'; g.globalAlpha = a * .8; g.fillRect(mid[0] + Math.cos(an) * d, mid[1] + Math.sin(an) * d, u * .012, u * .03); }
+    g.globalAlpha = 1;
+    // the last blow whites out into the Wake (a slow warm rise, never a flash)
+    if (C.k === 'final' && t > C.hit) { const w = Math.min(.6, (t - C.hit) / (C.len - C.hit) * .6), rg = g.createRadialGradient(mid[0], mid[1], 0, mid[0], mid[1], u * (.2 + (t - C.hit) * 1.6));
+      rg.addColorStop(0, `rgba(255,248,228,${w})`); rg.addColorStop(1, 'rgba(255,248,228,0)'); g.globalAlpha = 1; g.fillStyle = rg; g.fillRect(0, 0, W, H); }
+  }
+  g.restore();
+}
 // the season's home theme: it changes every season, so there is always something new to hear (A, 2026-10-05)
 const THEME = { id:'haven', n:'Haven' };
 
@@ -12156,7 +12415,7 @@ function loop(now, id) {
   if (!running || id !== loopId) return;
   $('#hud').classList.toggle('cine', !!(S && (S.omni || S.omniSnap)));
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
-  if (S.hitstop > 0) S.hitstop -= dt; else update(dt);   // a split-second freeze makes big hits land
+  if (S.clash) clashTick(dt); else if (S.hitstop > 0) S.hitstop -= dt; else update(dt);   // (a clash holds the world still)   // a split-second freeze makes big hits land
   draw(); edgeGlow(); drawMap(dt); hud(); coachTick(dt);
   if (running && id === loopId) requestAnimationFrame(t => loop(t, id));
 }
@@ -12246,7 +12505,7 @@ function breatheLife(realm, daily) {
   orb.onpointerdown = e => { e.preventDefault(); AU.init(); inhale(); }; orb.onpointerup = orb.onpointerleave = orb.onpointercancel = () => release();
   const kd = e => { if (scr.hidden) return removeEventListener('keydown', kd); if (e.key === ' ' && !e.repeat) { e.preventDefault(); inhale(); } }, ku = e => { if (scr.hidden) return removeEventListener('keyup', ku); if (e.key === ' ') release(); };
   addEventListener('keydown', kd); addEventListener('keyup', ku);
-  paint(); setOrb(1, .4, 'Hold to breathe in'); show('breathe'); AU.music(true); if (!(HMUSIC && S && S.hearth && S.won)) AU.song('home'); if (!again) AU.vo('vo-breathe-in', .5, .4); armIdle();
+  paint(); setOrb(1, .4, 'Hold to breathe in'); show('breathe'); AU.music(true); if (!((HMUSIC || HSCORE && S && S.hearth && S.hearth.lv === 1) && S && S.hearth && S.won)) AU.song('home'); if (!again) AU.vo('vo-breathe-in', .5, .4); armIdle();
   if (fast) { inhale(); t0 -= 3000; release(); }
 }
 /* Coming back every day (A, 2026-10-08: "i agree with the daily return question"; the rule: reward the grind, never punish the
@@ -12276,7 +12535,8 @@ function win() {
   // anyone still frozen is freed when the boss falls: nobody is ever left behind (batch 3)
   if (S && S.people) for (const q of rescueLeft()) freePerson(q, true);
   if (S.won) return; S.won = true; S.over = true; running = false; skillWin(S.t, S.falls || 0);
-  if (S.hearth) hearthWake();   // the Wake: the realm thaws in four seconds
+  const cl = S.hearth ? clash('final') : 0;   // the last blow: a clash that whites out into the Wake
+  if (S.hearth) hearthWake(cl);   // the Wake: the realm thaws in four seconds
   // no hurt tint frozen on the Keeper through the slow freeing (A's playthrough, 2026-10-05)
   S.p.hitAt = -9; S.p.hurt = 0;
   AU.music(false); SFX.bossdown(); S.shake = .8; S.dz = []; S.dzOn = false; AU.release();
@@ -12295,7 +12555,7 @@ function win() {
   let last = performance.now();
   const at = (k, t, fn) => { if (T.cue === k && T.t >= t) { T.cue++; fn(); } };
   const step = now => {
-    const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now; T.t += dt;
+    const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now; if (S.clash) clashTick(dt); else T.t += dt;
     const cx = T.x, cy = T.y - T.s * .45;
     at(0, .25, () => SFX.heartbeat());
     at(1, .95, () => SFX.heartbeat());
@@ -12647,7 +12907,7 @@ function results(quiet) {
   if (!reduce && !quiet) $('#resChips').querySelectorAll('[data-n]').forEach(el => { const n = +el.dataset.n, t0 = performance.now() + 900, fmt = el.dataset.f || '';
     const tick = now => { const k = Math.min(1, Math.max(0, (now - t0) / 1100)), v = Math.round(n * (1 - Math.pow(1 - k, 3))); el.firstChild.nodeValue = fmt + v.toLocaleString(); if (k < 1 && !$('#results').hidden) requestAnimationFrame(tick); };
     el.firstChild.nodeValue = fmt + '0'; requestAnimationFrame(tick); });
-  const last = S.won && LVL === LEVELS.length, next = S.won && LVL < LEVELS.length || last;
+  const last = S.won && LVL === LEVELS.length, next = S.won && LVL < Math.min(LEVELS.length, SHIPPED) || last;   // (no next button past the levels that have shipped)
   if (next && !last) { store.set('morqi.unlocked', Math.max(unlocked(), LVL + 1)); $('#nextLvBtn').textContent = `Level ${LVL + 1} ▶`; }
   // after the last level the green button leads to the thank-you for the whole demo
   if (last) { store.set('morqi.demoDone', '1'); $('#nextLvBtn').textContent = 'Continue ▶'; }
@@ -12661,12 +12921,12 @@ function results(quiet) {
 addEventListener('contextmenu', e => { if (!(e.target.closest && e.target.closest('input, textarea'))) e.preventDefault(); });
 // ...and on the breath screen a held thumb never starts iOS's text magnifier or selection (buttons keep their taps)
 $('#breathe').addEventListener('touchstart', e => { if (!e.target.closest('button')) e.preventDefault(); }, { passive:false });
-window.__morqi = { rescueAll:() => { for (const q of rescueLeft()) freePerson(q, true); }, au:AU, lb:() => ({ on:lbOn(), t:S.lb && S.lb.t, burst:S.lb && S.lb.burst, img:ok(IMG['k' + keeper + 'breath']), cam:[camX, camY, Z] }), react:(key, x, y) => react(key, REACT[key], x, y), reactKeys:() => Object.keys(REACT), giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => { if (!S.boss) spawnBoss(); win(); }, hearthSkip: () => hearthSkip(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
+window.__morqi = { clash:k => { if (S) S.clashAt = -99; return clash(k); }, rescueAll:() => { for (const q of rescueLeft()) freePerson(q, true); }, au:AU, lb:() => ({ on:lbOn(), t:S.lb && S.lb.t, burst:S.lb && S.lb.burst, img:ok(IMG['k' + keeper + 'breath']), cam:[camX, camY, Z] }), react:(key, x, y) => react(key, REACT[key], x, y), reactKeys:() => Object.keys(REACT), giant:(k, at) => spawnGiant(k, at), run:() => startLoop(), boss:() => spawnBoss(), view:() => (hudKeep(), { camX, camY, Z, W, H, hud:HUD_KEEP }), snap:() => { draw(); edgeGlow(); hud(); }, call:{ lane:(x, y) => tideLane(S.p, x, y, S.call, null, CALL[S.call.id].embers ? true : undefined), get seal() { return S && S.call ? CALL[S.call.id].seal : null; }, open:() => openSeal(), stroke:(dx, dy) => sealStroke(dx, dy), quick:() => quickCall(), ready:() => { if (S && S.call) S.call.cd = 0; }, get s() { return S && S.call; } }, tip: id => showCoach({ id, title:id, text:'' }), bloom: () => startBloom(), highest: t => hsStart(false, t || 5), forge: () => FORGE, tipPic: () => firebarPic(), outPic: () => outpostPic(), still: () => stillScene(), stone: el => collectStone(el), win: () => { if (!S.boss) spawnBoss(); win(); }, hearthSkip: () => hearthSkip(), ult: () => { const was = running; running = true; const r = fireUlt(); running = was; return r; },  state: () => S, finish: () => results(), opts: () => options(), levelUp: () => levelUp(), awaken: () => awaken(), tips: () => { COACH.gap = 0; coachTick(0); },
   step: (n, auto) => { loopId++; running = true; for (let i = 0; i < n; i++) {
       if (!$('#levelUp').hidden) { if (!auto) break; const o = (S.offered || options()).find(x => x.kind !== 'sparks'); if (o) { applyPick(o, true); megaRest(o); } else { payPouch(); S.mega = 1; S.megaNow = false; } show(null); afterPick(); }
       if (COACH.cur) { if (!auto) break; if (COACH.cur.card) show(null); hideCoach(); COACH.cur = null; }
       if (auto) COACH.q.length = 0;
-      if (!running) break; update(1 / 30); }
+      if (!running) break; if (S.clash) { clashTick(1 / 30); continue; } update(1 / 30); }   // (a clash holds the world still, as in loop())
     if (!S.over) running = false; draw(); hud(); return { t:Math.round(S.t), lv:S.lv, hp:Math.round(S.p.hp), en:S.en.length, freed:S.thawed, fx:FX.length }; } };
 // test hook: a burst of every debris and particle kind around the Keeper (rising spikes too), stepped n frames. draw() shows them in a
 // real frame; fxOnly draws the particles alone, so a check can count the shapes they make
@@ -12741,7 +13001,7 @@ function renderLevels() {
   const u = unlocked(), st = starsOf(LVL), locked = LVL > u;
   $('#lvNum').textContent = `Level ${LVL}`; $('#lvName').textContent = LEVELS[LVL - 1].name; $('.tname').style.setProperty('--c', EL[REALM[LVL - 1]]);
   $('.tname').classList.toggle('locked', locked);
-  if (locked) { $('#lvStars').innerHTML = `<b class="tlock">Free ${LEVELS[u - 1].name.replace(/^The /, 'the ')} to open it</b>`; $('#lvStars').setAttribute('aria-label', 'Locked'); }
+  if (locked) { $('#lvStars').innerHTML = `<b class="tlock">${LVL > SHIPPED ? 'Coming soon' : `Free ${LEVELS[u - 1].name.replace(/^The /, 'the ')} to open it`}</b>`; $('#lvStars').setAttribute('aria-label', 'Locked'); }
   else { const cr = !!store.get('morqi.crown.' + LVL);
     $('#lvStars').innerHTML = [0, 1, 2].map(i => `<i class="${i < st ? 'on' : ''}">\u2605</i>`).join('') + (st === 3 || cr ? `<svg class="crown${cr ? ' on' : ''}" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-1.6-10-4.6 4.2L12 5 9.2 12.2 4.6 8z"/></svg>` : '');
     $('#lvStars').setAttribute('aria-label', `${st} of 3 stars${cr ? ', and the crown' : ''}`); }
@@ -12992,7 +13252,7 @@ $('#thxAgain').onclick = () => { THX_T.forEach(clearTimeout); SFX.select(); show
 let editingKeeper = false, mapPicked = false, homeSaid = false;
 function profile() { try { const p = JSON.parse(store.get('morqi.profile') || 'null'); return p && p.keeper && ANIMAL[p.animal] && EL[p.el] ? p : null; } catch (e) { return null; } }
 function saveProfile() { store.set('morqi.profile', JSON.stringify({ keeper, animal, el:keeperEl })); }
-function applyProfile(p) { keeper = p.keeper; animal = p.animal; keeperEl = p.el; const base = ANIMAL_BASE[animal]; Object.assign(ANIMAL[animal], base, { e:keeperEl, e2:base.e !== keeperEl ? base.e : undefined }); }
+function applyProfile(p) { keeper = KEEPERS_OPEN.includes(p.keeper) ? p.keeper : KEEPERS_OPEN[0]; animal = p.animal; keeperEl = p.el; const base = ANIMAL_BASE[animal]; Object.assign(ANIMAL[animal], base, { e:keeperEl, e2:base.e !== keeperEl ? base.e : undefined }); }
 { const t0 = performance.now(), ti = $('#title'); ti.classList.add('loading');
   const tick = () => { const p = LD.n ? LD.d / LD.n : 1, lit = Math.min(5, Math.floor(p * 5 + .001)), done = (p >= 1 && performance.now() - t0 > 1200) || performance.now() - t0 > 7000;
     [...$('#ldBar').children].forEach((s, i) => s.classList.toggle('on', i < (done ? 5 : lit))); $('#ldBar').setAttribute('aria-valuenow', Math.round((done ? 1 : p) * 100));
@@ -13077,7 +13337,7 @@ function cloudFrame(now) {
     const kw = KNOT.w / 760 * 368 * 1.25, kh = KNOT.h / 256 * 116 * 1.25, cx = (KNOT.x + KNOT.w / 2) / 760 * 368, cy = KNOT.h / 2 / 256 * 116 + 1;
     x.drawImage(CLOUD.knot, cx - kw / 2, cy - kh / 2 + by, kw, kh); }
 }
-$('#ldGo').onclick = () => { AU.init(); SFX.select(); AU.music(true); AU.song('home'); let p = profile(); if (!p && PITCH) p = { keeper:1, animal:'goat', el:'wood' }; if (p) { applyProfile(p); goTab('home'); if (PITCH) pitchRun(); } else show('pickKeeper'); };
+$('#ldGo').onclick = () => { AU.init(); SFX.soft(); AU.music(true); AU.song('home'); let p = profile(); if (!p && PITCH) p = { keeper:1, animal:'goat', el:'wood' }; if (p) { applyProfile(p); goTab('home'); if (PITCH) pitchRun(); } else show('pickKeeper'); };
 // the pitch link goes straight into the run, never through the Star Call picker: the last call, or the first one owned (QA, 2026-10-08)
 function pitchRun() { const own = ownedCalls(), last = store.get('morqi.call'); callPick = callForced() || (own.includes(last) ? last : own[0]) || null; show(null); startRun(); }
 // a phone turned on its side shows the rotate screen; the run pauses under it and waits for a tap once the phone is
