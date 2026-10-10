@@ -4308,7 +4308,7 @@ function startRun() {
   // Level 5 holds the temples too (A, 2026-10-07)
   S.l5 = LVL === 5 && towersOn() ? makeL5() : null; S.well = LVL === 5 ? makeWell() : null;
   if (S.out) { S.p.x = S.out.start.x; S.p.y = S.out.start.y; S.pet.x = S.p.x - 40; S.pet.y = S.p.y + 30; camX = S.p.x - VW / 2; camY = S.p.y - VH * .45; }
-  new Image().src = `art4/rise/k${keeper}.jpg?v=13`; for (let r = 1; r <= 4; r++) if (!IMG[animal + 'r' + r]) load(animal + 'r' + r, `art4/run/a-${animal}-r${r}.png?v=1`); if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); for (const n of ['breath', 'inhale', 'exhale']) if (!IMG['k' + keeper + n]) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL >= SURGE.from) { formArt(); if (!IMG['k' + keeper + 'face']) load('k' + keeper + 'face', `art4/k${keeper}-face.png?v=13`); } if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=13`; new Image().src = `art4/k${keeper}-hurt.png?v=13`; } renderSkills();
+  new Image().src = `art4/rise/k${keeper}.jpg?v=13`; for (let r = 1; r <= 4; r++) if (!IMG[animal + 'r' + r]) load(animal + 'r' + r, `art4/run/a-${animal}-r${r}.png?v=1`); if (!IMG['k' + keeper + 'hs']) load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`); for (const n of ['breath', 'inhale', 'exhale', ...(CAST_ART ? ['throw', 'slam', 'push', 'summon'] : [])]) if (!IMG['k' + keeper + n]) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL >= SURGE.from) { formArt(); if (!IMG['k' + keeper + 'face']) load('k' + keeper + 'face', `art4/k${keeper}-face.png?v=13`); } if (OMNI_PAINTED[keeper]) { for (const v of ['', '-closed']) if (!IMG['k' + keeper + 'eyes' + v]) load('k' + keeper + 'eyes' + v, `art4/omni/k${keeper}-omni-eyes${v}.jpg?v=3`); } else if (!IMG['k' + keeper + 'eyesrc']) load('k' + keeper + 'eyesrc', `art4/k${keeper}-highest.png?v=8`); for (const n of ['reach', 'breath']) load('k' + keeper + n, `art4/k${keeper}-${n}.png?v=13`); if (LVL === 5) { new Image().src = `art4/k${keeper}-shock.png?v=13`; new Image().src = `art4/k${keeper}-hurt.png?v=13`; } renderSkills();
   COACH.q.length = 0; COACH.cur = null; COACH.gap = .4; hideCoach(); NOTES.q.length = 0; NOTES.t = 3;
   // (on a computer the keys card shows for a player's first two runs, for twenty seconds)
   stage.classList.remove('keyshow');
@@ -4848,7 +4848,20 @@ function nearest(x, y, n, maxD = 560, skip) {
   return out.sort((a, b) => a[1] - b[1]).slice(0, n).map(a => a[0]);
 }
 function inArea(x, y, r, fn) { for (const e of S.en) if (!e.dead && Math.abs(e.x - x) < r + e.r && Math.hypot(e.x - x, e.y - y) < r + e.r) fn(e); }
-function cool(id, t, dt) { S.cds[id] = (S.cds[id] ?? .3) - dt; if (S.cds[id] > 0) return false; S.cds[id] = t * cdMul(); return true; }
+// quiet hands (studio review, A approved 2026-10-10: "should the powers only fire when the enemy is at a certain distance so the weapons
+// arent just firing at all times"; the game director's bot: powers fired at empty air 54-61% of a Hearth level): a timed power waits,
+// ready, until a creature is in reach (on screen round the Keeper), then fires at once; auto-fire stays, aiming loses 7-year-olds
+function cool(id, t, dt) { S.cds[id] = (S.cds[id] ?? .3) - dt; if (S.cds[id] > 0) return false; if (!S.reach) { S.cds[id] = 0; return false; } S.cds[id] = t * cdMul(); castPose(id); return true; }
+// the Keeper's body says which power just went (A, 2026-10-10: "paintings/poses to match the animation to the power being performed"):
+// a throw, a slam, a push or a summon for a moment, turned toward the creature; Codex paints the four for every Keeper (brief 43)
+const CAST_POSE = { bamboo:'throw', ember:'throw', skip:'throw', lantern:'throw', boulder:'slam', dong:'slam', vine:'push', bellwave:'push', tidewave:'push', surge:'push', rain:'summon', pearl:'summon', swords:'summon', bamgrove:'summon' };
+const CAST_ART = false;   // on when brief 43 lands
+function castPose(id) { const P = S.p, k = CAST_POSE[id]; if (!k || S.t - (P.castAt ?? -9) < .35) return; P.castAt = S.t; P.castPose = k;
+  const t = nearest(P.x, P.y, 1, 900)[0]; if (t && !P.moving) P.face = t.x < P.x ? -1 : 1; }
+function reachTick() {
+  const P = S.p, hx = VW * .5 + 20, hy = VH * .5 + 20; S.reach = false;
+  for (const e of S.en) if (!e.dead && !e.horde && Math.abs(e.x - P.x) < hx && Math.abs(e.y - P.y) < hy) { S.reach = true; break; }
+}
 // a blast: flash, fireballs rolling outward, sparks, smoke, a scorch mark and a ring
 function explode(x, y, r, dmg, el, big) {
   inArea(x, y, r, e => hurt(e, dmg, el, { kb:220, fx:x, fy:y }));
@@ -4868,7 +4881,7 @@ function firePatch(x, y, r, dur, dmg, festival) {
 }
 
 function powers(dt) {
-  const cd0 = { ...S.cds }; powersRun(dt);
+  reachTick(); const cd0 = { ...S.cds }; powersRun(dt);
   for (const k in S.cds) if (S.cds[k] > (cd0[k] ?? 0) + .05) { palmPush(S.p); break; }
 }
 function powersRun(dt) {
@@ -9534,7 +9547,7 @@ function draw() {
   // brief 19); the slumped breath pose is kept for catching their breath at the end only (design review, 2026-10-08)
   // and for the first 0.6 s of the burst, the out-breath: palms pushing out, a long calm breath (Codex's exhale pose, brief 20)
   const lbk = lbOn() && S.lb.t > S.lb.life - .5, lbi = lbOn() && !S.lb.burst, lbx = lbOn() && S.lb.burst && S.lb.t < LB.breath + .6, lbIn = lbOn() && !S.lb.burst ? 1 + .03 * Math.sin(Math.min(1, S.lb.t / LB.breath) * Math.PI / 2) : 1;
-  const posed = lbi ? pose('inhale') : lbx ? pose('exhale') : lbk ? pose('breath') : S.dash ? pose('dash') : hk > .3 ? pose('hurt') : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
+  const posed = lbi ? pose('inhale') : lbx ? pose('exhale') : lbk ? pose('breath') : S.dash ? pose('dash') : hk > .3 ? pose('hurt') : CAST_ART && S.t - (P.castAt ?? -9) < .28 ? pose(P.castPose) : S.t - (P.cheerAt ?? -9) < .8 ? pose('cheer') : null;
   // the Keeper is drawn at KEEPER_KS (above draw()), one scale for every pose
   const hs = hsOn(), hsIm = hs ? (IMG['k' + keeper + 'hs'] || load('k' + keeper + 'hs', `art4/k${keeper}-omni.png?v=1`)) : null;
   // while Ascended the Keeper stays themself on the ground; the Ascended form rises out of them as a genie
