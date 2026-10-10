@@ -8122,7 +8122,9 @@ function makeHearth(lv) {
   for (const k of ['whole', 'hurt', 'frozen', 'surge']) A(`hs-${st.art}-${k}`);
   for (const p of plots) for (const k of ['ruin', 'built', 'u1', 'u2']) A(`ws-${p.id}-${k}`);
   A('mat-' + C.mat); A('horn-' + (C.mat === 'shell' ? 'conch' : 'bamboo'));
-  if (LM_ART && C.map) for (const L of C.map.lm) A('lm-' + L.id);
+  if (LM_ART && C.map) for (const L of C.map.lm) A('lm-' + (LM_PIC[L.id] || L.id));
+  if (C.mat === 'shell') A('mat-pearl'); else A('mat-bamboo-gold');
+  for (const k of ['wake-crack-1', 'wake-crack-2', 'wake-crack-3', 'wake-bloom-' + (C.mat === 'shell' ? 'water' : 'wood'), 'frost-' + (C.mat === 'shell' ? 'water' : 'wood') + '-1']) A(k);
   return { lv, C, stone:st, plots, phase:'day', pt:0, trickT:HH.trickle, storm:{ x:st.x - (C.map ? Math.cos(C.map.storm[0].from) * C.map.storm[0].D : 0), y:st.y - (C.map ? Math.sin(C.map.storm[0].from) * C.map.storm[0].D : 0), r:HSTORM.r0, out:0, beat:0, t:0 }, throws:[], beds:0, day:0, night:0, mat:0, drops:[], bolts:[], q:[], sq:0, surged:false, surgeT:0, hold:null, ease:0, tries:0, allAt:null, cause:null, minT:0 };
 }
 // the Keeper starts just below the stone, with home on screen
@@ -8152,6 +8154,8 @@ function hearthPhase(ph) { const H = HS(); H.phase = ph; H.pt = 0;
 /* ---------- the phase machine, called from direct() in place of the old waves ---------- */
 function hearthTick(dt) {
   const H = HS(), C = H.C, st = H.stone, P = S.p; H.pt += dt;
+  // the crystal frost arrives a moment after the run starts: the cached ground is redrawn once with it
+  if (!H.frostOn && ok(IMG['frost-' + (C.mat === 'shell' ? 'water' : 'wood') + '-1'])) { H.frostOn = true; icePat = null; resetTiles(); }
   H.surgeT = Math.max(0, H.surgeT - dt);
   // while Surge holds, the stone fountains its element: sparks leap up and out in the Keeper's colours
   if (H.surgeT > 0 && (H.sparkT = (H.sparkT || 0) - dt) <= 0) { H.sparkT = .03; const pal = FORM_PAL[keeperEl], a = -Math.PI / 2 + rnd(-1.1, 1.1), v = rnd(260, 520);
@@ -8540,11 +8544,12 @@ function hearthBanner(on) {
 }
 /* ---------- drawing (stand-ins until brief 38) ---------- */
 // the warm circle of home, the frost-throwers' red lanes, the shells, the hold ring and the cost chip: on the ground, under everyone
-const LM_ART = false;   // on when brief 42's landmarks land
+const LM_ART = true;   // brief 42 landed (2026-10-10)
+const LM_PIC = { clam:'rocks' };
 const LM_W = { pier:420, boat:360, nets:380, drowned:400, rocks:340, clam:200 };
 function drawLandmarks(inView) {
   const H = HS(), M = H.C.map, st = H.stone; if (!M) return;
-  for (const L of M.lm) { const x = st.x + L.x, y = st.y + L.y; if (!inView(x, y, 300)) continue; const im = LM_ART && IMG['lm-' + L.id], w = LM_W[L.id] || 360;
+  for (const L of M.lm) { const x = st.x + L.x, y = st.y + L.y; if (!inView(x, y, 300)) continue; const im = LM_ART && IMG['lm-' + (LM_PIC[L.id] || L.id)], w = LM_W[L.id] || 360;
     if (ok(im)) { g.drawImage(im, x - w / 2, y - w * .7, w, w); continue; }
     g.save(); g.translate(x, y); g.strokeStyle = 'rgba(46,42,68,.7)'; g.lineWidth = 3;
     if (L.id === 'pier') { g.fillStyle = '#9A7650'; for (let i = 0; i < 3; i++) { g.fillRect(-90 + i * 62, -14, 56, 28); g.strokeRect(-90 + i * 62, -14, 56, 28); } g.fillStyle = '#6E5236'; g.fillRect(96, -46, 12, 56); }
@@ -8579,10 +8584,10 @@ function hearthGround(inView) {
     add(() => { g.save(); const gr = g.createLinearGradient(0, d.y - 170, 0, d.y); gr.addColorStop(0, 'rgba(255,240,210,0)'); gr.addColorStop(1, `rgba(255,236,200,${.4 * bl})`); g.fillStyle = gr; g.fillRect(d.x - 9, d.y - 170, 18, 170); g.restore(); });
     g.globalAlpha = (.35 + .3 * pu) * bl; g.strokeStyle = H.C.mat === 'shell' ? '#FFE9DC' : '#C8F0A8'; g.lineWidth = 3; g.beginPath(); g.ellipse(d.x, d.y + 4, 30 + 6 * pu, 12 + 2 * pu, 0, 0, TAU); g.stroke(); g.globalAlpha = 1;
     g.globalAlpha = .25 * bl; g.fillStyle = '#000'; g.beginPath(); g.ellipse(d.x, d.y + 4, 13, 5, 0, 0, TAU); g.fill(); g.globalAlpha = bl;
-    add(() => glowAt(d.x, d.y - 10 - d.z, 60, H.C.mat === 'shell' ? '#FFE2C8' : '#C8F0A8', .5 * bl)); matAt(H.C.mat, d.x, d.y - 14 - d.z - Math.abs(Math.sin(S.t * 3 + d.x)) * 5, 21); g.globalAlpha = 1; }
+    add(() => glowAt(d.x, d.y - 10 - d.z, 60, H.C.mat === 'shell' ? '#FFE2C8' : '#C8F0A8', .5 * bl)); matAt(H.C.mat, d.x, d.y - 14 - d.z - Math.abs(Math.sin(S.t * 3 + d.x)) * 5, d.prize ? 34 : 21, d.prize); g.globalAlpha = 1; }
   g.restore();
 }
-function matAt(kind, x, y, r) { const im = IMG['mat-' + kind]; if (ok(im)) { const s = r * 3; g.drawImage(im, x - s / 2, y - s / 2, s, s); return; } if (kind === 'shell') return shellAt(x, y, r);
+function matAt(kind, x, y, r, prize) { const im = IMG[prize ? (kind === 'shell' ? 'mat-pearl' : 'mat-bamboo-gold') : 'mat-' + kind]; if (ok(im)) { const s = r * 3; g.drawImage(im, x - s / 2, y - s / 2, s, s); return; } if (kind === 'shell') return shellAt(x, y, r);
   g.save(); g.translate(x, y); g.rotate(-.6); g.fillStyle = '#7CC456'; g.strokeStyle = '#3F7A2A'; g.lineWidth = 2; g.beginPath(); g.roundRect(-r * .38, -r, r * .76, r * 2, r * .3); g.fill(); g.stroke();
   g.beginPath(); g.moveTo(-r * .38, -r * .2); g.lineTo(r * .38, -r * .2); g.moveTo(-r * .38, r * .5); g.lineTo(r * .38, r * .5); g.stroke(); g.restore(); }
 function shellAt(x, y, r) {
@@ -8741,6 +8746,7 @@ function hearthShimmerChip(p, x, y, sc, shake) {
 // the bolts, the well's bubbles, and the guide arrow: above the crowd
 function hearthTop() {
   const H = HS(), st = H.stone, P = S.p;
+  drawWake();
   // the storm wall, drawn the way the temple levels draw theirs, by day only
   if (stormOn() || (H.phase === 'dawn' && H.pt < HH.dawn)) hearthStormDraw();
   // what leaves a person's hands: a spinning net, a stream of bubbles, a cloud of bees, a volley of thorns
@@ -8828,6 +8834,18 @@ function hearthBossBadge() {
   g.rotate(a); g.fillStyle = 'rgba(200,232,255,.95)'; g.beginPath(); g.moveTo(r + 14, 0); g.lineTo(r + 4, -7); g.lineTo(r + 4, 7); g.closePath(); g.fill();
   g.restore(); g.globalAlpha = 1;
 }
+// the Wake (studio review; Codex brief 42): when the boss is freed, the ice cracks out in a ring, the shore bursts alive and the land
+// thaws from the stone outward, on its own clock so the victory sequence can't stall it
+function hearthWake() { const H = HS(); if (!H || H.wake) return; H.wake = { t0:performance.now(), x:S.boss ? S.boss.x : H.stone.x, y:S.boss ? S.boss.y : H.stone.y, r:0 }; SFX.shatter && SFX.shatter(); SFX.fanfare && SFX.fanfare(true); }
+function drawWake() {
+  const H = HS(), Wk = H && H.wake; if (!Wk) return; const t = (performance.now() - Wk.t0) / 1000; if (t > 4.5) return;
+  const st = H.stone, R = Math.min(1600, t * 520); if (R > Wk.r + 120) { Wk.r = R; paintThaw(st.x, st.y, R); }
+  const fr = t < .25 ? 1 : t < .5 ? 2 : 3, cr = IMG['wake-crack-' + fr], sz = 260 + t * 900;
+  if (t < 1.4 && ok(cr)) { g.globalAlpha = Math.max(0, 1 - t / 1.4); g.drawImage(cr, Wk.x - sz / 2, Wk.y - 120 - sz / 2, sz, sz); g.globalAlpha = 1; }
+  const bl = IMG['wake-bloom-' + (H.C.mat === 'shell' ? 'water' : 'wood')];
+  if (t > .35 && t < 4 && ok(bl)) { const k = Math.min(1, (t - .35) / .5), fade = Math.min(1, (4 - t) / .8), s2 = 380 + 140 * k; g.globalAlpha = fade; g.drawImage(bl, Wk.x - s2 / 2, Wk.y - 160 - s2 / 2 - 40 * k, s2, s2); g.globalAlpha = 1;
+    add(() => glowAt(Wk.x, Wk.y - 160, 520, '#FFF1C2', .35 * fade)); }
+}
 // dusk goes gold to violet to teal over the whole screen (screen space)
 function hearthSky() {
   const Hh = HS(); let k = 0, c = null;
@@ -8892,7 +8910,7 @@ const TILE = 512, TPAD = 8, TS = .7, tiles = new Map(), tmpT = document.createEl
 const TPX = Math.ceil((TILE + TPAD * 2) * TS); tmpT.width = tmpT.height = TPX;
 let icePat = null, grassPat = null, seaIcePat = null, seaPat = null;
 // each level's ground: frozen and restored
-const groundTex = () => S ? groundArt(worldOf()) : [texF, texM];
+const groundTex = () => { if (!S) return [texF, texM]; const a = groundArt(worldOf()); if (S.hearth) { const fr = IMG['frost-' + (S.hearth.C.mat === 'shell' ? 'water' : 'wood') + '-1']; if (ok(fr)) return [fr, ...a.slice(1)]; } return a; };   // (a Hearth level's frozen ground is brief 42's crystal frost, life trapped inside)
 let patW = '';
 function markThaw(x, y, r) { r += TPAD; for (let i = Math.floor((x - r) / TILE); i <= Math.floor((x + r) / TILE); i++) for (let j = Math.floor((y - r) / TILE); j <= Math.floor((y + r) / TILE); j++) { const t = tiles.get(i * 64 + j); if (t && !t.dirty) { t.dirty = true; t.since = performance.now(); } } }
 function resetTiles() { tiles.clear(); }
@@ -12194,6 +12212,7 @@ function win() {
   // anyone still frozen is freed when the boss falls: nobody is ever left behind (batch 3)
   if (S && S.people) for (const q of rescueLeft()) freePerson(q, true);
   if (S.won) return; S.won = true; S.over = true; running = false; skillWin(S.t, S.falls || 0);
+  if (S.hearth) hearthWake();   // the Wake: the realm thaws in four seconds
   // no hurt tint frozen on the Keeper through the slow freeing (A's playthrough, 2026-10-05)
   S.p.hitAt = -9; S.p.hurt = 0;
   AU.music(false); SFX.bossdown(); S.shake = .8; S.dz = []; S.dzOn = false; AU.release();
