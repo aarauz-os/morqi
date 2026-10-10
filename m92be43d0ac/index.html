@@ -1821,6 +1821,15 @@ select{color:#1B2257;background:linear-gradient(180deg,#FFFFFF,#E4EAFF);box-shad
 #hsBar .hsi img{position:relative;width:30px;height:30px;object-fit:contain}
 #matPill img{width:24px;height:24px;object-fit:contain}
 #duskBanner.art b{font-size:17px;white-space:nowrap}
+/* the Dawn Gift: who gives each card, and the one that beats tonight shimmers gold */
+#cards .card{position:relative}
+#cards .card .giver{position:absolute;top:-12px;left:12px;z-index:2;display:flex;align-items:center;gap:6px;padding:3px 10px 3px 3px;border-radius:16px;background:rgba(14,20,52,.92);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);font:800 12px/1 ui-rounded,system-ui;color:#fff}
+#cards .card .giver img{width:24px;height:24px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:#2B3594}
+#cards .card .giver.mine{padding:5px 10px;color:#FFD86A}
+#cards .card.counter{box-shadow:0 0 0 3px #FFD86A,0 0 26px 4px rgba(255,216,106,.55);animation:giftglow 1.4s ease-in-out infinite}
+@keyframes giftglow{50%{box-shadow:0 0 0 3px #FFE9A8,0 0 38px 8px rgba(255,216,106,.75)}}
+/* the banner's words sit on dark glass over Codex's frame, never ghosted (design critic, 2026-10-10) */
+#duskBanner.art div{padding:6px 12px;border-radius:12px;background:rgba(14,20,52,.84);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 </style>
 
 <div id="stage">
@@ -4623,11 +4632,11 @@ function spawnBoss() {
   ring(e.x, e.y, 20, 400, '#FFFFFF', .8, 16, true); smoke(e.x, e.y + 60, 14, 50, B.mist);
   // the first time a player meets each boss, one card names it and how to beat its signature attack
   // (the spirit animal's awakening follows that card; without a card it comes 1.4 s in, and never later than 12 s)
-  const card = !SEEN.has('_boss-' + realm);
+  const card = !SEEN.has('_boss-' + realm) && !S.hearth;   // (a Hearth boss is met at the last dusk, never carded mid-fight)
   if (card) setTimeout(() => { if (!S || S.over) return; coach('boss-' + realm, B.name, `${PEOPLE[realm].replace(/^The /, 'A ')}, stuck in ${FEEL[realm]}. ${B.tip}`, () => ({ sx:W / 2, sy:H * .4 })); COACH.gap = 0; }, 1100);
   const wake = () => { if (S && !S.over && !S.bossWoke) { S.bossWoke = true; awaken(); } };
   setTimeout(wake, card ? 12000 : 1400);
-  setTimeout(() => luma('vo-boss-' + realm, true), 1500);
+  if (!S.hearth) setTimeout(() => luma('vo-boss-' + realm, true), 1500);
   if (!card) setTimeout(() => { if (S && !S.over) releaseLevels(); }, 2400); else setTimeout(() => { if (S && !S.over && !COACH.cur) releaseLevels(); }, 15000);
 }
 
@@ -8082,11 +8091,11 @@ const HEARTH = {
   1:{ stone:{ x:1800, y:1800, art:'lamp', goal:'Keep the lamp lit till dawn', out:'The light went out' }, mat:'shell', cost:[6, 12], drop:.75,
       // Isla north-east, Pip south-west, and tonight's fire comes down those two lanes (CEO, conflict 2)
       plots:[{ id:'isla', n:'Isla', el:'water', role:'well', a:-Math.PI / 4, ice:[430, -680] }, { id:'pip', n:'Pip', el:'water', role:'trap', a:Math.PI * .75, ice:[-450, 660] }],
-      dayCap:45, days:[45, 20], nights:[{ el:'fire', len:45, waves:[[0, 8], [15, 10], [30, 12]], throwers:2, lanes:[-Math.PI / 4, Math.PI * .75] }],
+      reunion:{ who:'isla', word:'Papa?' }, dayCap:45, days:[45, 20], nights:[{ el:'fire', len:45, waves:[[0, 8], [15, 10], [30, 12]], throwers:2, lanes:[-Math.PI / 4, Math.PI * .75] }],
       boss:{ from:-Math.PI / 2, lanes:[-Math.PI / 4, Math.PI * .75] } },
   // the Bamboo Grove: the Whistle Bird Bo carved for his mother at six, on a living bamboo stump (creative's decision); two nights,
   // earth first so Bo's wood pays off, then metal so Tam's fire does; the element lesson starts here (CEO, conflict 3)
-  2:{ stone:{ x:1800, y:1800, art:'bird', goal:'Keep the Whistle Bird safe till dawn', out:'The bird went quiet' }, mat:'bamboo', cost:[10, 20], drop:.5,
+  2:{ reunion:{ who:'bo', word:'Mama?' }, stone:{ x:1800, y:1800, art:'bird', goal:'Keep the Whistle Bird safe till dawn', out:'The bird went quiet' }, mat:'bamboo', cost:[10, 20], drop:.5,
       plots:[{ id:'bo', n:'Bo', el:'wood', role:'wall', a:-Math.PI / 4, ice:[540, -620] }, { id:'tam', n:'Tam', el:'fire', role:'hive', a:Math.PI * .75, ice:[-560, 600] }],
       days:[35, 30, 15], nights:[{ el:'earth', len:40, waves:[[0, 10], [15, 12], [30, 14]], throwers:3, lanes:[-Math.PI / 4, Math.PI * .75] },
         { el:'metal', len:45, waves:[[0, 10], [15, 12], [30, 14]], throwers:3, lanes:[-Math.PI / 4, Math.PI * .75] }],
@@ -8156,9 +8165,12 @@ function hearthTick(dt) {
   } else if (H.phase === 'dawn') {
     st.hp = Math.min(st.max, st.hp + st.max * dt / HH.dawn);
     H.storm.r = HSTORM.home + (HSTORM.r0 - HSTORM.home) * Math.min(1, H.pt / HH.dawn);   // the sunrise pushes the frost back out
-    if (H.pt >= HH.dawn) { st.hp = st.max; hearthPhase('day'); }
+    if (H.pt >= HH.dawn) { st.hp = st.max; hearthPhase('day'); hearthDawnGifts(); }
   } else if (H.phase === 'boss') {
     H.sq = Math.min(100, H.sq + .5 * dt);
+    // he reaches the lamp, and his daughter knows him (A approved, 2026-10-10: her one word, the freed's only exception to "thank you")
+    const B = S.boss; if (B && !B.dead && B.atStone && !H.papa && C.reunion) { H.papa = true; const q = (S.people || []).find(q => q.id === C.reunion.who && q.state === 'keeper');
+      if (q) { q.freedAt = S.t; q.fx = B.x < q.x ? -1 : 1; floatText(q.x, q.y - 150, C.reunion.word, '#FFFFFF', 28); SFX.heal && SFX.heal(); B.stagAt = S.t; } }
     // minions down the lanes every 8 s, and every other time a frost-thrower too, so standing at home still can't win it
     if ((H.minT -= dt) <= 0) { H.minT = HH.minions[0]; H.minN = (H.minN || 0) + 1; const L = C.boss.lanes, el = S.boss ? S.boss.el : worldOf();
       for (let i = 0; i < HH.minions[1]; i++) H.q.push({ at:H.pt + i * .4, lane:L[i % L.length], el });
@@ -8168,7 +8180,7 @@ function hearthTick(dt) {
   }
   // queued spawns stream in down their lanes
   for (let i = H.q.length - 1; i >= 0; i--) if (H.pt >= H.q[i].at) { hearthSpawn(H.q[i]); H.q.splice(i, 1); }
-  hearthStorm(dt); hearthPeople(dt); hearthBuildings(dt); hearthDrops(dt); hearthBolts(dt); hearthHold(dt);
+  hearthGiftTick(dt); hearthStorm(dt); hearthPeople(dt); hearthBuildings(dt); hearthDrops(dt); hearthBolts(dt); hearthHold(dt);
   for (const t of H.throws) t.t += dt; H.throws = H.throws.filter(t => t.t < t.life);
   // the workshop whose element beats tonight's shimmers at dusk; from Level 2 only after 3 s, so the help fades as the lesson sticks
   { const N = hearthNight(), late = S.t - (H.duskAt ?? 1e9);
@@ -8258,7 +8270,7 @@ function hearthPeople(dt) {
   const H = HS();
   for (const q of S.people || []) { const p = q.hh; if (!p || q.state === 'ice') continue;
     const hx = p.x + 128, hy = p.y + 40;
-    if (q.state === 'free') { q.state = 'run'; q.runAt = S.t + .9; }   // a gasp, a look at you, then home
+    if (q.state === 'free') { q.state = 'run'; q.runAt = S.t + .9; hearthCrack(); }   // a gasp, a look at you, then home; and ice falls off him, far away
     if (q.state === 'run') { if (S.t < q.runAt) continue; const d = Math.hypot(hx - q.x, hy - q.y);
       if (d < 12) { q.state = 'craft'; q.craftT = 2; q.mv = 0; q.x = hx; q.y = hy; q.fx = -1; }
       else { const v = MOVE * .95 * dt; q.x += (hx - q.x) / d * Math.min(d, v); q.y += (hy - q.y) / d * Math.min(d, v); q.mv = 1; q.fx = hx < q.x ? -1 : 1; } }
@@ -8318,6 +8330,31 @@ function hearthBuildings(dt) {
 }
 // the person does the work: a craft pose and something you can see leave their hands for the creature
 function hearthThrow(q, e, k) { const H = HS(); q.castAt = S.t; q.fx = e.x < q.x ? -1 : 1; if (H.throws.length < 24) H.throws.push({ k, x0:q.x, y0:q.y - 70, e, x1:e.x, y1:e.y - e.size * .35, t:0, life:k === 'net' ? .4 : .5 }); }
+/* ---------- the Dawn Gift ---------- */
+const hearthTonight = () => hearthBossNext() ? BOSSES[worldOf()].name : hearthNight().el + ' creatures';
+// each freed person offers a power of their craft's element, and your own element offers one; the one that beats tonight shimmers
+function hearthOptions() {
+  const givers = [...(S.people || []).filter(q => q.state !== 'ice').map(q => ({ el:q.el, who:q })), { el:keeperEl, who:null }];
+  const tonight = hearthBossNext() ? worldOf() : hearthNight().el, beat = Object.keys(CONTROLS).find(k => CONTROLS[k] === tonight);
+  const opts = [], used = new Set(), nA = Object.keys(S.skills).length;
+  for (const g of givers) {
+    const ids = Object.keys(POW).filter(id => POW[id].e === g.el && !S.evo[id] && !used.has(id) && (S.skills[id] ? S.skills[id] < maxStars(id) : nA < SLOTS.active)).sort((a, b) => (S.skills[b] || 0) - (S.skills[a] || 0) + rnd(-.4, .4));
+    const id = ids[0]; if (!id) continue; used.add(id); opts.push({ kind:'active', id, giver:g.who ? g.who.n : null, gid:g.who && PEOPLE_ART.includes(g.who.id) ? g.who.id : null, mine:!g.who, counter:POW[id].e === beat });
+  }
+  if (opts.length < 3) for (const o of options()) { if (opts.length >= 3) break; if (!opts.some(p => p.kind === o.kind && p.id === o.id)) opts.push(o); }
+  return opts.slice(0, 3);
+}
+// at the start of each day after a night: up to 2 picks; every extra banked level grows the first pick (one MEGA, never a wall of cards)
+const HGIFT = { picks:2 };
+function hearthGiftTick(dt) {
+  const H = HS(); if (!H.giftPicks || S.pendingLevel || !running || S.over || COACH.cur || hsOn() || S.omni) return;
+  if ((H.giftWait = (H.giftWait ?? .6) - dt) > 0) return; H.giftWait = .5;
+  H.giftPicks--; if (H.giftExtra) { S.queued = H.giftExtra; H.giftExtra = 0; } H.giving = true; S.lastSheet = -99; levelUp(); H.giving = false;
+}
+function hearthDawnGifts() {
+  const H = HS(), n = H.gifts || 0; if (!n) return; H.gifts = 0;
+  H.giftPicks = Math.min(HGIFT.picks, n); H.giftWait = .8; S.queued = 0; H.giftExtra = n - H.giftPicks;
+}
 /* ---------- shells ---------- */
 function hearthDrop(e) {
   const H = HS(); if (!H || e.boss || e.horde || H.phase === 'out') return; e.xp *= HH.xp;
@@ -8386,11 +8423,29 @@ function hearthRetry(paid) {
 }
 // QA only: jump to the last day before the boss night (the bots walk the real way; QA's boss check waits only about 80 s)
 function hearthSkip() { const H = HS(); if (!H) return; H.night = H.C.nights.length; H.day = H.C.days.length - 1; hearthClear(true); hearthPhase('day'); H.pt = H.C.days[H.day] - .05; }
+/* ---------- the boss you already know ---------- */
+// (studio review, A approved 2026-10-10: "the boss just comes up out of nowhere"): his frozen figure stands on the horizon where he
+// will come from, from the first second; each person you free cracks ice off him; the last dusk is the meeting; then he walks in
+const bossSpot = () => { const H = HS(), a = H.C.boss.from; return { x:H.stone.x + Math.cos(a) * 1050, y:H.stone.y + Math.sin(a) * 1050 }; };
+function hearthCrack() { const H = HS(), b = bossSpot(); H.crackAt = S.t; shards(b.x, b.y - 140, '#DDF1FF', 26, 420); ring(b.x, b.y - 120, 20, 320, '#DDF1FF', .6, 12, true); SFX.shatter && SFX.shatter(); SFX.freeze && SFX.freeze(); }
+function drawBossFigure() {
+  const H = HS(); if (S.bossSpawned || H.phase === 'boss') return; const b = bossSpot(), realm = worldOf(), freed = S.freedPeople || 0, stage = Math.min(2, freed);
+  const art = IMG['boss-' + realm + '-ice' + (stage + 1)], base = IMG['bz-' + realm], sz = 300, k = Math.max(0, 1 - (S.t - (H.crackAt ?? -9)) / .5);
+  g.save(); g.translate(b.x + k * 6 * Math.sin(S.t * 60), b.y);
+  g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(0, 6, 90, 26, 0, 0, TAU); g.fill();
+  add(() => glowAt(0, -150, 260, '#BFE6FF', .25 + .15 * Math.sin(S.t * 2)));
+  if (ok(art)) g.drawImage(art, -sz / 2, -sz * .92, sz, sz);
+  else if (ok(base)) { g.globalAlpha = .92; g.drawImage(frozenArt(base, realm), -sz / 2, -sz * .92, sz, sz); g.globalAlpha = 1;
+    // the ice block: thick and whole, then cracked, then mostly fallen away
+    const a = [.55, .38, .2][stage]; g.fillStyle = `rgba(214,238,255,${a})`; g.strokeStyle = `rgba(240,250,255,${.6 + a})`; g.lineWidth = 3; g.beginPath(); g.roundRect(-sz * .4, -sz * .95 + stage * 40, sz * .8, sz * .95 - stage * 40, 22); g.fill(); g.stroke();
+    if (stage) { g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = 2.5; for (let i = 0; i < stage * 3; i++) { const x0 = -sz * .3 + i * 37 % (sz * .6), y0 = -sz * .8 + i * 53 % (sz * .6); g.beginPath(); g.moveTo(x0, y0); g.lineTo(x0 + 18, y0 + 26); g.lineTo(x0 + 6, y0 + 50); g.stroke(); } } }
+  g.restore();
+}
 /* ---------- the boss night ---------- */
 function hearthBossNight() {
   const H = HS(), st = H.stone, a = H.C.boss.from; hearthPhase('boss'); H.surged = false; H.minT = 6;
   spawnBoss(); const b = S.boss; if (!b) return;
-  b.hh = 1; b.x = st.x + Math.cos(a) * 1050; b.y = st.y + Math.sin(a) * 1050; // a Keeper whose element barely hurts this boss (water against the Pearl Shore's water boss) meets it a little weaker (bot, 2026-10-09:
+  b.hh = 1; { const sp = bossSpot(); b.x = sp.x; b.y = sp.y; } $('#bossWrap').classList.remove('on'); b.barOn = false; // a Keeper whose element barely hurts this boss (water against the Pearl Shore's water boss) meets it a little weaker (bot, 2026-10-09:
   // water Keepers lost a Rise in 80-90 s fights while every other element won in 20-40 s)
   b.hp = b.max = Math.round(b.max * HH.bossHp * (eff(keeperEl, b.el) < 1 ? .65 : 1));
   // the frost closes into a ring round home: the boss night is fought round the stone
@@ -8417,6 +8472,7 @@ function hearthGoal() {
 const hearthAfford = () => { const H = HS(); return H.plots.filter(p => p.lvl >= 1 && p.lvl < 3 && H.mat >= H.C.cost[p.lvl - 1]).sort((a, b) => Math.hypot(a.x - S.p.x, a.y - S.p.y) - Math.hypot(b.x - S.p.x, b.y - S.p.y))[0] || null; };
 function hearthHud() {
   const H = HS(), st = H.stone, bar = $('#hsBar'), mp = $('#matPill');
+  { const B = S.boss; if (B && !B.dead && !B.barOn && Math.abs(B.x - S.p.x) < VW * .55 && Math.abs(B.y - S.p.y) < VH * .55) { B.barOn = true; $('#bossWrap').classList.add('on'); } }
   if (bar.hidden) { bar.hidden = false; mp.hidden = false; }
   const f = st.hp / st.max, k = Math.round(f * 100) + ':' + Math.round(H.sq) + ':' + (H.surgeT > 0) + ':' + (S.t - (st.hitAt ?? -9) < .25);
   if (bar.dataset.k !== k) { bar.dataset.k = k; bar.style.setProperty('--hf', f.toFixed(3)); bar.style.setProperty('--hq', (H.surged ? 0 : H.sq / 100).toFixed(3)); bar.classList.toggle('low', f < 1 / 3); bar.classList.toggle('surge', H.surgeT > 0); bar.classList.toggle('hit', S.t - (st.hitAt ?? -9) < .25); }
@@ -8432,7 +8488,8 @@ function hearthBanner(on) {
   const boss = hearthBossNext(), N = hearthNight(), el = boss ? worldOf() : N.el;
   b.querySelector('em').textContent = boss ? 'THE LAST NIGHT' : 'NIGHT ' + (H.night + 1);
   b.querySelector('b').innerHTML = boss ? `Tonight: <span style="color:${EL[el]}">${BOSSES[worldOf()].name}</span>` : `Tonight: <span style="color:${GROUND_RING[el] || EL[el]}">${el}</span> creatures`;
-  const im = b.querySelector('img'), kid = boss ? null : el + '-a', pic = kid && IMG['e-' + kid]; im.hidden = !(pic && ok(pic)); if (pic && ok(pic)) im.src = pic.src;
+  const im = b.querySelector('img'), kid = boss ? null : el + '-a', pic = boss ? IMG['bz-' + worldOf()] : kid && IMG['e-' + kid];
+  if (boss) { b.querySelector('b').innerHTML = `Tonight, <span style="color:${EL[el]}">he comes</span>`; setTimeout(() => S && !S.over && luma('vo-boss-' + worldOf(), true), 600); } im.hidden = !(pic && ok(pic)); if (pic && ok(pic)) im.src = pic.src;
   b.classList.add('on');   // hidden by hearthTick when dusk ends, so a pause holds it
 }
 /* ---------- drawing (stand-ins until brief 38) ---------- */
@@ -8474,9 +8531,11 @@ function shellAt(x, y, r) {
 }
 // the stone and the workshops stand among the creatures, drawn in depth order
 let HDQ = [], HDI = 0;
-function hearthDepth() { const H = HS(); HDQ = [{ k:'stone', y:H.stone.y + 20, o:H.stone }, ...H.plots.map(p => ({ k:'plot', y:p.y + 30, o:p }))].sort((a, b) => a.y - b.y); HDI = 0; }
-function hearthTo(y) { while (HDI < HDQ.length && HDQ[HDI].y <= y) { const d = HDQ[HDI++]; d.k === 'stone' ? drawHearthStone(d.o) : drawWorkshop(d.o); } }
+function hearthDepth() { const H = HS(), b = bossSpot(); HDQ = [{ k:'stone', y:H.stone.y + 20, o:H.stone }, { k:'figure', y:b.y, o:null }, ...H.plots.map(p => ({ k:'plot', y:p.y + 30, o:p }))].sort((a, b) => a.y - b.y); HDI = 0; }
+function hearthTo(y) { while (HDI < HDQ.length && HDQ[HDI].y <= y) { const d = HDQ[HDI++]; d.k === 'stone' ? drawHearthStone(d.o) : d.k === 'figure' ? drawBossFigure() : drawWorkshop(d.o); } }
 function drawHearthStone(st) {
+  { const H = HS(), n = Math.min(8, (H.gifts || 0) + (H.giftPicks || 0)); for (let i = 0; i < n; i++) { const a = S.t * 1.4 + i * TAU / Math.max(n, 1), x = st.x + Math.cos(a) * 70, y = st.y - 120 + Math.sin(a) * 26 + Math.sin(S.t * 3 + i) * 6;
+      add(() => glowAt(x, y, 46, '#FFE08A', .85)); g.fillStyle = '#FFF6D8'; g.beginPath(); g.arc(x, y, 5, 0, TAU); g.fill(); } }
   const H = HS(), f = st.hp / st.max, nk = S.night || 0, x = st.x, y = st.y, sg = H.surgeT > 0, out = H.phase === 'out', hit = Math.max(0, 1 - (S.t - (st.hitAt ?? -9)) / .2);
   g.save();
   g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(x, y + 8, 70, 22, 0, 0, TAU); g.fill();
@@ -8681,7 +8740,22 @@ function hearthMap(mg, half, scale) {
   for (const d of H.drops) if (!d.got) { mg.fillStyle = '#FFE2C8'; mg.beginPath(); mg.arc(X(d.x), Y(d.y), 2.2, 0, TAU); mg.fill(); }
   for (const q of S.people || []) if (q.state === 'ice') { const x = X(q.x), y = Y(q.y), s = 4.5 + .8 * Math.sin(S.t * 5); mg.fillStyle = '#CFEAFF'; mg.strokeStyle = '#2B3594'; mg.lineWidth = 1.2; mg.beginPath(); mg.moveTo(x, y - s); mg.lineTo(x + s, y); mg.lineTo(x, y + s); mg.lineTo(x - s, y); mg.closePath(); mg.fill(); mg.stroke(); }
   mg.fillStyle = '#FFFFFF'; mg.strokeStyle = '#FFD98A'; mg.lineWidth = 2; mg.beginPath(); mg.arc(X(H.stone.x), Y(H.stone.y), 4, 0, TAU); mg.fill(); mg.stroke();
+  if (!S.bossSpawned) { const b = bossSpot(); mg.fillStyle = '#CFEAFF'; mg.strokeStyle = '#2B3594'; mg.lineWidth = 1.5; mg.beginPath(); mg.arc(X(b.x), Y(b.y), 5.5, 0, TAU); mg.fill(); mg.stroke(); }
   mg.restore();
+}
+// he is always in view: when his frozen figure is off screen, his icy face waits at the screen's edge, pointing to him, and shakes as
+// ice falls off him (screen space)
+function hearthBossBadge() {
+  const H = HS(); if (S.bossSpawned || H.phase === 'boss' || H.phase === 'out') return; const b = bossSpot(), cam = S.cam || { x:camX, y:camY };
+  const sx = (b.x - cam.x) * Z, sy = (b.y - 150 - cam.y) * Z; if (sx > 20 && sx < W - 20 && sy > 150 && sy < H_px() - 40) return;
+  const cx = W / 2, cy = H_px() / 2, dx = sx - cx, dy = sy - cy, k = Math.min((W / 2 - 46) / Math.abs(dx || 1e-3), (H_px() / 2 - 120) / Math.abs(dy || 1e-3)), x = cx + dx * k, y = Math.max(178, cy + dy * k);
+  const im = IMG['bz-' + worldOf()], sh = Math.max(0, 1 - (S.t - (H.crackAt ?? -9)) / .6) * 6 * Math.sin(S.t * 50), r = 26, a = Math.atan2(dy, dx), pu = .5 + .5 * Math.sin(S.t * 2.5);
+  g.save(); g.translate(x + sh, y);
+  g.globalAlpha = .9; g.fillStyle = 'rgba(14,20,52,.85)'; g.beginPath(); g.arc(0, 0, r + 4, 0, TAU); g.fill();
+  g.strokeStyle = `rgba(200,232,255,${.6 + .4 * pu})`; g.lineWidth = 3; g.stroke();
+  g.save(); g.beginPath(); g.arc(0, 0, r, 0, TAU); g.clip(); if (ok(im)) g.drawImage(frozenArt(im, worldOf()), -r * 1.9, -r * 1.2, r * 3.8, r * 3.8); g.fillStyle = `rgba(214,238,255,${.35 - .1 * Math.min(2, S.freedPeople || 0)})`; g.fillRect(-r, -r, r * 2, r * 2); g.restore();
+  g.rotate(a); g.fillStyle = 'rgba(200,232,255,.95)'; g.beginPath(); g.moveTo(r + 14, 0); g.lineTo(r + 4, -7); g.lineTo(r + 4, 7); g.closePath(); g.fill();
+  g.restore(); g.globalAlpha = 1;
 }
 // dusk goes gold to violet to teal over the whole screen (screen space)
 function hearthSky() {
@@ -9630,7 +9704,7 @@ function draw() {
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
   if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
-  if (S.hearth) { g.setTransform(DPR, 0, 0, DPR, 0, 0); hearthSky(); world(g); }
+  if (S.hearth) { g.setTransform(DPR, 0, 0, DPR, 0, 0); hearthSky(); hearthBossBadge(); world(g); }
   drawFX(true);
   // a waiting Qi Stone: a glowing beacon at your side leans toward it, small at first and growing brighter and bigger the
   // longer it waits (A, 2026-10-05: a reminder that does not get in the way)
@@ -11265,6 +11339,10 @@ function payPouch() {
   P.hp = Math.min(P.max, P.hp + P.max * .2); ring(P.x, P.y, 20, 220, '#FFC54A', .45, 12, true); stars(P.x, P.y - 40, 16, '#FFE58A', 300); SFX.ting();
 }
 function levelUp() {
+  // the Dawn Gift (studio review, A approved 2026-10-10): on a Hearth level a level-up never stops play; it banks as a gift light on the
+  // Heartstone, and at dawn the people you freed give them (5b-hearth.js, hearthGifts)
+  if (S.hearth && !S.hearth.giving) { S.hearth.gifts = (S.hearth.gifts || 0) + 1 + (S.queued || 0); S.queued = 0; return; }
+  const giving = !!(S.hearth && S.hearth.giving);
   // never break a Bloom or Ascended, the boss's entrance or a Star Call: level-ups wait, then come one after another
   // a level-up in a lull that already has picks waiting joins them, so the lull's cap of three holds (QA, 2026-10-08); and any picks
   // still queued from an earlier flush fold back into the held count, so nothing slips past the cap in a chain
@@ -11272,7 +11350,7 @@ function levelUp() {
   const soon = !S.flushing && !S.bossAt && !S.bossSpawned && S.t - (S.lastSheet ?? -99) < 20;
   if (S.bloom || hsOn() || S.omni || S.omniSnap || S.holdLevels || callBusy() || inPeak() || lbOn() || joinLull || soon) { S.lvlDefer = (S.lvlDefer || 0) + 1 + (S.queued || 0); S.queued = 0;
     return; }
-  const P = S.p, chain = S.lvChain, opts = options(); S.lvChain = false;
+  const P = S.p, chain = S.lvChain, opts = giving ? hearthOptions() : options(); S.lvChain = false;
   // a Keeper with every power at its best is paid on the spot, a pouch of Sparks and a breath of health, with no sheet to
   // stop play (QA, 2026-10-06: a gem-chasing player met sixty sheets of only a pouch and tea)
   // (a MEGA ready is used up here too, paid once as its bonus in pouches, and counts as a sheet; studio QA, 2026-10-08: without
@@ -11295,7 +11373,7 @@ function levelUp() {
   draw(); hud();
   // a stack of level-ups (Level 5's swarms) shows its picks still to come as gold pips that empty one by one, so the run
   // of cards reads as one big reward without a number to read (A, 2026-10-06: "so much that we get for bigger rewards")
-  $('#luTitle').textContent = S.megaNow ? 'MEGA Level Up!' : 'Level Up!'; $('#levelUp').classList.toggle('mega', !!S.megaNow);
+  $('#luTitle').textContent = giving ? (S.megaNow ? 'A golden dawn!' : 'Gifts at dawn') : S.megaNow ? 'MEGA Level Up!' : 'Level Up!'; $('#levelUp').classList.toggle('mega', !!S.megaNow);
   { const pp = $('#luPips'); pp.hidden = S.mega < 2; pp.innerHTML = `<b>+${S.mega} levels</b>`; pp.setAttribute('aria-label', `Your pick grows ${S.mega} levels`); }
   const tip = $('#luTip');
   if (!S.taught.lu) { S.taught.lu = 1; AU.vo('vo-card-levelup'); tip.innerHTML = 'Pick one. The <b>bars</b> show its level.'; tip.hidden = false; }
@@ -11303,9 +11381,12 @@ function levelUp() {
   else if (opts.some(o => o.kind === 'evo') && !S.taught.luevo) { S.taught.luevo = 1; tip.innerHTML = '<b>EVOLVE!</b> Take it.'; tip.hidden = false; }
   else if (opts.some(o => o.kind === 'gift') && !S.taught.lugift) { S.taught.lugift = 1; tip.innerHTML = '<b>Gifts</b> (round) unlock evolutions.'; tip.hidden = false; }
   else tip.hidden = true;
+  if (giving && !S.taught.dawngift) { S.taught.dawngift = 1; const N = hearthTonight(); tip.innerHTML = `Gifts from the people you freed. Tonight: <b>${N}</b>. The <b>glowing</b> card beats it.`; tip.hidden = false; }
   // the first MEGA says what it is and how the next one is earned
   if (S.megaNow && !SEEN.has('_megateach')) { markSeen('_megateach'); tip.innerHTML = `<b>MEGA!</b> Your pick grows ${S.mega} levels. Free creatures with the element that beats them to earn the next.`; tip.hidden = false; }
   renderLoadout(); renderCards(opts);
+  // who gives each gift, and the one that beats tonight shimmers gold
+  if (giving) [...$('#cards').children].forEach((b, i) => { const o = opts[i]; if (!o) return; if (o.gid) b.insertAdjacentHTML('afterbegin', `<span class="giver"><img src="art4/people/p-${o.gid}-hold.png?v=3" alt="">${o.giver}</span>`); else if (o.mine) b.insertAdjacentHTML('afterbegin', `<span class="giver mine">Yours</span>`); b.classList.toggle('counter', !!o.counter); });
   $('#rerollN').textContent = S.rerolls; $('#rerollBtn').disabled = !S.rerolls; $('#rerollBtn').style.opacity = S.rerolls ? 1 : .45;
   show('levelUp');
 }
