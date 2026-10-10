@@ -2960,8 +2960,9 @@ ZOD.forEach(z => { load(z + 'y', `art4/a-${z}-y.png?v=8`); load(z + 'm', `art4/a
 ['f1', 'up', 'slam', 'dash', 'cast'].forEach(n => load('w-' + n, `art4/warden/${n}.png?v=8`));   // the Warden's poses
 // the five realm bosses, each with its idle pose and four attack poses, and its minion
 // (loaded when its level starts, so a run only fetches the one boss it will meet)
-// a realm boss repainted as the person inside, turned to ice (Codex brief 41, A approved 2026-10-10): new versions, walk frames as png
-const BOSS_V2 = { water:true };
+// the bosses stay monsters (A, 2026-10-10: "why are we going with the boss being a frozen person and not a monster?! That's such a baby
+// move. I want to introduce and carry real weight and depth"); brief 41's toy-ice repaint is withdrawn; the person is revealed only when freed
+const BOSS_V2 = {};
 function loadBoss(b) { if (IMG['bz-' + b]) return; const v = BOSS_V2[b] ? 10 : 9; load('bz-' + b, `art4/bosses/${b}.png?v=${v}`); for (const n of ['up', 'slam', 'dash', 'cast']) load(`bz-${b}-${n}`, `art4/bosses/${b}-${n}.png?v=${v}`); for (let n = 1; n <= 4; n++) load(`bz-${b}-w${n}`, BOSS_V2[b] ? `art4/bosses/${b}-w${n}.png?v=10` : `art4/bosses/${b}-w${n}.webp?v=1`); }
 // every element sends its own creatures: a swarm creature (a), a specialist with its own trick (b) and a brute (c)
 const ROLE = { critter:'a', wolf:'b', golem:'c', minion:'m' };
