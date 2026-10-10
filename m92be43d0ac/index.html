@@ -8081,7 +8081,7 @@ function makeHearth(lv) {
   for (const q of S.people) { if (PEOPLE_ART.includes(q.id)) { for (const ps of PEOPLE_POSES) if (!IMG['p-' + q.id + '-' + ps]) load('p-' + q.id + '-' + ps, `art4/people/p-${q.id}-${ps}.png?v=3`); }
     else if (!IMG['k' + q.stand]) load('k' + q.stand, `art4/k${q.stand}.png?v=13`); }
   // Codex's brief 38 (2026-10-09): the Heartstone in four states, each workshop in four, the material, the dusk banner and the horn
-  const A = (n, v = 1) => IMG[n] || load(n, `art4/hearth/${n}.png?v=${n.startsWith('hs-') ? 2 : v}`);
+  const A = (n, v = 1) => IMG[n] || load(n, `art4/hearth/${n}.png?v=${n.startsWith('hs-') || n.endsWith('-ruin') ? 2 : v}`)   // (briefs 39 and 40 repainted the stones and the ruins);
   for (const k of ['whole', 'hurt', 'frozen', 'surge']) A(`hs-${st.art}-${k}`);
   for (const p of plots) for (const k of ['ruin', 'built', 'u1', 'u2']) A(`ws-${p.id}-${k}`);
   A('mat-' + C.mat); A('horn-' + (C.mat === 'shell' ? 'conch' : 'bamboo'));
