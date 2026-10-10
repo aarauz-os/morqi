@@ -8189,9 +8189,7 @@ function hearthStorm(dt) {
     if (!St.wasOut) { const m = fewTimes('_hstorm', 3); if (m) { markSeen(m); floatText(P.x, P.y - 120, 'Back inside the light!', '#FFE6A3', 22); } } }
   else { St.out = Math.max(0, St.out - dt * 2.5); St.beat = 0; }
   St.wasOut = out;
-  // taught once: the first morning, as the wall first moves
-  if (stormOn() && H.day === 0 && H.pt > 5 && !SEEN.has('_hstormcard') && !COACH.cur) { markSeen('_hstormcard');
-    coach('hstorm', 'The frost is closing in!', `Grab the ${H.C.mat === 'shell' ? 'shells' : 'bamboo'} before the frost reaches them, and get home before it does. When it reaches home, night falls.`, () => ({ sx:W / 2, sy:H_SY() })); }
+  // (no card: the wall, the minimap and "Back inside the light!" teach it; every card must be voiced, and the level maps will open with a glide instead)
   // anything the storm passes over freezes: shells left out are lost
   if (stormOn()) for (const d of H.drops) if (!d.got && Math.hypot(d.x - St.x, d.y - St.y) > St.r + 10) { d.got = true; d.lost = true; shards(d.x, d.y - 10, '#DDF1FF', 5, 160); }
 }
