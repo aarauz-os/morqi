@@ -707,6 +707,17 @@ html.keys .keyscard kbd{display:inline-block;min-width:16px;margin-right:6px;pad
 #breathe .br-p.alive img{animation:brHop .55s var(--spring) 2}
 /* the daily breath: the animal is never grey, only asleep: a slow lean and a drifting z, and a warm glow that grows as you breathe */
 #breathe.daily .br-frost{display:none}
+/* the breath in the dark (A, 2026-10-10: "a dark lit scene where its just me and the person dimmed"): a pool of light on the floor, both of
+   them dimmed, the person grey; the breath lands and the light floods back into them */
+#breathe.dark .br-sky{background:radial-gradient(ellipse 75% 55% at 50% 60%,#2A2F52 0%,#0E1126 55%,#030409 100%)}
+#breathe.dark .br-hill,#breathe.dark .br-frost{display:none}
+#breathe.dark .br-stage::before{content:'';position:absolute;left:-12%;right:-12%;bottom:-14%;height:46%;border-radius:50%;background:radial-gradient(ellipse at 50% 55%,rgba(255,236,200,.22),rgba(255,236,200,0) 70%);transition:background 1.4s}
+#breathe.dark.lit .br-stage::before{background:radial-gradient(ellipse at 50% 55%,rgba(255,226,160,.55),rgba(255,226,160,0) 72%)}
+#breathe.dark .br-k img{filter:brightness(.6) saturate(.75);transition:filter 1.4s}
+#breathe.dark.lit .br-k img{filter:none}
+#breathe.dark .br-p img{filter:grayscale(1) brightness(.45)!important;transition:filter 1.4s ease-out}
+#breathe.dark .br-p.alive img{filter:none!important}
+#breathe.dark .br-p.alive .br-glow{opacity:1}
 #breathe.daily .br-p img{filter:none!important}
 #breathe .br-glow{position:absolute;left:10%;right:10%;bottom:4%;height:80%;border-radius:50%;background:radial-gradient(circle,rgba(255,232,170,.75),rgba(255,232,170,0) 65%);opacity:0;transition:opacity 1.4s}
 #breathe.daily .br-glow{opacity:var(--warm)}
@@ -8280,7 +8291,7 @@ const hearthNight = () => { const H = HS(); return H.C.nights[Math.min(H.night, 
 const hearthBossNext = () => { const H = HS(); return H.night >= H.C.nights.length; };
 function hearthPhase(ph) { const H = HS(); H.phase = ph; H.pt = 0;
   if (ph === 'dusk') { if (HMUSIC || HSCORE && H.lv === 1) SFX.conch(hearthBossNext()); else SFX.horn(); H.banner = 0; hearthBanner(true); if (!hearthBossNext()) AU.vo('vo-hearth-dusk', 1.4, .5); }
-  if (ph === 'night') { H.surged = false; H.waveI = 0; H.left = 0; clash('night'); }
+  if (ph === 'night') { H.surged = false; H.waveI = 0; H.left = 0; }
   if (ph === 'boss') H.introOff = false;
   if (ph === 'dawn') { SFX.dawn(); hearthClear(false); for (const p of H.plots) if (p.lvl >= 1) { if (p.down) smoke(p.x, p.y, 10, 40, '240,232,214'); hearthFix(p); } }
   if (ph === 'dusk') H.duskAt = S.t;
@@ -8658,7 +8669,7 @@ function hearthBossNight() {
   if (H.bossLeft != null) { b.hp = Math.max(1, Math.round(b.max * H.bossLeft)); b.guardDone = H.bossGD; }   // (and his guard stays broken, or it would eat the Surge while he walks in)
   // the frost closes into a ring round home: the boss night is fought round the stone
   S.arena = { x:st.x, y:st.y, r:1250 }; if (HMUSIC) AU.holdIntro(true);
-  clash('face');
+  cine('arrive', S.boss);   // the animatic: the ice cracks, he breaks free and comes for you (replaces the face-off cut-in)
 }
 /* ---------- the screen: goal line, stone bar, shells, dusk banner ---------- */
 function hearthGoal() {
@@ -8990,8 +9001,10 @@ function hearthBreathOrb() {
   g.fillText(B.st === 'ready' ? 'Hold to breathe in' : B.st === 'in' ? 'Breathe in…' : 'Breathe out…', cx, cy + r + 44);
   g.restore();
 }
+// (off: A, 2026-10-10, "the game has me still pointing at the monster"; he stays on the horizon as scenery, never a waypoint)
+const BOSS_BADGE = false;
 function hearthBossBadge() {
-  const H = HS(); if (S.bossSpawned || H.phase === 'boss' || H.phase === 'out') return; const b = bossSpot(), cam = S.cam || { x:camX, y:camY };
+  if (!BOSS_BADGE) return; const H = HS(); if (S.bossSpawned || H.phase === 'boss' || H.phase === 'out') return; const b = bossSpot(), cam = S.cam || { x:camX, y:camY };
   const sx = (b.x - cam.x) * Z, sy = (b.y - 150 - cam.y) * Z; if (sx > 20 && sx < W - 20 && sy > 150 && sy < H_px() - 40) return;
   const cx = W / 2, cy = H_px() / 2, dx = sx - cx, dy = sy - cy, k = Math.min((W / 2 - 46) / Math.abs(dx || 1e-3), (H_px() / 2 - 120) / Math.abs(dy || 1e-3)), x = cx + dx * k, y = Math.max(178, cy + dy * k);
   const im = IMG['bz-' + worldOf()], sh = Math.max(0, 1 - (S.t - (H.crackAt ?? -9)) / .6) * 6 * Math.sin(S.t * 50), r = 26, a = Math.atan2(dy, dx), pu = .5 + .5 * Math.sin(S.t * 2.5);
@@ -10337,6 +10350,7 @@ function draw() {
   if (lbOn() && !S.lb.burst) { const k = .7 * Math.min(1, S.lb.t / .2), sx = (P.x - camX) * Z, sy = (P.y - 40 - camY) * Z, v = g.createRadialGradient(sx, sy, 70 * Z, sx, sy, H * .5); v.addColorStop(0, 'rgba(8,10,28,0)'); v.addColorStop(1, `rgba(8,10,28,${k})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
   if (S.freeze > 0) { g.fillStyle = `rgba(160,220,255,${Math.min(.18, S.freeze * .08)})`; g.fillRect(0, 0, W, H); }
   if (S.clash) drawClash();
+  if (S.cine) drawCine();
   if (P.hp < P.max * .3 && !S.fall) { const v = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); v.addColorStop(0, 'rgba(200,40,30,0)'); v.addColorStop(1, `rgba(200,40,30,${.4 * (1 - P.hp / (P.max * .3)) * (.7 + .3 * Math.sin(S.t * 8))})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
 }
 
@@ -11881,6 +11895,63 @@ function drawClash() {
   }
   g.restore();
 }
+
+/* ---------- the animatic (A, 2026-10-10: "a couple of slides for the animatic effect where we see the titan/warden/boss break free and it
+   starts to come for us ... right after the battle is over we can fade to another cut scene where we see him transform from the monster
+   to himself THEN that goes in to a dark lit scene where its just me and the person dimmed and the player has to breathe life into him
+   with one breath ... then we flash transition straight into the victory scene"). Two scenes, letterboxed, the world held still under
+   them: 'arrive' (the ice cracks, bursts, he rears up and roars, then walks straight at you) and 'change' (fade to black; he cracks with
+   light, bursts, and the person kneels where he stood). Drawn from the boss's own frames until dedicated panels are painted. */
+function cine(k, B) { if (!S || S.cine) return 0; const realm = (B && B.realm) || worldOf(), L = { arrive:6, change:5.2 }[k] || 0; if (!L) return 0;
+  S.cine = { k, t:0, len:L, realm, img:(B && B.img) || 'bz-' + realm, cue:0, then:null }; return L; }
+function cineTick(dt) {
+  const C = S.cine; if (!C) return; C.t += dt; const at = (n, t, fn) => { if (C.cue === n && C.t >= t) { C.cue++; fn(); } }, mo = !reduce;
+  if (C.k === 'arrive') {
+    at(0, .3, () => SFX.crackle && SFX.crackle()); at(1, 1, () => { SFX.crackle && SFX.crackle(); if (mo) S.shake = .3; });
+    at(2, 1.7, () => { SFX.shatter && SFX.shatter(); SFX.boom && SFX.boom(true); if (mo) S.shake = .8; });
+    at(3, 2.15, () => { const BB = BOSSES[C.realm]; if (BB && BB.snd) SFX.bx(BB.snd.roar, 0); });
+    for (let i = 0; i < 4; i++) at(4 + i, 3.3 + i * .55, () => { SFX.stomp && SFX.stomp(); if (mo) S.shake = Math.max(S.shake, .25 + i * .1); });
+  } else { at(0, .9, () => SFX.heartbeat && SFX.heartbeat()); at(1, 1.55, () => SFX.heartbeat && SFX.heartbeat()); at(2, 2.5, () => { SFX.shatter && SFX.shatter(); SFX.heal && SFX.heal(); }); }
+  S.shake = Math.max(0, (S.shake || 0) - dt * 1.5);
+  if (C.t >= C.len) { S.cine = null; if (C.then) C.then(); }
+}
+// where the painted figure sits in its frame, as fractions [x0, y0, x1, y1], read once per picture
+function figBox(im) { if (im.__box) return im.__box; try { const c = document.createElement('canvas'), n = c.width = c.height = 64, x = c.getContext('2d', { willReadFrequently:true }); x.drawImage(im, 0, 0, n, n);
+    const d = x.getImageData(0, 0, n, n).data; let x0 = n, y0 = n, x1 = 0, y1 = 0; for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) if (d[(j * n + i) * 4 + 3] > 40) { x0 = Math.min(x0, i); x1 = Math.max(x1, i); y0 = Math.min(y0, j); y1 = Math.max(y1, j); }
+    im.__box = x1 > x0 ? [x0 / n, y0 / n, (x1 + 1) / n, (y1 + 1) / n] : [0, 0, 1, 1]; } catch (e) { im.__box = [0, 0, 1, 1]; } return im.__box; }
+function drawCine() {
+  const C = S.cine; if (!C) return; const t = C.t, I = n => IMG[n], ease = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+  const sh = (S.shake || 0) * 14 * Math.sin(t * 61), cx = W / 2 + sh, cy = H * .5;
+  const pic = (im, x, y, h, al = 1) => { if (!ok(im)) return; const b = figBox(im), s = h / (b[3] - b[1]) / im.height * im.height, sc = h / ((b[3] - b[1]) * im.height); g.globalAlpha = al;
+    g.drawImage(im, x - ((b[0] + b[2]) / 2) * im.width * sc, y - ((b[1] + b[3]) / 2) * im.height * sc, im.width * sc, im.height * sc); g.globalAlpha = 1; };
+  const inA = Math.min(1, t / .35), outA = C.k === 'arrive' ? Math.min(1, Math.max(0, (C.len - t) / .5)) : 1, A = Math.min(inA, outA);
+  g.save();
+  // the dark, and a cold glow behind him
+  g.globalAlpha = A; const bg = g.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * .7);
+  if (C.k === 'arrive') { bg.addColorStop(0, '#1C3358'); bg.addColorStop(1, '#03050C'); } else { bg.addColorStop(0, '#2A2238'); bg.addColorStop(1, '#020208'); }
+  g.fillStyle = bg; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
+  if (C.k === 'arrive') {
+    if (t < 1.7) { const im = I('boss-' + C.realm + '-ice' + (t < 1 ? 1 : 2)), k = t / 1.7; add(() => glowAt(cx, cy, H * .32, '#9FD8FF', (.25 + .2 * Math.sin(t * 5)) * A)); pic(im, cx, cy + H * .04, H * .55 * (1 + .08 * k), A); }
+    else if (t < 3.1) { const k = (t - 1.7) / 1.4, im = t < 1.9 ? I('boss-' + C.realm + '-ice3') : I(C.img + '-up') || I(C.img);
+      pic(im, cx, cy, H * (.58 + .14 * ease(k)), A);
+      for (let i = 0; i < 30; i++) { const a = i * 2.39996, d = (t - 1.7) * H * (.5 + (i % 5) * .18); g.fillStyle = '#DDF1FF'; g.globalAlpha = Math.max(0, 1 - (t - 1.7) / 1.1) * A; g.save(); g.translate(cx + Math.cos(a) * d, cy + Math.sin(a) * d * .8); g.rotate(a); g.fillRect(-4, -11, 8, 22); g.restore(); }
+      g.globalAlpha = 1; const fl = Math.max(0, .35 - (t - 1.7) * .7); if (fl > 0) { g.fillStyle = `rgba(230,244,255,${fl})`; g.fillRect(0, 0, W, H); } }
+    else { const k = Math.min(1, (t - 3.1) / 2.4), im = I(C.img + '-w' + (1 + (Math.floor(t * 5) % 4))) || I(C.img), h = H * (.45 + .62 * ease(k));
+      pic(im, cx, cy + h * .08 + Math.sin(t * 10) * 6, h, A);
+      const v = g.createRadialGradient(cx, cy, H * .2, cx, cy, H * .75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(0,0,0,${.55 * A})`); g.fillStyle = v; g.fillRect(0, 0, W, H); }
+  } else {
+    if (t < .6) { g.fillStyle = `rgba(2,2,8,${t / .6})`; g.fillRect(0, 0, W, H); }
+    else if (t < 2.5) { const k = (t - .6) / 1.9, j = Math.sin(t * 52) * k * 10, im = I(C.img + '-shatter-1') || I(C.img);
+      pic(im, cx + j, cy, H * (.6 + .05 * k), Math.min(1, (t - .6) / .4));
+      add(() => { for (let i = 0; i < 3 + Math.floor(k * 9); i++) { const an = i * 2.39996 + t * .5, L = H * (.25 + k * .35), w = .05; const gr = g.createLinearGradient(cx, cy, cx + Math.cos(an) * L, cy + Math.sin(an) * L);
+          gr.addColorStop(0, `rgba(255,248,220,${.7 * k})`); gr.addColorStop(1, 'rgba(255,214,110,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, L, an - w, an + w); g.closePath(); g.fill(); } }); }
+    else if (t < 3.4) { const im = I(C.img + '-shatter-2') || I(C.img); pic(im, cx, cy, H * .66); const fl = Math.max(0, .35 - (t - 2.5) * .5); if (fl > 0) { g.fillStyle = `rgba(255,246,226,${fl})`; g.fillRect(0, 0, W, H); } }
+    else { const k = Math.min(1, (t - 3.4) / 1.8), im = I(C.img + '-shatter-3') || I(C.img); add(() => glowAt(cx, cy + H * .1, H * .3, '#FFE6B0', .35 * (1 - k * .5))); pic(im, cx, cy + H * .06, H * .34 * (1 + .04 * k)); }
+  }
+  // the letterbox
+  g.fillStyle = '#000'; const bar = H * .11 * Math.min(1, t / .3); g.fillRect(0, 0, W, bar); g.fillRect(0, H - bar, W, bar);
+  g.restore();
+}
 // the season's home theme: it changes every season, so there is always something new to hear (A, 2026-10-05)
 const THEME = { id:'haven', n:'Haven' };
 
@@ -12608,9 +12679,9 @@ function hud() {
 }
 function loop(now, id) {
   if (!running || id !== loopId) return;
-  $('#hud').classList.toggle('cine', !!(S && (S.omni || S.omniSnap)));
+  $('#hud').classList.toggle('cine', !!(S && (S.omni || S.omniSnap || S.cine)));
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
-  if (S.clash) clashTick(dt); else if (S.hitstop > 0) S.hitstop -= dt; else update(dt);   // (a clash holds the world still)   // a split-second freeze makes big hits land
+  if (S.cine) cineTick(dt); else if (S.clash) clashTick(dt); else if (S.hitstop > 0) S.hitstop -= dt; else update(dt);   // (a scene or a clash holds the world still)   // (a clash holds the world still)   // a split-second freeze makes big hits land
   draw(); edgeGlow(); drawMap(dt); hud(); coachTick(dt);
   if (running && id === loopId) requestAnimationFrame(t => loop(t, id));
 }
@@ -12649,12 +12720,16 @@ const wiseShare = () => { const n = S.wiseN || 0; return n > 0 ? Math.min(1, (S.
    holds to breathe in (the Keeper kneels, palms rising) and lets go to breathe out (the Keeper pushes the breath out), and each
    full breath brings back a share of their colour. After the last one they thank you, and the Victory card follows. A breath in
    shorter than 2 s asks for a longer one; if nobody touches it for 8 s, the Keeper breathes on their own, so no child is stuck. */
+// a flash into the next scene: one warm-white rise and fall, never a strobe (A, 2026-10-10: "flash transition straight into the victory scene")
+function flashTo(fn) { const d = document.createElement('div'); d.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;background:#FFF8EC;opacity:0'; document.body.appendChild(d);
+  SFX.sweep && SFX.sweep(); d.animate([{ opacity:0 }, { opacity:.85 }], { duration:240, easing:'ease-in', fill:'forwards' }).onfinish = () => { fn(); d.animate([{ opacity:.85 }, { opacity:0 }], { duration:650, easing:'ease-out', fill:'forwards' }).onfinish = () => d.remove(); }; }
 function breatheLife(realm, daily) {
   const pet = ANIMAL[animal].y, f = daily ? { img:null, alt:pet } : freedOf(realm), used = daily ? 0 : RISES[LVL - 1] - S.rises, again = !daily && SEEN.has('_breathed-' + realm);
   // the full breath the first time each person is freed; one breath on a replay (design review, 2026-10-08: 18-30 s on every win)
-  const N = daily ? 5 : again ? 1 : Math.min(5, 3 + (S.p.hp < S.p.max * .5 ? 1 : 0) + (used > 0 ? 1 : 0));
+  // (a Hearth level: one breath, in the dark, the same breath the game opens with; A, 2026-10-10)
+  const hz = !daily && !!(S && S.hearth), N = daily ? 5 : hz || again ? 1 : Math.min(5, 3 + (S.p.hp < S.p.max * .5 ? 1 : 0) + (used > 0 ? 1 : 0));
   const scr = $('#breathe'), orb = $('#brOrb'), say = $('#brSay'), kim = $('#brKeeper'), pim = $('#brPerson'), who = daily ? pet : PEOPLE[realm].replace(/^The/, 'the');
-  scr.classList.toggle('daily', !!daily);
+  scr.classList.toggle('daily', !!daily); scr.classList.toggle('dark', hz); scr.classList.remove('lit');
   const SK = VIC_SKY[realm] || VIC_SKY.water, G = GROUND_ART[realm] || GROUND_ART.water;
   scr.style.setProperty('--sky1', SK[0]); scr.style.setProperty('--sky2', SK[1]); scr.style.setProperty('--acc', SK[2]);
   scr.style.setProperty('--ground-cold', `url(art4/${G[0]}.jpg?v=8)`); scr.style.setProperty('--ground-warm', `url(art4/${G[1]}.jpg?v=8)`);
@@ -12685,9 +12760,9 @@ function breatheLife(realm, daily) {
     if (daily) { const r = dailyDone(); pim.src = lookSrc(`art4/a-${animal}-y.png?v=8`); seat(pim); $('#brTitle').textContent = `${who} is wide awake!`; setOrb(1, .6, r.line); $('.br-p').classList.add('alive'); SFX.cleared();
       setTimeout(() => { show('home'); renderHome(); { const say = [r.grew && `Your breath grew ${r.grew}.`, r.bonus].filter(Boolean).join(' '); if (say) toast(say, 4200); } }, fast ? 50 : 3200); return; }
     markSeen('_breathed-' + realm);
-    $('#brTitle').textContent = `You brought ${who} back!`; setOrb(1, .6, ''); $('.br-p').classList.add('alive'); SFX.cleared();
+    $('#brTitle').textContent = `You brought ${who} back!`; setOrb(1, .6, ''); $('.br-p').classList.add('alive'); scr.classList.add('lit'); SFX.cleared();
     AU.vo('vo-breathe-done', .2, .4); setTimeout(() => AU.vo('vo-thanks-' + realm, 0, .4, false), 2200);
-    setTimeout(() => { if (S && S.over) results(); }, fast ? 50 : 3600); };
+    setTimeout(() => { if (S && S.over) { if (hz && !fast) flashTo(() => results()); else results(); } }, fast ? 50 : hz ? 2800 : 3600); };
   const exhale = () => { phase = 'out'; pose('exhale'); setOrb(1, 3, 'Breathe out…'); SFX.sweep(); if (done === 0 && !again) AU.vo('vo-breathe-out', 0, .4);
     stream(); setTimeout(() => { if (finished) return; done++; paint(); SFX.ting && SFX.ting(); }, fast ? 5 : 1800);
     setTimeout(() => { if (finished) return; pose(''); phase = 'rest'; if (done >= N) end(); else { setOrb(1, .4, 'Hold to breathe in'); armIdle(); } }, fast ? 10 : 3000); };
@@ -12750,7 +12825,13 @@ function win() {
   let last = performance.now();
   const at = (k, t, fn) => { if (T.cue === k && T.t >= t) { T.cue++; fn(); } };
   const step = now => {
-    const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now; if (S.clash) clashTick(dt); else T.t += dt;
+    const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
+    // a Hearth level: after the last blow, the change plays as its own scene, then the breath in the dark
+    if (S.hearth) { if (S.clash) { clashTick(dt); draw(); requestAnimationFrame(step); return; }
+      if (!T.cined) { T.cined = true; cine('change', B); if (S.cine) S.cine.then = () => { T.cineDone = true; }; else T.cineDone = true; }
+      if (S.cine) { cineTick(dt); draw(); requestAnimationFrame(step); return; }
+      if (T.cineDone && !T.done) { T.done = true; breatheLife(B.realm || worldOf()); } return; }
+    if (S.clash) clashTick(dt); else T.t += dt;
     const cx = T.x, cy = T.y - T.s * .45;
     at(0, .25, () => SFX.heartbeat());
     at(1, .95, () => SFX.heartbeat());
@@ -13121,7 +13202,7 @@ window.__morqi = { clash:k => { if (S) S.clashAt = -99; return clash(k); }, resc
       if (!$('#levelUp').hidden) { if (!auto) break; const o = (S.offered || options()).find(x => x.kind !== 'sparks'); if (o) { applyPick(o, true); megaRest(o); } else { payPouch(); S.mega = 1; S.megaNow = false; } show(null); afterPick(); }
       if (COACH.cur) { if (!auto) break; if (COACH.cur.card) show(null); hideCoach(); COACH.cur = null; }
       if (auto) COACH.q.length = 0;
-      if (!running) break; if (S.clash) { clashTick(1 / 30); continue; } update(1 / 30); }   // (a clash holds the world still, as in loop())
+      if (!running) break; if (S.cine) { cineTick(1 / 30); continue; } if (S.clash) { clashTick(1 / 30); continue; } update(1 / 30); }   // (a clash holds the world still, as in loop())
     if (!S.over) running = false; draw(); hud(); return { t:Math.round(S.t), lv:S.lv, hp:Math.round(S.p.hp), en:S.en.length, freed:S.thawed, fx:FX.length }; } };
 // test hook: a burst of every debris and particle kind around the Keeper (rising spikes too), stepped n frames. draw() shows them in a
 // real frame; fxOnly draws the particles alone, so a check can count the shapes they make
