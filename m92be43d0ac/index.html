@@ -8097,7 +8097,7 @@ function update(dt) {
   if (keys.a || keys.arrowleft) mx -= 1; if (keys.d || keys.arrowright) mx += 1;
   if (keys.w || keys.arrowup) my -= 1; if (keys.s || keys.arrowdown) my += 1;
   const m = Math.hypot(mx, my); if (m > 1) { mx /= m; my /= m; }
-  P.slowT = Math.max(0, (P.slowT || 0) - dt); P.safe = Math.max(0, (P.safe || 0) - dt); const spd = MOVE * (1 + .03 * (S.grow.metal || 0)) * (P.slowT > 0 ? .6 : 1);
+  P.slowT = Math.max(0, (P.slowT || 0) - dt); P.rootT = Math.max(0, (P.rootT || 0) - dt); P.safe = Math.max(0, (P.safe || 0) - dt); const spd = MOVE * (1 + .03 * (S.grow.metal || 0)) * (P.slowT > 0 ? .6 : 1) * (P.rootT > 0 ? 0 : 1);   // (rootT: the drowned hands hold you, no damage)
   // the Keeper's speed eases toward where the thumb points: quick to get going, a short glide to stop, so a turn curves
   // instead of snapping (A, 2026-10-05: "movement is very slow … make it more flowy"); a hard turn kicks up a skid of dust
   const vx0 = P.vx || 0, vy0 = P.vy || 0, ease = 1 - Math.exp(-(m > .1 ? 18 : 9) * dt);
@@ -8359,7 +8359,7 @@ function hearthTick(dt) {
     else if (N) { const near = S.en.some(e => !e.dead && e.hh && Math.hypot(e.x - st.x, e.y - st.y) < 700); want = H.waveI >= N.waves.length ? 2 : (near || H.pt > 9) ? 1 : 0; }
     if (HMUSIC) AU.hearthMusic({ want, hurry });
     if (HSCORE && H.lv === 1 && H.phase !== 'out' && H.phase !== 'boss') AU.cue(H.phase === 'dusk' || H.phase === 'night' ? 'night' : (S.people || []).some(q => q.id === 'isla' && q.state !== 'ice') ? 'day-b' : 'day-a', hurry); }
-  hearthGiftTick(dt); shoreTick(dt); hearthStorm(dt); hearthPeople(dt); hearthBuildings(dt); hearthDrops(dt); hearthBolts(dt); hearthHold(dt);
+  hearthGiftTick(dt); shoreTick(dt); lifeTick(dt); frostTick(dt); hearthStorm(dt); hearthPeople(dt); hearthBuildings(dt); hearthDrops(dt); hearthBolts(dt); hearthHold(dt);
   for (const t of H.throws) t.t += dt; H.throws = H.throws.filter(t => t.t < t.life);
   // the workshop whose element beats tonight's shimmers at dusk; from Level 2 only after 3 s, so the help fades as the lesson sticks
   { const N = hearthNight(), late = S.t - (H.duskAt ?? 1e9);
@@ -8710,9 +8710,14 @@ function hearthBanner(on) {
 const LM_ART = true;   // brief 42 landed (2026-10-10)
 const LM_PIC = { clam:'rocks' };
 const LM_W = { pier:420, boat:360, nets:380, drowned:400, rocks:340, clam:200 };
+// the Wake's beacon: its beam sweeps the shore for 3 s, then comes to rest on Isla
+function drowBeam(x, y) { const im = IMG['lf-beacon-beam'] || lifeImg('beacon-beam'), isla = (S.people || []).find(q => q.id === 'isla'); if (!ok(im)) return; const t = S.t - (HF.beamAt ?? S.t);
+  const rest = isla ? Math.atan2(isla.y - y, isla.x - x) : Math.PI / 2, a = t < 3 ? rest + Math.sin(t * 2.2) * 1.2 * (1 - t / 3) : rest, L = isla ? Math.min(1400, Math.hypot(isla.x - x, isla.y - y)) : 900;
+  add(() => { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .7; g.translate(x, y - 140); g.rotate(a); g.drawImage(im, 0, -60, L, 120); g.restore(); }); }
 function drawLandmarks(inView) {
   const H = HS(), M = H.C.map, st = H.stone; if (!M) return;
-  for (const L of M.lm) { const x = st.x + L.x, y = st.y + L.y; if (!inView(x, y, 300)) continue; const im = LM_ART && IMG['lm-' + (LM_PIC[L.id] || L.id)], w = LM_W[L.id] || 360;
+  for (const L of M.lm) { const x = st.x + L.x, y = st.y + L.y; if (!inView(x, y, 300)) continue; let im = LM_ART && IMG['lm-' + (LM_PIC[L.id] || L.id)]; const w = LM_W[L.id] || 360;
+    if (L.id === 'drowned' && H.lv === 1 && HZ.ready) { const st2 = H.wake ? IMG['lf-drowned-light-beacon'] || lifeImg('drowned-light-beacon') : H.day >= 1 ? IMG['lf-drowned-light-2'] || lifeImg('drowned-light-2') : null; if (ok(st2)) im = st2; if (H.wake) drowBeam(x, y); }
     if (ok(im)) { g.drawImage(im, x - w / 2, y - w * .7, w, w); continue; }
     g.save(); g.translate(x, y); g.strokeStyle = 'rgba(46,42,68,.7)'; g.lineWidth = 3;
     if (L.id === 'pier') { g.fillStyle = '#9A7650'; for (let i = 0; i < 3; i++) { g.fillRect(-90 + i * 62, -14, 56, 28); g.strokeRect(-90 + i * 62, -14, 56, 28); } g.fillStyle = '#6E5236'; g.fillRect(96, -46, 12, 56); }
@@ -8725,7 +8730,7 @@ function drawLandmarks(inView) {
 }
 function hearthGround(inView) {
   const H = HS(), st = H.stone, nk = S.night || 0;
-  drawLandmarks(inView);
+  drawLandmarks(inView); lifeFlat(); frostFlat();
   g.save();
   // home: a warm circle on the ground, brighter at night
   const hr = 300; g.globalAlpha = .1 + .14 * nk; g.fillStyle = '#FFD9A0'; g.beginPath(); g.ellipse(st.x, st.y + 10, hr, hr * .62, 0, 0, TAU); g.fill();
@@ -8761,8 +8766,8 @@ function shellAt(x, y, r) {
 }
 // the stone and the workshops stand among the creatures, drawn in depth order
 let HDQ = [], HDI = 0;
-function hearthDepth() { const H = HS(), b = bossSpot(); HDQ = [{ k:'stone', y:H.stone.y + 20, o:H.stone }, { k:'figure', y:b.y, o:null }, ...H.plots.map(p => ({ k:'plot', y:p.y + 30, o:p })), ...(HZ.ready ? HZ.posts.map(p => ({ k:'post', y:p.y, o:p })) : [])].sort((a, b) => a.y - b.y); HDI = 0; }
-function hearthTo(y) { while (HDI < HDQ.length && HDQ[HDI].y <= y) { const d = HDQ[HDI++]; d.k === 'stone' ? drawHearthStone(d.o) : d.k === 'figure' ? drawBossFigure() : d.k === 'post' ? drawPost(d.o) : drawWorkshop(d.o); } }
+function hearthDepth() { const H = HS(), b = bossSpot(); HDQ = [{ k:'stone', y:H.stone.y + 20, o:H.stone }, { k:'figure', y:b.y, o:null }, ...H.plots.map(p => ({ k:'plot', y:p.y + 30, o:p })), ...(HZ.ready ? HZ.posts.map(p => ({ k:'post', y:p.y, o:p })) : []), ...lifeDepth()].sort((a, b) => a.y - b.y); HDI = 0; }
+function hearthTo(y) { while (HDI < HDQ.length && HDQ[HDI].y <= y) { const d = HDQ[HDI++]; d.k === 'stone' ? drawHearthStone(d.o) : d.k === 'figure' ? drawBossFigure() : d.k === 'post' ? drawPost(d.o) : d.k === 'life' ? drawLife(d.o) : drawWorkshop(d.o); } }
 function drawHearthStone(st) {
   { const H = HS(), n = Math.min(8, (H.gifts || 0) + (H.giftPicks || 0)); for (let i = 0; i < n; i++) { const a = S.t * 1.4 + i * TAU / Math.max(n, 1), x = st.x + Math.cos(a) * 70, y = st.y - 120 + Math.sin(a) * 26 + Math.sin(S.t * 3 + i) * 6;
       add(() => glowAt(x, y, 46, '#FFE08A', .85)); g.fillStyle = '#FFF6D8'; g.beginPath(); g.arc(x, y, 5, 0, TAU); g.fill(); } }
@@ -9090,6 +9095,196 @@ function shoreLights() {
   g.save(); g.globalCompositeOperation = 'lighter';
   for (const p of HZ.posts) if (p.lit) { const sx = (p.x - cam.x) * Z, sy = (p.y - cam.y) * Z; if (sx < -300 || sx > W + 300 || sy < -300 || sy > H_px() + 300) continue; glowAt(sx, sy, SHORE.post * 2.4 * Z, '#FFD9A0', .22 * nk); }
   g.restore();
+}
+
+/* ================= the living Pearl Shore, phase 2: your side, alive (brief 45 P2; living-world spec §3) =================
+   Everything here belongs to whoever holds the ground under it. Frozen ground keeps it in the ice; thawed ground sets it free; the
+   giant's aura sends it into hiding. Crabs pop free and nip at night, gulls land only on thawed ground and lift as you run through,
+   roost on the lit posts at dusk and come back in a wave at the Wake; grass is glass until it thaws, then sways and parts for you;
+   fish under the sea ice drift toward you, hopeful, and dart free when it melts; a thawed rock pool heals you; Pip's thawed nets snag
+   creatures. Caps from the spec (crabs 12, gulls 10, fish 8) keep the iPad frame budget. */
+const LIFE = { on:true, crabs:12, gulls:10, fish:8, grass:34, kelp:5, drift:5, pools:3, nets:2, aura:380 };
+const HL = { ready:false, mk:null, mkT:0, all:[] };
+function lifeImg(n) { return IMG['lf-' + n] || load('lf-' + n, `art4/shore/${n}.png?v=1`); }
+// one read of the thaw mask a second, shared by every creature (a read per creature would stall an iPad)
+function lifeMask(dt) { if ((HL.mkT -= dt) > 0 && HL.mk) return; HL.mkT = 1; try { HL.mk = tg.getImageData(0, 0, thaw.width, thaw.height).data; } catch (e) { HL.mk = null; } }
+const thawed = (x, y) => { const m = HL.mk; if (!m) return false; const W0 = thaw.width, px = Math.round(x * MASK), py = Math.round(y * MASK); if (px < 0 || py < 0 || px >= W0 || py >= W0) return false; return m[(py * W0 + px) * 4 + 3] > 50; };
+// (the zone maps are read once and kept: a canvas read every frame would stall an iPad)
+const inZone = (z, x, y) => { const c = HZ.ZM[z]; if (!c) return false; HZ.ZD = HZ.ZD || {}; if (!HZ.ZD[z]) { try { HZ.ZD[z] = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; } catch (e) { return false; } }
+  const px = Math.round(x * MASK), py = Math.round(y * MASK); if (px < 0 || py < 0 || px >= c.width || py >= c.height) return false; return HZ.ZD[z][(py * c.width + px) * 4 + 3] > 120; };
+const drowned = (x, y) => { const B = S.boss; if (typeof corrupted === 'function' && corrupted(x, y)) return true; return !!(B && !B.dead && Math.hypot(B.x - x, B.y - y) < (S.hearth && S.hearth.hesAt != null && S.t - S.hearth.hesAt < 2.8 ? 200 : LIFE.aura)); };
+function lifeInit() {
+  const H = HS(), st = H.stone; let seed = 7; const R = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  ['crab-scuttle-1', 'crab-scuttle-2', 'crab-claw-up', 'crab-dug-in', 'crab-frozen', 'gull-stand', 'gull-flap-1', 'gull-flap-2', 'gull-glide', 'gull-shadow', 'fish-silhouette-1', 'fish-silhouette-2', 'fish-silhouette-3',
+    'grass-tuft-alive-1', 'grass-tuft-alive-2', 'grass-tuft-alive-3', 'grass-tuft-glass-1', 'grass-tuft-glass-2', 'grass-tuft-glass-3', 'net-line-alive', 'net-line-frozen', 'pool-alive', 'pool-frozen', 'kelp-1', 'kelp-2', 'driftwood-1', 'driftwood-2',
+    // the frost's side too, so the first crack or hand never pops in late
+    'crack-reach-1', 'crack-reach-2', 'crack-reach-3', 'hand-drowned-rise', 'hand-drowned-grasp', 'hand-drowned-shatter', 'fog-bank', 'fog-eyes-1', 'fog-eyes-2', 'footprint', 'undertow-streak', 'corruption-edge',
+    'rising-frond-1', 'rising-frond-2', 'rising-frond-3', 'drowned-light-2', 'drowned-light-beacon', 'beacon-beam'].forEach(lifeImg);
+  // places: points round home in a zone (or none), never on the stone's own ring or on another thing
+  const pick = (zone, n, rmin, rmax, gap) => { const out = []; for (let i = 0; i < n * 40 && out.length < n; i++) { const a = R() * TAU, r = rmin + R() * (rmax - rmin), x = st.x + Math.cos(a) * r, y = st.y + Math.sin(a) * r * .9;
+      if (zone === 'dune' ? SHORE.zones.some(z => inZone(z, x, y)) : !inZone(zone, x, y)) continue; if ([...HL.all, ...out].some(o => Math.hypot(o.x - x, o.y - y) < gap)) continue; if (H.plots.some(p => Math.hypot(p.x - x, p.y - y) < 160)) continue; out.push({ x, y }); } return out; };
+  const add = (k, list, extra) => list.forEach((p, i) => HL.all.push({ k, ...p, hx:p.x, hy:p.y, ph:R() * TAU, v:i % 3, t:R() * 3, ...(extra ? extra(p, i) : {}) }));
+  add('pool', pick('rock', LIFE.pools, 380, 1100, 220));
+  add('net', pick('yard', LIFE.nets, 380, 1100, 300));
+  add('crab', [...pick('rock', LIFE.crabs / 2, 340, 1150, 90), ...pick('tide', LIFE.crabs / 2, 300, 1400, 90)], () => ({ st:'ice', nipT:0 }));
+  add('fish', pick('tide', LIFE.fish, 300, 1400, 120), () => ({ st:'ice', a:R() * TAU }));
+  add('kelp', pick('tide', LIFE.kelp, 300, 1400, 160)); add('drift', [...pick('tide', 3, 300, 1400, 200), ...pick('yard', 2, 380, 1100, 200)]);
+  add('grass', [...pick('dune', LIFE.grass * .6 | 0, 360, 1300, 70), ...pick('board', LIFE.grass * .2 | 0, 340, 900, 70), ...pick('yard', LIFE.grass * .2 | 0, 360, 1100, 70)]);
+  // gulls start on home's boardwalk, the one ground that is yours from the start
+  add('gull', pick('board', 4, 200, 320, 70), () => ({ st:'stand', h:0, face:1 }));
+  HL.ready = true; H.life = HL;   // (reachable for the bots)
+}
+const nearCreature = (x, y, r) => { let b = null, bd = r; for (const e of S.en) { if (e.dead || e.boss || !e.hh) continue; const d = Math.hypot(e.x - x, e.y - y); if (d < bd) { bd = d; b = e; } } return b; };
+function gullFly(o, tx, ty) { o.st = 'fly'; o.t = 0; o.fx = o.x; o.fy = o.y; o.tx = tx; o.ty = ty; o.dur = Math.max(1.2, Math.hypot(tx - o.x, ty - o.y) / 260); o.face = tx < o.x ? -1 : 1; }
+function gullSpot(o, near, far) { for (let i = 0; i < 24; i++) { const a = rnd(0, TAU), r = rnd(near, far), x = o.x + Math.cos(a) * r, y = o.y + Math.sin(a) * r; if (thawed(x, y) && !drowned(x, y)) return [x, y]; } const st = HS().stone; return [st.x + rnd(-200, 200), st.y + rnd(-150, 150)]; }
+function lifeTick(dt) {
+  const H = HS(); if (!HZ.ready || !LIFE.on) return; if (!HL.ready) lifeInit(); lifeMask(dt);
+  const P = S.p, night = H.phase === 'night' || H.phase === 'boss', dusk = H.phase === 'dusk';
+  if (H.wake && !HL.waked) { HL.waked = true; for (let i = 0; i < 6; i++) { const st = H.stone, o = { k:'gull', x:st.x + rnd(-900, 900), y:st.y + 1300, hx:0, hy:0, ph:rnd(0, TAU), v:i % 3, t:0, h:140 }; HL.all.push(o); const [tx, ty] = gullSpot({ x:st.x, y:st.y }, 120, 700); gullFly(o, tx, ty); o.t = -i * .35; } }
+  for (const o of HL.all) {
+    o.t += dt;
+    if (o.k === 'crab') {
+      const free = thawed(o.hx, o.hy);
+      if (!free) { o.st = 'ice'; o.x = o.hx; o.y = o.hy; continue; }
+      if (o.st === 'ice') { o.st = 'claw'; o.t = 0; ring(o.x, o.y - 10, 6, 70, '#FFB27A', .5, 6, true); continue; }   // pops free, claw up
+      if (drowned(o.x, o.y)) { o.st = 'dug'; continue; }
+      if (o.st === 'claw' && o.t < .8) continue;
+      const dk = Math.hypot(P.x - o.x, P.y - o.y);
+      if (o.st !== 'run' && dk < 140) { const a = Math.atan2(o.y - P.y, o.x - P.x) + rnd(-.6, .6); o.st = 'run'; o.t = 0; o.vx = Math.cos(a) * 170; o.vy = Math.sin(a) * 120; }
+      else if (night && o.st !== 'run') { const e = nearCreature(o.x, o.y, 200); if (e) { const d = Math.hypot(e.x - o.x, e.y - o.y); if (d > 40) { o.x += (e.x - o.x) / d * 90 * dt; o.y += (e.y - o.y) / d * 70 * dt; o.st = 'walk'; }
+          else if ((o.nipT -= dt) <= 0) { o.nipT = 2; o.st = 'nip'; o.t = 0; hurt(e, 6, 'water', { kb:20, fx:o.x, fy:o.y }); } } else o.st = o.st === 'nip' && o.t < .4 ? 'nip' : 'idle'; }
+      if (o.st === 'run') { o.x += o.vx * dt; o.y += o.vy * dt; if (o.t > .55 || !thawed(o.x, o.y)) { o.st = 'idle'; o.hx = o.x; o.hy = o.y; if (!thawed(o.x, o.y)) { o.x -= o.vx * dt; o.y -= o.vy * dt; o.hx = o.x; o.hy = o.y; } } }
+      else if (o.st === 'idle' || o.st === 'dug') { o.st = 'idle'; o.x += (o.hx - o.x) * Math.min(1, dt * 2); o.y += (o.hy - o.y) * Math.min(1, dt * 2); }
+    } else if (o.k === 'gull') {
+      if (o.st === 'fly') { const k = Math.max(0, Math.min(1, o.t / o.dur)); if (o.t < 0) continue; const e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        o.x = o.fx + (o.tx - o.fx) * e; o.y = o.fy + (o.ty - o.fy) * e; o.h = Math.sin(k * Math.PI) * (90 + 40 * Math.sin(o.ph)) + (o.perch && k > .5 ? 0 : 0);
+        if (k >= 1) { o.st = 'stand'; o.h = o.perch ? 95 : 0; o.t = 0; } continue; }
+      // dusk: roost on the lit posts; by day and at dawn they come down to the ground again
+      if (dusk && !o.perch) { const p = HZ.posts.filter(p => p.lit && !HL.all.some(q => q !== o && q.perch === p)).sort((a, b) => Math.hypot(a.x - o.x, a.y - o.y) - Math.hypot(b.x - o.x, b.y - o.y))[0]; if (p) { o.perch = p; gullFly(o, p.x + 8, p.y + 1); continue; } }
+      if (!night && !dusk && o.perch) { o.perch = null; const [tx, ty] = gullSpot(o, 120, 420); gullFly(o, tx, ty); continue; }
+      if (o.perch) continue;
+      if (!thawed(o.x, o.y) || drowned(o.x, o.y)) { const [tx, ty] = gullSpot(o, 200, 700); gullFly(o, tx, ty); continue; }   // their ground froze, or he came near: they go silent and leave
+      if (Math.hypot(P.x - o.x, P.y - o.y) < 160 && (P.moving || P.vx || P.vy)) { const [tx, ty] = gullSpot(o, 300, 650); gullFly(o, tx, ty); }   // you run through: they lift and circle away
+    } else if (o.k === 'fish') {
+      const free = thawed(o.hx, o.hy), dk = Math.hypot(P.x - o.x, P.y - o.y);
+      if (drowned(o.x, o.y)) { o.a += dt * 6; o.x += Math.cos(o.a) * 140 * dt; o.y += Math.sin(o.a) * 90 * dt; }   // scatter
+      else if (!free && dk < 260) { o.x += (P.x - o.x) * dt * .5; o.y += (P.y - o.y) * dt * .5; o.a = Math.atan2(P.y - o.y, P.x - o.x); }   // under the ice they press toward you
+      else { o.a += Math.sin(o.t * .7 + o.ph) * dt * (free ? 2.4 : .8); const sp = free ? 110 : 26; o.x += Math.cos(o.a) * sp * dt; o.y += Math.sin(o.a) * sp * .6 * dt; }
+      if (Math.hypot(o.x - o.hx, o.y - o.hy) > 160) { o.a = Math.atan2(o.hy - o.y, o.hx - o.x); }
+      o.st = free ? 'free' : 'ice';
+    } else if (o.k === 'pool') { o.alive = thawed(o.x, o.y) && !drowned(o.x, o.y);
+      if (o.alive && Math.hypot(P.x - o.x, P.y - o.y) < 80 && P.hp < P.max) { P.hp = Math.min(P.max, P.hp + P.max * .06 * dt); if ((o.sp = (o.sp || 0) - dt) <= 0) { o.sp = .4; fx({ k:'spark', x:P.x + rnd(-20, 20), y:P.y - 30, vx:0, vy:-50, drag:2, life:.6, s:3, c:'#9CF0E0' }); } } }
+    else if (o.k === 'net') { o.alive = thawed(o.x, o.y); if (o.alive && night) for (const e of S.en) if (!e.dead && !e.boss && Math.abs(e.x - o.x) < 120 && Math.abs(e.y - o.y) < 40) e.slow = Math.max(e.slow || 0, .4); }   // a thawed net snags creatures
+    else if (o.k === 'grass') o.alive = thawed(o.x, o.y);
+  }
+}
+// what stands on the ground goes into the scene's depth order; the pools and fish lie flat under everything
+function lifeDepth() { return HL.ready ? HL.all.filter(o => o.k !== 'pool' && o.k !== 'fish' && !(o.k === 'gull' && o.st === 'fly')).map(o => ({ k:'life', y:o.y, o })) : []; }
+function lifeFlat() {
+  if (!HL.ready) return; const P = S.p;
+  for (const o of HL.all) {
+    if (o.k === 'pool') { const im = IMG['lf-pool-' + (o.alive ? 'alive' : 'frozen')]; if (ok(im)) g.drawImage(im, o.x - 80, o.y - 60, 160, 160 * im.height / im.width);
+      if (o.alive) { const sh = .5 + .5 * Math.sin(S.t * 2 + o.ph); add(() => glowAt(o.x, o.y - 10, 70, '#9CF0E0', .18 + .12 * sh)); } }
+    else if (o.k === 'fish') { const im = IMG['lf-fish-silhouette-' + (o.v + 1)]; if (!ok(im)) continue; g.save(); g.globalAlpha = o.st === 'ice' ? .32 : .55; g.translate(o.x, o.y); if (Math.cos(o.a) < 0) g.scale(-1, 1); g.drawImage(im, -26, -26, 52, 52); g.restore(); }
+  }
+}
+function drawLife(o) {
+  const P = S.p, img = n => IMG['lf-' + n];
+  if (o.k === 'crab') { const n = o.st === 'ice' ? 'crab-frozen' : o.st === 'claw' || o.st === 'nip' ? 'crab-claw-up' : o.st === 'dug' ? 'crab-dug-in' : o.st === 'run' || o.st === 'walk' ? 'crab-scuttle-' + (1 + (Math.floor(S.t * 12) & 1)) : 'crab-scuttle-' + (1 + (Math.floor(o.t * 1.5 + o.ph) & 1));
+    const im = img(n); if (!ok(im)) return; g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.ellipse(o.x, o.y + 2, 20, 6, 0, 0, TAU); g.fill(); g.drawImage(im, o.x - 30, o.y - 46, 60, 60); }
+  else if (o.k === 'gull') { const im = img('gull-stand'); if (!ok(im)) return; g.save(); g.translate(o.x, o.y - (o.h || 0)); if (o.face < 0) g.scale(-1, 1); g.drawImage(im, -32, -56, 64, 64); g.restore(); }
+  else if (o.k === 'grass') { const im = img('grass-tuft-' + (o.alive ? 'alive' : 'glass') + '-' + (o.v + 1)); if (!ok(im)) return;
+    const dk = Math.hypot(P.x - o.x, P.y - o.y), part = dk < 80 ? (1 - dk / 80) * .4 * Math.sign(o.x - P.x || 1) : 0, sway = o.alive && !drowned(o.x, o.y) ? Math.sin(S.t * 1.6 + o.ph) * .07 : 0;
+    g.save(); g.translate(o.x, o.y); g.rotate(sway + part); g.drawImage(im, -36, -66, 72, 72); g.restore(); }
+  else if (o.k === 'kelp') { const im = img('kelp-' + (1 + (o.v & 1))); if (!ok(im)) return; g.save(); g.translate(o.x, o.y); g.rotate(Math.sin(S.t * 1.1 + o.ph) * .06); g.drawImage(im, -45, -86, 90, 90); g.restore(); }
+  else if (o.k === 'drift') { const im = img('driftwood-' + (1 + (o.v & 1))); if (ok(im)) g.drawImage(im, o.x - 55, o.y - 70, 110, 110); }
+  else if (o.k === 'net') { const im = img('net-line-' + (o.alive ? 'alive' : 'frozen')); if (ok(im)) g.drawImage(im, o.x - 120, o.y - 110, 240, 120); }
+}
+// the flying gulls ride above the scene, their shadows on the ground under them
+function lifeSky() {
+  if (!HL.ready) return;
+  for (const o of HL.all) { if (o.k !== 'gull' || o.st !== 'fly' || o.t < 0) continue; const sh = IMG['lf-gull-shadow'], f = ['gull-flap-1', 'gull-flap-2', 'gull-glide', 'gull-glide'][Math.floor(S.t * 8 + o.ph) & 3], im = IMG['lf-' + f];
+    if (ok(sh)) { g.globalAlpha = .35; g.drawImage(sh, o.x - 30, o.y - 12, 60, 24); g.globalAlpha = 1; }
+    if (ok(im)) { g.save(); g.translate(o.x, o.y - o.h - 30); if (o.face < 0) g.scale(-1, 1); g.drawImage(im, -36, -36, 72, 72); g.restore(); } }
+}
+
+/* ================= the living Pearl Shore, phase 3: the frost answers back (brief 45 P3; living-world spec §2-4) =================
+   The frost's side, rising with the arc: day 1 brings cracks; night 1 adds hands and fog; the boss night adds the undertow; day 2 the
+   Drowned Light breaks the ice and its corruption spreads. Nothing here ever hurts: a crack that reaches you raises crystal hands that hold
+   you for 0.8 s (A: "unsettling is good"); the undertow drags; the giant's ground sinks your steps. Thawed land is the answer to all of it.
+   The Wake undoes it: the beacon lights, its beam comes to rest on Isla, the hands become sea-grass fronds that float up, and the posts
+   relight in a chain from the lamp outward. */
+const FROSTS = { on:true, still:1.5, crack:220, cd:4, root:.8, undertow:60, foot:.35, footLife:6, fog:500 };
+const HF = { cracks:[], hands:[], prints:[], streaks:[], fronds:[], eyes:[], stillT:0, cd:0, lx:0, ly:0, footT:0, waked:false };
+const dLight = () => { const H = HS(), st = H.stone, L = H.C.map && H.C.map.lm.find(l => l.id === 'drowned'); return L ? { x:st.x + L.x, y:st.y + L.y } : null; };
+// the corruption round the Drowned Light: it breaks the ice on day 2 and spreads from 300 to 600 by dusk; the boss night holds it at 600
+function corruptR() { const H = HS(); if (!H || H.wake || H.lv !== 1) return 0; if (H.phase === 'boss') return 600; if (H.day < 1) return 0;
+  if (H.phase === 'day') return 300 + 300 * Math.min(1, (H.dayT || 0) / H.C.days[Math.min(H.day, H.C.days.length - 1)]); return 600; }
+const corrupted = (x, y) => { const r = corruptR(), D = r && dLight(); return !!(D && Math.hypot(x - D.x, y - D.y) < r); };
+function frostTick(dt) {
+  const H = HS(); if (!FROSTS.on || !HZ.ready || !HL.ready || H.lv !== 1) return; const P = S.p, night = H.phase === 'night' || H.phase === 'boss'; H.frost = HF;   // (reachable for the bots)
+  // the Wake undoes it all
+  if (H.wake) { if (!HF.waked) { HF.waked = true; const st = H.stone;
+      for (const h of HF.hands) HF.fronds.push({ x:h.x, y:h.y, t:0 }); for (let i = 0; i < 14; i++) { const a = rnd(0, TAU), r = rnd(250, 1100); HF.fronds.push({ x:st.x + Math.cos(a) * r, y:st.y + Math.sin(a) * r * .8, t:-rnd(0, 1.6) }); }
+      HF.hands = []; HF.cracks = []; HF.streaks = []; HF.prints = [];
+      HZ.posts.slice().sort((a, b) => Math.hypot(a.x - st.x, a.y - st.y) - Math.hypot(b.x - st.x, b.y - st.y)).forEach((p, i) => { p.lit = false; p.relightAt = performance.now() + 900 + i * 150; });
+      HF.beamAt = S.t; }
+    for (const p of HZ.posts) if (p.relightAt && performance.now() >= p.relightAt) { p.relightAt = 0; p.lit = true; p.litAt = S.t; ring(p.x, p.y - 80, 10, 160, '#FFD98A', .5, 8, true); }
+    for (const f of HF.fronds) f.t += dt; HF.fronds = HF.fronds.filter(f => f.t < 3.2); return; }
+  const frozen = !thawed(P.x, P.y), out = H.phase === 'day' && Math.hypot(P.x - H.storm.x, P.y - H.storm.y) > H.storm.r, handsOn = night || H.night >= 1;
+  // cracks: stand still on frozen ground (at night, or out in the storm) and one races toward you, its tip glowing
+  const moved = Math.hypot(P.x - HF.lx, P.y - HF.ly); HF.lx = P.x; HF.ly = P.y; HF.stillT = moved < 2 && frozen && (night || out) ? HF.stillT + dt : 0; HF.cd -= dt;
+  if (HF.stillT >= FROSTS.still && HF.cd <= 0 && !HF.cracks.length && !HF.hands.length) { const a = rnd(0, TAU), d = 320; HF.cracks.push({ x0:P.x + Math.cos(a) * d, y0:P.y + Math.sin(a) * d * .8, tx:P.x, ty:P.y, len:0, t:0, dead:0 }); HF.cd = FROSTS.cd; SFX.crackle && SFX.crackle(); }
+  for (const c of HF.cracks) { c.t += dt; const L = Math.hypot(c.tx - c.x0, c.ty - c.y0);
+    if (c.dead) { c.dead += dt; continue; }
+    if (Math.hypot(P.x - c.tx, P.y - c.ty) > 90) { c.dead = .001; continue; }   // you moved: it fizzles
+    c.len = Math.min(L, c.len + FROSTS.crack * dt);
+    if (c.len >= L) { c.dead = .001; if (handsOn) { HF.hands.push({ x:P.x, y:P.y, t:0 }); SFX.freeze && SFX.freeze(); } else P.slowT = Math.max(P.slowT || 0, 1); } }
+  HF.cracks = HF.cracks.filter(c => !c.dead || c.dead < .5);
+  // the hands rise for 0.8 s, hold you for 0.8 s (no damage), then shatter
+  for (const h of HF.hands) { h.t += dt; if (h.t >= .8 && h.t < .8 + FROSTS.root) P.rootT = Math.max(P.rootT || 0, .05); if (h.t >= 1.6 && !h.sh) { h.sh = true; shards(h.x, h.y - 40, '#DDF1FF', 14, 260); } }
+  HF.hands = HF.hands.filter(h => h.t < 2.1);
+  // the undertow: on the boss night, frozen tide flats drag you toward the Drowned Light
+  const D = dLight();
+  if (D && H.day >= 1 && night) { const onFlat = frozen && inZone('tide', P.x, P.y); if (onFlat) { const d = Math.hypot(D.x - P.x, D.y - P.y) || 1; P.x += (D.x - P.x) / d * FROSTS.undertow * dt; P.y += (D.y - P.y) / d * FROSTS.undertow * dt; }
+    if (HF.streaks.length < 6 && Math.random() < dt * 3) { const a = rnd(0, TAU), r = rnd(150, 600), x = P.x + Math.cos(a) * r, y = P.y + Math.sin(a) * r; if (!thawed(x, y) && inZone('tide', x, y)) HF.streaks.push({ x, y, t:0, a:Math.atan2(D.y - y, D.x - x) }); } }
+  for (const s of HF.streaks) { s.t += dt; s.x += Math.cos(s.a) * 120 * dt; s.y += Math.sin(s.a) * 120 * dt; } HF.streaks = HF.streaks.filter(s => s.t < 1.6);
+  // his ground: near him (or in the corruption) your steps sink and stay, and slow you
+  if (drowned(P.x, P.y) || corrupted(P.x, P.y)) { if ((HF.footT -= dt) <= 0 && P.moving) { HF.footT = FROSTS.foot; HF.prints.push({ x:P.x + (HF.side = -(HF.side || 1)) * 8, y:P.y + 4, a:Math.atan2(P.my || 0, P.mx || 1) + Math.PI / 2, t:0 }); } P.slowT = Math.max(P.slowT || 0, .1); }
+  for (const f of HF.prints) f.t += dt; HF.prints = HF.prints.filter(f => f.t < FROSTS.footLife);
+  // eyes in the fog: at night a creature's eyes glow where it steps out
+  if (night) for (const e of S.en) if (e.hh && !e.dead && !e.boss && !e.eyed) { e.eyed = true; HF.eyes.push({ x:e.x, y:e.y - 30, t:0, v:Math.random() < .5 ? 1 : 2 }); }
+  for (const e of HF.eyes) e.t += dt; HF.eyes = HF.eyes.filter(e => e.t < 1.2);
+}
+// on the ground: the corruption's edge, the cracks, the undertow, the footprints
+function frostFlat() {
+  const H = HS(); if (!HZ.ready || H.lv !== 1) return; const img = n => IMG['lf-' + n] || lifeImg(n);
+  { const r = corruptR(), D = r && dLight(), im = img('corruption-edge'); if (D && ok(im)) { const n = 12; for (let i = 0; i < n; i++) { const a = i / n * TAU + .2; g.save(); g.translate(D.x + Math.cos(a) * r, D.y + Math.sin(a) * r * .8); g.rotate(a + Math.PI / 2); g.globalAlpha = .85; g.drawImage(im, -130, -130, 260, 260); g.restore(); } g.globalAlpha = 1; } }
+  for (const c of HF.cracks) { const im = img('crack-reach-' + (c.len < 110 ? 1 : c.len < 220 ? 2 : 3)), L = Math.hypot(c.tx - c.x0, c.ty - c.y0) || 1, a = Math.atan2(c.ty - c.y0, c.tx - c.x0), al = c.dead ? Math.max(0, 1 - c.dead / .5) : 1;
+    if (ok(im)) { g.save(); g.globalAlpha = al; g.translate(c.x0, c.y0); g.rotate(a); g.drawImage(im, 0, -45, Math.max(20, c.len), 90); g.restore(); }
+    const tx = c.x0 + Math.cos(a) * c.len, ty = c.y0 + Math.sin(a) * c.len; add(() => glowAt(tx, ty, 80, '#BFE8FF', .9 * al)); }
+  for (const s of HF.streaks) { const im = img('undertow-streak'); if (!ok(im)) break; g.save(); g.globalAlpha = Math.sin(Math.min(1, s.t / 1.6) * Math.PI) * .8; g.translate(s.x, s.y); g.rotate(s.a); g.drawImage(im, -120, -30, 240, 60); g.restore(); }
+  for (const f of HF.prints) { const im = img('footprint'); if (!ok(im)) break; g.save(); g.globalAlpha = Math.min(1, (FROSTS.footLife - f.t) / 1.5) * .8; g.translate(f.x, f.y); g.rotate(f.a); g.drawImage(im, -14, -14, 28, 28); g.restore(); }
+  g.globalAlpha = 1;
+}
+// standing up: the hands, the rising fronds, the eyes in the fog
+function frostUp() {
+  const H = HS(); if (!HZ.ready || H.lv !== 1) return; const img = n => IMG['lf-' + n] || lifeImg(n);
+  for (const h of HF.hands) { const n = h.t < .8 ? 'hand-drowned-rise' : h.t < 1.6 ? 'hand-drowned-grasp' : 'hand-drowned-shatter', im = img(n), k = Math.min(1, h.t / .8), al = h.t > 1.6 ? Math.max(0, 1 - (h.t - 1.6) / .5) : 1;
+    if (ok(im)) { const s = 190 * (.6 + .4 * k); add(() => glowAt(h.x, h.y - s * .35, s * .9, '#BFE8FF', .45 * al)); g.save(); g.globalAlpha = al; g.drawImage(im, h.x - s / 2, h.y - s * .8, s, s); g.restore(); } }
+  for (const f of HF.fronds) { if (f.t < 0) continue; const im = img('rising-frond-' + Math.min(3, 1 + Math.floor(f.t / .3))), up = Math.max(0, f.t - .9) * 60, al = f.t > 2.2 ? Math.max(0, 1 - (f.t - 2.2)) : 1;
+    if (ok(im)) { g.save(); g.globalAlpha = al; g.drawImage(im, f.x - 40, f.y - 120 - up, 80, 120); g.restore(); } }
+  for (const e of HF.eyes) { const im = img('fog-eyes-' + e.v); if (!ok(im)) continue; g.globalAlpha = Math.sin(Math.min(1, e.t / 1.2) * Math.PI); g.drawImage(im, e.x - 48, e.y - 48, 96, 96); }
+  g.globalAlpha = 1;
+}
+// the fog: it rolls off the sea at dusk, and at night the shore fades beyond 500 (screen space, over the night grade)
+function frostFog() {
+  const H = HS(); if (!HZ.ready || H.lv !== 1 || H.wake) return; const ph = H.phase, k = ph === 'dusk' ? Math.min(1, H.pt / 3) : ph === 'night' || ph === 'boss' ? 1 : 0; if (k <= 0) return;
+  const P = S.p, cam = S.cam || { x:camX, y:camY }, sx = (P.x - cam.x) * Z, sy = (P.y - 40 - cam.y) * Z, r0 = FROSTS.fog * Z, Hh = H_px();
+  const v = g.createRadialGradient(sx, sy, r0 * .7, sx, sy, r0 * 1.6); v.addColorStop(0, 'rgba(150,176,200,0)'); v.addColorStop(1, `rgba(150,176,200,${.34 * k})`); g.fillStyle = v; g.fillRect(0, 0, W, Hh);
+  const im = IMG['lf-fog-bank'] || lifeImg('fog-bank'); if (!ok(im)) return;
+  for (let i = 0; i < 3; i++) { const w = W * .9, x = ((S.t * (14 + i * 5) + i * W * .6) % (W + w)) - w, y = Hh * (.72 + i * .1); g.globalAlpha = .45 * k; g.drawImage(im, x, y - w * .25, w, w * .5); }
+  g.globalAlpha = 1;
 }
 
 /* ================= drawing ================= */
@@ -9813,7 +10008,7 @@ function draw() {
   };
   if (S.hearth) hearthDepth();
   for (const e of list) { towersTo(e.y + e.r * .5); if (S.hearth) hearthTo(e.y + e.r * .5); drawCreature(e); }
-  if (S.hearth) hearthTo(1e9);
+  if (S.hearth) { hearthTo(1e9); frostUp(); lifeSky(); }
   // every tower whose front, at the Keeper's x, is behind the Keeper's feet stands behind them
   for (let i = twi; i < TW.length; i++) if (!TW[i].drawnAt && !keeperBehind(TW[i])) { TW[i].drawnAt = S.t; drawTowerAt(TW[i], cx, cy); }
   // sacred trees (Rising Grove)
@@ -10034,7 +10229,7 @@ function draw() {
   // particles on top
   g.setTransform(DPR, 0, 0, DPR, 0, 0); drawWeather(); world(g);
   if (S.night > 0) { g.setTransform(DPR, 0, 0, DPR, 0, 0); drawNight(cx, cy); world(g); }
-  if (S.hearth) { g.setTransform(DPR, 0, 0, DPR, 0, 0); hearthSky(); shoreLights(); hearthBossBadge(); hearthBreathOrb(); world(g); }
+  if (S.hearth) { g.setTransform(DPR, 0, 0, DPR, 0, 0); hearthSky(); shoreLights(); frostFog(); hearthBossBadge(); hearthBreathOrb(); world(g); }
   drawFX(true);
   // a waiting Qi Stone: a glowing beacon at your side leans toward it, small at first and growing brighter and bigger the
   // longer it waits (A, 2026-10-05: a reminder that does not get in the way)
